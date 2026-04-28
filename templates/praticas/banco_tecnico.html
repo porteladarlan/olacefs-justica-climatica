@@ -1,31 +1,46 @@
 {% extends 'praticas/base.html' %}
 
-{% block title %}Banco T&eacute;cnico{% endblock %}
+{% block title %}Banco T&eacute;cnico | Plataforma Regional{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-3">Banco t&eacute;cnico</h1>
+<section class="mb-4">
+    <div class="section-kicker">Biblioteca de apoio</div>
+    <h1 class="section-title display-6 mb-2">Banco t&eacute;cnico</h1>
+    <p class="section-subtitle mb-0">
+        Recursos metodol&oacute;gicos, perguntas orientadoras e ferramentas para apoiar auditorias com enfoque de justi&ccedil;a clim&aacute;tica.
+    </p>
+</section>
 
 <div class="row g-3">
     {% for recurso in recursos %}
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h2 class="h5">{{ recurso.titulo }}</h2>
-                    <p>{{ recurso.descricao }}</p>
-                    <p class="small text-muted">
-                        Tipo: {{ recurso.tipo_recurso }}
-                        {% if recurso.setor %} &bull; Setor: {{ recurso.setor.nome }}{% endif %}
-                    </p>
-                    {% if recurso.url %}
-                        <a href="{{ recurso.url }}" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm">
-                            Acessar recurso
-                        </a>
+        <div class="col-lg-6">
+            <article class="resource-card h-100">
+                <div class="d-flex justify-content-between gap-2 mb-3">
+                    <span class="badge-soft">{{ recurso.tipo_recurso }}</span>
+                    {% if recurso.setor %}
+                        <span class="badge-soft badge-yellow">{{ recurso.setor.nome }}</span>
                     {% endif %}
                 </div>
-            </div>
+                <h2 class="h4 section-title">{{ recurso.titulo }}</h2>
+                <p class="section-subtitle">{{ recurso.descricao }}</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% for dimensao in recurso.dimensoes.all %}
+                        <span class="badge-soft">{{ dimensao.nome }}</span>
+                    {% endfor %}
+                </div>
+                {% if recurso.url %}
+                    <a href="{{ recurso.url }}" target="_blank" rel="noopener" class="btn btn-primary">
+                        Acessar recurso
+                    </a>
+                {% endif %}
+            </article>
         </div>
     {% empty %}
-        <p>Nenhum recurso cadastrado.</p>
+        <div class="col-12">
+            <div class="feature-card">
+                <p class="mb-0 text-muted">Nenhum recurso cadastrado.</p>
+            </div>
+        </div>
     {% endfor %}
 </div>
 {% endblock %}
