@@ -7,7 +7,50 @@
     <div class="section-kicker">Biblioteca de apoio</div>
     <h1 class="section-title display-6 mb-2">Banco t&eacute;cnico</h1>
     <p class="section-subtitle mb-0">
-        Recursos metodol&oacute;gicos, perguntas orientadoras e ferramentas para apoiar auditorias com enfoque de justi&ccedil;a clim&aacute;tica.
+        Reposit&oacute;rio de perguntas orientadoras, crit&eacute;rios, modelos e ferramentas para apoiar auditorias
+        com perspectiva de justi&ccedil;a clim&aacute;tica.
+    </p>
+</section>
+
+<section class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-label">Planejamento</div>
+            <p class="metric-value fs-5">Perguntas</p>
+            <p class="text-muted small mb-0">
+                Apoio para formular quest&otilde;es de auditoria e delimitar escopo.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-label">An&aacute;lise</div>
+            <p class="metric-value fs-5">Crit&eacute;rios</p>
+            <p class="text-muted small mb-0">
+                Refer&ecirc;ncias para avaliar equidade, vulnerabilidade e resposta institucional.
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="metric-label">Replica&ccedil;&atilde;o</div>
+            <p class="metric-value fs-5">Modelos</p>
+            <p class="text-muted small mb-0">
+                Insumos reutiliz&aacute;veis para novas auditorias e adapta&ccedil;&otilde;es nacionais.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="detail-section mb-4">
+    <div class="section-kicker">Uso pr&aacute;tico</div>
+    <h2 class="section-title h3 mb-2">Como utilizar o banco t&eacute;cnico</h2>
+    <p class="section-subtitle mb-0">
+        Os recursos abaixo funcionam como insumos metodol&oacute;gicos para equipes de auditoria. Eles podem apoiar
+        o planejamento, a defini&ccedil;&atilde;o de crit&eacute;rios, a coleta de evid&ecirc;ncias, a an&aacute;lise de impactos
+        diferenciados e a identifica&ccedil;&atilde;o de elementos replic&aacute;veis.
     </p>
 </section>
 
@@ -15,30 +58,55 @@
     {% for recurso in recursos %}
         <div class="col-lg-6">
             <article class="resource-card h-100">
-                <div class="d-flex justify-content-between gap-2 mb-3">
+                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
                     <span class="badge-soft">{{ recurso.tipo_recurso }}</span>
+
                     {% if recurso.setor %}
                         <span class="badge-soft badge-yellow">{{ recurso.setor.nome }}</span>
                     {% endif %}
                 </div>
-                <h2 class="h4 section-title">{{ recurso.titulo }}</h2>
-                <p class="section-subtitle">{{ recurso.descricao }}</p>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    {% for dimensao in recurso.dimensoes.all %}
-                        <span class="badge-soft">{{ dimensao.nome }}</span>
-                    {% endfor %}
+
+                <h2 class="h4 section-title mb-2">{{ recurso.titulo }}</h2>
+
+                <p class="section-subtitle">
+                    {{ recurso.descricao }}
+                </p>
+
+                <div class="border-top pt-3 mt-3">
+                    <div class="small text-muted mb-2">Dimens&otilde;es relacionadas</div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for dimensao in recurso.dimensoes.all %}
+                            <span class="badge-soft">{{ dimensao.nome }}</span>
+                        {% empty %}
+                            <span class="text-muted small">Nenhuma dimens&atilde;o vinculada</span>
+                        {% endfor %}
+                    </div>
                 </div>
-                {% if recurso.url %}
-                    <a href="{{ recurso.url }}" target="_blank" rel="noopener" class="btn btn-primary">
-                        Acessar recurso
-                    </a>
-                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <span class="text-muted small">
+                        Recurso metodol&oacute;gico
+                    </span>
+
+                    {% if recurso.url %}
+                        <a href="{{ recurso.url }}" target="_blank" rel="noopener" class="btn btn-primary">
+                            Acessar recurso
+                        </a>
+                    {% else %}
+                        <span class="text-muted small">Sem link externo</span>
+                    {% endif %}
+                </div>
             </article>
         </div>
     {% empty %}
         <div class="col-12">
             <div class="feature-card">
-                <p class="mb-0 text-muted">Nenhum recurso cadastrado.</p>
+                <div class="section-kicker">Sem registros</div>
+                <h2 class="h5 section-title">Nenhum recurso cadastrado</h2>
+                <p class="section-subtitle mb-0">
+                    Os recursos t&eacute;cnicos poder&atilde;o ser cadastrados pelo painel administrativo.
+                </p>
             </div>
         </div>
     {% endfor %}
