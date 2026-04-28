@@ -24,3 +24,11 @@ venv/
 # Scripts locais de desenvolvimento
 scripts/dev/
 scripts/setup/
+
+# Scripts locais de desenvolvimento
+scripts/dev/
+db.sqlite3
+media/
+venv/
+__pycache__/
+*.pyc
