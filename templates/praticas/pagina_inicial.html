@@ -1,0 +1,30 @@
+{% extends 'praticas/base.html' %}
+{% block title %}Início | Plataforma Regional{% endblock %}
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <h1 class="display-6">Plataforma Regional de Boas Práticas em Auditoria com Perspectiva de Justiça Climática</h1>
+    <p class="lead">Ambiente para reunir experiências de EFS da região, apoiar aprendizado e fortalecer auditorias climáticas.</p>
+    <a href="{% url 'catalogo_experiencias' %}" class="btn btn-success">Ver catálogo</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card"><div class="card-body"><h2 class="h5">Experiências</h2><p class="display-6">{{ total_experiencias }}</p></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h2 class="h5">EFS</h2><p class="display-6">{{ total_efs }}</p></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><h2 class="h5">Países</h2><p class="display-6">{{ total_paises }}</p></div></div></div>
+</div>
+<h2 class="h4 mb-3">Últimas experiências publicadas</h2>
+<div class="row g-3">
+    {% for experiencia in ultimas_experiencias %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">{{ experiencia.titulo }}</h3>
+                    <p class="small text-muted">{{ experiencia.efs }} • {{ experiencia.ano_execucao }}</p>
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-outline-success btn-sm">Detalhes</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>Nenhuma experiência publicada ainda.</p>
+    {% endfor %}
+</div>
+{% endblock %}

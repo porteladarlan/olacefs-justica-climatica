@@ -1,0 +1,21 @@
+{% extends 'praticas/base.html' %}
+{% block title %}Banco Técnico{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Banco técnico</h1>
+<div class="row g-3">
+    {% for recurso in recursos %}
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">{{ recurso.titulo }}</h2>
+                <p>{{ recurso.descricao }}</p>
+                <p class="small text-muted">Tipo: {{ recurso.tipo_recurso }}{% if recurso.setor %} • Setor: {{ recurso.setor.nome }}{% endif %}</p>
+                <a href="{{ recurso.url }}" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm">Acessar recurso</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Nenhum recurso cadastrado.</p>
+    {% endfor %}
+</div>
+{% endblock %}

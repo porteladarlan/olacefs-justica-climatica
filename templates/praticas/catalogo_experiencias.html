@@ -1,0 +1,31 @@
+{% extends 'praticas/base.html' %}
+{% block title %}Catálogo | Plataforma Regional{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Catálogo de experiências</h1>
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-3"><input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Palavra-chave"></div>
+    <div class="col-md-2"><select name="pais" class="form-select"><option value="">País</option>{% for item in paises %}<option value="{{ item.id }}" {% if request.GET.pais == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="efs" class="form-select"><option value="">EFS</option>{% for item in efs_lista %}<option value="{{ item.id }}" {% if request.GET.efs == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="tipo" class="form-select"><option value="">Tipo</option>{% for item in tipos %}<option value="{{ item.id }}" {% if request.GET.tipo == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="setor" class="form-select"><option value="">Setor</option>{% for item in setores %}<option value="{{ item.id }}" {% if request.GET.setor == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="dimensao" class="form-select"><option value="">Dimensão</option>{% for item in dimensoes %}<option value="{{ item.id }}" {% if request.GET.dimensao == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="grupo" class="form-select"><option value="">Grupo vulnerável</option>{% for item in grupos %}<option value="{{ item.id }}" {% if request.GET.grupo == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="ano" class="form-select"><option value="">Ano</option>{% for item in anos %}<option value="{{ item }}" {% if request.GET.ano == item|stringformat:'s' %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit">Filtrar</button></div>
+    <div class="col-md-2 d-grid"><a class="btn btn-outline-secondary" href="{% url 'catalogo_experiencias' %}">Limpar</a></div>
+</form>
+<div class="list-group">
+    {% for experiencia in experiencias %}
+    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+            <h2 class="h6 mb-1">{{ experiencia.titulo }}</h2>
+            <small>{{ experiencia.ano_execucao }}</small>
+        </div>
+        <p class="mb-1">{{ experiencia.descricao|truncatechars:190 }}</p>
+        <small class="text-muted">{{ experiencia.pais.nome }} • {{ experiencia.efs.nome }} • {{ experiencia.setor.nome }}</small>
+    </a>
+    {% empty %}
+    <p>Nenhuma experiência encontrada para os filtros selecionados.</p>
+    {% endfor %}
+</div>
+{% endblock %}

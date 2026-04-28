@@ -1,0 +1,29 @@
+{% extends 'praticas/base.html' %}
+{% block title %}{{ experiencia.titulo }}{% endblock %}
+{% block content %}
+<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0">← Voltar ao catálogo</a>
+<h1 class="h3">{{ experiencia.titulo }}</h1>
+<p class="text-muted">{{ experiencia.pais.nome }} • {{ experiencia.efs.nome }} • {{ experiencia.ano_execucao }} • {{ experiencia.tipo_experiencia.nome }}</p>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-6"><div class="card"><div class="card-body"><h2 class="h6">Problema climático</h2><p>{{ experiencia.problema_climatico }}</p></div></div></div>
+  <div class="col-md-6"><div class="card"><div class="card-body"><h2 class="h6">Objetivo</h2><p>{{ experiencia.objetivo }}</p></div></div></div>
+</div>
+
+<div class="card mb-3"><div class="card-body"><h2 class="h6">Descrição</h2><p>{{ experiencia.descricao }}</p></div></div>
+<div class="card mb-3"><div class="card-body"><h2 class="h6">Enfoque de justiça climática</h2><p>{{ experiencia.enfoque_justica_climatica }}</p></div></div>
+<div class="card mb-3"><div class="card-body"><h2 class="h6">Resultados e impactos</h2><p>{{ experiencia.resultados }}</p><p>{{ experiencia.mudancas_ou_impactos }}</p></div></div>
+<div class="card mb-3"><div class="card-body"><h2 class="h6">Replicabilidade</h2><p>{{ experiencia.replicabilidade }}</p><p>{{ experiencia.necessidades_para_replicacao }}</p></div></div>
+
+<p><strong>Dimensões:</strong> {% for d in experiencia.dimensoes_consideradas.all %}{{ d.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+<p><strong>Grupos vulneráveis:</strong> {% for g in experiencia.grupos_vulneraveis.all %}{{ g.nome }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+
+{% if experiencia.anexos.all %}
+<h2 class="h5 mt-4">Anexos</h2>
+<ul>
+    {% for anexo in experiencia.anexos.all %}
+    <li>{{ anexo.titulo }} {% if anexo.url_externa %}- <a href="{{ anexo.url_externa }}" target="_blank" rel="noopener">Link</a>{% endif %}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
