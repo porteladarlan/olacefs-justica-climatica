@@ -1,0 +1,63 @@
+{% extends 'praticas/base.html' %}
+
+{% block title %}In&iacute;cio | Plataforma Regional{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <h1 class="display-6">Plataforma Regional de Boas Pr&aacute;ticas em Auditoria com Perspectiva de Justi&ccedil;a Clim&aacute;tica</h1>
+    <p class="lead">
+        Ambiente para reunir, organizar e consultar experi&ecirc;ncias de EFS relacionadas &agrave; justi&ccedil;a clim&aacute;tica.
+    </p>
+    <a href="{% url 'catalogo_experiencias' %}" class="btn btn-success">Ver cat&aacute;logo</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Experi&ecirc;ncias publicadas</h2>
+                <p class="display-6">{{ total_experiencias }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">EFS cadastradas</h2>
+                <p class="display-6">{{ total_efs }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Pa&iacute;ses</h2>
+                <p class="display-6">{{ total_paises }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="h4 mb-3">&Uacute;ltimas experi&ecirc;ncias publicadas</h2>
+
+<div class="row g-3">
+    {% for experiencia in ultimas_experiencias %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">{{ experiencia.titulo }}</h3>
+                    <p class="small text-muted">
+                        {{ experiencia.pais.nome }} &bull; {{ experiencia.efs.nome }} &bull; {{ experiencia.ano_execucao }}
+                    </p>
+                    <p>{{ experiencia.descricao|truncatechars:120 }}</p>
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-outline-success btn-sm">
+                        Ver detalhes
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>Nenhuma experi&ecirc;ncia publicada ainda.</p>
+    {% endfor %}
+</div>
+{% endblock %}

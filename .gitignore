@@ -11,3 +11,16 @@ staticfiles/
 .vscode/
 .idea/
 .DS_Store
+
+# Scripts locais de desenvolvimento
+scripts/dev/
+scripts/setup/
+db.sqlite3
+media/
+__pycache__/
+*.pyc
+venv/
+
+# Scripts locais de desenvolvimento
+scripts/dev/
+scripts/setup/
