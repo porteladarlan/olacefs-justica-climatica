@@ -3,95 +3,98 @@
 {% block title %}{{ experiencia.titulo }}{% endblock %}
 
 {% block content %}
-<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0">&larr; Voltar ao cat&aacute;logo</a>
+<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0 text-decoration-none">&larr; Voltar ao cat&aacute;logo</a>
 
-<h1 class="h3">{{ experiencia.titulo }}</h1>
-<p class="text-muted">
-    {{ experiencia.pais.nome }} &bull; {{ experiencia.efs.nome }} &bull; {{ experiencia.ano_execucao }} &bull; {{ experiencia.tipo_experiencia.nome }}
-</p>
+<section class="page-hero mb-4">
+    <span class="hero-eyebrow">{{ experiencia.pais.nome }} &bull; {{ experiencia.ano_execucao }}</span>
+    <h1 class="hero-title">{{ experiencia.titulo }}</h1>
+    <p class="hero-subtitle">
+        {{ experiencia.efs.nome }} &bull; {{ experiencia.tipo_experiencia.nome }} &bull; {{ experiencia.setor.nome }}
+    </p>
+</section>
 
 <div class="row g-3 mb-3">
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-body">
-                <h2 class="h6">Problema clim&aacute;tico</h2>
-                <p>{{ experiencia.problema_climatico }}</p>
+    <div class="col-lg-6">
+        <section class="detail-section h-100">
+            <span class="badge-soft mb-2">Problema clim&aacute;tico</span>
+            <p class="mb-0">{{ experiencia.problema_climatico }}</p>
+        </section>
+    </div>
+
+    <div class="col-lg-6">
+        <section class="detail-section h-100">
+            <span class="badge-soft mb-2">Objetivo</span>
+            <p class="mb-0">{{ experiencia.objetivo }}</p>
+        </section>
+    </div>
+</div>
+
+<section class="detail-section mb-3">
+    <h2 class="h5 section-title">Descri&ccedil;&atilde;o da experi&ecirc;ncia</h2>
+    <p class="mb-0">{{ experiencia.descricao }}</p>
+</section>
+
+<section class="detail-section mb-3">
+    <h2 class="h5 section-title">Enfoque de justi&ccedil;a clim&aacute;tica</h2>
+    <p class="mb-0">{{ experiencia.enfoque_justica_climatica }}</p>
+</section>
+
+<section class="detail-section mb-3">
+    <h2 class="h5 section-title">Resultados e impactos</h2>
+    <p>{{ experiencia.resultados }}</p>
+    <p class="mb-0">{{ experiencia.mudancas_ou_impactos }}</p>
+</section>
+
+<section class="detail-section mb-3">
+    <h2 class="h5 section-title">Replicabilidade</h2>
+    <p>{{ experiencia.replicabilidade }}</p>
+    <p class="mb-0">{{ experiencia.necessidades_para_replicacao }}</p>
+</section>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <section class="detail-section h-100">
+            <h2 class="h6 section-title">Dimens&otilde;es consideradas</h2>
+            <div class="d-flex flex-wrap gap-2">
+                {% for dimensao in experiencia.dimensoes_consideradas.all %}
+                    <span class="badge-soft">{{ dimensao.nome }}</span>
+                {% empty %}
+                    <span class="text-muted">N&atilde;o informado</span>
+                {% endfor %}
             </div>
-        </div>
+        </section>
     </div>
 
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-body">
-                <h2 class="h6">Objetivo</h2>
-                <p>{{ experiencia.objetivo }}</p>
+    <div class="col-lg-6">
+        <section class="detail-section h-100">
+            <h2 class="h6 section-title">Grupos vulner&aacute;veis</h2>
+            <div class="d-flex flex-wrap gap-2">
+                {% for grupo in experiencia.grupos_vulneraveis.all %}
+                    <span class="badge-soft">{{ grupo.nome }}</span>
+                {% empty %}
+                    <span class="text-muted">N&atilde;o informado</span>
+                {% endfor %}
             </div>
-        </div>
+        </section>
     </div>
 </div>
-
-<div class="card mb-3">
-    <div class="card-body">
-        <h2 class="h6">Descri&ccedil;&atilde;o</h2>
-        <p>{{ experiencia.descricao }}</p>
-    </div>
-</div>
-
-<div class="card mb-3">
-    <div class="card-body">
-        <h2 class="h6">Enfoque de justi&ccedil;a clim&aacute;tica</h2>
-        <p>{{ experiencia.enfoque_justica_climatica }}</p>
-    </div>
-</div>
-
-<div class="card mb-3">
-    <div class="card-body">
-        <h2 class="h6">Resultados e impactos</h2>
-        <p>{{ experiencia.resultados }}</p>
-        <p>{{ experiencia.mudancas_ou_impactos }}</p>
-    </div>
-</div>
-
-<div class="card mb-3">
-    <div class="card-body">
-        <h2 class="h6">Replicabilidade</h2>
-        <p>{{ experiencia.replicabilidade }}</p>
-        <p>{{ experiencia.necessidades_para_replicacao }}</p>
-    </div>
-</div>
-
-<p>
-    <strong>Dimens&otilde;es:</strong>
-    {% for dimensao in experiencia.dimensoes_consideradas.all %}
-        {{ dimensao.nome }}{% if not forloop.last %}, {% endif %}
-    {% empty %}
-        N&atilde;o informado
-    {% endfor %}
-</p>
-
-<p>
-    <strong>Grupos vulner&aacute;veis:</strong>
-    {% for grupo in experiencia.grupos_vulneraveis.all %}
-        {{ grupo.nome }}{% if not forloop.last %}, {% endif %}
-    {% empty %}
-        N&atilde;o informado
-    {% endfor %}
-</p>
 
 {% if experiencia.anexos.all %}
-    <h2 class="h5 mt-4">Anexos</h2>
-    <ul>
-        {% for anexo in experiencia.anexos.all %}
-            <li>
-                {{ anexo.titulo }}
-                {% if anexo.url_externa %}
-                    - <a href="{{ anexo.url_externa }}" target="_blank" rel="noopener">Link externo</a>
-                {% endif %}
-                {% if anexo.arquivo %}
-                    - <a href="{{ anexo.arquivo.url }}">Arquivo</a>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+    <section class="detail-section">
+        <h2 class="h5 section-title">Anexos</h2>
+        <ul class="mb-0">
+            {% for anexo in experiencia.anexos.all %}
+                <li>
+                    {{ anexo.titulo }}
+                    {% if anexo.url_externa %}
+                        - <a href="{{ anexo.url_externa }}" target="_blank" rel="noopener">Link externo</a>
+                    {% endif %}
+                    {% if anexo.arquivo %}
+                        - <a href="{{ anexo.arquivo.url }}">Arquivo</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
 {% endif %}
 {% endblock %}

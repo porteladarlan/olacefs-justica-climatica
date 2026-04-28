@@ -3,61 +3,78 @@
 {% block title %}In&iacute;cio | Plataforma Regional{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-light rounded-3">
-    <h1 class="display-6">Plataforma Regional de Boas Pr&aacute;ticas em Auditoria com Perspectiva de Justi&ccedil;a Clim&aacute;tica</h1>
-    <p class="lead">
-        Ambiente para reunir, organizar e consultar experi&ecirc;ncias de EFS relacionadas &agrave; justi&ccedil;a clim&aacute;tica.
+<section class="page-hero mb-4">
+    <span class="hero-eyebrow">MVP Regional</span>
+    <h1 class="hero-title">Boas pr&aacute;ticas para auditorias com perspectiva de justi&ccedil;a clim&aacute;tica.</h1>
+    <p class="hero-subtitle">
+        Ambiente para reunir experi&ecirc;ncias, organizar refer&ecirc;ncias e apoiar EFS na incorpora&ccedil;&atilde;o
+        da agenda clim&aacute;tica em auditorias, estudos e metodologias.
     </p>
-    <a href="{% url 'catalogo_experiencias' %}" class="btn btn-success">Ver cat&aacute;logo</a>
-</div>
+    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-brand">Explorar cat&aacute;logo</a>
+        <a href="{% url 'banco_tecnico' %}" class="btn btn-brand-outline">Ver banco t&eacute;cnico</a>
+    </div>
+</section>
 
-<div class="row g-3 mb-4">
+<section class="row g-3 mb-4">
     <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h2 class="h5">Experi&ecirc;ncias publicadas</h2>
-                <p class="display-6">{{ total_experiencias }}</p>
-            </div>
+        <div class="metric-card">
+            <div class="metric-label">Experi&ecirc;ncias publicadas</div>
+            <p class="metric-value">{{ total_experiencias }}</p>
+            <p class="text-muted mb-0 small">Registros dispon&iacute;veis para consulta no MVP.</p>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h2 class="h5">EFS cadastradas</h2>
-                <p class="display-6">{{ total_efs }}</p>
-            </div>
+        <div class="metric-card">
+            <div class="metric-label">EFS cadastradas</div>
+            <p class="metric-value">{{ total_efs }}</p>
+            <p class="text-muted mb-0 small">Institui&ccedil;&otilde;es representadas nos dados de demonstra&ccedil;&atilde;o.</p>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h2 class="h5">Pa&iacute;ses</h2>
-                <p class="display-6">{{ total_paises }}</p>
-            </div>
+        <div class="metric-card">
+            <div class="metric-label">Pa&iacute;ses</div>
+            <p class="metric-value">{{ total_paises }}</p>
+            <p class="text-muted mb-0 small">Cobertura regional simulada para valida&ccedil;&atilde;o funcional.</p>
         </div>
     </div>
-</div>
+</section>
 
-<h2 class="h4 mb-3">&Uacute;ltimas experi&ecirc;ncias publicadas</h2>
+<section>
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-end mb-3">
+        <div>
+            <div class="section-kicker">Em destaque</div>
+            <h2 class="section-title h3 mb-1">&Uacute;ltimas experi&ecirc;ncias publicadas</h2>
+            <p class="section-subtitle mb-0">Exemplos de boas pr&aacute;ticas organizadas para consulta r&aacute;pida.</p>
+        </div>
+        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-primary">Ver todas</a>
+    </div>
 
-<div class="row g-3">
-    {% for experiencia in ultimas_experiencias %}
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h3 class="h6">{{ experiencia.titulo }}</h3>
-                    <p class="small text-muted">
-                        {{ experiencia.pais.nome }} &bull; {{ experiencia.efs.nome }} &bull; {{ experiencia.ano_execucao }}
-                    </p>
-                    <p>{{ experiencia.descricao|truncatechars:120 }}</p>
-                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-outline-success btn-sm">
+    <div class="row g-3">
+        {% for experiencia in ultimas_experiencias %}
+            <div class="col-md-4">
+                <article class="catalog-card h-100">
+                    <div class="d-flex justify-content-between gap-2 mb-3">
+                        <span class="badge-soft">{{ experiencia.setor.nome }}</span>
+                        <span class="badge-soft badge-yellow">{{ experiencia.ano_execucao }}</span>
+                    </div>
+                    <h3 class="h5 section-title">{{ experiencia.titulo }}</h3>
+                    <p class="section-subtitle small">{{ experiencia.descricao|truncatechars:150 }}</p>
+                    <div class="text-muted small mb-3">
+                        {{ experiencia.pais.nome }} &bull; {{ experiencia.efs.nome }}
+                    </div>
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary btn-sm">
                         Ver detalhes
                     </a>
+                </article>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="feature-card">
+                    <p class="mb-0 text-muted">Nenhuma experi&ecirc;ncia publicada ainda.</p>
                 </div>
             </div>
-        </div>
-    {% empty %}
-        <p>Nenhuma experi&ecirc;ncia publicada ainda.</p>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}
