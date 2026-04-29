@@ -1,9 +1,17 @@
+import json
+
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ConsultaStatusForm, ExperienciaSubmissaoForm, RevisaoExperienciaForm
+from .forms import (
+    ConsultaStatusForm,
+    ExperienciaSubmissaoForm,
+    PropostaEdicaoPublicadaForm,
+    RevisaoExperienciaForm,
+    RevisaoPropostaEdicaoForm,
+)
 from .models import (
     Anexo,
     BancoTecnico,
@@ -13,6 +21,7 @@ from .models import (
     GrupoVulneravel,
     NormaInternacional,
     Pais,
+    PropostaEdicaoExperiencia,
     Setor,
     TemaTransversal,
     TipoExperiencia,
@@ -98,24 +107,6 @@ def catalogo_experiencias(request):
             | Q(descricao__icontains=termo)
             | Q(descricao_es__icontains=termo)
             | Q(descricao_en__icontains=termo)
-            | Q(problema_climatico__icontains=termo)
-            | Q(problema_climatico_es__icontains=termo)
-            | Q(problema_climatico_en__icontains=termo)
-            | Q(objetivo__icontains=termo)
-            | Q(objetivo_es__icontains=termo)
-            | Q(objetivo_en__icontains=termo)
-            | Q(resultados__icontains=termo)
-            | Q(resultados_es__icontains=termo)
-            | Q(resultados_en__icontains=termo)
-            | Q(recomendacoes__icontains=termo)
-            | Q(recomendacoes_es__icontains=termo)
-            | Q(recomendacoes_en__icontains=termo)
-            | Q(motivo_boa_pratica__icontains=termo)
-            | Q(motivo_boa_pratica_es__icontains=termo)
-            | Q(motivo_boa_pratica_en__icontains=termo)
-            | Q(elementos_replicaveis__icontains=termo)
-            | Q(elementos_replicaveis_es__icontains=termo)
-            | Q(elementos_replicaveis_en__icontains=termo)
             | Q(perguntas_chave__icontains=termo)
             | Q(perguntas_chave_es__icontains=termo)
             | Q(perguntas_chave_en__icontains=termo)
@@ -257,11 +248,7 @@ def editar_boa_pratica(request, pk):
         return redirect("status_envio")
 
     if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
-        messages.error(
-            request,
-            "Esta experiência já está publicada. Nesta versão do MVP, edições de conteúdo publicado devem ser solicitadas à administração.",
-        )
-        return redirect("status_envio")
+        return redirect(f"/solicitar-edicao-publicada/{experiencia.pk}/?email={email}")
 
     acao = request.POST.get("acao_envio", "enviar")
     obrigatorio_para_envio = acao != "rascunho"
@@ -286,7 +273,7 @@ def editar_boa_pratica(request, pk):
             salvar_anexos_submissao(request, experiencia)
 
             messages.success(request, mensagem)
-            return redirect(f"{reverse_status_url()}?email_contato={experiencia.email_contato}")
+            return redirect(f"/status-envio/?email_contato={experiencia.email_contato}")
     else:
         form = ExperienciaSubmissaoForm(instance=experiencia)
 
@@ -301,9 +288,103 @@ def editar_boa_pratica(request, pk):
     )
 
 
-def reverse_status_url():
-    # Mantido simples para evitar dependência circular em testes e facilitar montagem de query string.
-    return "/status-envio/"
+def dados_proposta_from_form(form):
+    dados = {}
+    campos_many_to_many = {"temas_transversais", "normas_internacionais"}
+    campos_fk = {"efs", "pais", "tipo_experiencia", "setor"}
+
+    for campo in ExperienciaSubmissaoForm.Meta.fields:
+        valor = form.cleaned_data.get(campo)
+
+        if campo in campos_many_to_many:
+            dados[campo] = [item.pk for item in valor]
+        elif campo in campos_fk:
+            dados[campo] = valor.pk if valor else None
+        else:
+            dados[campo] = valor
+
+    return dados
+
+
+def solicitar_edicao_publicada(request, pk):
+    experiencia = get_object_or_404(
+        Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related(
+            "temas_transversais",
+            "normas_internacionais",
+        ),
+        pk=pk,
+        status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+    )
+
+    email = request.GET.get("email") or request.POST.get("email_contato_original")
+    if not email or email.lower() != (experiencia.email_contato or "").lower():
+        messages.error(request, "Não foi possível validar o e-mail informado para solicitar edição.")
+        return redirect("status_envio")
+
+    if request.method == "POST":
+        form = PropostaEdicaoPublicadaForm(
+            request.POST,
+            instance=experiencia,
+            obrigatorio_para_envio=True,
+        )
+        if form.is_valid():
+            PropostaEdicaoExperiencia.objects.create(
+                experiencia=experiencia,
+                email_contato=email,
+                comentario_autor=form.cleaned_data.get("comentario_autor", ""),
+                dados_json=dados_proposta_from_form(form),
+                status=PropostaEdicaoExperiencia.Status.PENDENTE,
+            )
+            messages.success(
+                request,
+                "Proposta de edição enviada para revisão. A versão publicada permanecerá ativa até aprovação.",
+            )
+            return redirect(f"/status-envio/?email_contato={email}")
+    else:
+        form = PropostaEdicaoPublicadaForm(instance=experiencia)
+
+    return render(
+        request,
+        "praticas/solicitar_edicao_publicada.html",
+        {
+            "form": form,
+            "experiencia": experiencia,
+            "email_validado": email,
+        },
+    )
+
+
+def aplicar_proposta_edicao(proposta):
+    experiencia = proposta.experiencia
+    dados = proposta.dados_json
+
+    campos_fk = {
+        "efs": EFS,
+        "pais": Pais,
+        "tipo_experiencia": TipoExperiencia,
+        "setor": Setor,
+    }
+    campos_many_to_many = {
+        "temas_transversais": TemaTransversal,
+        "normas_internacionais": NormaInternacional,
+    }
+
+    for campo, modelo in campos_fk.items():
+        valor_id = dados.get(campo)
+        if valor_id:
+            setattr(experiencia, campo, modelo.objects.get(pk=valor_id))
+
+    for campo in ExperienciaSubmissaoForm.Meta.fields:
+        if campo in campos_fk or campo in campos_many_to_many:
+            continue
+        setattr(experiencia, campo, dados.get(campo))
+
+    experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
+    experiencia.save()
+
+    for campo, modelo in campos_many_to_many.items():
+        ids = dados.get(campo, [])
+        getattr(experiencia, campo).set(modelo.objects.filter(pk__in=ids))
 
 
 def confirmacao_envio(request):
@@ -313,12 +394,18 @@ def confirmacao_envio(request):
 def status_envio(request):
     form = ConsultaStatusForm(request.GET or None)
     experiencias = Experiencia.objects.none()
+    propostas = PropostaEdicaoExperiencia.objects.none()
 
     if form.is_valid():
         email = form.cleaned_data["email_contato"]
         experiencias = (
             Experiencia.objects.filter(email_contato__iexact=email)
             .select_related("efs", "pais", "tipo_experiencia", "setor")
+            .order_by("-atualizado_em")
+        )
+        propostas = (
+            PropostaEdicaoExperiencia.objects.filter(email_contato__iexact=email)
+            .select_related("experiencia")
             .order_by("-atualizado_em")
         )
 
@@ -328,6 +415,7 @@ def status_envio(request):
         {
             "form": form,
             "experiencias": experiencias,
+            "propostas": propostas,
             "consulta_realizada": form.is_valid(),
         },
     )
@@ -351,6 +439,7 @@ def painel_revisao(request):
         "aprovado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.APROVADO).count(),
         "rascunho": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.RASCUNHO).count(),
         "rejeitado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.REJEITADO).count(),
+        "edicoes_pendentes": PropostaEdicaoExperiencia.objects.filter(status=PropostaEdicaoExperiencia.Status.PENDENTE).count(),
     }
 
     return render(
@@ -413,6 +502,69 @@ def revisar_experiencia(request, pk):
         "praticas/revisar_experiencia.html",
         {
             "experiencia": experiencia,
+            "form": form,
+        },
+    )
+
+
+@staff_member_required
+def painel_revisao_edicoes(request):
+    status = request.GET.get("status", "")
+    propostas = (
+        PropostaEdicaoExperiencia.objects.select_related("experiencia", "experiencia__efs", "experiencia__pais")
+        .order_by("-atualizado_em")
+    )
+    if status:
+        propostas = propostas.filter(status=status)
+
+    return render(
+        request,
+        "praticas/painel_revisao_edicoes.html",
+        {
+            "propostas": propostas,
+            "status_atual": status,
+            "status_choices": PropostaEdicaoExperiencia.Status.choices,
+        },
+    )
+
+
+@staff_member_required
+def revisar_edicao_publicada(request, pk):
+    proposta = get_object_or_404(
+        PropostaEdicaoExperiencia.objects.select_related("experiencia", "experiencia__efs", "experiencia__pais"),
+        pk=pk,
+    )
+
+    if request.method == "POST":
+        form = RevisaoPropostaEdicaoForm(request.POST, instance=proposta)
+        if form.is_valid():
+            acao = form.cleaned_data["acao"]
+            proposta.comentario_revisor = form.cleaned_data["comentario_revisor"]
+
+            if acao == "em_revisao":
+                proposta.status = PropostaEdicaoExperiencia.Status.EM_REVISAO
+                mensagem = "Proposta marcada como em revisão."
+            elif acao == "aprovar":
+                aplicar_proposta_edicao(proposta)
+                proposta.status = PropostaEdicaoExperiencia.Status.APROVADA
+                mensagem = "Proposta aprovada e aplicada à experiência publicada."
+            elif acao == "rejeitar":
+                proposta.status = PropostaEdicaoExperiencia.Status.REJEITADA
+                mensagem = "Proposta de edição rejeitada."
+            else:
+                mensagem = "Revisão registrada."
+
+            proposta.save(update_fields=["status", "comentario_revisor", "atualizado_em"])
+            messages.success(request, mensagem)
+            return redirect("painel_revisao_edicoes")
+    else:
+        form = RevisaoPropostaEdicaoForm(instance=proposta)
+
+    return render(
+        request,
+        "praticas/revisar_edicao_publicada.html",
+        {
+            "proposta": proposta,
             "form": form,
         },
     )

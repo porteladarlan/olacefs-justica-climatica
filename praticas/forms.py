@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Anexo, Experiencia
+from .models import Anexo, Experiencia, PropostaEdicaoExperiencia
 
 
 class ExperienciaSubmissaoForm(forms.ModelForm):
@@ -169,3 +169,45 @@ class ConsultaStatusForm(forms.Form):
             }
         ),
     )
+
+
+class PropostaEdicaoPublicadaForm(ExperienciaSubmissaoForm):
+    comentario_autor = forms.CharField(
+        label="Comentário sobre a alteração solicitada",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Explique resumidamente o que mudou e por que a alteração é necessária.",
+            }
+        ),
+    )
+
+
+class RevisaoPropostaEdicaoForm(forms.ModelForm):
+    acao = forms.ChoiceField(
+        label="Decisão sobre a proposta",
+        choices=[
+            ("em_revisao", "Marcar como em revisão"),
+            ("aprovar", "Aprovar e aplicar edição"),
+            ("rejeitar", "Rejeitar proposta"),
+        ],
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
+    class Meta:
+        model = PropostaEdicaoExperiencia
+        fields = ["acao", "comentario_revisor"]
+        widgets = {
+            "comentario_revisor": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Registre a justificativa da decisão ou orientação ao autor.",
+                }
+            )
+        }
+        labels = {
+            "comentario_revisor": "Comentário do revisor",
+        }
