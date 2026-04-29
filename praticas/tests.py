@@ -261,3 +261,9 @@ class RotasPublicasTests(TestCase):
         experiencia.refresh_from_db()
         self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
         self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
+
+    def test_catalogo_tem_selecao_para_comparacao(self):
+        response = self.client.get(reverse("catalogo_experiencias"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "catalog-compare-checkbox")
+        self.assertContains(response, "catalogoCompararSelecionadas")
