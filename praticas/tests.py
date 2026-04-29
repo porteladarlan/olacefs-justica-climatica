@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
@@ -18,14 +19,49 @@ from .models import (
 class RotasPublicasTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        pais = Pais.objects.create(nome="Brasil", nome_es="Brasil", nome_en="Brazil", sigla="BRA")
-        efs = EFS.objects.create(nome="Tribunal de Contas da Uniao", nome_es="Tribunal de Cuentas de la Union", nome_en="Federal Court of Accounts", sigla="TCU", pais=pais)
-        tipo = TipoExperiencia.objects.create(nome="Auditoria", nome_es="Auditoria", nome_en="Audit")
-        setor = Setor.objects.create(nome="Agua", nome_es="Agua", nome_en="Water")
-        tema = TemaTransversal.objects.create(nome="Direitos humanos", nome_es="Derechos humanos", nome_en="Human rights")
-        norma = NormaInternacional.objects.create(nome="Acordo de Paris", nome_es="Acuerdo de Paris", nome_en="Paris Agreement")
-        dimensao = DimensaoJusticaClimatica.objects.create(nome="Distributiva", nome_es="Distributiva", nome_en="Distributive")
-        grupo = GrupoVulneravel.objects.create(nome="Populacao rural", nome_es="Poblacion rural", nome_en="Rural population")
+        pais = Pais.objects.create(
+            nome="Brasil",
+            nome_es="Brasil",
+            nome_en="Brazil",
+            sigla="BRA",
+        )
+        efs = EFS.objects.create(
+            nome="Tribunal de Contas da Uniao",
+            nome_es="Tribunal de Cuentas de la Union",
+            nome_en="Federal Court of Accounts",
+            sigla="TCU",
+            pais=pais,
+        )
+        tipo = TipoExperiencia.objects.create(
+            nome="Auditoria",
+            nome_es="Auditoria",
+            nome_en="Audit",
+        )
+        setor = Setor.objects.create(
+            nome="Agua",
+            nome_es="Agua",
+            nome_en="Water",
+        )
+        tema = TemaTransversal.objects.create(
+            nome="Direitos humanos",
+            nome_es="Derechos humanos",
+            nome_en="Human rights",
+        )
+        norma = NormaInternacional.objects.create(
+            nome="Acordo de Paris",
+            nome_es="Acuerdo de Paris",
+            nome_en="Paris Agreement",
+        )
+        dimensao = DimensaoJusticaClimatica.objects.create(
+            nome="Distributiva",
+            nome_es="Distributiva",
+            nome_en="Distributive",
+        )
+        grupo = GrupoVulneravel.objects.create(
+            nome="Populacao rural",
+            nome_es="Poblacion rural",
+            nome_en="Rural population",
+        )
 
         experiencia = Experiencia.objects.create(
             titulo="Avaliacao da equidade no acesso a agua",
@@ -51,6 +87,29 @@ class RotasPublicasTests(TestCase):
         experiencia.normas_internacionais.add(norma)
         experiencia.dimensoes_consideradas.add(dimensao)
         experiencia.grupos_vulneraveis.add(grupo)
+
+        pendente = Experiencia.objects.create(
+            titulo="Boa pratica pendente",
+            titulo_es="Buena practica pendiente",
+            titulo_en="Pending good practice",
+            efs=efs,
+            pais=pais,
+            tipo_experiencia=tipo,
+            ano_execucao=2026,
+            status_iniciativa=Experiencia.StatusIniciativa.CONCLUIDA,
+            setor=setor,
+            contato_referencia="Contato Pendente",
+            email_contato="autor@example.org",
+            descricao="Experiencia aguardando revisao.",
+            descricao_es="Experiencia esperando revision.",
+            descricao_en="Experience awaiting review.",
+            enfoque_justica_climatica="Equidade.",
+            enfoque_justica_climatica_es="Equidad.",
+            enfoque_justica_climatica_en="Equity.",
+            status_publicacao=Experiencia.StatusPublicacao.ENVIADO,
+        )
+        pendente.temas_transversais.add(tema)
+        pendente.normas_internacionais.add(norma)
 
         recurso = BancoTecnico.objects.create(
             titulo="Checklist para avaliar planos de adaptacao",
@@ -78,6 +137,9 @@ class RotasPublicasTests(TestCase):
     def test_adicionar_boa_pratica_retorna_200(self):
         self.assertEqual(self.client.get(reverse("adicionar_boa_pratica")).status_code, 200)
 
+    def test_status_envio_retorna_200(self):
+        self.assertEqual(self.client.get(reverse("status_envio")).status_code, 200)
+
     def test_banco_tecnico_retorna_200(self):
         self.assertEqual(self.client.get(reverse("banco_tecnico")).status_code, 200)
 
@@ -100,3 +162,52 @@ class RotasPublicasTests(TestCase):
         response = self.client.get(reverse("catalogo_experiencias"), {"norma": norma.id})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "TCU")
+
+    def test_painel_revisao_exige_login_staff(self):
+        response = self.client.get(reverse("painel_revisao"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_painel_revisao_staff_retorna_200(self):
+        usuario = get_user_model().objects.create_user(
+            username="revisor",
+            password="teste123",
+            is_staff=True,
+        )
+        self.client.force_login(usuario)
+        response = self.client.get(reverse("painel_revisao"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Pending good practice")
+        self.assertContains(response, "autor@example.org")
+        self.assertContains(response, "2026")
+
+    def test_revisor_publica_experiencia(self):
+        usuario = get_user_model().objects.create_user(
+            username="revisor2",
+            password="teste123",
+            is_staff=True,
+        )
+        self.client.force_login(usuario)
+        experiencia = Experiencia.objects.get(titulo="Boa pratica pendente")
+        response = self.client.post(
+            reverse("revisar_experiencia", args=[experiencia.pk]),
+            {
+                "acao": "publicar",
+                "comentario_revisor": "Aprovada para publicação.",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        experiencia.refresh_from_db()
+        self.assertEqual(
+            experiencia.status_publicacao,
+            Experiencia.StatusPublicacao.PUBLICADO,
+        )
+
+    def test_consulta_status_por_email(self):
+        response = self.client.get(
+            reverse("status_envio"),
+            {"email_contato": "autor@example.org"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Pending good practice")
+        self.assertContains(response, "autor@example.org")
+        self.assertContains(response, "2026")

@@ -9,91 +9,506 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
-            --giz-blue: #005e7a;
-            --giz-blue-dark: #003f52;
-            --giz-blue-soft: #e7f3f6;
-            --giz-yellow: #f5c542;
-            --giz-green: #6fbf73;
-            --giz-red: #d64032;
-            --olacefs-cyan: #0097b2;
-            --ink: #263238;
-            --muted: #66757f;
-            --line: #d9e5e9;
-            --canvas: #f5f8f9;
-            --shadow: 0 12px 28px rgba(0, 63, 82, 0.08);
+            --blue-900: #07384a;
+            --blue-800: #0b4f66;
+            --blue-700: #126a84;
+            --blue-100: #e9f5f8;
+            --yellow-500: #f2c230;
+            --green-500: #65b96f;
+            --red-500: #d84937;
+            --ink: #1f3037;
+            --muted: #667780;
+            --line: #dce8ec;
+            --surface: #ffffff;
+            --background: #f6f9fa;
+            --shadow-soft: 0 16px 40px rgba(7, 56, 74, 0.08);
+            --radius-xl: 26px;
             --radius-lg: 18px;
             --radius-md: 12px;
         }
-        html, body { min-height: 100%; }
-        body { min-height: 100vh; margin: 0; color: var(--ink); background: linear-gradient(180deg, #ffffff 0%, var(--canvas) 42%, #eef5f7 100%); font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; display: flex; flex-direction: column; }
-        a { color: var(--giz-blue); }
-        a:hover { color: var(--giz-blue-dark); }
-        .brand-strip { height: 6px; background: linear-gradient(90deg, var(--giz-red) 0%, var(--giz-red) 22%, var(--giz-yellow) 22%, var(--giz-yellow) 48%, var(--giz-green) 48%, var(--giz-green) 72%, var(--olacefs-cyan) 72%, var(--olacefs-cyan) 100%); }
-        .navbar-institutional { background: rgba(255, 255, 255, 0.96); border-bottom: 1px solid rgba(0, 94, 122, 0.13); backdrop-filter: blur(10px); }
-        .brand-lockup { display: flex; align-items: center; gap: 0.85rem; color: var(--ink); text-decoration: none; }
-        .brand-symbol { width: 46px; height: 46px; border-radius: 4px; background: linear-gradient(135deg, rgba(0, 94, 122, 0.98), rgba(0, 151, 178, 0.85)); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 0.86rem; font-weight: 700; letter-spacing: 0.04em; }
-        .brand-name { display: block; color: var(--giz-blue-dark); font-weight: 600; font-size: 1.02rem; }
-        .brand-caption { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 0.1rem; }
-        .navbar-nav .nav-link { color: #40535b; font-weight: 500; font-size: 0.95rem; padding: 0.55rem 0.8rem; border-bottom: 2px solid transparent; }
-        .navbar-nav .nav-link:hover, .navbar-nav .nav-link:focus-visible { color: var(--giz-blue); border-bottom-color: var(--giz-yellow); }
-        .nav-admin { border: 1px solid var(--line); border-radius: 999px; margin-left: 0.25rem; }
-        .nav-submit { background: var(--giz-yellow); color: #1b2c31 !important; border-radius: 999px; margin-left: 0.25rem; border-bottom: 0 !important; }
-        .language-select { width: auto; min-width: 100px; border-radius: 999px; border-color: var(--line); font-size: 0.84rem; padding: 0.42rem 2rem 0.42rem 0.8rem; }
-        .main-shell { flex: 1; padding-top: 2rem; padding-bottom: 3rem; }
-        .page-shell { background: #ffffff; border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; }
-        .page-inner { padding: 1.25rem; }
-        @media (min-width: 768px) { .page-inner { padding: 2rem; } }
-        .page-hero { position: relative; border-radius: var(--radius-lg); background: linear-gradient(120deg, rgba(0, 94, 122, 0.94), rgba(0, 151, 178, 0.82)), radial-gradient(circle at 88% 18%, rgba(245, 197, 66, 0.55), transparent 15rem); color: #fff; padding: 2.25rem; overflow: hidden; }
-        .page-hero::after { content: ""; position: absolute; right: 5%; bottom: 0; width: 38%; height: 8px; background: linear-gradient(90deg, var(--giz-red), var(--giz-yellow), var(--giz-green)); border-radius: 999px 999px 0 0; }
-        .hero-eyebrow { display: inline-block; color: #15323a; background: var(--giz-yellow); border-radius: 2px; padding: 0.38rem 0.58rem; font-size: 0.76rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; }
-        .hero-title { max-width: 920px; margin: 1rem 0 0.75rem; font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.05; font-weight: 500; letter-spacing: -0.045em; }
-        .hero-subtitle { max-width: 800px; color: rgba(255, 255, 255, 0.92); font-size: 1.08rem; line-height: 1.65; }
-        .btn-brand { background: var(--giz-yellow); color: #1b2c31; border: 0; border-radius: 4px; padding: 0.78rem 1.05rem; font-weight: 600; }
-        .btn-brand:hover { background: #ffd75c; color: #1b2c31; }
-        .btn-brand-outline { border: 1px solid rgba(255, 255, 255, 0.55); color: #fff; border-radius: 4px; padding: 0.76rem 1.05rem; font-weight: 500; }
-        .btn-brand-outline:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
-        .section-kicker { color: var(--giz-blue); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 0.35rem; }
-        .section-title { color: var(--giz-blue-dark); font-weight: 500; letter-spacing: -0.035em; }
-        .section-subtitle { color: var(--muted); line-height: 1.65; }
-        .metric-card, .feature-card, .catalog-card, .resource-card, .detail-section, .filter-panel, .form-section { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: 0 8px 20px rgba(0, 63, 82, 0.05); }
-        .metric-card { padding: 1.2rem; height: 100%; border-top: 4px solid var(--giz-yellow); }
-        .metric-label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; }
-        .metric-value { margin: 0.25rem 0 0.2rem; color: var(--giz-blue); font-size: 2rem; line-height: 1; font-weight: 500; }
-        .feature-card, .catalog-card, .resource-card, .detail-section, .form-section { padding: 1.25rem; }
-        .catalog-card, .resource-card { transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease; }
-        .catalog-card:hover, .resource-card:hover { transform: translateY(-2px); border-color: rgba(0, 94, 122, 0.24); box-shadow: 0 14px 32px rgba(0, 63, 82, 0.09); }
-        .badge-soft { display: inline-flex; align-items: center; background: var(--giz-blue-soft); color: var(--giz-blue-dark); border: 1px solid rgba(0, 94, 122, 0.14); border-radius: 4px; padding: 0.32rem 0.55rem; font-size: 0.76rem; font-weight: 600; }
-        .badge-yellow { background: rgba(245, 197, 66, 0.26); color: #5b480a; border-color: rgba(245, 197, 66, 0.44); }
-        .filter-panel { background: linear-gradient(180deg, #fff, #f8fbfb); padding: 1.1rem; border-left: 5px solid var(--giz-blue); }
-        .form-control, .form-select { border-radius: 4px; border-color: #cfdde1; padding: 0.72rem 0.78rem; }
-        .form-control:focus, .form-select:focus { border-color: var(--giz-blue); box-shadow: 0 0 0 0.2rem rgba(0, 94, 122, 0.10); }
-        .footer-institutional { background: #fff; border-top: 1px solid var(--line); }
-        .footer-title { color: var(--giz-blue-dark); font-weight: 600; }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top right, rgba(18, 106, 132, 0.08), transparent 34rem),
+                linear-gradient(180deg, #ffffff 0%, var(--background) 46%, #eef5f7 100%);
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: var(--blue-800);
+        }
+
+        a:hover {
+            color: var(--blue-900);
+        }
+
+        .brand-strip {
+            height: 5px;
+            background: linear-gradient(90deg, var(--red-500) 0 22%, var(--yellow-500) 22% 52%, var(--green-500) 52% 76%, var(--blue-700) 76% 100%);
+        }
+
+        .navbar-institutional {
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid rgba(7, 56, 74, 0.10);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--ink);
+            text-decoration: none;
+            min-width: 270px;
+        }
+
+        .brand-symbol {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            box-shadow: 0 10px 22px rgba(7, 56, 74, 0.16);
+        }
+
+        .brand-name {
+            display: block;
+            color: var(--blue-900);
+            font-weight: 700;
+            font-size: 0.98rem;
+            line-height: 1.15;
+        }
+
+        .brand-caption {
+            display: block;
+            color: var(--muted);
+            font-size: 0.75rem;
+            line-height: 1.25;
+            margin-top: 0.15rem;
+        }
+
+        .navbar-nav {
+            align-items: center;
+        }
+
+        .navbar-nav .nav-link {
+            color: #42545d;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 0.48rem 0.58rem;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link:focus-visible {
+            color: var(--blue-900);
+            background: var(--blue-100);
+        }
+
+        .nav-primary-action {
+            background: var(--yellow-500);
+            color: #203138 !important;
+            border-radius: 999px;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
+            box-shadow: 0 8px 18px rgba(242, 194, 48, 0.24);
+        }
+
+        .nav-primary-action:hover {
+            background: #ffd24a !important;
+        }
+
+        .nav-secondary-action {
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .language-select {
+            width: auto;
+            min-width: 86px;
+            border-radius: 999px;
+            border-color: var(--line);
+            font-size: 0.84rem;
+            padding: 0.42rem 2rem 0.42rem 0.8rem;
+            font-weight: 700;
+            color: var(--blue-900);
+        }
+
+        .main-shell {
+            flex: 1;
+            padding-top: 1.45rem;
+            padding-bottom: 3rem;
+        }
+
+        .page-shell {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .page-inner {
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .page-inner {
+                padding: 1.55rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1180px;
+            }
+        }
+
+        .page-hero {
+            position: relative;
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.20), transparent 10rem),
+                linear-gradient(120deg, #0b4f66 0%, #177a93 58%, #59b4c5 100%);
+            color: #fff;
+            padding: clamp(1.65rem, 3vw, 2.7rem);
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            right: 3.8rem;
+            top: -3.7rem;
+            width: 12rem;
+            height: 12rem;
+            border: 1.4rem solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+        }
+
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            right: 5%;
+            bottom: 0;
+            width: min(38rem, 38%);
+            height: 8px;
+            background: linear-gradient(90deg, var(--red-500), var(--yellow-500), var(--green-500));
+            border-radius: 999px 999px 0 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-eyebrow {
+            display: inline-block;
+            color: #15323a;
+            background: var(--yellow-500);
+            border-radius: 999px;
+            padding: 0.42rem 0.78rem;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-title {
+            max-width: 850px;
+            margin: 1rem 0 0.75rem;
+            font-size: clamp(2rem, 4vw, 3.45rem);
+            line-height: 1.02;
+            font-weight: 600;
+            letter-spacing: -0.055em;
+        }
+
+        .hero-subtitle {
+            max-width: 760px;
+            color: rgba(255, 255, 255, 0.93);
+            font-size: 1.03rem;
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        .btn-brand {
+            background: var(--yellow-500);
+            color: #203138;
+            border: 0;
+            border-radius: 999px;
+            padding: 0.76rem 1.08rem;
+            font-weight: 800;
+        }
+
+        .btn-brand:hover {
+            background: #ffd24a;
+            color: #203138;
+        }
+
+        .btn-brand-outline {
+            border: 1px solid rgba(255, 255, 255, 0.60);
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.74rem 1.08rem;
+            font-weight: 700;
+        }
+
+        .btn-brand-outline:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .section-kicker {
+            color: var(--blue-700);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            font-weight: 800;
+            margin-bottom: 0.35rem;
+        }
+
+        .section-title {
+            color: var(--blue-900);
+            font-weight: 650;
+            letter-spacing: -0.035em;
+        }
+
+        .section-subtitle {
+            color: var(--muted);
+            line-height: 1.68;
+        }
+
+        .metric-card,
+        .feature-card,
+        .catalog-card,
+        .resource-card,
+        .detail-section,
+        .filter-panel,
+        .form-section,
+        .knowledge-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 20px rgba(7, 56, 74, 0.045);
+        }
+
+        .metric-card {
+            padding: 1rem;
+            height: 100%;
+            border-top: 4px solid var(--yellow-500);
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            font-weight: 800;
+            min-height: 2.2em;
+        }
+
+        .metric-value {
+            margin: 0.18rem 0 0;
+            color: var(--blue-800);
+            font-size: 1.9rem;
+            line-height: 1;
+            font-weight: 650;
+        }
+
+        .feature-card,
+        .catalog-card,
+        .resource-card,
+        .detail-section,
+        .form-section,
+        .knowledge-card {
+            padding: 1.25rem;
+        }
+
+        .knowledge-card {
+            height: 100%;
+            border-left: 5px solid var(--blue-700);
+        }
+
+        .catalog-card,
+        .resource-card {
+            transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+        }
+
+        .catalog-card:hover,
+        .resource-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(18, 106, 132, 0.24);
+            box-shadow: 0 14px 32px rgba(7, 56, 74, 0.09);
+        }
+
+        .badge-soft {
+            display: inline-flex;
+            align-items: center;
+            background: var(--blue-100);
+            color: var(--blue-900);
+            border: 1px solid rgba(18, 106, 132, 0.14);
+            border-radius: 999px;
+            padding: 0.32rem 0.62rem;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .badge-yellow {
+            background: rgba(242, 194, 48, 0.24);
+            color: #5b480a;
+            border-color: rgba(242, 194, 48, 0.44);
+        }
+
+        .badge-status {
+            border-radius: 999px;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .status-rascunho { background: #f4f1e7; color: #705a11; }
+        .status-enviado { background: #e7f3f6; color: #005e7a; }
+        .status-em_revisao { background: #fff4d5; color: #846000; }
+        .status-aprovado { background: #e8f5e9; color: #2e7d32; }
+        .status-publicado { background: #e3f2fd; color: #1565c0; }
+        .status-rejeitado { background: #fdecea; color: #b42318; }
+
+        .filter-panel {
+            background: linear-gradient(180deg, #fff, #f8fbfb);
+            padding: 1.1rem;
+            border-left: 5px solid var(--blue-700);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border-color: #cfdde1;
+            padding: 0.72rem 0.78rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--blue-700);
+            box-shadow: 0 0 0 0.2rem rgba(18, 106, 132, 0.10);
+        }
+
+        .footer-institutional {
+            background: #fff;
+            border-top: 1px solid var(--line);
+        }
+
+        .footer-title {
+            color: var(--blue-900);
+            font-weight: 700;
+        }
+
+        @media (max-width: 991.98px) {
+            .brand-lockup {
+                min-width: 0;
+            }
+
+            .navbar-nav {
+                align-items: stretch;
+                padding-top: 1rem;
+            }
+
+            .navbar-nav .nav-link {
+                border-radius: 10px;
+            }
+
+            .nav-primary-action,
+            .nav-secondary-action {
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="brand-strip"></div>
+
 <nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top">
     <div class="container">
         <a class="brand-lockup" href="{% url 'pagina_inicial' %}">
             <span class="brand-symbol">JC</span>
             <span>
                 <span class="brand-name">Plataforma Regional OLACEFS</span>
-                <span class="brand-caption">{% if LANGUAGE_CODE == 'en' %}Good Practices in Audit and Climate Justice{% elif LANGUAGE_CODE == 'es' %}Buenas Pr&aacute;cticas en Auditor&iacute;a y Justicia Clim&aacute;tica{% else %}Boas Pr&aacute;ticas em Auditoria e Justi&ccedil;a Clim&aacute;tica{% endif %}</span>
+                <span class="brand-caption">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        Audit and Climate Justice
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        Auditor&iacute;a y Justicia Clim&aacute;tica
+                    {% else %}
+                        Auditoria e Justi&ccedil;a Clim&aacute;tica
+                    {% endif %}
+                </span>
             </span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Menu"><span class="navbar-toggler-icon"></span></button>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
         <div class="collapse navbar-collapse" id="menuPrincipal">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-1">
-                <li class="nav-item"><a class="nav-link" href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'catalogo_experiencias' %}">{% if LANGUAGE_CODE == 'en' %}Good practices{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas{% else %}Boas pr&aacute;ticas{% endif %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'normas_internacionais' %}">{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normas internacionales{% else %}Normas internacionais{% endif %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'banco_tecnico' %}">{% if LANGUAGE_CODE == 'en' %}Technical Bank{% else %}Banco T&eacute;cnico{% endif %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'sobre_plataforma' %}">{% if LANGUAGE_CODE == 'en' %}About{% elif LANGUAGE_CODE == 'es' %}Acerca de{% else %}Sobre{% endif %}</a></li>
-                <li class="nav-item"><a class="nav-link nav-submit" href="{% url 'adicionar_boa_pratica' %}">{% if LANGUAGE_CODE == 'en' %}Submit practice{% elif LANGUAGE_CODE == 'es' %}Agregar buena pr&aacute;ctica{% else %}Adicionar boa pr&aacute;tica{% endif %}</a></li>
-                <li class="nav-item"><a class="nav-link nav-admin" href="/admin/">Admin</a></li>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1">
                 <li class="nav-item">
-                    <div class="ms-lg-2 mt-2 mt-lg-0">
+                    <a class="nav-link" href="{% url 'pagina_inicial' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'catalogo_experiencias' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Practices{% elif LANGUAGE_CODE == 'es' %}Pr&aacute;cticas{% else %}Pr&aacute;ticas{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'normas_internacionais' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Standards{% elif LANGUAGE_CODE == 'es' %}Normas{% else %}Normas{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'banco_tecnico' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-secondary-action" href="{% url 'status_envio' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Status{% elif LANGUAGE_CODE == 'es' %}Estado{% else %}Status{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-primary-action" href="{% url 'adicionar_boa_pratica' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Submit{% elif LANGUAGE_CODE == 'es' %}Enviar{% else %}Enviar{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-secondary-action" href="{% url 'painel_revisao' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Review{% elif LANGUAGE_CODE == 'es' %}Revisi&oacute;n{% else %}Revis&atilde;o{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-secondary-action" href="/admin/">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <div class="ms-lg-1 mt-2 mt-lg-0">
                         <select id="languageSwitcher" class="form-select form-select-sm language-select">
                             <option value="pt-br" {% if LANGUAGE_CODE == 'pt-br' %}selected{% endif %}>PT</option>
                             <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>ES</option>
@@ -105,6 +520,7 @@
         </div>
     </div>
 </nav>
+
 <main class="container main-shell">
     <div class="page-shell">
         <div class="page-inner">
@@ -117,15 +533,41 @@
         </div>
     </div>
 </main>
+
 <footer class="footer-institutional py-4 mt-auto">
     <div class="container d-flex flex-column flex-lg-row justify-content-between gap-3">
         <div>
-            <div class="footer-title">{% if LANGUAGE_CODE == 'en' %}Regional Good Practices Platform{% elif LANGUAGE_CODE == 'es' %}Plataforma Regional de Buenas Pr&aacute;cticas{% else %}Plataforma Regional de Boas Pr&aacute;ticas{% endif %}</div>
-            <div class="text-muted small">{% if LANGUAGE_CODE == 'en' %}The Guide provides orientation; the platform demonstrates.{% elif LANGUAGE_CODE == 'es' %}La Gu&iacute;a orienta; la plataforma demuestra.{% else %}A Guia orienta; a plataforma demonstra.{% endif %}</div>
+            <div class="footer-title">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Regional Good Practices Platform
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Plataforma Regional de Buenas Pr&aacute;cticas
+                {% else %}
+                    Plataforma Regional de Boas Pr&aacute;ticas
+                {% endif %}
+            </div>
+            <div class="text-muted small">
+                {% if LANGUAGE_CODE == 'en' %}
+                    The Guide provides orientation; the platform demonstrates.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La Gu&iacute;a orienta; la plataforma demuestra.
+                {% else %}
+                    A Guia orienta; a plataforma demonstra.
+                {% endif %}
+            </div>
         </div>
-        <div class="text-muted small">{% if LANGUAGE_CODE == 'en' %}Local MVP &bull; Demonstration environment{% elif LANGUAGE_CODE == 'es' %}MVP local &bull; Ambiente de demostraci&oacute;n{% else %}MVP local &bull; Ambiente de demonstra&ccedil;&atilde;o{% endif %}</div>
+        <div class="text-muted small">
+            {% if LANGUAGE_CODE == 'en' %}
+                Local MVP &bull; Demonstration environment
+            {% elif LANGUAGE_CODE == 'es' %}
+                MVP local &bull; Ambiente de demostraci&oacute;n
+            {% else %}
+                MVP local &bull; Ambiente de demonstra&ccedil;&atilde;o
+            {% endif %}
+        </div>
     </div>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const languageSwitcher = document.getElementById("languageSwitcher");

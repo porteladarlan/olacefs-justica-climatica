@@ -6,54 +6,172 @@
 
 {% block content %}
 <section class="page-hero mb-4">
-    <span class="hero-eyebrow">COMTEMA &bull; CGID &bull; AdaptaInfra OLACEFS-GIZ</span>
-    <h1 class="hero-title">
-        {% if LANGUAGE_CODE == 'en' %}Good practices in audit with a climate justice perspective.{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas en auditor&iacute;a con perspectiva de justicia clim&aacute;tica.{% else %}Boas pr&aacute;ticas em auditoria com perspectiva de justi&ccedil;a clim&aacute;tica.{% endif %}
-    </h1>
-    <p class="hero-subtitle">
-        {% if LANGUAGE_CODE == 'en' %}A living knowledge hub where SAIs can consult experiences, find tools and criteria, and share how they incorporate equity, inclusion and human rights into sustainable infrastructure audits.{% elif LANGUAGE_CODE == 'es' %}Un espacio vivo de aprendizaje colectivo donde las EFS pueden consultar experiencias, encontrar herramientas y criterios, y compartir c&oacute;mo incorporan equidad, inclusi&oacute;n y derechos humanos en auditor&iacute;as de infraestructura sostenible.{% else %}Um espa&ccedil;o vivo de aprendizagem coletiva onde as EFS podem consultar experi&ecirc;ncias, encontrar ferramentas e crit&eacute;rios, e compartilhar como incorporam equidade, inclus&atilde;o e direitos humanos em auditorias de infraestrutura sustent&aacute;vel.{% endif %}
-    </p>
-    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
-        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-brand">{% if LANGUAGE_CODE == 'en' %}Explore good practices{% elif LANGUAGE_CODE == 'es' %}Explorar buenas pr&aacute;cticas{% else %}Explorar boas pr&aacute;ticas{% endif %}</a>
-        <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-brand-outline">{% if LANGUAGE_CODE == 'en' %}Submit your practice{% elif LANGUAGE_CODE == 'es' %}Agregar su buena pr&aacute;ctica{% else %}Adicionar sua boa pr&aacute;tica{% endif %}</a>
+    <div class="hero-content">
+        <span class="hero-eyebrow">COMTEMA &bull; CGID &bull; AdaptaInfra OLACEFS-GIZ</span>
+        <h1 class="hero-title">
+            {% if LANGUAGE_CODE == 'en' %}
+                A living knowledge hub for climate justice auditing.
+            {% elif LANGUAGE_CODE == 'es' %}
+                Un portal vivo de conocimiento para auditar con justicia clim&aacute;tica.
+            {% else %}
+                Um portal vivo de conhecimento para auditar com justi&ccedil;a clim&aacute;tica.
+            {% endif %}
+        </h1>
+        <p class="hero-subtitle">
+            {% if LANGUAGE_CODE == 'en' %}
+                Find good practices, audit questions, criteria, methodologies and international frameworks used by SAIs in Latin America and the Caribbean.
+            {% elif LANGUAGE_CODE == 'es' %}
+                Encuentre buenas pr&aacute;cticas, preguntas de auditor&iacute;a, criterios, metodolog&iacute;as y marcos internacionales utilizados por las EFS de Am&eacute;rica Latina y el Caribe.
+            {% else %}
+                Encontre boas pr&aacute;ticas, perguntas de auditoria, crit&eacute;rios, metodologias e marcos internacionais utilizados pelas EFS da Am&eacute;rica Latina e do Caribe.
+            {% endif %}
+        </p>
+
+        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+            <a href="{% url 'catalogo_experiencias' %}" class="btn btn-brand">
+                {% if LANGUAGE_CODE == 'en' %}Explore practices{% elif LANGUAGE_CODE == 'es' %}Explorar pr&aacute;cticas{% else %}Explorar pr&aacute;ticas{% endif %}
+            </a>
+            <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-brand-outline">
+                {% if LANGUAGE_CODE == 'en' %}Submit a practice{% elif LANGUAGE_CODE == 'es' %}Enviar una pr&aacute;ctica{% else %}Enviar uma pr&aacute;tica{% endif %}
+            </a>
+        </div>
     </div>
 </section>
 
 <section class="row g-3 mb-4">
-    <div class="col-md-3"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Published practices{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas publicadas{% else %}Boas pr&aacute;ticas publicadas{% endif %}</div><p class="metric-value">{{ total_experiencias }}</p></div></div>
-    <div class="col-md-3"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Registered SAIs{% elif LANGUAGE_CODE == 'es' %}EFS registradas{% else %}EFS cadastradas{% endif %}</div><p class="metric-value">{{ total_efs }}</p></div></div>
-    <div class="col-md-3"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Countries{% else %}Pa&iacute;ses{% endif %}</div><p class="metric-value">{{ total_paises }}</p></div></div>
-    <div class="col-md-3"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normas internacionales{% else %}Normas internacionais{% endif %}</div><p class="metric-value">{{ total_normas }}</p></div></div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Published practices{% elif LANGUAGE_CODE == 'es' %}Pr&aacute;cticas publicadas{% else %}Pr&aacute;ticas publicadas{% endif %}</div>
+            <p class="metric-value">{{ total_experiencias }}</p>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Registered SAIs{% elif LANGUAGE_CODE == 'es' %}EFS registradas{% else %}EFS cadastradas{% endif %}</div>
+            <p class="metric-value">{{ total_efs }}</p>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Countries{% else %}Pa&iacute;ses{% endif %}</div>
+            <p class="metric-value">{{ total_paises }}</p>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-label">{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normas internacionales{% else %}Normas internacionais{% endif %}</div>
+            <p class="metric-value">{{ total_normas }}</p>
+        </div>
+    </div>
 </section>
 
-<section class="row g-4 mb-4">
+<section class="row g-3 mb-4">
     <div class="col-lg-6">
-        <div class="detail-section h-100">
+        <div class="knowledge-card">
             <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Concept{% elif LANGUAGE_CODE == 'es' %}Concepto{% else %}Conceito{% endif %}</div>
-            <h2 class="section-title h3">{% if LANGUAGE_CODE == 'en' %}What is climate justice?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; es la justicia clim&aacute;tica?{% else %}O que &eacute; justi&ccedil;a clim&aacute;tica?{% endif %}</h2>
-            <p class="section-subtitle">
-                {% if LANGUAGE_CODE == 'en' %}Climate change impacts do not affect everyone equally. Climate justice means placing equity and human rights at the center of climate action, asking who benefits, who bears the greatest risks and whether public decisions reduce or deepen structural inequalities.{% elif LANGUAGE_CODE == 'es' %}Los impactos del cambio clim&aacute;tico no afectan a todas las personas por igual. La justicia clim&aacute;tica significa colocar la equidad y los derechos humanos en el n&uacute;cleo de la acci&oacute;n clim&aacute;tica, preguntando qui&eacute;nes se benefician, qu&eacute; grupos asumen los mayores riesgos y si las decisiones reducen o profundizan desigualdades estructurales.{% else %}Os impactos da mudan&ccedil;a clim&aacute;tica n&atilde;o afetam todas as pessoas da mesma forma. A justi&ccedil;a clim&aacute;tica significa colocar equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica, perguntando quem se beneficia, quais grupos assumem os maiores riscos e se as decis&otilde;es reduzem ou aprofundam desigualdades estruturais.{% endif %}
+            <h2 class="section-title h3">
+                {% if LANGUAGE_CODE == 'en' %}
+                    What is climate justice?
+                {% elif LANGUAGE_CODE == 'es' %}
+                    &iquest;Qu&eacute; es la justicia clim&aacute;tica?
+                {% else %}
+                    O que &eacute; justi&ccedil;a clim&aacute;tica?
+                {% endif %}
+            </h2>
+            <p class="section-subtitle mb-0">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Climate justice places equity and human rights at the center of climate action. In infrastructure, it asks who benefits, who bears the risks and whether public decisions reduce structural inequalities.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La justicia clim&aacute;tica coloca la equidad y los derechos humanos en el centro de la acci&oacute;n clim&aacute;tica. En infraestructura, pregunta qui&eacute;nes se benefician, qu&eacute; grupos asumen los riesgos y si las decisiones reducen desigualdades estructurales.
+                {% else %}
+                    A justi&ccedil;a clim&aacute;tica coloca equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica. Em infraestrutura, pergunta quem se beneficia, quais grupos assumem os riscos e se as decis&otilde;es reduzem desigualdades estruturais.
+                {% endif %}
             </p>
         </div>
     </div>
+
     <div class="col-lg-6">
-        <div class="detail-section h-100">
+        <div class="knowledge-card">
             <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Purpose{% elif LANGUAGE_CODE == 'es' %}Prop&oacute;sito{% else %}Prop&oacute;sito{% endif %}</div>
-            <h2 class="section-title h3">{% if LANGUAGE_CODE == 'en' %}What is this platform for?{% elif LANGUAGE_CODE == 'es' %}&iquest;Para qu&eacute; sirve esta plataforma?{% else %}Para que serve esta plataforma?{% endif %}</h2>
-            <p class="section-subtitle">
-                {% if LANGUAGE_CODE == 'en' %}The platform compiles experiences, tools and methodologies from SAIs in Latin America and the Caribbean. The Guide provides conceptual orientation; the platform demonstrates it through concrete cases.{% elif LANGUAGE_CODE == 'es' %}La plataforma re&uacute;ne experiencias, herramientas y metodolog&iacute;as de las EFS de Am&eacute;rica Latina y el Caribe. La Gu&iacute;a orienta; la plataforma demuestra con casos concretos.{% else %}A plataforma re&uacute;ne experi&ecirc;ncias, ferramentas e metodologias das EFS da Am&eacute;rica Latina e do Caribe. A Guia orienta; a plataforma demonstra com casos concretos.{% endif %}
+            <h2 class="section-title h3">
+                {% if LANGUAGE_CODE == 'en' %}
+                    What is this platform for?
+                {% elif LANGUAGE_CODE == 'es' %}
+                    &iquest;Para qu&eacute; sirve esta plataforma?
+                {% else %}
+                    Para que serve esta plataforma?
+                {% endif %}
+            </h2>
+            <p class="section-subtitle mb-0">
+                {% if LANGUAGE_CODE == 'en' %}
+                    The platform compiles experiences, tools and methodologies from SAIs. The Guide provides conceptual orientation; the platform demonstrates it with concrete cases and practical references.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La plataforma re&uacute;ne experiencias, herramientas y metodolog&iacute;as de las EFS. La Gu&iacute;a orienta; la plataforma demuestra con casos concretos y referencias pr&aacute;cticas.
+                {% else %}
+                    A plataforma re&uacute;ne experi&ecirc;ncias, ferramentas e metodologias das EFS. A Guia orienta; a plataforma demonstra com casos concretos e refer&ecirc;ncias pr&aacute;ticas.
+                {% endif %}
             </p>
         </div>
     </div>
 </section>
 
 <section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}How to use{% elif LANGUAGE_CODE == 'es' %}C&oacute;mo usar{% else %}Como usar{% endif %}</div>
-    <h2 class="section-title h3 mb-3">{% if LANGUAGE_CODE == 'en' %}Find references in a few clicks{% elif LANGUAGE_CODE == 'es' %}Encuentre referencias en pocos clics{% else %}Encontre refer&ecirc;ncias em poucos cliques{% endif %}</h2>
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-end mb-3">
+        <div>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Find what matters{% elif LANGUAGE_CODE == 'es' %}Encuentre lo relevante{% else %}Encontre o que importa{% endif %}</div>
+            <h2 class="section-title h3 mb-1">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Start from the filters, not from a static repository
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Empiece por los filtros, no por un repositorio est&aacute;tico
+                {% else %}
+                    Comece pelos filtros, n&atilde;o por um reposit&oacute;rio est&aacute;tico
+                {% endif %}
+            </h2>
+            <p class="section-subtitle mb-0">
+                {% if LANGUAGE_CODE == 'en' %}
+                    The platform was designed for auditors who need practical references in a few clicks.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La plataforma fue dise&ntilde;ada para personas auditoras que necesitan referencias pr&aacute;cticas en pocos clics.
+                {% else %}
+                    A plataforma foi desenhada para pessoas auditoras que precisam de refer&ecirc;ncias pr&aacute;ticas em poucos cliques.
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-primary">
+            {% if LANGUAGE_CODE == 'en' %}Open catalog{% elif LANGUAGE_CODE == 'es' %}Abrir cat&aacute;logo{% else %}Abrir cat&aacute;logo{% endif %}
+        </a>
+    </div>
+
     <div class="row g-3">
-        <div class="col-lg-4"><div class="feature-card h-100"><span class="badge-soft badge-yellow mb-2">01</span><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}Filter by type{% elif LANGUAGE_CODE == 'es' %}Filtrar por tipo{% else %}Filtrar por tipo{% endif %}</h3><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Prioritize research, policy evaluations, training, audits, tools or methodologies.{% elif LANGUAGE_CODE == 'es' %}Priorice investigaci&oacute;n, evaluaciones de pol&iacute;tica p&uacute;blica, capacitaciones, auditor&iacute;as, herramientas o metodolog&iacute;as.{% else %}Priorize pesquisa, avalia&ccedil;&otilde;es de pol&iacute;tica p&uacute;blica, capacita&ccedil;&otilde;es, auditorias, ferramentas ou metodologias.{% endif %}</p></div></div>
-        <div class="col-lg-4"><div class="feature-card h-100"><span class="badge-soft badge-yellow mb-2">02</span><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}Connect standards{% elif LANGUAGE_CODE == 'es' %}Conectar normativas{% else %}Conectar normativas{% endif %}</h3><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Identify which experiences relate to the Paris Agreement, SDGs and other international frameworks.{% elif LANGUAGE_CODE == 'es' %}Identifique qu&eacute; experiencias se vinculan con el Acuerdo de Par&iacute;s, ODS y otros marcos internacionales.{% else %}Identifique quais experi&ecirc;ncias se vinculam ao Acordo de Paris, ODS e outros marcos internacionais.{% endif %}</p></div></div>
-        <div class="col-lg-4"><div class="feature-card h-100"><span class="badge-soft badge-yellow mb-2">03</span><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}Submit practices{% elif LANGUAGE_CODE == 'es' %}Enviar buenas pr&aacute;cticas{% else %}Enviar boas pr&aacute;ticas{% endif %}</h3><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}SAI members can submit new experiences for review before publication.{% elif LANGUAGE_CODE == 'es' %}Integrantes de las EFS pueden enviar nuevas experiencias para revisi&oacute;n antes de su publicaci&oacute;n.{% else %}Integrantes das EFS podem enviar novas experi&ecirc;ncias para revis&atilde;o antes da publica&ccedil;&atilde;o.{% endif %}</p></div></div>
+        <div class="col-md-6 col-xl">
+            <div class="feature-card h-100">
+                <span class="badge-soft badge-yellow">01</span>
+                <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Type of practice{% elif LANGUAGE_CODE == 'es' %}Tipo de experiencia{% else %}Tipo de experi&ecirc;ncia{% endif %}</h3>
+                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Research, public policy evaluation, training, audit, tool or methodology.{% elif LANGUAGE_CODE == 'es' %}Investigaci&oacute;n, evaluaci&oacute;n de pol&iacute;tica p&uacute;blica, capacitaci&oacute;n, auditor&iacute;a, herramienta o metodolog&iacute;a.{% else %}Pesquisa, avalia&ccedil;&atilde;o de pol&iacute;tica p&uacute;blica, capacita&ccedil;&atilde;o, auditoria, ferramenta ou metodologia.{% endif %}</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="feature-card h-100">
+                <span class="badge-soft badge-yellow">02</span>
+                <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Cross-cutting themes{% elif LANGUAGE_CODE == 'es' %}Temas transversales{% else %}Temas transversais{% endif %}</h3>
+                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Gender, women, vulnerable populations, Indigenous peoples, LGBTQI+ and human rights.{% elif LANGUAGE_CODE == 'es' %}G&eacute;nero, mujeres, poblaciones vulnerables, pueblos ind&iacute;genas, LGBTQI+ y derechos humanos.{% else %}G&ecirc;nero, mulheres, popula&ccedil;&otilde;es vulner&aacute;veis, povos ind&iacute;genas, LGBTQI+ e direitos humanos.{% endif %}</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="feature-card h-100">
+                <span class="badge-soft badge-yellow">03</span>
+                <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</h3>
+                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Infrastructure, water, energy, environment and technology.{% elif LANGUAGE_CODE == 'es' %}Infraestructura, agua, energ&iacute;a, medio ambiente y tecnolog&iacute;a.{% else %}Infraestrutura, &aacute;gua, energia, meio ambiente e tecnologia.{% endif %}</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="feature-card h-100">
+                <span class="badge-soft badge-yellow">04</span>
+                <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Frameworks{% elif LANGUAGE_CODE == 'es' %}Normativas{% else %}Normativas{% endif %}</h3>
+                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Paris Agreement, SDGs, Sendai Framework and other international references.{% elif LANGUAGE_CODE == 'es' %}Acuerdo de Par&iacute;s, ODS, Marco de Sendai y otras referencias internacionales.{% else %}Acordo de Paris, ODS, Marco de Sendai e outras refer&ecirc;ncias internacionais.{% endif %}</p>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}
