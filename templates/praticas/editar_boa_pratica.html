@@ -2,22 +2,39 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Submit good practice{% elif LANGUAGE_CODE == 'es' %}Enviar buena pr&aacute;ctica{% else %}Enviar boa pr&aacute;tica{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Edit submission{% elif LANGUAGE_CODE == 'es' %}Editar env&iacute;o{% else %}Editar envio{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submission form{% elif LANGUAGE_CODE == 'es' %}Formulario de env&iacute;o{% else %}Formul&aacute;rio de envio{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Submit a good practice{% elif LANGUAGE_CODE == 'es' %}Enviar una buena pr&aacute;ctica{% else %}Enviar uma boa pr&aacute;tica{% endif %}</h1>
-    <p class="section-subtitle">{% if LANGUAGE_CODE == 'en' %}You can save a draft or submit the experience for review. Submitted content is not published automatically.{% elif LANGUAGE_CODE == 'es' %}Puede guardar un borrador o enviar la experiencia para revisi&oacute;n. El contenido enviado no se publica autom&aacute;ticamente.{% else %}Voc&ecirc; pode salvar um rascunho ou enviar a experi&ecirc;ncia para revis&atilde;o. O conte&uacute;do enviado n&atilde;o &eacute; publicado automaticamente.{% endif %}</p>
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Edit before publication{% elif LANGUAGE_CODE == 'es' %}Editar antes de la publicaci&oacute;n{% else %}Editar antes da publica&ccedil;&atilde;o{% endif %}</div>
+    <h1 class="section-title display-6 mb-2">{{ experiencia.titulo_exibicao }}</h1>
+    <p class="section-subtitle">
+        {% if LANGUAGE_CODE == 'en' %}
+            Update the submission and send it again for review. You may also save it as a draft.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Actualice el env&iacute;o y vuelva a enviarlo para revisi&oacute;n. Tambi&eacute;n puede guardarlo como borrador.
+        {% else %}
+            Atualize o envio e reenvie para revis&atilde;o. Voc&ecirc; tamb&eacute;m pode salvar como rascunho.
+        {% endif %}
+    </p>
+
+    {% if experiencia.comentario_revisor %}
+        <div class="alert alert-warning">
+            <strong>{% if LANGUAGE_CODE == 'en' %}Reviewer comment{% elif LANGUAGE_CODE == 'es' %}Comentario de revisi&oacute;n{% else %}Coment&aacute;rio da revis&atilde;o{% endif %}:</strong>
+            {{ experiencia.comentario_revisor }}
+        </div>
+    {% endif %}
 </section>
 
 <form method="post" enctype="multipart/form-data" class="row g-4">
     {% csrf_token %}
+    <input type="hidden" name="email_contato_original" value="{{ email_validado }}">
+
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
     <div class="col-12">
         <div class="form-section">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Required identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n obligatoria{% else %}Identifica&ccedil;&atilde;o obrigat&oacute;ria{% endif %}</h2>
+            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n{% else %}Identifica&ccedil;&atilde;o{% endif %}</h2>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
@@ -40,13 +57,11 @@
                 <div class="col-lg-6">
                     <label class="form-label fw-semibold">{{ form.temas_transversais.label }}</label>
                     {{ form.temas_transversais }}
-                    {% if form.temas_transversais.help_text %}<div class="form-text">{{ form.temas_transversais.help_text }}</div>{% endif %}
                     {% for error in form.temas_transversais.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
                 </div>
                 <div class="col-lg-6">
                     <label class="form-label fw-semibold">{{ form.normas_internacionais.label }}</label>
                     {{ form.normas_internacionais }}
-                    {% if form.normas_internacionais.help_text %}<div class="form-text">{{ form.normas_internacionais.help_text }}</div>{% endif %}
                     {% for error in form.normas_internacionais.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
                 </div>
             </div>
@@ -55,7 +70,7 @@
 
     <div class="col-12">
         <div class="form-section">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Audit questions, criteria and tools{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y herramientas{% else %}Perguntas, crit&eacute;rios e ferramentas{% endif %}</h2>
+            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Audit content{% elif LANGUAGE_CODE == 'es' %}Contenido de auditor&iacute;a{% else %}Conte&uacute;do de auditoria{% endif %}</h2>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "pessoa_responsavel,objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade,contribui_para_guia" %}
@@ -73,8 +88,21 @@
 
     <div class="col-12">
         <div class="form-section">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Attachments and external links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces externos{% else %}Anexos e links externos{% endif %}</h2>
-            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}PDF, Word or Excel files are recommended. Use clear titles such as "Audit report" or "Methodological matrix".{% elif LANGUAGE_CODE == 'es' %}Se recomiendan archivos PDF, Word o Excel. Use t&iacute;tulos claros como "Informe de auditor&iacute;a" o "Matriz metodol&oacute;gica".{% else %}S&atilde;o recomendados arquivos PDF, Word ou Excel. Use t&iacute;tulos claros como "Informe de auditoria" ou "Matriz metodol&oacute;gica".{% endif %}</p>
+            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Add new attachments{% elif LANGUAGE_CODE == 'es' %}Agregar nuevos anexos{% else %}Adicionar novos anexos{% endif %}</h2>
+
+            {% if experiencia.anexos.all %}
+                <div class="mb-3">
+                    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Existing attachments{% elif LANGUAGE_CODE == 'es' %}Anexos existentes{% else %}Anexos existentes{% endif %}</div>
+                    {% for anexo in experiencia.anexos.all %}
+                        <div class="small mb-2">
+                            <strong>{{ anexo.titulo_exibicao }}</strong>
+                            {% if anexo.arquivo %} &bull; <a href="{{ anexo.arquivo.url }}" target="_blank">Download</a>{% endif %}
+                            {% if anexo.url_externa %} &bull; <a href="{{ anexo.url_externa }}" target="_blank">Link</a>{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% for indice in "123" %}
             <div class="row g-2 align-items-end mb-3">
                 <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}Attachment title{% elif LANGUAGE_CODE == 'es' %}T&iacute;tulo del anexo{% else %}T&iacute;tulo do anexo{% endif %} {{ indice }}</label><input class="form-control" type="text" name="anexo_titulo_{{ indice }}"></div>
@@ -86,9 +114,9 @@
     </div>
 
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
+        <a href="{% url 'status_envio' %}?email_contato={{ email_validado }}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to status{% elif LANGUAGE_CODE == 'es' %}Volver al estado{% else %}Voltar ao status{% endif %}</a>
         <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
-        <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisi&oacute;n{% else %}Enviar para revis&atilde;o{% endif %}</button>
+        <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Resubmit for review{% elif LANGUAGE_CODE == 'es' %}Reenviar para revisi&oacute;n{% else %}Reenviar para revis&atilde;o{% endif %}</button>
     </div>
 </form>
 {% endblock %}
