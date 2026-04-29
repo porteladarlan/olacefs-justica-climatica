@@ -1,4 +1,4 @@
-﻿from django.db.models import Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 
 from .models import (
@@ -16,6 +16,11 @@ from .models import (
 def pagina_inicial(request):
     experiencias_publicadas = Experiencia.objects.filter(
         status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).select_related(
+        "efs",
+        "pais",
+        "tipo_experiencia",
+        "setor",
     )
 
     contexto = {
@@ -28,17 +33,22 @@ def pagina_inicial(request):
 
 
 def catalogo_experiencias(request):
-    experiencias = Experiencia.objects.filter(
-        status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
-    ).select_related(
-        "efs",
-        "pais",
-        "tipo_experiencia",
-        "setor",
-    ).prefetch_related(
-        "dimensoes_consideradas",
-        "grupos_vulneraveis",
-    ).distinct()
+    experiencias = (
+        Experiencia.objects.filter(
+            status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+        )
+        .select_related(
+            "efs",
+            "pais",
+            "tipo_experiencia",
+            "setor",
+        )
+        .prefetch_related(
+            "dimensoes_consideradas",
+            "grupos_vulneraveis",
+        )
+        .distinct()
+    )
 
     pais_id = request.GET.get("pais")
     efs_id = request.GET.get("efs")
@@ -51,26 +61,65 @@ def catalogo_experiencias(request):
 
     if pais_id:
         experiencias = experiencias.filter(pais_id=pais_id)
+
     if efs_id:
         experiencias = experiencias.filter(efs_id=efs_id)
+
     if tipo_id:
         experiencias = experiencias.filter(tipo_experiencia_id=tipo_id)
+
     if setor_id:
         experiencias = experiencias.filter(setor_id=setor_id)
+
     if dimensao_id:
         experiencias = experiencias.filter(dimensoes_consideradas__id=dimensao_id)
+
     if grupo_id:
         experiencias = experiencias.filter(grupos_vulneraveis__id=grupo_id)
+
     if ano:
         experiencias = experiencias.filter(ano_execucao=ano)
+
     if termo:
         experiencias = experiencias.filter(
             Q(titulo__icontains=termo)
+            | Q(titulo_es__icontains=termo)
+            | Q(titulo_en__icontains=termo)
             | Q(descricao__icontains=termo)
+            | Q(descricao_es__icontains=termo)
+            | Q(descricao_en__icontains=termo)
             | Q(problema_climatico__icontains=termo)
+            | Q(problema_climatico_es__icontains=termo)
+            | Q(problema_climatico_en__icontains=termo)
+            | Q(objetivo__icontains=termo)
+            | Q(objetivo_es__icontains=termo)
+            | Q(objetivo_en__icontains=termo)
             | Q(resultados__icontains=termo)
+            | Q(resultados_es__icontains=termo)
+            | Q(resultados_en__icontains=termo)
+            | Q(recomendacoes__icontains=termo)
+            | Q(recomendacoes_es__icontains=termo)
+            | Q(recomendacoes_en__icontains=termo)
             | Q(motivo_boa_pratica__icontains=termo)
-        )
+            | Q(motivo_boa_pratica_es__icontains=termo)
+            | Q(motivo_boa_pratica_en__icontains=termo)
+            | Q(elementos_replicaveis__icontains=termo)
+            | Q(elementos_replicaveis_es__icontains=termo)
+            | Q(elementos_replicaveis_en__icontains=termo)
+            | Q(setor__nome__icontains=termo)
+            | Q(setor__nome_es__icontains=termo)
+            | Q(setor__nome_en__icontains=termo)
+            | Q(tipo_experiencia__nome__icontains=termo)
+            | Q(tipo_experiencia__nome_es__icontains=termo)
+            | Q(tipo_experiencia__nome_en__icontains=termo)
+            | Q(pais__nome__icontains=termo)
+            | Q(pais__nome_es__icontains=termo)
+            | Q(pais__nome_en__icontains=termo)
+            | Q(efs__nome__icontains=termo)
+            | Q(efs__nome_es__icontains=termo)
+            | Q(efs__nome_en__icontains=termo)
+            | Q(efs__sigla__icontains=termo)
+        ).distinct()
 
     contexto = {
         "experiencias": experiencias,
@@ -80,7 +129,11 @@ def catalogo_experiencias(request):
         "setores": Setor.objects.all(),
         "dimensoes": DimensaoJusticaClimatica.objects.all(),
         "grupos": GrupoVulneravel.objects.all(),
-        "anos": Experiencia.objects.values_list("ano_execucao", flat=True).distinct().order_by("-ano_execucao"),
+        "anos": (
+            Experiencia.objects.values_list("ano_execucao", flat=True)
+            .distinct()
+            .order_by("-ano_execucao")
+        ),
     }
     return render(request, "praticas/catalogo_experiencias.html", contexto)
 
@@ -100,11 +153,19 @@ def detalhe_experiencia(request, pk):
         pk=pk,
         status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
     )
-    return render(request, "praticas/detalhe_experiencia.html", {"experiencia": experiencia})
+    return render(
+        request,
+        "praticas/detalhe_experiencia.html",
+        {"experiencia": experiencia},
+    )
 
 
 def banco_tecnico(request):
-    recursos = BancoTecnico.objects.select_related("setor").prefetch_related("dimensoes")
+    recursos = (
+        BancoTecnico.objects.select_related("setor")
+        .prefetch_related("dimensoes")
+        .all()
+    )
     return render(request, "praticas/banco_tecnico.html", {"recursos": recursos})
 
 

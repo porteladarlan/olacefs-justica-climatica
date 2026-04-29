@@ -1,34 +1,27 @@
-﻿venv/
+# Ambiente virtual
+venv/
+.env
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 .Python
-.env
+
+# Banco e arquivos locais
 db.sqlite3
 media/
 staticfiles/
+
+# IDE e sistema operacional
 .vscode/
 .idea/
 .DS_Store
 
-# Scripts locais de desenvolvimento
-scripts/dev/
-scripts/setup/
-db.sqlite3
-media/
-__pycache__/
-*.pyc
-venv/
-
-# Scripts locais de desenvolvimento
+# Scripts locais
 scripts/dev/
 scripts/setup/
 
-# Scripts locais de desenvolvimento
-scripts/dev/
-db.sqlite3
-media/
-venv/
-__pycache__/
-*.pyc
+# Logs
+*.log
