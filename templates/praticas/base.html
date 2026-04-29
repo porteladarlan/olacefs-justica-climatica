@@ -9,11 +9,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
+            --blue-950: #062f3f;
             --blue-900: #07384a;
             --blue-800: #0b4f66;
             --blue-700: #126a84;
             --blue-100: #e9f5f8;
+            --blue-050: #f5fbfc;
             --yellow-500: #f2c230;
+            --yellow-100: #fff4c9;
             --green-500: #65b96f;
             --red-500: #d84937;
             --ink: #1f3037;
@@ -22,6 +25,7 @@
             --surface: #ffffff;
             --background: #f6f9fa;
             --shadow-soft: 0 16px 40px rgba(7, 56, 74, 0.08);
+            --shadow-nav: 0 10px 28px rgba(7, 56, 74, 0.07);
             --radius-xl: 26px;
             --radius-lg: 18px;
             --radius-md: 12px;
@@ -58,50 +62,44 @@
         }
 
         .navbar-institutional {
-            background: rgba(255, 255, 255, 0.97);
+            background: rgba(255, 255, 255, 0.98);
             border-bottom: 1px solid rgba(7, 56, 74, 0.10);
-            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-nav);
+            backdrop-filter: blur(14px);
         }
 
         .brand-lockup {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            flex-direction: column;
+            justify-content: center;
             color: var(--ink);
             text-decoration: none;
-            min-width: 270px;
-        }
-
-        .brand-symbol {
-            width: 42px;
-            height: 42px;
-            flex: 0 0 42px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.82rem;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            box-shadow: 0 10px 22px rgba(7, 56, 74, 0.16);
+            min-width: 260px;
+            padding: 0.25rem 0;
         }
 
         .brand-name {
             display: block;
-            color: var(--blue-900);
-            font-weight: 700;
-            font-size: 0.98rem;
+            color: var(--blue-950);
+            font-weight: 800;
+            font-size: 1.05rem;
             line-height: 1.15;
+            letter-spacing: -0.02em;
         }
 
         .brand-caption {
             display: block;
             color: var(--muted);
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             line-height: 1.25;
-            margin-top: 0.15rem;
+            margin-top: 0.16rem;
+            font-weight: 500;
+        }
+
+        .navbar-toggler {
+            border-color: var(--line);
+            border-radius: 999px;
+            padding: 0.5rem 0.7rem;
         }
 
         .navbar-nav {
@@ -109,17 +107,18 @@
         }
 
         .navbar-nav .nav-link {
-            color: #42545d;
-            font-weight: 600;
-            font-size: 0.88rem;
-            padding: 0.48rem 0.58rem;
+            color: #41515a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.58rem 0.7rem;
             border-radius: 999px;
             white-space: nowrap;
+            transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
         }
 
         .navbar-nav .nav-link:hover,
         .navbar-nav .nav-link:focus-visible {
-            color: var(--blue-900);
+            color: var(--blue-950);
             background: var(--blue-100);
         }
 
@@ -127,18 +126,56 @@
             background: var(--yellow-500);
             color: #203138 !important;
             border-radius: 999px;
-            padding-left: 0.85rem !important;
-            padding-right: 0.85rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
             box-shadow: 0 8px 18px rgba(242, 194, 48, 0.24);
         }
 
-        .nav-primary-action:hover {
+        .nav-primary-action:hover,
+        .nav-primary-action:focus-visible {
             background: #ffd24a !important;
+            color: #203138 !important;
         }
 
         .nav-secondary-action {
             border: 1px solid var(--line);
             background: #fff;
+        }
+
+        .dropdown-menu {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: 0 18px 42px rgba(7, 56, 74, 0.14);
+            padding: 0.55rem;
+            min-width: 230px;
+        }
+
+        .dropdown-item {
+            border-radius: 10px;
+            color: var(--ink);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.62rem 0.72rem;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background: var(--blue-100);
+            color: var(--blue-950);
+        }
+
+        .dropdown-header {
+            color: var(--blue-700);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.5rem 0.72rem 0.35rem;
+        }
+
+        .dropdown-divider {
+            border-top-color: var(--line);
+            margin: 0.45rem 0;
         }
 
         .language-select {
@@ -147,9 +184,10 @@
             border-radius: 999px;
             border-color: var(--line);
             font-size: 0.84rem;
-            padding: 0.42rem 2rem 0.42rem 0.8rem;
-            font-weight: 700;
-            color: var(--blue-900);
+            padding: 0.5rem 2rem 0.5rem 0.82rem;
+            font-weight: 800;
+            color: var(--blue-950);
+            background-color: #fff;
         }
 
         .main-shell {
@@ -388,9 +426,12 @@
         .status-rascunho { background: #f4f1e7; color: #705a11; }
         .status-enviado { background: #e7f3f6; color: #005e7a; }
         .status-em_revisao { background: #fff4d5; color: #846000; }
-        .status-aprovado { background: #e8f5e9; color: #2e7d32; }
+        .status-aprovado,
+        .status-aprovada { background: #e8f5e9; color: #2e7d32; }
         .status-publicado { background: #e3f2fd; color: #1565c0; }
-        .status-rejeitado { background: #fdecea; color: #b42318; }
+        .status-rejeitado,
+        .status-rejeitada { background: #fdecea; color: #b42318; }
+        .status-pendente { background: #fff4d5; color: #846000; }
 
         .filter-panel {
             background: linear-gradient(180deg, #fff, #f8fbfb);
@@ -424,20 +465,37 @@
         @media (max-width: 991.98px) {
             .brand-lockup {
                 min-width: 0;
+                max-width: 72%;
+            }
+
+            .brand-name {
+                font-size: 0.98rem;
             }
 
             .navbar-nav {
                 align-items: stretch;
                 padding-top: 1rem;
+                gap: 0.35rem;
             }
 
             .navbar-nav .nav-link {
-                border-radius: 10px;
+                border-radius: 12px;
+                padding: 0.75rem 0.85rem;
+            }
+
+            .dropdown-menu {
+                box-shadow: none;
+                border-radius: 12px;
+                margin-top: 0.35rem;
             }
 
             .nav-primary-action,
             .nav-secondary-action {
                 text-align: center;
+            }
+
+            .language-select {
+                width: 100%;
             }
         }
     </style>
@@ -448,18 +506,15 @@
 <nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top">
     <div class="container">
         <a class="brand-lockup" href="{% url 'pagina_inicial' %}">
-            <span class="brand-symbol">JC</span>
-            <span>
-                <span class="brand-name">Plataforma Regional OLACEFS</span>
-                <span class="brand-caption">
-                    {% if LANGUAGE_CODE == 'en' %}
-                        Audit and Climate Justice
-                    {% elif LANGUAGE_CODE == 'es' %}
-                        Auditor&iacute;a y Justicia Clim&aacute;tica
-                    {% else %}
-                        Auditoria e Justi&ccedil;a Clim&aacute;tica
-                    {% endif %}
-                </span>
+            <span class="brand-name">Plataforma Regional OLACEFS</span>
+            <span class="brand-caption">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Audit and Climate Justice
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Auditor&iacute;a y Justicia Clim&aacute;tica
+                {% else %}
+                    Auditoria e Justi&ccedil;a Clim&aacute;tica
+                {% endif %}
             </span>
         </a>
 
@@ -474,72 +529,116 @@
                         {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'catalogo_experiencias' %}">
                         {% if LANGUAGE_CODE == 'en' %}Practices{% elif LANGUAGE_CODE == 'es' %}Pr&aacute;cticas{% else %}Pr&aacute;ticas{% endif %}
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'comparar_experiencias' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Compare{% elif LANGUAGE_CODE == 'es' %}Comparar{% else %}Comparar{% endif %}
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'favoritos_experiencias' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Favorites{% elif LANGUAGE_CODE == 'es' %}Favoritos{% else %}Favoritos{% endif %}
-                    </a>
-                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'normas_internacionais' %}">
                         {% if LANGUAGE_CODE == 'en' %}Standards{% elif LANGUAGE_CODE == 'es' %}Normas{% else %}Normas{% endif %}
                     </a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'banco_tecnico' %}">
                         {% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-secondary-action" href="{% url 'status_envio' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Status{% elif LANGUAGE_CODE == 'es' %}Estado{% else %}Status{% endif %}
-                    </a>
-                </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link nav-secondary-action" href="{% url 'meus_envios' %}">
-                        {% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}
-                    </a>
-                </li>
-                {% endif %}
+
                 <li class="nav-item">
                     <a class="nav-link nav-primary-action" href="{% url 'adicionar_boa_pratica' %}">
                         {% if LANGUAGE_CODE == 'en' %}Submit{% elif LANGUAGE_CODE == 'es' %}Enviar{% else %}Enviar{% endif %}
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-secondary-action" href="{% url 'painel_revisao' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Review{% elif LANGUAGE_CODE == 'es' %}Revisi&oacute;n{% else %}Revis&atilde;o{% endif %}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle nav-secondary-action" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if LANGUAGE_CODE == 'en' %}My area{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="dropdown-header">
+                            {% if LANGUAGE_CODE == 'en' %}User tools{% elif LANGUAGE_CODE == 'es' %}Herramientas de usuario{% else %}Ferramentas do usu&aacute;rio{% endif %}
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'favoritos_experiencias' %}">
+                                {% if LANGUAGE_CODE == 'en' %}Favorites{% elif LANGUAGE_CODE == 'es' %}Favoritos{% else %}Favoritos{% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'comparar_experiencias' %}">
+                                {% if LANGUAGE_CODE == 'en' %}Compare practices{% elif LANGUAGE_CODE == 'es' %}Comparar pr&aacute;cticas{% else %}Comparar pr&aacute;ticas{% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'status_envio' %}">
+                                {% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %}
+                            </a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'meus_envios' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        {% if request.user.is_authenticated %}
+                            <li>
+                                <span class="dropdown-item-text small text-muted d-block px-3 py-2">
+                                    {{ request.user.get_full_name|default:request.user.username }}
+                                </span>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'logout_usuario' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'login_usuario' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'registrar_usuario' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link nav-secondary-action" href="{% url 'logout_usuario' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle nav-secondary-action" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if LANGUAGE_CODE == 'en' %}Governance{% elif LANGUAGE_CODE == 'es' %}Gesti&oacute;n{% else %}Gest&atilde;o{% endif %}
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="dropdown-header">
+                            {% if LANGUAGE_CODE == 'en' %}Restricted area{% elif LANGUAGE_CODE == 'es' %}Área restringida{% else %}Área restrita{% endif %}
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'painel_revisao' %}">
+                                {% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n{% else %}Painel de revis&atilde;o{% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'painel_revisao_edicoes' %}">
+                                {% if LANGUAGE_CODE == 'en' %}Published edits{% elif LANGUAGE_CODE == 'es' %}Ediciones publicadas{% else %}Edi&ccedil;&otilde;es publicadas{% endif %}
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/">Admin Django</a>
+                        </li>
+                    </ul>
                 </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link nav-secondary-action" href="{% url 'login_usuario' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}
-                    </a>
-                </li>
-                {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link nav-secondary-action" href="/admin/">Admin</a>
-                </li>
+
                 <li class="nav-item">
                     <div class="ms-lg-1 mt-2 mt-lg-0">
-                        <select id="languageSwitcher" class="form-select form-select-sm language-select">
+                        <select id="languageSwitcher" class="form-select form-select-sm language-select" aria-label="Selecionar idioma">
                             <option value="pt-br" {% if LANGUAGE_CODE == 'pt-br' %}selected{% endif %}>PT</option>
                             <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>ES</option>
                             <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
