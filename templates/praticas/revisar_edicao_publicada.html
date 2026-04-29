@@ -1,0 +1,50 @@
+{% extends 'praticas/base.html' %}
+{% block title %}Revisar edição publicada | Plataforma Regional{% endblock %}
+
+{% block content %}
+<a href="{% url 'painel_revisao_edicoes' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; Voltar ao painel de edições</a>
+
+<section class="page-hero mb-4">
+    <div class="hero-content">
+        <span class="hero-eyebrow">Proposta de edição publicada</span>
+        <h1 class="hero-title">{{ proposta.experiencia.titulo_exibicao }}</h1>
+        <p class="hero-subtitle">Status da proposta: {{ proposta.get_status_display }} &bull; Autor: {{ proposta.email_contato }}</p>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="detail-section mb-3">
+            <div class="section-kicker">Comentário do autor</div>
+            <p class="section-subtitle mb-0">{{ proposta.comentario_autor|default:"Sem comentário." }}</p>
+        </section>
+
+        <section class="detail-section mb-3">
+            <div class="section-kicker">Resumo técnico da proposta</div>
+            <h2 class="section-title h4">Campos propostos</h2>
+            <pre class="bg-light border rounded p-3 small" style="white-space: pre-wrap;">{{ proposta.dados_json }}</pre>
+        </section>
+    </div>
+
+    <aside class="col-lg-4">
+        <section class="form-section">
+            <div class="section-kicker">Decisão do revisor</div>
+            <h2 class="section-title h4 mb-3">Registrar decisão</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ form.acao.label }}</label>
+                    {{ form.acao }}
+                    {% for error in form.acao.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ form.comentario_revisor.label }}</label>
+                    {{ form.comentario_revisor }}
+                    {% for error in form.comentario_revisor.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Salvar decisão</button>
+            </form>
+        </section>
+    </aside>
+</div>
+{% endblock %}

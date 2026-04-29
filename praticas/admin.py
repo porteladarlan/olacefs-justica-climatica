@@ -9,6 +9,7 @@ from .models import (
     GrupoVulneravel,
     NormaInternacional,
     Pais,
+    PropostaEdicaoExperiencia,
     Setor,
     TemaTransversal,
     TipoExperiencia,
@@ -139,24 +140,14 @@ class ExperienciaAdmin(admin.ModelAdmin):
     date_hierarchy = "criado_em"
     list_per_page = 20
 
-    fieldsets = (
-        ("Identificacao obrigatoria", {"fields": ("titulo", "titulo_es", "titulo_en", "efs", "pais", "tipo_experiencia", "ano_execucao", "status_iniciativa", "setor", "temas_transversais", "normas_internacionais")}),
-        ("Contato e revisao", {"fields": ("contato_referencia", "email_contato", "pessoa_responsavel", "status_publicacao", "comentario_revisor", "contribui_para_guia", "destacado", "relevante")}),
-        ("Contexto PT", {"fields": ("descricao", "problema_climatico", "relacao_adaptacao_mitigacao_gestao_desastres", "riscos_climaticos", "enfoque_justica_climatica", "impactos_diferenciados")}),
-        ("Contexto ES", {"fields": ("descricao_es", "problema_climatico_es", "relacao_adaptacao_mitigacao_gestao_desastres_es", "riscos_climaticos_es", "enfoque_justica_climatica_es", "impactos_diferenciados_es")}),
-        ("Contexto EN", {"fields": ("descricao_en", "problema_climatico_en", "relacao_adaptacao_mitigacao_gestao_desastres_en", "riscos_climaticos_en", "enfoque_justica_climatica_en", "impactos_diferenciados_en")}),
-        ("Classificacao complementar", {"fields": ("dimensoes_consideradas", "grupos_vulneraveis")}),
-        ("Perguntas, criterios e ferramentas PT", {"fields": ("objetivo", "perguntas_chave", "criterios_utilizados", "metodologia", "ferramentas_utilizadas", "fontes_informacao")}),
-        ("Perguntas, criterios e ferramentas ES", {"fields": ("objetivo_es", "perguntas_chave_es", "criterios_utilizados_es", "metodologia_es", "ferramentas_utilizadas_es", "fontes_informacao_es")}),
-        ("Perguntas, criterios e ferramentas EN", {"fields": ("objetivo_en", "perguntas_chave_en", "criterios_utilizados_en", "metodologia_en", "ferramentas_utilizadas_en", "fontes_informacao_en")}),
-        ("Resultados PT", {"fields": ("resultados", "recomendacoes", "mudancas_ou_impactos", "motivo_boa_pratica")}),
-        ("Resultados ES", {"fields": ("resultados_es", "recomendacoes_es", "mudancas_ou_impactos_es", "motivo_boa_pratica_es")}),
-        ("Resultados EN", {"fields": ("resultados_en", "recomendacoes_en", "mudancas_ou_impactos_en", "motivo_boa_pratica_en")}),
-        ("Replicabilidade PT", {"fields": ("elementos_replicaveis", "dificuldades", "licoes_aprendidas", "o_que_fariam_diferente", "replicabilidade", "necessidades_para_replicacao", "ferramentas_metodologias_uteis", "temas_sugeridos_para_guia", "apoio_requerido_pelas_efs")}),
-        ("Replicabilidade ES", {"fields": ("elementos_replicaveis_es", "dificuldades_es", "licoes_aprendidas_es", "o_que_fariam_diferente_es", "replicabilidade_es", "necessidades_para_replicacao_es", "ferramentas_metodologias_uteis_es", "temas_sugeridos_para_guia_es", "apoio_requerido_pelas_efs_es")}),
-        ("Replicabilidade EN", {"fields": ("elementos_replicaveis_en", "dificuldades_en", "licoes_aprendidas_en", "o_que_fariam_diferente_en", "replicabilidade_en", "necessidades_para_replicacao_en", "ferramentas_metodologias_uteis_en", "temas_sugeridos_para_guia_en", "apoio_requerido_pelas_efs_en")}),
-        ("Controle", {"fields": ("criado_em", "atualizado_em")}),
-    )
+
+@admin.register(PropostaEdicaoExperiencia)
+class PropostaEdicaoExperienciaAdmin(admin.ModelAdmin):
+    list_display = ("experiencia", "email_contato", "status", "criado_em", "atualizado_em")
+    list_filter = ("status", "criado_em")
+    search_fields = ("experiencia__titulo", "email_contato", "comentario_autor", "comentario_revisor")
+    readonly_fields = ("dados_json", "criado_em", "atualizado_em")
+    autocomplete_fields = ("experiencia",)
 
 
 @admin.register(Anexo)

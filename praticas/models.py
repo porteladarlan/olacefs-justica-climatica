@@ -411,6 +411,35 @@ class Anexo(models.Model):
         return texto_por_idioma(self.titulo, self.titulo_es, self.titulo_en)
 
 
+class PropostaEdicaoExperiencia(models.Model):
+    class Status(models.TextChoices):
+        PENDENTE = "pendente", "Pendente"
+        EM_REVISAO = "em_revisao", "Em revisao"
+        APROVADA = "aprovada", "Aprovada"
+        REJEITADA = "rejeitada", "Rejeitada"
+
+    experiencia = models.ForeignKey(
+        Experiencia,
+        on_delete=models.CASCADE,
+        related_name="propostas_edicao",
+    )
+    email_contato = models.EmailField()
+    comentario_autor = models.TextField(blank=True)
+    comentario_revisor = models.TextField(blank=True)
+    dados_json = models.JSONField(default=dict)
+    status = models.CharField(max_length=30, choices=Status.choices, default=Status.PENDENTE)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Proposta de edicao"
+        verbose_name_plural = "Propostas de edicao"
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return f"Proposta de edicao - {self.experiencia.titulo_exibicao} ({self.get_status_display()})"
+
+
 class BancoTecnico(models.Model):
     titulo = models.CharField(max_length=220)
     titulo_es = models.CharField(max_length=220, blank=True)
