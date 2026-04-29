@@ -1,195 +1,39 @@
 {% extends 'praticas/base.html' %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{{ experiencia.titulo }} | Plataforma Regional{% endblock %}
+{% block title %}{{ experiencia.titulo_exibicao }} | Plataforma Regional{% endblock %}
 
 {% block content %}
-<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0 text-decoration-none mb-3">
-    &larr; Voltar ao cat&aacute;logo
-</a>
+<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to catalog{% elif LANGUAGE_CODE == 'es' %}Volver al cat&aacute;logo{% else %}Voltar ao cat&aacute;logo{% endif %}</a>
 
 <section class="page-hero mb-4">
-    <span class="hero-eyebrow">Ficha executiva da experi&ecirc;ncia</span>
-    <h1 class="hero-title">{{ experiencia.titulo }}</h1>
-    <p class="hero-subtitle">
-        {{ experiencia.efs.nome }} &bull; {{ experiencia.pais.nome }} &bull; {{ experiencia.ano_execucao }}
-    </p>
-
-    <div class="d-flex flex-wrap gap-2 mt-4">
-        <span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome }}</span>
-        <span class="badge-soft badge-yellow">{{ experiencia.setor.nome }}</span>
-        <span class="badge-soft badge-yellow">{{ experiencia.get_status_iniciativa_display }}</span>
-    </div>
+    <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Executive experience profile{% elif LANGUAGE_CODE == 'es' %}Ficha ejecutiva de la experiencia{% else %}Ficha executiva da experi&ecirc;ncia{% endif %}</span>
+    <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
+    <p class="hero-subtitle">{{ experiencia.efs.nome_exibicao }} &bull; {{ experiencia.pais.nome_exibicao }} &bull; {{ experiencia.ano_execucao }}</p>
+    <div class="d-flex flex-wrap gap-2 mt-4"><span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome_exibicao }}</span><span class="badge-soft badge-yellow">{{ experiencia.setor.nome_exibicao }}</span><span class="badge-soft badge-yellow">{{ experiencia.get_status_iniciativa_display }}</span></div>
 </section>
 
 <section class="row g-3 mb-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="metric-label">Pa&iacute;s</div>
-            <p class="metric-value fs-4">{{ experiencia.pais.nome }}</p>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="metric-label">EFS</div>
-            <p class="metric-value fs-5">{{ experiencia.efs.sigla|default:experiencia.efs.nome }}</p>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="metric-label">Ano</div>
-            <p class="metric-value fs-4">{{ experiencia.ano_execucao }}</p>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6">
-        <div class="metric-card">
-            <div class="metric-label">Setor</div>
-            <p class="metric-value fs-5">{{ experiencia.setor.nome }}</p>
-        </div>
-    </div>
+    <div class="col-lg-3 col-md-6"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Country{% else %}Pa&iacute;s{% endif %}</div><p class="metric-value fs-4">{{ experiencia.pais.nome_exibicao }}</p></div></div>
+    <div class="col-lg-3 col-md-6"><div class="metric-card"><div class="metric-label">EFS</div><p class="metric-value fs-5">{{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }}</p></div></div>
+    <div class="col-lg-3 col-md-6"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}A&ntilde;o{% else %}Ano{% endif %}</div><p class="metric-value fs-4">{{ experiencia.ano_execucao }}</p></div></div>
+    <div class="col-lg-3 col-md-6"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</div><p class="metric-value fs-5">{{ experiencia.setor.nome_exibicao }}</p></div></div>
 </section>
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Contexto clim&aacute;tico</div>
-            <h2 class="section-title h4">Problema abordado</h2>
-            <p class="section-subtitle mb-0">{{ experiencia.problema_climatico }}</p>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Objetivo da experi&ecirc;ncia</div>
-            <h2 class="section-title h4">O que foi avaliado</h2>
-            <p class="section-subtitle mb-0">{{ experiencia.objetivo }}</p>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Descri&ccedil;&atilde;o</div>
-            <h2 class="section-title h4">Resumo da iniciativa</h2>
-            <p class="section-subtitle mb-0">{{ experiencia.descricao }}</p>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Justi&ccedil;a clim&aacute;tica</div>
-            <h2 class="section-title h4">Enfoque incorporado</h2>
-            <p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica }}</p>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Resultados</div>
-            <h2 class="section-title h4">Principais achados e impactos</h2>
-            <p class="section-subtitle">{{ experiencia.resultados }}</p>
-
-            {% if experiencia.mudancas_ou_impactos %}
-                <hr>
-                <h3 class="h6 section-title">Mudancas ou impactos gerados</h3>
-                <p class="section-subtitle mb-0">{{ experiencia.mudancas_ou_impactos }}</p>
-            {% endif %}
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Recomenda&ccedil;&otilde;es</div>
-            <h2 class="section-title h4">Encaminhamentos sugeridos</h2>
-            <p class="section-subtitle mb-0">{{ experiencia.recomendacoes }}</p>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Replicabilidade</div>
-            <h2 class="section-title h4">Potencial de uso por outras EFS</h2>
-            <p class="section-subtitle">{{ experiencia.replicabilidade }}</p>
-
-            {% if experiencia.necessidades_para_replicacao %}
-                <hr>
-                <h3 class="h6 section-title">Condi&ccedil;&otilde;es para replica&ccedil;&atilde;o</h3>
-                <p class="section-subtitle mb-0">{{ experiencia.necessidades_para_replicacao }}</p>
-            {% endif %}
-        </section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Climate context{% else %}Contexto clim&aacute;tico{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Problem addressed{% elif LANGUAGE_CODE == 'es' %}Problema abordado{% else %}Problema abordado{% endif %}</h2><p class="section-subtitle mb-0">{{ experiencia.problema_climatico_exibicao }}</p></section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Objective{% else %}Objetivo{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}What was assessed{% elif LANGUAGE_CODE == 'es' %}Qu&eacute; fue evaluado{% else %}O que foi avaliado{% endif %}</h2><p class="section-subtitle mb-0">{{ experiencia.objetivo_exibicao }}</p></section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Description{% elif LANGUAGE_CODE == 'es' %}Descripci&oacute;n{% else %}Descri&ccedil;&atilde;o{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Initiative summary{% elif LANGUAGE_CODE == 'es' %}Resumen de la iniciativa{% else %}Resumo da iniciativa{% endif %}</h2><p class="section-subtitle mb-0">{{ experiencia.descricao_exibicao }}</p></section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Climate justice{% elif LANGUAGE_CODE == 'es' %}Justicia clim&aacute;tica{% else %}Justi&ccedil;a clim&aacute;tica{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Incorporated approach{% elif LANGUAGE_CODE == 'es' %}Enfoque incorporado{% else %}Enfoque incorporado{% endif %}</h2><p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica_exibicao }}</p></section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Results{% else %}Resultados{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Main findings and impacts{% elif LANGUAGE_CODE == 'es' %}Principales hallazgos e impactos{% else %}Principais achados e impactos{% endif %}</h2><p class="section-subtitle">{{ experiencia.resultados_exibicao }}</p>{% if experiencia.mudancas_ou_impactos_exibicao %}<hr><h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Changes or impacts generated{% elif LANGUAGE_CODE == 'es' %}Cambios o impactos generados{% else %}Mudan&ccedil;as ou impactos gerados{% endif %}</h3><p class="section-subtitle mb-0">{{ experiencia.mudancas_ou_impactos_exibicao }}</p>{% endif %}</section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Recommendations{% elif LANGUAGE_CODE == 'es' %}Recomendaciones{% else %}Recomenda&ccedil;&otilde;es{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Suggested follow-up{% elif LANGUAGE_CODE == 'es' %}Encaminamientos sugeridos{% else %}Encaminhamentos sugeridos{% endif %}</h2><p class="section-subtitle mb-0">{{ experiencia.recomendacoes_exibicao }}</p></section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</div><h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Potential use by other SAIs{% elif LANGUAGE_CODE == 'es' %}Potencial de uso por otras EFS{% else %}Potencial de uso por outras EFS{% endif %}</h2><p class="section-subtitle">{{ experiencia.replicabilidade_exibicao }}</p></section>
     </div>
-
     <aside class="col-lg-4">
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Classifica&ccedil;&atilde;o</div>
-            <h2 class="section-title h5">Dimens&otilde;es consideradas</h2>
-
-            <div class="d-flex flex-wrap gap-2 mt-3">
-                {% for dimensao in experiencia.dimensoes_consideradas.all %}
-                    <span class="badge-soft">{{ dimensao.nome }}</span>
-                {% empty %}
-                    <span class="text-muted">N&atilde;o informado</span>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">P&uacute;blico afetado</div>
-            <h2 class="section-title h5">Grupos vulner&aacute;veis</h2>
-
-            <div class="d-flex flex-wrap gap-2 mt-3">
-                {% for grupo in experiencia.grupos_vulneraveis.all %}
-                    <span class="badge-soft">{{ grupo.nome }}</span>
-                {% empty %}
-                    <span class="text-muted">N&atilde;o informado</span>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Metodologia</div>
-            <h2 class="section-title h5">Como foi conduzida</h2>
-
-            {% if experiencia.metodologia %}
-                <p class="section-subtitle small">{{ experiencia.metodologia }}</p>
-            {% endif %}
-
-            {% if experiencia.criterios_utilizados %}
-                <h3 class="h6 section-title">Crit&eacute;rios utilizados</h3>
-                <p class="section-subtitle small">{{ experiencia.criterios_utilizados }}</p>
-            {% endif %}
-
-            {% if experiencia.fontes_informacao %}
-                <h3 class="h6 section-title">Fontes de informa&ccedil;&atilde;o</h3>
-                <p class="section-subtitle small mb-0">{{ experiencia.fontes_informacao }}</p>
-            {% endif %}
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Aprendizados</div>
-            <h2 class="section-title h5">Li&ccedil;&otilde;es e elementos replic&aacute;veis</h2>
-
-            {% if experiencia.licoes_aprendidas %}
-                <p class="section-subtitle small">{{ experiencia.licoes_aprendidas }}</p>
-            {% endif %}
-
-            {% if experiencia.elementos_replicaveis %}
-                <h3 class="h6 section-title">Elementos replic&aacute;veis</h3>
-                <p class="section-subtitle small mb-0">{{ experiencia.elementos_replicaveis }}</p>
-            {% endif %}
-        </section>
-
-        {% if experiencia.anexos.all %}
-            <section class="detail-section">
-                <div class="section-kicker">Documentos</div>
-                <h2 class="section-title h5">Anexos</h2>
-
-                <ul class="list-unstyled mb-0 mt-3">
-                    {% for anexo in experiencia.anexos.all %}
-                        <li class="mb-2">
-                            <strong>{{ anexo.titulo }}</strong>
-                            <div>
-                                {% if anexo.url_externa %}
-                                    <a href="{{ anexo.url_externa }}" target="_blank" rel="noopener">Link externo</a>
-                                {% endif %}
-                                {% if anexo.arquivo %}
-                                    <a href="{{ anexo.arquivo.url }}">Arquivo</a>
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% endif %}
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Classification{% elif LANGUAGE_CODE == 'es' %}Clasificaci&oacute;n{% else %}Classifica&ccedil;&atilde;o{% endif %}</div><h2 class="section-title h5">{% if LANGUAGE_CODE == 'en' %}Dimensions considered{% elif LANGUAGE_CODE == 'es' %}Dimensiones consideradas{% else %}Dimens&otilde;es consideradas{% endif %}</h2><div class="d-flex flex-wrap gap-2 mt-3">{% for dimensao in experiencia.dimensoes_consideradas.all %}<span class="badge-soft">{{ dimensao.nome_exibicao }}</span>{% empty %}<span class="text-muted">{% if LANGUAGE_CODE == 'en' %}Not informed{% elif LANGUAGE_CODE == 'es' %}No informado{% else %}N&atilde;o informado{% endif %}</span>{% endfor %}</div></section>
+        <section class="detail-section mb-3"><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Affected population{% elif LANGUAGE_CODE == 'es' %}P&uacute;blico afectado{% else %}P&uacute;blico afetado{% endif %}</div><h2 class="section-title h5">{% if LANGUAGE_CODE == 'en' %}Vulnerable groups{% elif LANGUAGE_CODE == 'es' %}Grupos vulnerables{% else %}Grupos vulner&aacute;veis{% endif %}</h2><div class="d-flex flex-wrap gap-2 mt-3">{% for grupo in experiencia.grupos_vulneraveis.all %}<span class="badge-soft">{{ grupo.nome_exibicao }}</span>{% empty %}<span class="text-muted">{% if LANGUAGE_CODE == 'en' %}Not informed{% elif LANGUAGE_CODE == 'es' %}No informado{% else %}N&atilde;o informado{% endif %}</span>{% endfor %}</div></section>
     </aside>
 </div>
 {% endblock %}
