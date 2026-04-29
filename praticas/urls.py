@@ -8,7 +8,11 @@ urlpatterns = [
     path("experiencias/<int:pk>/", views.detalhe_experiencia, name="detalhe_experiencia"),
     path("normas-internacionais/", views.normas_internacionais, name="normas_internacionais"),
     path("adicionar-boa-pratica/", views.adicionar_boa_pratica, name="adicionar_boa_pratica"),
+    path("editar-boa-pratica/<int:pk>/", views.editar_boa_pratica, name="editar_boa_pratica"),
     path("envio-confirmado/", views.confirmacao_envio, name="confirmacao_envio"),
+    path("status-envio/", views.status_envio, name="status_envio"),
+    path("painel-revisao/", views.painel_revisao, name="painel_revisao"),
+    path("painel-revisao/<int:pk>/", views.revisar_experiencia, name="revisar_experiencia"),
     path("banco-tecnico/", views.banco_tecnico, name="banco_tecnico"),
     path("sobre/", views.sobre_plataforma, name="sobre_plataforma"),
 ]

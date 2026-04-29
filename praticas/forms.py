@@ -86,6 +86,37 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "ferramentas_utilizadas": "Exemplos: perguntas, matrizes, checklists, metodologias, painéis ou bases de dados.",
         }
 
+    def __init__(self, *args, obrigatorio_para_envio=True, **kwargs):
+        self.obrigatorio_para_envio = obrigatorio_para_envio
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.obrigatorio_para_envio:
+            return cleaned_data
+
+        obrigatorios = [
+            "efs",
+            "pais",
+            "titulo",
+            "tipo_experiencia",
+            "setor",
+            "contato_referencia",
+            "email_contato",
+            "descricao",
+            "enfoque_justica_climatica",
+            "ano_execucao",
+        ]
+        for campo in obrigatorios:
+            if not cleaned_data.get(campo):
+                self.add_error(campo, "Campo obrigatório para envio da boa prática.")
+        if not cleaned_data.get("temas_transversais"):
+            self.add_error("temas_transversais", "Selecione pelo menos um tema transversal.")
+        if not cleaned_data.get("normas_internacionais"):
+            self.add_error("normas_internacionais", "Selecione pelo menos uma norma internacional.")
+        return cleaned_data
+
 
 class AnexoSubmissaoForm(forms.ModelForm):
     class Meta:
@@ -96,3 +127,45 @@ class AnexoSubmissaoForm(forms.ModelForm):
             "arquivo": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "url_externa": forms.URLInput(attrs={"class": "form-control"}),
         }
+
+
+class RevisaoExperienciaForm(forms.ModelForm):
+    acao = forms.ChoiceField(
+        label="Decisão da revisão",
+        choices=[
+            ("em_revisao", "Marcar como em revisão"),
+            ("aprovar", "Aprovar"),
+            ("publicar", "Publicar"),
+            ("devolver", "Devolver para ajuste"),
+            ("rejeitar", "Rejeitar"),
+        ],
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
+    class Meta:
+        model = Experiencia
+        fields = ["acao", "comentario_revisor"]
+        widgets = {
+            "comentario_revisor": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Registre comentários para o autor ou justificativa da decisão.",
+                }
+            )
+        }
+        labels = {
+            "comentario_revisor": "Comentário do revisor",
+        }
+
+
+class ConsultaStatusForm(forms.Form):
+    email_contato = forms.EmailField(
+        label="E-mail institucional informado no envio",
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "nome@efs.gob",
+            }
+        ),
+    )

@@ -211,3 +211,44 @@ class RotasPublicasTests(TestCase):
         self.assertContains(response, "Pending good practice")
         self.assertContains(response, "autor@example.org")
         self.assertContains(response, "2026")
+
+    def test_edicao_exige_email_valido(self):
+        experiencia = Experiencia.objects.get(titulo="Boa pratica pendente")
+        response = self.client.get(reverse("editar_boa_pratica", args=[experiencia.pk]))
+        self.assertEqual(response.status_code, 302)
+
+    def test_autor_edita_e_reenvia(self):
+        experiencia = Experiencia.objects.get(titulo="Boa pratica pendente")
+        response = self.client.post(
+            f"{reverse('editar_boa_pratica', args=[experiencia.pk])}?email=autor@example.org",
+            {
+                "efs": experiencia.efs_id,
+                "pais": experiencia.pais_id,
+                "titulo": "Boa pratica ajustada",
+                "tipo_experiencia": experiencia.tipo_experiencia_id,
+                "setor": experiencia.setor_id,
+                "temas_transversais": [str(item.id) for item in experiencia.temas_transversais.all()],
+                "normas_internacionais": [str(item.id) for item in experiencia.normas_internacionais.all()],
+                "contato_referencia": "Contato Ajustado",
+                "email_contato": "autor@example.org",
+                "pessoa_responsavel": "Pessoa Ajustada",
+                "descricao": "Descricao ajustada.",
+                "enfoque_justica_climatica": "Enfoque ajustado.",
+                "objetivo": "Objetivo ajustado.",
+                "perguntas_chave": "Pergunta ajustada.",
+                "criterios_utilizados": "Criterio ajustado.",
+                "metodologia": "Metodologia ajustada.",
+                "ferramentas_utilizadas": "Ferramenta ajustada.",
+                "resultados": "Resultado ajustado.",
+                "recomendacoes": "Recomendacao ajustada.",
+                "replicabilidade": "Replicabilidade ajustada.",
+                "ano_execucao": 2026,
+                "contribui_para_guia": "on",
+                "acao_envio": "enviar",
+                "email_contato_original": "autor@example.org",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        experiencia.refresh_from_db()
+        self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)

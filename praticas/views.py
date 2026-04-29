@@ -1,8 +1,9 @@
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ExperienciaSubmissaoForm
+from .forms import ConsultaStatusForm, ExperienciaSubmissaoForm, RevisaoExperienciaForm
 from .models import (
     Anexo,
     BancoTecnico,
@@ -72,28 +73,20 @@ def catalogo_experiencias(request):
 
     if pais_id:
         experiencias = experiencias.filter(pais_id=pais_id)
-
     if efs_id:
         experiencias = experiencias.filter(efs_id=efs_id)
-
     if tipo_id:
         experiencias = experiencias.filter(tipo_experiencia_id=tipo_id)
-
     if setor_id:
         experiencias = experiencias.filter(setor_id=setor_id)
-
     if tema_id:
         experiencias = experiencias.filter(temas_transversais__id=tema_id)
-
     if norma_id:
         experiencias = experiencias.filter(normas_internacionais__id=norma_id)
-
     if dimensao_id:
         experiencias = experiencias.filter(dimensoes_consideradas__id=dimensao_id)
-
     if grupo_id:
         experiencias = experiencias.filter(grupos_vulneraveis__id=grupo_id)
-
     if ano:
         experiencias = experiencias.filter(ano_execucao=ano)
 
@@ -197,33 +190,47 @@ def normas_internacionais(request):
     return render(request, "praticas/normas_internacionais.html", {"normas": normas})
 
 
+def salvar_anexos_submissao(request, experiencia):
+    for indice in range(1, 4):
+        titulo = request.POST.get(f"anexo_titulo_{indice}", "").strip()
+        arquivo = request.FILES.get(f"anexo_arquivo_{indice}")
+        url = request.POST.get(f"anexo_url_{indice}", "").strip()
+
+        if titulo or arquivo or url:
+            Anexo.objects.create(
+                experiencia=experiencia,
+                titulo=titulo or f"Anexo {indice}",
+                arquivo=arquivo,
+                url_externa=url,
+            )
+
+
 def adicionar_boa_pratica(request):
+    acao = request.POST.get("acao_envio", "enviar")
+    obrigatorio_para_envio = acao != "rascunho"
+
     if request.method == "POST":
-        form = ExperienciaSubmissaoForm(request.POST, request.FILES)
+        form = ExperienciaSubmissaoForm(
+            request.POST,
+            request.FILES,
+            obrigatorio_para_envio=obrigatorio_para_envio,
+        )
         if form.is_valid():
             experiencia = form.save(commit=False)
-            experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
             experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
+            if acao == "rascunho":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
+                mensagem = "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão."
+            else:
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
+                mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
             experiencia.save()
             form.save_m2m()
+            salvar_anexos_submissao(request, experiencia)
 
-            for indice in range(1, 4):
-                titulo = request.POST.get(f"anexo_titulo_{indice}", "").strip()
-                arquivo = request.FILES.get(f"anexo_arquivo_{indice}")
-                url = request.POST.get(f"anexo_url_{indice}", "").strip()
-
-                if titulo or arquivo or url:
-                    Anexo.objects.create(
-                        experiencia=experiencia,
-                        titulo=titulo or f"Anexo {indice}",
-                        arquivo=arquivo,
-                        url_externa=url,
-                    )
-
-            messages.success(
-                request,
-                "Boa prática enviada com sucesso. Ela ficará pendente até a revisão.",
-            )
+            messages.success(request, mensagem)
+            if acao == "rascunho":
+                return redirect(f"{request.path}?rascunho_salvo=1")
             return redirect("confirmacao_envio")
     else:
         form = ExperienciaSubmissaoForm()
@@ -231,8 +238,184 @@ def adicionar_boa_pratica(request):
     return render(request, "praticas/adicionar_boa_pratica.html", {"form": form})
 
 
+def editar_boa_pratica(request, pk):
+    experiencia = get_object_or_404(
+        Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related(
+            "temas_transversais",
+            "normas_internacionais",
+            "anexos",
+        ),
+        pk=pk,
+    )
+
+    email = request.GET.get("email") or request.POST.get("email_contato_original")
+    if not email or email.lower() != (experiencia.email_contato or "").lower():
+        messages.error(
+            request,
+            "Não foi possível validar o e-mail informado para edição deste envio.",
+        )
+        return redirect("status_envio")
+
+    if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
+        messages.error(
+            request,
+            "Esta experiência já está publicada. Nesta versão do MVP, edições de conteúdo publicado devem ser solicitadas à administração.",
+        )
+        return redirect("status_envio")
+
+    acao = request.POST.get("acao_envio", "enviar")
+    obrigatorio_para_envio = acao != "rascunho"
+
+    if request.method == "POST":
+        form = ExperienciaSubmissaoForm(
+            request.POST,
+            request.FILES,
+            instance=experiencia,
+            obrigatorio_para_envio=obrigatorio_para_envio,
+        )
+        if form.is_valid():
+            experiencia = form.save(commit=False)
+            if acao == "rascunho":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
+                mensagem = "Alterações salvas como rascunho."
+            else:
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
+                mensagem = "Boa prática reenviada para revisão."
+            experiencia.save()
+            form.save_m2m()
+            salvar_anexos_submissao(request, experiencia)
+
+            messages.success(request, mensagem)
+            return redirect(f"{reverse_status_url()}?email_contato={experiencia.email_contato}")
+    else:
+        form = ExperienciaSubmissaoForm(instance=experiencia)
+
+    return render(
+        request,
+        "praticas/editar_boa_pratica.html",
+        {
+            "form": form,
+            "experiencia": experiencia,
+            "email_validado": email,
+        },
+    )
+
+
+def reverse_status_url():
+    # Mantido simples para evitar dependência circular em testes e facilitar montagem de query string.
+    return "/status-envio/"
+
+
 def confirmacao_envio(request):
     return render(request, "praticas/confirmacao_envio.html")
+
+
+def status_envio(request):
+    form = ConsultaStatusForm(request.GET or None)
+    experiencias = Experiencia.objects.none()
+
+    if form.is_valid():
+        email = form.cleaned_data["email_contato"]
+        experiencias = (
+            Experiencia.objects.filter(email_contato__iexact=email)
+            .select_related("efs", "pais", "tipo_experiencia", "setor")
+            .order_by("-atualizado_em")
+        )
+
+    return render(
+        request,
+        "praticas/status_envio.html",
+        {
+            "form": form,
+            "experiencias": experiencias,
+            "consulta_realizada": form.is_valid(),
+        },
+    )
+
+
+@staff_member_required
+def painel_revisao(request):
+    status = request.GET.get("status", "")
+    experiencias = (
+        Experiencia.objects.exclude(status_publicacao=Experiencia.StatusPublicacao.PUBLICADO)
+        .select_related("efs", "pais", "tipo_experiencia", "setor")
+        .order_by("-atualizado_em")
+    )
+
+    if status:
+        experiencias = experiencias.filter(status_publicacao=status)
+
+    contadores = {
+        "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
+        "em_revisao": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.EM_REVISAO).count(),
+        "aprovado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.APROVADO).count(),
+        "rascunho": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.RASCUNHO).count(),
+        "rejeitado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.REJEITADO).count(),
+    }
+
+    return render(
+        request,
+        "praticas/painel_revisao.html",
+        {
+            "experiencias": experiencias,
+            "status_atual": status,
+            "status_choices": Experiencia.StatusPublicacao.choices,
+            "contadores": contadores,
+        },
+    )
+
+
+@staff_member_required
+def revisar_experiencia(request, pk):
+    experiencia = get_object_or_404(
+        Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related(
+            "temas_transversais",
+            "normas_internacionais",
+            "dimensoes_consideradas",
+            "grupos_vulneraveis",
+            "anexos",
+        ),
+        pk=pk,
+    )
+
+    if request.method == "POST":
+        form = RevisaoExperienciaForm(request.POST, instance=experiencia)
+        if form.is_valid():
+            acao = form.cleaned_data["acao"]
+            experiencia.comentario_revisor = form.cleaned_data["comentario_revisor"]
+
+            if acao == "em_revisao":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.EM_REVISAO
+                mensagem = "Experiência marcada como em revisão."
+            elif acao == "aprovar":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.APROVADO
+                mensagem = "Experiência aprovada. Ela ainda não está pública."
+            elif acao == "publicar":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
+                mensagem = "Experiência publicada no catálogo público."
+            elif acao == "devolver":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
+                mensagem = "Experiência devolvida para ajustes."
+            elif acao == "rejeitar":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.REJEITADO
+                mensagem = "Experiência rejeitada."
+            else:
+                mensagem = "Revisão registrada."
+
+            experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
+            messages.success(request, mensagem)
+            return redirect("painel_revisao")
+    else:
+        form = RevisaoExperienciaForm(instance=experiencia)
+
+    return render(
+        request,
+        "praticas/revisar_experiencia.html",
+        {
+            "experiencia": experiencia,
+            "form": form,
+        },
+    )
 
 
 def banco_tecnico(request):
