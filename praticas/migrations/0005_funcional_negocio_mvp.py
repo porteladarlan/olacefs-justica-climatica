@@ -43,11 +43,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="experiencia",
-            name="apoio_requerido_pelas_efs_en",
-            field=models.TextField(blank=True),
-        ),
-        migrations.AddField(
-            model_name="experiencia",
             name="comentario_revisor",
             field=models.TextField(blank=True),
         ),
