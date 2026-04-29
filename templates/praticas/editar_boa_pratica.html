@@ -88,16 +88,23 @@
 
     <div class="col-12">
         <div class="form-section">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Add new attachments{% elif LANGUAGE_CODE == 'es' %}Agregar nuevos anexos{% else %}Adicionar novos anexos{% endif %}</h2>
+            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Manage attachments{% elif LANGUAGE_CODE == 'es' %}Gestionar anexos{% else %}Gerenciar anexos{% endif %}</h2>
+            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Keep up to three attachments per experience. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each.{% elif LANGUAGE_CODE == 'es' %}Mantenga hasta tres anexos por experiencia. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno.{% else %}Mantenha at&eacute; tr&ecirc;s anexos por experi&ecirc;ncia. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada.{% endif %}</p>
 
             {% if experiencia.anexos.all %}
                 <div class="mb-3">
                     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Existing attachments{% elif LANGUAGE_CODE == 'es' %}Anexos existentes{% else %}Anexos existentes{% endif %}</div>
                     {% for anexo in experiencia.anexos.all %}
-                        <div class="small mb-2">
-                            <strong>{{ anexo.titulo_exibicao }}</strong>
-                            {% if anexo.arquivo %} &bull; <a href="{{ anexo.arquivo.url }}" target="_blank">Download</a>{% endif %}
-                            {% if anexo.url_externa %} &bull; <a href="{{ anexo.url_externa }}" target="_blank">Link</a>{% endif %}
+                        <div class="border rounded p-2 mb-2 d-flex flex-column flex-md-row justify-content-between gap-2">
+                            <div class="small">
+                                <strong>{{ anexo.titulo_exibicao }}</strong>
+                                {% if anexo.arquivo %} &bull; <a href="{{ anexo.arquivo.url }}" target="_blank">Download</a>{% endif %}
+                                {% if anexo.url_externa %} &bull; <a href="{{ anexo.url_externa }}" target="_blank">Link</a>{% endif %}
+                            </div>
+                            <label class="form-check-label small text-danger">
+                                <input class="form-check-input me-1" type="checkbox" name="remover_anexo" value="{{ anexo.id }}">
+                                {% if LANGUAGE_CODE == 'en' %}Remove{% elif LANGUAGE_CODE == 'es' %}Eliminar{% else %}Remover{% endif %}
+                            </label>
                         </div>
                     {% endfor %}
                 </div>

@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from .models import (
+    Anexo,
     BancoTecnico,
     DimensaoJusticaClimatica,
     EFS,
@@ -325,3 +327,76 @@ class RotasPublicasTests(TestCase):
         response = self.client.get(reverse("meus_envios"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Pending good practice")
+
+    def dados_validos_submissao(self):
+        experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
+        tema = experiencia.temas_transversais.first()
+        norma = experiencia.normas_internacionais.first()
+        return {
+            "efs": experiencia.efs_id,
+            "pais": experiencia.pais_id,
+            "titulo": "Boa pratica com anexo validado",
+            "tipo_experiencia": experiencia.tipo_experiencia_id,
+            "setor": experiencia.setor_id,
+            "temas_transversais": [str(tema.id)],
+            "normas_internacionais": [str(norma.id)],
+            "contato_referencia": "Contato Anexo",
+            "email_contato": "anexo@example.org",
+            "pessoa_responsavel": "Pessoa Anexo",
+            "descricao": "Descricao com anexo.",
+            "enfoque_justica_climatica": "Enfoque com anexo.",
+            "objetivo": "Objetivo com anexo.",
+            "perguntas_chave": "Pergunta com anexo.",
+            "criterios_utilizados": "Criterio com anexo.",
+            "metodologia": "Metodologia com anexo.",
+            "ferramentas_utilizadas": "Ferramenta com anexo.",
+            "resultados": "Resultado com anexo.",
+            "recomendacoes": "Recomendacao com anexo.",
+            "replicabilidade": "Replicabilidade com anexo.",
+            "ano_execucao": 2026,
+            "contribui_para_guia": "on",
+            "acao_envio": "enviar",
+        }
+
+    def test_anexo_invalido_nao_e_aceito_no_envio(self):
+        usuario = get_user_model().objects.create_user(
+            username="autor_anexo",
+            email="anexo@example.org",
+            password="teste123",
+        )
+        self.client.force_login(usuario)
+
+        dados = self.dados_validos_submissao()
+        dados["anexo_titulo_1"] = "Arquivo executavel"
+        dados["anexo_arquivo_1"] = SimpleUploadedFile(
+            "risco.exe",
+            b"conteudo",
+            content_type="application/octet-stream",
+        )
+
+        response = self.client.post(reverse("adicionar_boa_pratica"), dados)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "tipo de arquivo")
+        self.assertFalse(Anexo.objects.filter(titulo="Arquivo executavel").exists())
+
+    def test_anexo_pdf_valido_e_salvo_no_envio(self):
+        usuario = get_user_model().objects.create_user(
+            username="autor_anexo_pdf",
+            email="anexo_pdf@example.org",
+            password="teste123",
+        )
+        self.client.force_login(usuario)
+
+        dados = self.dados_validos_submissao()
+        dados["email_contato"] = "anexo_pdf@example.org"
+        dados["anexo_titulo_1"] = "Relatorio PDF"
+        dados["anexo_arquivo_1"] = SimpleUploadedFile(
+            "relatorio.pdf",
+            b"%PDF-1.4 conteudo",
+            content_type="application/pdf",
+        )
+
+        response = self.client.post(reverse("adicionar_boa_pratica"), dados)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Anexo.objects.filter(titulo="Relatorio PDF").exists())
+

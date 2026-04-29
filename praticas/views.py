@@ -1,4 +1,8 @@
 import json
+from pathlib import Path
+
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -35,6 +39,80 @@ def experiencias_publicas():
     return Experiencia.objects.filter(
         status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
     )
+
+
+ANEXO_EXTENSOES_PERMITIDAS = {".pdf", ".doc", ".docx", ".xls", ".xlsx"}
+ANEXO_TAMANHO_MAXIMO_MB = 10
+ANEXO_TAMANHO_MAXIMO_BYTES = ANEXO_TAMANHO_MAXIMO_MB * 1024 * 1024
+ANEXO_LIMITE_POR_EXPERIENCIA = 3
+
+
+def obter_anexos_do_request(request):
+    anexos = []
+    for indice in range(1, ANEXO_LIMITE_POR_EXPERIENCIA + 1):
+        titulo = request.POST.get(f"anexo_titulo_{indice}", "").strip()
+        arquivo = request.FILES.get(f"anexo_arquivo_{indice}")
+        url = request.POST.get(f"anexo_url_{indice}", "").strip()
+
+        if titulo or arquivo or url:
+            anexos.append(
+                {
+                    "indice": indice,
+                    "titulo": titulo,
+                    "arquivo": arquivo,
+                    "url": url,
+                }
+            )
+    return anexos
+
+
+def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
+    ids_remover = ids_remover or []
+    anexos = obter_anexos_do_request(request)
+    erros = []
+    validador_url = URLValidator(schemes=["http", "https"])
+
+    quantidade_final = quantidade_existente - len(ids_remover) + len(anexos)
+    if quantidade_final > ANEXO_LIMITE_POR_EXPERIENCIA:
+        erros.append(
+            f"É permitido manter no máximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiência."
+        )
+
+    for anexo in anexos:
+        indice = anexo["indice"]
+        arquivo = anexo["arquivo"]
+        url = anexo["url"]
+
+        if arquivo:
+            extensao = Path(arquivo.name).suffix.lower()
+            if extensao not in ANEXO_EXTENSOES_PERMITIDAS:
+                erros.append(
+                    f"Anexo {indice}: tipo de arquivo não permitido. Use PDF, Word ou Excel."
+                )
+            if arquivo.size > ANEXO_TAMANHO_MAXIMO_BYTES:
+                erros.append(
+                    f"Anexo {indice}: arquivo maior que {ANEXO_TAMANHO_MAXIMO_MB} MB."
+                )
+
+        if url:
+            try:
+                validador_url(url)
+            except ValidationError:
+                erros.append(
+                    f"Anexo {indice}: informe uma URL válida iniciada por http:// ou https://."
+                )
+
+        if not arquivo and not url:
+            erros.append(
+                f"Anexo {indice}: informe um arquivo ou um link externo."
+            )
+
+    return anexos, erros
+
+
+def adicionar_erros_anexos_ao_formulario(form, erros):
+    for erro in erros:
+        form.add_error(None, erro)
 
 
 
@@ -336,19 +414,14 @@ def normas_internacionais(request):
     return render(request, "praticas/normas_internacionais.html", {"normas": normas})
 
 
-def salvar_anexos_submissao(request, experiencia):
-    for indice in range(1, 4):
-        titulo = request.POST.get(f"anexo_titulo_{indice}", "").strip()
-        arquivo = request.FILES.get(f"anexo_arquivo_{indice}")
-        url = request.POST.get(f"anexo_url_{indice}", "").strip()
-
-        if titulo or arquivo or url:
-            Anexo.objects.create(
-                experiencia=experiencia,
-                titulo=titulo or f"Anexo {indice}",
-                arquivo=arquivo,
-                url_externa=url,
-            )
+def salvar_anexos_submissao(experiencia, anexos):
+    for anexo in anexos:
+        Anexo.objects.create(
+            experiencia=experiencia,
+            titulo=anexo["titulo"] or f"Anexo {anexo['indice']}",
+            arquivo=anexo["arquivo"],
+            url_externa=anexo["url"],
+        )
 
 
 @login_required(login_url="login_usuario")
@@ -362,7 +435,9 @@ def adicionar_boa_pratica(request):
             request.FILES,
             obrigatorio_para_envio=obrigatorio_para_envio,
         )
-        if form.is_valid():
+        anexos, erros_anexos = validar_anexos_request(request)
+
+        if form.is_valid() and not erros_anexos:
             experiencia = form.save(commit=False)
             experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
             if request.user.is_authenticated and not experiencia.email_contato:
@@ -377,12 +452,14 @@ def adicionar_boa_pratica(request):
                 mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
             experiencia.save()
             form.save_m2m()
-            salvar_anexos_submissao(request, experiencia)
+            salvar_anexos_submissao(experiencia, anexos)
 
             messages.success(request, mensagem)
             if acao == "rascunho":
                 return redirect(f"{request.path}?rascunho_salvo=1")
             return redirect("confirmacao_envio")
+
+        adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
         form = ExperienciaSubmissaoForm(
             initial={
@@ -425,7 +502,20 @@ def editar_boa_pratica(request, pk):
             instance=experiencia,
             obrigatorio_para_envio=obrigatorio_para_envio,
         )
-        if form.is_valid():
+        ids_remover = [
+            int(valor)
+            for valor in request.POST.getlist("remover_anexo")
+            if valor.isdigit()
+        ]
+        quantidade_existente = experiencia.anexos.count()
+        anexos, erros_anexos = validar_anexos_request(
+            request,
+            quantidade_existente=quantidade_existente,
+            ids_remover=ids_remover,
+        )
+
+        if form.is_valid() and not erros_anexos:
+            Anexo.objects.filter(experiencia=experiencia, id__in=ids_remover).delete()
             experiencia = form.save(commit=False)
             if acao == "rascunho":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
@@ -435,10 +525,11 @@ def editar_boa_pratica(request, pk):
                 mensagem = "Boa prática reenviada para revisão."
             experiencia.save()
             form.save_m2m()
-            salvar_anexos_submissao(request, experiencia)
+            salvar_anexos_submissao(experiencia, anexos)
 
             messages.success(request, mensagem)
             return redirect(f"/status-envio/?email_contato={experiencia.email_contato}")
+        adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
         form = ExperienciaSubmissaoForm(instance=experiencia)
 
