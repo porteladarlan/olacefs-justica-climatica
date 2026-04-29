@@ -2,56 +2,59 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Catalog{% else %}Cat&aacute;logo{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Good practices{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas{% else %}Boas pr&aacute;ticas{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Regional catalog{% else %}Cat&aacute;logo regional{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Experiences and good practices{% elif LANGUAGE_CODE == 'es' %}Experiencias y buenas pr&aacute;cticas{% else %}Experi&ecirc;ncias e boas pr&aacute;ticas{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Search initiatives by country, SAI, sector, type of experience, climate justice dimension, vulnerable group or keyword.{% elif LANGUAGE_CODE == 'es' %}Consulte iniciativas por pa&iacute;s, EFS, sector, tipo de experiencia, dimensi&oacute;n de justicia clim&aacute;tica, grupo vulnerable o palabra clave.{% else %}Consulte iniciativas por pa&iacute;s, EFS, setor, tipo de experi&ecirc;ncia, dimens&atilde;o de justi&ccedil;a clim&aacute;tica, grupo vulner&aacute;vel ou palavra-chave.{% endif %}</p>
-</section>
-
-<section class="row g-3 mb-4">
-    <div class="col-md-4"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Guided query{% elif LANGUAGE_CODE == 'es' %}Consulta orientada{% else %}Consulta orientada{% endif %}</div><p class="metric-value fs-5">{% if LANGUAGE_CODE == 'en' %}Filters{% else %}Filtros{% endif %}</p><p class="text-muted small mb-0">{% if LANGUAGE_CODE == 'en' %}Combine criteria to locate relevant experiences.{% elif LANGUAGE_CODE == 'es' %}Combine criterios para localizar experiencias relevantes.{% else %}Combine crit&eacute;rios para localizar experi&ecirc;ncias relevantes.{% endif %}</p></div></div>
-    <div class="col-md-4"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Regional learning{% elif LANGUAGE_CODE == 'es' %}Aprendizaje regional{% else %}Aprendizagem regional{% endif %}</div><p class="metric-value fs-5">{% if LANGUAGE_CODE == 'en' %}Cases{% else %}Casos{% endif %}</p><p class="text-muted small mb-0">{% if LANGUAGE_CODE == 'en' %}Compare approaches, results and replicable elements.{% elif LANGUAGE_CODE == 'es' %}Compare enfoques, resultados y elementos replicables.{% else %}Compare abordagens, resultados e elementos replic&aacute;veis.{% endif %}</p></div></div>
-    <div class="col-md-4"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Practical use{% elif LANGUAGE_CODE == 'es' %}Uso pr&aacute;ctico{% else %}Uso pr&aacute;tico{% endif %}</div><p class="metric-value fs-5">{% if LANGUAGE_CODE == 'en' %}Audits{% elif LANGUAGE_CODE == 'es' %}Auditor&iacute;as{% else %}Auditorias{% endif %}</p><p class="text-muted small mb-0">{% if LANGUAGE_CODE == 'en' %}Use profiles as inputs for new control work.{% elif LANGUAGE_CODE == 'es' %}Use las fichas como insumo para nuevos trabajos de control.{% else %}Use as fichas como insumo para novos trabalhos de controle.{% endif %}</p></div></div>
+    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Good practices and audit experiences{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas y experiencias de auditor&iacute;a{% else %}Boas pr&aacute;ticas e experi&ecirc;ncias de auditoria{% endif %}</h1>
+    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Use filters as the main navigation path. Search is available as support, but the platform is organized around type of practice, cross-cutting themes, sector, international standard and SAI.{% elif LANGUAGE_CODE == 'es' %}Use los filtros como principal camino de navegaci&oacute;n. La b&uacute;squeda por palabra clave est&aacute; disponible como apoyo, pero la plataforma est&aacute; organizada por tipo de pr&aacute;ctica, temas transversales, sector, normativa internacional y EFS.{% else %}Use os filtros como principal caminho de navega&ccedil;&atilde;o. A busca por palavra-chave est&aacute; dispon&iacute;vel como apoio, mas a plataforma est&aacute; organizada por tipo de pr&aacute;tica, temas transversais, setor, normativa internacional e EFS.{% endif %}</p>
 </section>
 
 <form method="get" class="filter-panel row g-3 mb-4">
     <div class="col-lg-4">
         <label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Keyword search{% elif LANGUAGE_CODE == 'es' %}B&uacute;squeda por palabra clave{% else %}Busca por palavra-chave{% endif %}</label>
-        <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="{% if LANGUAGE_CODE == 'en' %}Example: drought, infrastructure, climate finance{% elif LANGUAGE_CODE == 'es' %}Ej.: sequ&iacute;a, infraestructura, financiamiento clim&aacute;tico{% else %}Ex.: seca, infraestrutura, financiamento clim&aacute;tico{% endif %}">
+        <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="{% if LANGUAGE_CODE == 'en' %}Support search: water, gender, methodology...{% elif LANGUAGE_CODE == 'es' %}B&uacute;squeda de apoyo: agua, g&eacute;nero, metodolog&iacute;a...{% else %}Busca de apoio: &aacute;gua, g&ecirc;nero, metodologia...{% endif %}">
     </div>
+    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Type of practice{% elif LANGUAGE_CODE == 'es' %}Tipo de buena pr&aacute;ctica{% else %}Tipo de boa pr&aacute;tica{% endif %}</label><select name="tipo" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in tipos %}<option value="{{ item.id }}" {% if request.GET.tipo == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
+    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Cross-cutting theme{% elif LANGUAGE_CODE == 'es' %}Tema transversal{% else %}Tema transversal{% endif %}</label><select name="tema" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in temas %}<option value="{{ item.id }}" {% if request.GET.tema == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
+    <div class="col-md-4 col-lg-2"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</label><select name="setor" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in setores %}<option value="{{ item.id }}" {% if request.GET.setor == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
+    <div class="col-md-6 col-lg-4"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}International standard{% elif LANGUAGE_CODE == 'es' %}Normativa internacional{% else %}Normativa internacional{% endif %}</label><select name="norma" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todas{% else %}Todas{% endif %}</option>{% for item in normas %}<option value="{{ item.id }}" {% if request.GET.norma == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
+    <div class="col-md-6 col-lg-3"><label class="form-label small fw-semibold text-muted">EFS</label><select name="efs" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todas{% else %}Todas{% endif %}</option>{% for item in efs_lista %}<option value="{{ item.id }}" {% if request.GET.efs == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
     <div class="col-md-4 col-lg-2"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Country{% else %}Pa&iacute;s{% endif %}</label><select name="pais" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in paises %}<option value="{{ item.id }}" {% if request.GET.pais == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">EFS</label><select name="efs" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todas{% else %}Todas{% endif %}</option>{% for item in efs_lista %}<option value="{{ item.id }}" {% if request.GET.efs == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Type of experience{% elif LANGUAGE_CODE == 'es' %}Tipo de experiencia{% else %}Tipo de experi&ecirc;ncia{% endif %}</label><select name="tipo" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in tipos %}<option value="{{ item.id }}" {% if request.GET.tipo == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</label><select name="setor" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in setores %}<option value="{{ item.id }}" {% if request.GET.setor == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Climate justice dimension{% elif LANGUAGE_CODE == 'es' %}Dimensi&oacute;n de justicia clim&aacute;tica{% else %}Dimens&atilde;o de justi&ccedil;a clim&aacute;tica{% endif %}</label><select name="dimensao" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todas{% else %}Todas{% endif %}</option>{% for item in dimensoes %}<option value="{{ item.id }}" {% if request.GET.dimensao == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Vulnerable group{% elif LANGUAGE_CODE == 'es' %}Grupo vulnerable{% else %}Grupo vulner&aacute;vel{% endif %}</label><select name="grupo" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in grupos %}<option value="{{ item.id }}" {% if request.GET.grupo == item.id|stringformat:'s' %}selected{% endif %}>{{ item.nome_exibicao }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-3"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}A&ntilde;o{% else %}Ano{% endif %}</label><select name="ano" class="form-select"><option value="">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</option>{% for item in anos %}<option value="{{ item }}" {% if request.GET.ano == item|stringformat:'s' %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
-    <div class="col-md-4 col-lg-2 d-grid align-self-end"><button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Apply filters{% elif LANGUAGE_CODE == 'es' %}Aplicar filtros{% else %}Aplicar filtros{% endif %}</button></div>
-    <div class="col-md-4 col-lg-2 d-grid align-self-end"><a class="btn btn-outline-secondary" href="{% url 'catalogo_experiencias' %}">{% if LANGUAGE_CODE == 'en' %}Clear{% elif LANGUAGE_CODE == 'es' %}Limpiar{% else %}Limpar{% endif %}</a></div>
+    <div class="col-md-4 col-lg-1"><label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}A&ntilde;o{% else %}Ano{% endif %}</label><select name="ano" class="form-select"><option value="">--</option>{% for item in anos %}<option value="{{ item }}" {% if request.GET.ano == item|stringformat:'s' %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-4 col-lg-1 d-grid align-self-end"><button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Filter{% else %}Filtrar{% endif %}</button></div>
+    <div class="col-md-4 col-lg-1 d-grid align-self-end"><a class="btn btn-outline-secondary" href="{% url 'catalogo_experiencias' %}">{% if LANGUAGE_CODE == 'en' %}Clear{% elif LANGUAGE_CODE == 'es' %}Limpiar{% else %}Limpar{% endif %}</a></div>
 </form>
 
-<section>
-    <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-end mb-3">
-        <div><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Results{% else %}Resultados{% endif %}</div><h2 class="section-title h3 mb-1">{% if LANGUAGE_CODE == 'en' %}Experiences found{% elif LANGUAGE_CODE == 'es' %}Experiencias encontradas{% else %}Experi&ecirc;ncias encontradas{% endif %}</h2></div>
+<div class="row g-3">
+    {% for experiencia in experiencias %}
+    <div class="col-lg-6">
+        <article class="catalog-card h-100">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
+                <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
+                <span class="badge-soft">{{ experiencia.pais.nome_exibicao }}</span>
+                <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
+            </div>
+            <h3 class="h4 section-title mb-2">{{ experiencia.titulo_exibicao }}</h3>
+            <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:360 }}</p>
+            <div class="text-muted small mb-3"><strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }}{% if experiencia.contato_referencia %} &bull; <strong>{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}:</strong> {{ experiencia.contato_referencia }}{% endif %}</div>
+            <div class="border-top pt-3 mt-3">
+                <div class="small text-muted mb-2">{% if LANGUAGE_CODE == 'en' %}Cross-cutting themes and frameworks{% elif LANGUAGE_CODE == 'es' %}Temas transversales y marcos internacionales{% else %}Temas transversais e marcos internacionais{% endif %}</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tema in experiencia.temas_transversais.all|slice:":4" %}<span class="badge-soft">{{ tema.nome_exibicao }}</span>{% endfor %}
+                    {% for norma in experiencia.normas_internacionais.all|slice:":3" %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% endfor %}
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <span class="text-muted small">{% if experiencia.contribui_para_guia %}{% if LANGUAGE_CODE == 'en' %}Contributes to the Guide{% elif LANGUAGE_CODE == 'es' %}Contribuye a la Gu&iacute;a{% else %}Contribui para a Guia{% endif %}{% endif %}</span>
+                <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
+            </div>
+        </article>
     </div>
-    <div class="row g-3">
-        {% for experiencia in experiencias %}
-        <div class="col-lg-6">
-            <article class="catalog-card h-100">
-                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3"><span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span><span class="badge-soft badge-yellow">{{ experiencia.ano_execucao }}</span></div>
-                <h3 class="h4 section-title mb-2">{{ experiencia.titulo_exibicao }}</h3>
-                <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:220 }}</p>
-                <div class="d-flex flex-wrap gap-2 mb-3"><span class="badge-soft">{{ experiencia.pais.nome_exibicao }}</span><span class="badge-soft">{{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }}</span><span class="badge-soft">{{ experiencia.tipo_experiencia.nome_exibicao }}</span></div>
-                <div class="border-top pt-3 mt-3"><div class="small text-muted mb-2">{% if LANGUAGE_CODE == 'en' %}Dimensions considered{% elif LANGUAGE_CODE == 'es' %}Dimensiones consideradas{% else %}Dimens&otilde;es consideradas{% endif %}</div><div class="d-flex flex-wrap gap-2">{% for dimensao in experiencia.dimensoes_consideradas.all|slice:":3" %}<span class="badge-soft">{{ dimensao.nome_exibicao }}</span>{% empty %}<span class="text-muted small">{% if LANGUAGE_CODE == 'en' %}Not informed{% elif LANGUAGE_CODE == 'es' %}No informado{% else %}N&atilde;o informado{% endif %}</span>{% endfor %}</div></div>
-                <div class="d-flex justify-content-between align-items-center mt-4"><span class="text-muted small">{% if LANGUAGE_CODE == 'en' %}Status{% elif LANGUAGE_CODE == 'es' %}Estado{% else %}Status{% endif %}: {{ experiencia.get_status_iniciativa_display }}</span><a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a></div>
-            </article>
-        </div>
-        {% empty %}
-        <div class="col-12"><div class="feature-card"><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}No experience found{% elif LANGUAGE_CODE == 'es' %}Ninguna experiencia encontrada{% else %}Nenhuma experi&ecirc;ncia encontrada{% endif %}</h3></div></div>
-        {% endfor %}
-    </div>
-</section>
+    {% empty %}
+    <div class="col-12"><div class="feature-card"><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}No good practice found{% elif LANGUAGE_CODE == 'es' %}Ninguna buena pr&aacute;ctica encontrada{% else %}Nenhuma boa pr&aacute;tica encontrada{% endif %}</h3></div></div>
+    {% endfor %}
+</div>
 {% endblock %}

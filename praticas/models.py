@@ -92,6 +92,50 @@ class Setor(models.Model):
         return texto_por_idioma(self.nome, self.nome_es, self.nome_en)
 
 
+class TemaTransversal(models.Model):
+    nome = models.CharField(max_length=160, unique=True)
+    nome_es = models.CharField(max_length=160, blank=True)
+    nome_en = models.CharField(max_length=160, blank=True)
+
+    class Meta:
+        verbose_name = "Tema transversal"
+        verbose_name_plural = "Temas transversais"
+        ordering = ["nome"]
+
+    def __str__(self):
+        return self.nome_exibicao
+
+    @property
+    def nome_exibicao(self):
+        return texto_por_idioma(self.nome, self.nome_es, self.nome_en)
+
+
+class NormaInternacional(models.Model):
+    nome = models.CharField(max_length=180, unique=True)
+    nome_es = models.CharField(max_length=180, blank=True)
+    nome_en = models.CharField(max_length=180, blank=True)
+    resumo = models.TextField(blank=True)
+    resumo_es = models.TextField(blank=True)
+    resumo_en = models.TextField(blank=True)
+    url_referencia = models.URLField(blank=True)
+
+    class Meta:
+        verbose_name = "Norma internacional"
+        verbose_name_plural = "Normas internacionais"
+        ordering = ["nome"]
+
+    def __str__(self):
+        return self.nome_exibicao
+
+    @property
+    def nome_exibicao(self):
+        return texto_por_idioma(self.nome, self.nome_es, self.nome_en)
+
+    @property
+    def resumo_exibicao(self):
+        return texto_por_idioma(self.resumo, self.resumo_es, self.resumo_en)
+
+
 class DimensaoJusticaClimatica(models.Model):
     nome = models.CharField(max_length=160, unique=True)
     nome_es = models.CharField(max_length=160, blank=True)
@@ -136,8 +180,11 @@ class Experiencia(models.Model):
 
     class StatusPublicacao(models.TextChoices):
         RASCUNHO = "rascunho", "Rascunho"
-        REVISAO = "revisao", "Em revisao"
+        ENVIADO = "enviado", "Enviado"
+        EM_REVISAO = "em_revisao", "Em revisao"
+        APROVADO = "aprovado", "Aprovado"
         PUBLICADO = "publicado", "Publicado"
+        REJEITADO = "rejeitado", "Rejeitado"
 
     titulo = models.CharField(max_length=220)
     titulo_es = models.CharField(max_length=220, blank=True)
@@ -149,6 +196,13 @@ class Experiencia(models.Model):
     ano_execucao = models.PositiveIntegerField()
     status_iniciativa = models.CharField(max_length=30, choices=StatusIniciativa.choices, default=StatusIniciativa.CONCLUIDA)
     setor = models.ForeignKey(Setor, on_delete=models.PROTECT, related_name="experiencias")
+
+    temas_transversais = models.ManyToManyField(TemaTransversal, blank=True, related_name="experiencias")
+    normas_internacionais = models.ManyToManyField(NormaInternacional, blank=True, related_name="experiencias")
+
+    contato_referencia = models.CharField(max_length=180, blank=True)
+    email_contato = models.EmailField(blank=True)
+    pessoa_responsavel = models.CharField(max_length=180, blank=True)
 
     descricao = models.TextField()
     descricao_es = models.TextField(blank=True)
@@ -192,6 +246,10 @@ class Experiencia(models.Model):
     metodologia = models.TextField(blank=True)
     metodologia_es = models.TextField(blank=True)
     metodologia_en = models.TextField(blank=True)
+
+    ferramentas_utilizadas = models.TextField(blank=True)
+    ferramentas_utilizadas_es = models.TextField(blank=True)
+    ferramentas_utilizadas_en = models.TextField(blank=True)
 
     fontes_informacao = models.TextField(blank=True)
     fontes_informacao_es = models.TextField(blank=True)
@@ -249,7 +307,12 @@ class Experiencia(models.Model):
     apoio_requerido_pelas_efs_es = models.TextField(blank=True)
     apoio_requerido_pelas_efs_en = models.TextField(blank=True)
 
+    contribui_para_guia = models.BooleanField(default=False)
+    destacado = models.BooleanField(default=False)
+    relevante = models.BooleanField(default=False)
+
     status_publicacao = models.CharField(max_length=30, choices=StatusPublicacao.choices, default=StatusPublicacao.PUBLICADO)
+    comentario_revisor = models.TextField(blank=True)
 
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -257,7 +320,7 @@ class Experiencia(models.Model):
     class Meta:
         verbose_name = "Experiencia"
         verbose_name_plural = "Experiencias"
-        ordering = ["-ano_execucao", "titulo"]
+        ordering = ["-ano_execucao", "-criado_em", "titulo"]
 
     def __str__(self):
         return self.titulo_exibicao
@@ -303,8 +366,16 @@ class Experiencia(models.Model):
         return texto_por_idioma(self.metodologia, self.metodologia_es, self.metodologia_en)
 
     @property
+    def ferramentas_utilizadas_exibicao(self):
+        return texto_por_idioma(self.ferramentas_utilizadas, self.ferramentas_utilizadas_es, self.ferramentas_utilizadas_en)
+
+    @property
     def criterios_utilizados_exibicao(self):
         return texto_por_idioma(self.criterios_utilizados, self.criterios_utilizados_es, self.criterios_utilizados_en)
+
+    @property
+    def perguntas_chave_exibicao(self):
+        return texto_por_idioma(self.perguntas_chave, self.perguntas_chave_es, self.perguntas_chave_en)
 
     @property
     def fontes_informacao_exibicao(self):

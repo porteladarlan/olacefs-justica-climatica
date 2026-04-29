@@ -7,8 +7,10 @@ from .models import (
     EFS,
     Experiencia,
     GrupoVulneravel,
+    NormaInternacional,
     Pais,
     Setor,
+    TemaTransversal,
     TipoExperiencia,
 )
 
@@ -47,6 +49,20 @@ class SetorAdmin(admin.ModelAdmin):
     ordering = ("nome",)
 
 
+@admin.register(TemaTransversal)
+class TemaTransversalAdmin(admin.ModelAdmin):
+    list_display = ("nome", "nome_es", "nome_en")
+    search_fields = ("nome", "nome_es", "nome_en")
+    ordering = ("nome",)
+
+
+@admin.register(NormaInternacional)
+class NormaInternacionalAdmin(admin.ModelAdmin):
+    list_display = ("nome", "nome_es", "nome_en", "url_referencia")
+    search_fields = ("nome", "nome_es", "nome_en", "resumo", "resumo_es", "resumo_en")
+    ordering = ("nome",)
+
+
 @admin.register(DimensaoJusticaClimatica)
 class DimensaoJusticaClimaticaAdmin(admin.ModelAdmin):
     list_display = ("nome", "nome_es", "nome_en")
@@ -71,15 +87,15 @@ class AnexoInline(admin.TabularInline):
 class ExperienciaAdmin(admin.ModelAdmin):
     list_display = (
         "titulo",
-        "titulo_es",
-        "titulo_en",
         "pais",
         "efs",
         "tipo_experiencia",
         "setor",
         "ano_execucao",
-        "status_iniciativa",
         "status_publicacao",
+        "contribui_para_guia",
+        "destacado",
+        "relevante",
     )
     list_filter = (
         "status_publicacao",
@@ -88,9 +104,14 @@ class ExperienciaAdmin(admin.ModelAdmin):
         "efs",
         "tipo_experiencia",
         "setor",
-        "ano_execucao",
+        "temas_transversais",
+        "normas_internacionais",
         "dimensoes_consideradas",
         "grupos_vulneraveis",
+        "ano_execucao",
+        "contribui_para_guia",
+        "destacado",
+        "relevante",
     )
     search_fields = (
         "titulo",
@@ -99,41 +120,35 @@ class ExperienciaAdmin(admin.ModelAdmin):
         "descricao",
         "descricao_es",
         "descricao_en",
-        "problema_climatico",
-        "problema_climatico_es",
-        "problema_climatico_en",
-        "objetivo",
-        "objetivo_es",
-        "objetivo_en",
-        "resultados",
-        "resultados_es",
-        "resultados_en",
+        "contato_referencia",
+        "email_contato",
+        "pessoa_responsavel",
         "pais__nome",
-        "pais__nome_es",
-        "pais__nome_en",
         "efs__nome",
-        "efs__nome_es",
-        "efs__nome_en",
         "setor__nome",
-        "setor__nome_es",
-        "setor__nome_en",
     )
     autocomplete_fields = ("pais", "efs", "tipo_experiencia", "setor")
-    filter_horizontal = ("dimensoes_consideradas", "grupos_vulneraveis")
+    filter_horizontal = (
+        "temas_transversais",
+        "normas_internacionais",
+        "dimensoes_consideradas",
+        "grupos_vulneraveis",
+    )
     readonly_fields = ("criado_em", "atualizado_em")
     inlines = [AnexoInline]
     date_hierarchy = "criado_em"
     list_per_page = 20
 
     fieldsets = (
-        ("Identificacao", {"fields": ("titulo", "titulo_es", "titulo_en", "efs", "pais", "tipo_experiencia", "ano_execucao", "status_iniciativa", "setor", "status_publicacao")}),
+        ("Identificacao obrigatoria", {"fields": ("titulo", "titulo_es", "titulo_en", "efs", "pais", "tipo_experiencia", "ano_execucao", "status_iniciativa", "setor", "temas_transversais", "normas_internacionais")}),
+        ("Contato e revisao", {"fields": ("contato_referencia", "email_contato", "pessoa_responsavel", "status_publicacao", "comentario_revisor", "contribui_para_guia", "destacado", "relevante")}),
         ("Contexto PT", {"fields": ("descricao", "problema_climatico", "relacao_adaptacao_mitigacao_gestao_desastres", "riscos_climaticos", "enfoque_justica_climatica", "impactos_diferenciados")}),
         ("Contexto ES", {"fields": ("descricao_es", "problema_climatico_es", "relacao_adaptacao_mitigacao_gestao_desastres_es", "riscos_climaticos_es", "enfoque_justica_climatica_es", "impactos_diferenciados_es")}),
         ("Contexto EN", {"fields": ("descricao_en", "problema_climatico_en", "relacao_adaptacao_mitigacao_gestao_desastres_en", "riscos_climaticos_en", "enfoque_justica_climatica_en", "impactos_diferenciados_en")}),
-        ("Classificacao", {"fields": ("dimensoes_consideradas", "grupos_vulneraveis")}),
-        ("Metodologia PT", {"fields": ("objetivo", "perguntas_chave", "criterios_utilizados", "metodologia", "fontes_informacao")}),
-        ("Metodologia ES", {"fields": ("objetivo_es", "perguntas_chave_es", "criterios_utilizados_es", "metodologia_es", "fontes_informacao_es")}),
-        ("Metodologia EN", {"fields": ("objetivo_en", "perguntas_chave_en", "criterios_utilizados_en", "metodologia_en", "fontes_informacao_en")}),
+        ("Classificacao complementar", {"fields": ("dimensoes_consideradas", "grupos_vulneraveis")}),
+        ("Perguntas, criterios e ferramentas PT", {"fields": ("objetivo", "perguntas_chave", "criterios_utilizados", "metodologia", "ferramentas_utilizadas", "fontes_informacao")}),
+        ("Perguntas, criterios e ferramentas ES", {"fields": ("objetivo_es", "perguntas_chave_es", "criterios_utilizados_es", "metodologia_es", "ferramentas_utilizadas_es", "fontes_informacao_es")}),
+        ("Perguntas, criterios e ferramentas EN", {"fields": ("objetivo_en", "perguntas_chave_en", "criterios_utilizados_en", "metodologia_en", "ferramentas_utilizadas_en", "fontes_informacao_en")}),
         ("Resultados PT", {"fields": ("resultados", "recomendacoes", "mudancas_ou_impactos", "motivo_boa_pratica")}),
         ("Resultados ES", {"fields": ("resultados_es", "recomendacoes_es", "mudancas_ou_impactos_es", "motivo_boa_pratica_es")}),
         ("Resultados EN", {"fields": ("resultados_en", "recomendacoes_en", "mudancas_ou_impactos_en", "motivo_boa_pratica_en")}),
@@ -159,8 +174,3 @@ class BancoTecnicoAdmin(admin.ModelAdmin):
     autocomplete_fields = ("setor",)
     filter_horizontal = ("dimensoes",)
     list_per_page = 20
-
-    fieldsets = (
-        ("Identificacao", {"fields": ("titulo", "titulo_es", "titulo_en", "tipo_recurso", "tipo_recurso_es", "tipo_recurso_en", "setor", "url")}),
-        ("Descricao", {"fields": ("descricao", "descricao_es", "descricao_en", "dimensoes")}),
-    )
