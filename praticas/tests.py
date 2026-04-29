@@ -261,3 +261,34 @@ class RotasPublicasTests(TestCase):
         experiencia.refresh_from_db()
         self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
         self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
+
+    def test_catalogo_tem_selecao_para_comparacao(self):
+        response = self.client.get(reverse("catalogo_experiencias"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "catalog-compare-checkbox")
+        self.assertContains(response, "catalogoCompararSelecionadas")
+
+
+    def test_favoritos_retorna_200(self):
+        response = self.client.get(reverse("favoritos_experiencias"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_alternar_favorito_adiciona_na_sessao(self):
+        experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
+        response = self.client.post(
+            reverse("alternar_favorito", args=[experiencia.pk]),
+            {"next": reverse("favoritos_experiencias")},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(experiencia.pk, self.client.session.get("favoritos_experiencias", []))
+
+    def test_favoritos_exibe_experiencia_salva(self):
+        experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
+        session = self.client.session
+        session["favoritos_experiencias"] = [experiencia.pk]
+        session.save()
+
+        response = self.client.get(reverse("favoritos_experiencias"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Assessment of equity in access to water")
+

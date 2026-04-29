@@ -34,6 +34,55 @@ def experiencias_publicas():
     )
 
 
+
+
+def favoritos_ids(request):
+    return [int(item) for item in request.session.get("favoritos_experiencias", []) if str(item).isdigit()]
+
+
+def salvar_favoritos_ids(request, ids):
+    request.session["favoritos_experiencias"] = [int(item) for item in ids]
+    request.session.modified = True
+
+
+def alternar_favorito(request, pk):
+    experiencia = get_object_or_404(experiencias_publicas(), pk=pk)
+    ids = favoritos_ids(request)
+
+    if experiencia.pk in ids:
+        ids = [item for item in ids if item != experiencia.pk]
+        messages.success(request, "Experiência removida dos favoritos.")
+    else:
+        ids.append(experiencia.pk)
+        messages.success(request, "Experiência adicionada aos favoritos.")
+
+    salvar_favoritos_ids(request, ids)
+    destino = request.POST.get("next") or request.GET.get("next") or "catalogo_experiencias"
+    return redirect(destino)
+
+
+def favoritos_experiencias(request):
+    ids = favoritos_ids(request)
+    experiencias = (
+        experiencias_publicas()
+        .filter(id__in=ids)
+        .select_related("efs", "pais", "tipo_experiencia", "setor")
+        .prefetch_related(
+            "temas_transversais",
+            "normas_internacionais",
+            "dimensoes_consideradas",
+            "grupos_vulneraveis",
+        )
+        .order_by("-ano_execucao", "titulo")
+    )
+
+    contexto = {
+        "experiencias": experiencias,
+        "favoritos_ids": ids,
+    }
+    return render(request, "praticas/favoritos_experiencias.html", contexto)
+
+
 def pagina_inicial(request):
     experiencias = experiencias_publicas().select_related(
         "efs",
@@ -152,6 +201,7 @@ def catalogo_experiencias(request):
             .distinct()
             .order_by("-ano_execucao")
         ),
+        "favoritos_ids": favoritos_ids(request),
     }
     return render(request, "praticas/catalogo_experiencias.html", contexto)
 
@@ -183,6 +233,7 @@ def comparar_experiencias(request):
         "experiencias_selecionadas": experiencias_selecionadas,
         "ids_selecionados": [str(item) for item in ids],
         "limite_comparacao": 3,
+        "favoritos_ids": favoritos_ids(request),
     }
     return render(request, "praticas/comparar_experiencias.html", contexto)
 
@@ -203,7 +254,7 @@ def detalhe_experiencia(request, pk):
     return render(
         request,
         "praticas/detalhe_experiencia.html",
-        {"experiencia": experiencia},
+        {"experiencia": experiencia, "favoritos_ids": favoritos_ids(request)},
     )
 
 

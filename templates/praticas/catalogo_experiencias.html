@@ -7,8 +7,15 @@
 {% block content %}
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Regional catalog{% else %}Cat&aacute;logo regional{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Good practices and audit experiences{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas y experiencias de auditor&iacute;a{% else %}Boas pr&aacute;ticas e experi&ecirc;ncias de auditoria{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Use filters as the main navigation path. Search is available as support, but the platform is organized around type of practice, cross-cutting themes, sector, international standard and SAI.{% elif LANGUAGE_CODE == 'es' %}Use los filtros como principal camino de navegaci&oacute;n. La b&uacute;squeda por palabra clave est&aacute; disponible como apoyo, pero la plataforma est&aacute; organizada por tipo de pr&aacute;ctica, temas transversales, sector, normativa internacional y EFS.{% else %}Use os filtros como principal caminho de navega&ccedil;&atilde;o. A busca por palavra-chave est&aacute; dispon&iacute;vel como apoio, mas a plataforma est&aacute; organizada por tipo de pr&aacute;tica, temas transversais, setor, normativa internacional e EFS.{% endif %}</p>
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-end">
+        <div>
+            <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Good practices and audit experiences{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas y experiencias de auditor&iacute;a{% else %}Boas pr&aacute;ticas e experi&ecirc;ncias de auditoria{% endif %}</h1>
+            <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Use filters as the main navigation path. Select up to three cards to compare experiences side by side.{% elif LANGUAGE_CODE == 'es' %}Use los filtros como principal camino de navegaci&oacute;n. Seleccione hasta tres tarjetas para comparar experiencias lado a lado.{% else %}Use os filtros como principal caminho de navega&ccedil;&atilde;o. Selecione at&eacute; tr&ecirc;s cards para comparar experi&ecirc;ncias lado a lado.{% endif %}</p>
+        </div>
+        <a href="{% url 'comparar_experiencias' %}" class="btn btn-outline-primary">
+            {% if LANGUAGE_CODE == 'en' %}Open comparison page{% elif LANGUAGE_CODE == 'es' %}Abrir comparador{% else %}Abrir comparador{% endif %}
+        </a>
+    </div>
 </section>
 
 <form method="get" class="filter-panel row g-3 mb-4">
@@ -27,15 +34,31 @@
     <div class="col-md-4 col-lg-1 d-grid align-self-end"><a class="btn btn-outline-secondary" href="{% url 'catalogo_experiencias' %}">{% if LANGUAGE_CODE == 'en' %}Clear{% elif LANGUAGE_CODE == 'es' %}Limpiar{% else %}Limpar{% endif %}</a></div>
 </form>
 
-<div class="row g-3">
+<div class="alert alert-warning d-none" id="catalogoComparacaoAviso">
+    {% if LANGUAGE_CODE == 'en' %}
+        You can select up to three experiences to compare.
+    {% elif LANGUAGE_CODE == 'es' %}
+        Puede seleccionar hasta tres experiencias para comparar.
+    {% else %}
+        Você pode selecionar até três experiências para comparar.
+    {% endif %}
+</div>
+
+<div class="row g-3 mb-5">
     {% for experiencia in experiencias %}
     <div class="col-lg-6">
-        <article class="catalog-card h-100">
-            <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
-                <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
-                <span class="badge-soft">{{ experiencia.pais.nome_exibicao }}</span>
-                <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
+        <article class="catalog-card h-100 catalog-card-compare" data-experiencia-id="{{ experiencia.id }}">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
+                    <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
+                    <span class="badge-soft">{{ experiencia.pais.nome_exibicao }}</span>
+                    <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
+                </div>
+                <label class="form-check-label small text-muted d-flex align-items-center gap-2" style="white-space: nowrap; cursor: pointer;">
+                    <input class="form-check-input catalog-compare-checkbox" type="checkbox" value="{{ experiencia.id }}">
+                    {% if LANGUAGE_CODE == 'en' %}Compare{% elif LANGUAGE_CODE == 'es' %}Comparar{% else %}Comparar{% endif %}
+                </label>
             </div>
             <h3 class="h4 section-title mb-2">{{ experiencia.titulo_exibicao }}</h3>
             <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:360 }}</p>
@@ -47,9 +70,23 @@
                     {% for norma in experiencia.normas_internacionais.all|slice:":3" %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% endfor %}
                 </div>
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mt-4">
                 <span class="text-muted small">{% if experiencia.contribui_para_guia %}{% if LANGUAGE_CODE == 'en' %}Contributes to the Guide{% elif LANGUAGE_CODE == 'es' %}Contribuye a la Gu&iacute;a{% else %}Contribui para a Guia{% endif %}{% endif %}</span>
-                <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
+                <div class="d-flex flex-wrap gap-2">
+
+                <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn btn-sm {% if experiencia.pk in favoritos_ids %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+                        {% if experiencia.pk in favoritos_ids %}
+                            {% if LANGUAGE_CODE == 'en' %}Favorited{% elif LANGUAGE_CODE == 'es' %}Favorita{% else %}Favorita{% endif %}
+                        {% else %}
+                            {% if LANGUAGE_CODE == 'en' %}Favorite{% elif LANGUAGE_CODE == 'es' %}Favoritar{% else %}Favoritar{% endif %}
+                        {% endif %}
+                    </button>
+                </form>
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
+                </div>
             </div>
         </article>
     </div>
@@ -57,4 +94,95 @@
     <div class="col-12"><div class="feature-card"><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}No good practice found{% elif LANGUAGE_CODE == 'es' %}Ninguna buena pr&aacute;ctica encontrada{% else %}Nenhuma boa pr&aacute;tica encontrada{% endif %}</h3></div></div>
     {% endfor %}
 </div>
+
+<div class="position-sticky bottom-0 pb-3" style="z-index: 10;">
+    <div class="catalog-card d-none" id="catalogoComparacaoBarra" style="box-shadow: 0 -10px 28px rgba(7, 56, 74, 0.12);">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+            <div>
+                <div class="section-kicker mb-1">
+                    {% if LANGUAGE_CODE == 'en' %}Selected for comparison{% elif LANGUAGE_CODE == 'es' %}Seleccionadas para comparar{% else %}Selecionadas para compara&ccedil;&atilde;o{% endif %}
+                </div>
+                <div class="section-subtitle mb-0">
+                    <span id="catalogoComparacaoContador">0</span>/3
+                    {% if LANGUAGE_CODE == 'en' %}experiences selected{% elif LANGUAGE_CODE == 'es' %}experiencias seleccionadas{% else %}experi&ecirc;ncias selecionadas{% endif %}
+                </div>
+            </div>
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <button class="btn btn-outline-secondary" type="button" id="catalogoLimparComparacao">
+                    {% if LANGUAGE_CODE == 'en' %}Clear selection{% elif LANGUAGE_CODE == 'es' %}Limpiar selecci&oacute;n{% else %}Limpar sele&ccedil;&atilde;o{% endif %}
+                </button>
+                <a class="btn btn-primary disabled" href="#" id="catalogoCompararSelecionadas">
+                    {% if LANGUAGE_CODE == 'en' %}Compare selected{% elif LANGUAGE_CODE == 'es' %}Comparar seleccionadas{% else %}Comparar selecionadas{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = Array.from(document.querySelectorAll(".catalog-compare-checkbox"));
+        const cards = Array.from(document.querySelectorAll(".catalog-card-compare"));
+        const barra = document.getElementById("catalogoComparacaoBarra");
+        const contador = document.getElementById("catalogoComparacaoContador");
+        const linkComparar = document.getElementById("catalogoCompararSelecionadas");
+        const botaoLimpar = document.getElementById("catalogoLimparComparacao");
+        const aviso = document.getElementById("catalogoComparacaoAviso");
+        const limite = 3;
+
+        function atualizarComparacao() {
+            const selecionados = checkboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value);
+            const chegouNoLimite = selecionados.length >= limite;
+
+            checkboxes.forEach((checkbox) => {
+                checkbox.disabled = !checkbox.checked && chegouNoLimite;
+            });
+
+            cards.forEach((card) => {
+                const checkbox = card.querySelector(".catalog-compare-checkbox");
+                card.style.borderColor = checkbox && checkbox.checked ? "rgba(18, 106, 132, 0.55)" : "";
+                card.style.boxShadow = checkbox && checkbox.checked ? "0 14px 34px rgba(7, 56, 74, 0.12)" : "";
+            });
+
+            if (barra) {
+                barra.classList.toggle("d-none", selecionados.length === 0);
+            }
+
+            if (contador) {
+                contador.textContent = selecionados.length;
+            }
+
+            if (linkComparar) {
+                if (selecionados.length > 0) {
+                    const params = selecionados.map((id) => "experiencias=" + encodeURIComponent(id)).join("&");
+                    linkComparar.href = "{% url 'comparar_experiencias' %}?" + params;
+                    linkComparar.classList.remove("disabled");
+                } else {
+                    linkComparar.href = "#";
+                    linkComparar.classList.add("disabled");
+                }
+            }
+
+            if (aviso) {
+                aviso.classList.toggle("d-none", !chegouNoLimite);
+            }
+        }
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", atualizarComparacao);
+        });
+
+        if (botaoLimpar) {
+            botaoLimpar.addEventListener("click", function () {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = false;
+                    checkbox.disabled = false;
+                });
+                atualizarComparacao();
+            });
+        }
+
+        atualizarComparacao();
+    });
+</script>
 {% endblock %}
