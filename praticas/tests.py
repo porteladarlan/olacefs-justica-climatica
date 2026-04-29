@@ -143,7 +143,17 @@ class RotasPublicasTests(TestCase):
     def test_normas_retorna_200(self):
         self.assertEqual(self.client.get(reverse("normas_internacionais")).status_code, 200)
 
-    def test_adicionar_boa_pratica_retorna_200(self):
+    def test_adicionar_boa_pratica_exige_login(self):
+        response = self.client.get(reverse("adicionar_boa_pratica"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_adicionar_boa_pratica_logado_retorna_200(self):
+        usuario = get_user_model().objects.create_user(
+            username="autor",
+            email="autor.org",
+            password="teste123",
+        )
+        self.client.force_login(usuario)
         self.assertEqual(self.client.get(reverse("adicionar_boa_pratica")).status_code, 200)
 
     def test_status_envio_retorna_200(self):
@@ -292,3 +302,26 @@ class RotasPublicasTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Assessment of equity in access to water")
 
+
+    def test_cadastro_usuario_retorna_200(self):
+        response = self.client.get(reverse("registrar_usuario"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_usuario_retorna_200(self):
+        response = self.client.get(reverse("login_usuario"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_meus_envios_exige_login(self):
+        response = self.client.get(reverse("meus_envios"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_meus_envios_logado_retorna_envios_do_email(self):
+        usuario = get_user_model().objects.create_user(
+            username="autor_envios",
+            email="autor@example.org",
+            password="teste123",
+        )
+        self.client.force_login(usuario)
+        response = self.client.get(reverse("meus_envios"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Pending good practice")

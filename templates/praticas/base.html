@@ -504,6 +504,13 @@
                         {% if LANGUAGE_CODE == 'en' %}Status{% elif LANGUAGE_CODE == 'es' %}Estado{% else %}Status{% endif %}
                     </a>
                 </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link nav-secondary-action" href="{% url 'meus_envios' %}">
+                        {% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}
+                    </a>
+                </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link nav-primary-action" href="{% url 'adicionar_boa_pratica' %}">
                         {% if LANGUAGE_CODE == 'en' %}Submit{% elif LANGUAGE_CODE == 'es' %}Enviar{% else %}Enviar{% endif %}
@@ -514,6 +521,19 @@
                         {% if LANGUAGE_CODE == 'en' %}Review{% elif LANGUAGE_CODE == 'es' %}Revisi&oacute;n{% else %}Revis&atilde;o{% endif %}
                     </a>
                 </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link nav-secondary-action" href="{% url 'logout_usuario' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link nav-secondary-action" href="{% url 'login_usuario' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}
+                    </a>
+                </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link nav-secondary-action" href="/admin/">Admin</a>
                 </li>

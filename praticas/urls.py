@@ -4,6 +4,10 @@ from . import views
 
 urlpatterns = [
     path("", views.pagina_inicial, name="pagina_inicial"),
+    path("cadastro/", views.registrar_usuario, name="registrar_usuario"),
+    path("entrar/", views.login_usuario, name="login_usuario"),
+    path("sair/", views.logout_usuario, name="logout_usuario"),
+    path("meus-envios/", views.meus_envios, name="meus_envios"),
     path("catalogo/", views.catalogo_experiencias, name="catalogo_experiencias"),
     path("comparar/", views.comparar_experiencias, name="comparar_experiencias"),
     path("favoritos/", views.favoritos_experiencias, name="favoritos_experiencias"),

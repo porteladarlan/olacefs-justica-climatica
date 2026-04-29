@@ -1,6 +1,9 @@
 import json
 
 from django.contrib import messages
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -35,6 +38,76 @@ def experiencias_publicas():
 
 
 
+
+
+def estilizar_formulario_autenticacao(form):
+    for field in form.fields.values():
+        field.widget.attrs.setdefault("class", "form-control")
+    return form
+
+
+def registrar_usuario(request):
+    if request.user.is_authenticated:
+        return redirect("meus_envios")
+
+    if request.method == "POST":
+        form = estilizar_formulario_autenticacao(UserCreationForm(request.POST))
+        email = request.POST.get("email", "").strip().lower()
+        nome = request.POST.get("first_name", "").strip()
+        sobrenome = request.POST.get("last_name", "").strip()
+
+        if not email:
+            form.add_error(None, "Informe um e-mail institucional.")
+        elif form.is_valid():
+            user = form.save(commit=False)
+            user.email = email
+            user.first_name = nome
+            user.last_name = sobrenome
+            user.save()
+            login(request, user)
+            messages.success(request, "Cadastro realizado com sucesso.")
+            return redirect("meus_envios")
+    else:
+        form = estilizar_formulario_autenticacao(UserCreationForm())
+
+    return render(request, "praticas/registrar_usuario.html", {"form": form})
+
+
+def login_usuario(request):
+    if request.user.is_authenticated:
+        return redirect("meus_envios")
+
+    if request.method == "POST":
+        form = estilizar_formulario_autenticacao(AuthenticationForm(request, data=request.POST))
+        if form.is_valid():
+            login(request, form.get_user())
+            destino = request.POST.get("next") or request.GET.get("next") or "meus_envios"
+            return redirect(destino)
+    else:
+        form = estilizar_formulario_autenticacao(AuthenticationForm(request))
+
+    return render(request, "praticas/login_usuario.html", {"form": form, "next": request.GET.get("next", "")})
+
+
+def logout_usuario(request):
+    logout(request)
+    messages.success(request, "Sessão encerrada com sucesso.")
+    return redirect("pagina_inicial")
+
+
+@login_required(login_url="login_usuario")
+def meus_envios(request):
+    experiencias = (
+        Experiencia.objects.filter(email_contato__iexact=request.user.email)
+        .select_related("efs", "pais", "tipo_experiencia", "setor")
+        .order_by("-atualizado_em")
+    )
+    propostas = (
+        PropostaEdicaoExperiencia.objects.filter(email_contato__iexact=request.user.email)
+        .select_related("experiencia")
+        .order_by("-atualizado_em")
+    )
+    return render(request, "praticas/meus_envios.html", {"experiencias": experiencias, "propostas": propostas})
 
 def favoritos_ids(request):
     return [int(item) for item in request.session.get("favoritos_experiencias", []) if str(item).isdigit()]
@@ -278,6 +351,7 @@ def salvar_anexos_submissao(request, experiencia):
             )
 
 
+@login_required(login_url="login_usuario")
 def adicionar_boa_pratica(request):
     acao = request.POST.get("acao_envio", "enviar")
     obrigatorio_para_envio = acao != "rascunho"
@@ -291,6 +365,10 @@ def adicionar_boa_pratica(request):
         if form.is_valid():
             experiencia = form.save(commit=False)
             experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
+            if request.user.is_authenticated and not experiencia.email_contato:
+                experiencia.email_contato = request.user.email
+            if request.user.is_authenticated and not experiencia.pessoa_responsavel:
+                experiencia.pessoa_responsavel = request.user.get_full_name() or request.user.username
             if acao == "rascunho":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
                 mensagem = "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão."
@@ -306,7 +384,12 @@ def adicionar_boa_pratica(request):
                 return redirect(f"{request.path}?rascunho_salvo=1")
             return redirect("confirmacao_envio")
     else:
-        form = ExperienciaSubmissaoForm()
+        form = ExperienciaSubmissaoForm(
+            initial={
+                "email_contato": request.user.email,
+                "pessoa_responsavel": request.user.get_full_name() or request.user.username,
+            }
+        )
 
     return render(request, "praticas/adicionar_boa_pratica.html", {"form": form})
 
