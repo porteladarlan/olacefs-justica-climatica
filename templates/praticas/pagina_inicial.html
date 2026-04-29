@@ -1,172 +1,70 @@
 {% extends 'praticas/base.html' %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}In&iacute;cio | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="page-hero mb-4">
     <span class="hero-eyebrow">MVP Regional</span>
-    <h1 class="hero-title">Boas pr&aacute;ticas para auditorias com perspectiva de justi&ccedil;a clim&aacute;tica.</h1>
+    <h1 class="hero-title">
+        {% if LANGUAGE_CODE == 'en' %}Good practices for audits with a climate justice perspective.{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas para auditor&iacute;as con perspectiva de justicia clim&aacute;tica.{% else %}Boas pr&aacute;ticas para auditorias com perspectiva de justi&ccedil;a clim&aacute;tica.{% endif %}
+    </h1>
     <p class="hero-subtitle">
-        Ambiente para reunir experi&ecirc;ncias, organizar refer&ecirc;ncias e apoiar EFS na incorpora&ccedil;&atilde;o
-        da agenda clim&aacute;tica em auditorias, estudos e metodologias.
+        {% if LANGUAGE_CODE == 'en' %}A space to gather experiences, organize references and support SAIs in incorporating the climate agenda into audits, studies and methodologies.{% elif LANGUAGE_CODE == 'es' %}Ambiente para reunir experiencias, organizar referencias y apoyar a las EFS en la incorporaci&oacute;n de la agenda clim&aacute;tica en auditor&iacute;as, estudios y metodolog&iacute;as.{% else %}Ambiente para reunir experi&ecirc;ncias, organizar refer&ecirc;ncias e apoiar EFS na incorpora&ccedil;&atilde;o da agenda clim&aacute;tica em auditorias, estudos e metodologias.{% endif %}
     </p>
     <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
-        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-brand">Explorar cat&aacute;logo</a>
-        <a href="{% url 'banco_tecnico' %}" class="btn btn-brand-outline">Ver banco t&eacute;cnico</a>
+        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-brand">{% if LANGUAGE_CODE == 'en' %}Explore catalog{% else %}Explorar cat&aacute;logo{% endif %}</a>
+        <a href="{% url 'banco_tecnico' %}" class="btn btn-brand-outline">{% if LANGUAGE_CODE == 'en' %}View technical bank{% elif LANGUAGE_CODE == 'es' %}Ver banco t&eacute;cnico{% else %}Ver banco t&eacute;cnico{% endif %}</a>
     </div>
 </section>
 
 <section class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="metric-card">
-            <div class="metric-label">Experi&ecirc;ncias publicadas</div>
-            <p class="metric-value">{{ total_experiencias }}</p>
-            <p class="text-muted mb-0 small">Registros dispon&iacute;veis para consulta no MVP.</p>
-        </div>
-    </div>
+    <div class="col-md-4"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Published experiences{% elif LANGUAGE_CODE == 'es' %}Experiencias publicadas{% else %}Experi&ecirc;ncias publicadas{% endif %}</div><p class="metric-value">{{ total_experiencias }}</p><p class="text-muted mb-0 small">{% if LANGUAGE_CODE == 'en' %}Records available for consultation in the MVP.{% elif LANGUAGE_CODE == 'es' %}Registros disponibles para consulta en el MVP.{% else %}Registros dispon&iacute;veis para consulta no MVP.{% endif %}</p></div></div>
+    <div class="col-md-4"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Registered SAIs{% elif LANGUAGE_CODE == 'es' %}EFS registradas{% else %}EFS cadastradas{% endif %}</div><p class="metric-value">{{ total_efs }}</p><p class="text-muted mb-0 small">{% if LANGUAGE_CODE == 'en' %}Institutions represented in the demonstration dataset.{% elif LANGUAGE_CODE == 'es' %}Instituciones representadas en los datos de demostraci&oacute;n.{% else %}Institui&ccedil;&otilde;es representadas nos dados de demonstra&ccedil;&atilde;o.{% endif %}</p></div></div>
+    <div class="col-md-4"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Countries{% else %}Pa&iacute;ses{% endif %}</div><p class="metric-value">{{ total_paises }}</p><p class="text-muted mb-0 small">{% if LANGUAGE_CODE == 'en' %}Simulated regional coverage for functional validation.{% elif LANGUAGE_CODE == 'es' %}Cobertura regional simulada para validaci&oacute;n funcional.{% else %}Cobertura regional simulada para valida&ccedil;&atilde;o funcional.{% endif %}</p></div></div>
+</section>
 
-    <div class="col-md-4">
-        <div class="metric-card">
-            <div class="metric-label">EFS cadastradas</div>
-            <p class="metric-value">{{ total_efs }}</p>
-            <p class="text-muted mb-0 small">Institui&ccedil;&otilde;es representadas nos dados de demonstra&ccedil;&atilde;o.</p>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="metric-card">
-            <div class="metric-label">Pa&iacute;ses</div>
-            <p class="metric-value">{{ total_paises }}</p>
-            <p class="text-muted mb-0 small">Cobertura regional simulada para valida&ccedil;&atilde;o funcional.</p>
-        </div>
+<section class="mb-4">
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Value for SAIs{% elif LANGUAGE_CODE == 'es' %}Valor para las EFS{% else %}Valor para as EFS{% endif %}</div>
+    <h2 class="section-title h3 mb-2">{% if LANGUAGE_CODE == 'en' %}How the platform supports audit work{% elif LANGUAGE_CODE == 'es' %}C&oacute;mo la plataforma apoya el trabajo de auditor&iacute;a{% else %}Como a plataforma apoia o trabalho de auditoria{% endif %}</h2>
+    <p class="section-subtitle mb-3">{% if LANGUAGE_CODE == 'en' %}The MVP organizes regional knowledge in a searchable format, enabling technical teams to identify approaches, criteria and lessons applicable to new control work.{% elif LANGUAGE_CODE == 'es' %}El MVP organiza conocimiento regional de forma consultable, permitiendo que equipos t&eacute;cnicos identifiquen enfoques, criterios y aprendizajes aplicables a nuevos trabajos de control.{% else %}O MVP organiza conhecimento regional de forma consult&aacute;vel, permitindo que equipes t&eacute;cnicas identifiquem abordagens, crit&eacute;rios e aprendizados aplic&aacute;veis a novos trabalhos de controle.{% endif %}</p>
+    <div class="row g-3">
+        <div class="col-lg-4"><div class="feature-card h-100"><span class="badge-soft badge-yellow mb-2">01</span><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}Systematize good practices{% elif LANGUAGE_CODE == 'es' %}Sistematizar buenas pr&aacute;cticas{% else %}Sistematizar boas pr&aacute;ticas{% endif %}</h3><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Brings together audit experiences, studies and methodologies in a common structure, facilitating comparison and consultation.{% elif LANGUAGE_CODE == 'es' %}Re&uacute;ne experiencias de auditor&iacute;a, estudios y metodolog&iacute;as en una estructura com&uacute;n, facilitando comparaci&oacute;n y consulta.{% else %}Re&uacute;ne experi&ecirc;ncias de auditoria, estudos e metodologias em uma estrutura comum, facilitando compara&ccedil;&atilde;o e consulta.{% endif %}</p></div></div>
+        <div class="col-lg-4"><div class="feature-card h-100"><span class="badge-soft badge-yellow mb-2">02</span><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}Search regional experiences{% elif LANGUAGE_CODE == 'es' %}Consultar experiencias regionales{% else %}Consultar experi&ecirc;ncias regionais{% endif %}</h3><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Allows filtering initiatives by country, SAI, sector, climate justice dimension and vulnerable groups.{% elif LANGUAGE_CODE == 'es' %}Permite filtrar iniciativas por pa&iacute;s, EFS, sector, dimensi&oacute;n de justicia clim&aacute;tica y grupos vulnerables.{% else %}Permite filtrar iniciativas por pa&iacute;s, EFS, setor, dimens&atilde;o de justi&ccedil;a clim&aacute;tica e grupos vulner&aacute;veis.{% endif %}</p></div></div>
+        <div class="col-lg-4"><div class="feature-card h-100"><span class="badge-soft badge-yellow mb-2">03</span><h3 class="h5 section-title">{% if LANGUAGE_CODE == 'en' %}Support new audits{% elif LANGUAGE_CODE == 'es' %}Apoyar nuevas auditor&iacute;as{% else %}Apoiar novas auditorias{% endif %}</h3><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Provides inputs for planning, audit questions, criteria, information sources and replicable elements.{% elif LANGUAGE_CODE == 'es' %}Ofrece insumos para planificaci&oacute;n, preguntas de auditor&iacute;a, criterios, fuentes de informaci&oacute;n y elementos replicables.{% else %}Oferece insumos para planejamento, perguntas de auditoria, crit&eacute;rios, fontes de informa&ccedil;&atilde;o e elementos replic&aacute;veis.{% endif %}</p></div></div>
     </div>
 </section>
 
 <section class="mb-4">
-    <div class="section-kicker">Valor para as EFS</div>
-    <h2 class="section-title h3 mb-2">Como a plataforma apoia o trabalho de auditoria</h2>
-    <p class="section-subtitle mb-3">
-        O MVP organiza conhecimento regional de forma consult&aacute;vel, permitindo que equipes t&eacute;cnicas identifiquem
-        abordagens, crit&eacute;rios e aprendizados aplic&aacute;veis a novos trabalhos de controle.
-    </p>
-
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}MVP flow{% elif LANGUAGE_CODE == 'es' %}Flujo del MVP{% else %}Fluxo do MVP{% endif %}</div>
+    <h2 class="section-title h3 mb-2">{% if LANGUAGE_CODE == 'en' %}From registration to regional learning{% elif LANGUAGE_CODE == 'es' %}Del registro al aprendizaje regional{% else %}Do cadastro &agrave; aprendizagem regional{% endif %}</h2>
     <div class="row g-3">
-        <div class="col-lg-4">
-            <div class="feature-card h-100">
-                <span class="badge-soft badge-yellow mb-2">01</span>
-                <h3 class="h5 section-title">Sistematizar boas pr&aacute;ticas</h3>
-                <p class="section-subtitle mb-0">
-                    Re&uacute;ne experi&ecirc;ncias de auditoria, estudos e metodologias em uma estrutura comum,
-                    facilitando compara&ccedil;&atilde;o e consulta.
-                </p>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="feature-card h-100">
-                <span class="badge-soft badge-yellow mb-2">02</span>
-                <h3 class="h5 section-title">Consultar experi&ecirc;ncias regionais</h3>
-                <p class="section-subtitle mb-0">
-                    Permite filtrar iniciativas por pa&iacute;s, EFS, setor, dimens&atilde;o de justi&ccedil;a clim&aacute;tica
-                    e grupos vulner&aacute;veis.
-                </p>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="feature-card h-100">
-                <span class="badge-soft badge-yellow mb-2">03</span>
-                <h3 class="h5 section-title">Apoiar novas auditorias</h3>
-                <p class="section-subtitle mb-0">
-                    Oferece insumos para planejamento, perguntas de auditoria, crit&eacute;rios, fontes de informa&ccedil;&atilde;o
-                    e elementos replic&aacute;veis.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="mb-4">
-    <div class="section-kicker">Fluxo do MVP</div>
-    <h2 class="section-title h3 mb-2">Do cadastro &agrave; aprendizagem regional</h2>
-
-    <div class="row g-3">
-        <div class="col-md-6 col-xl">
-            <div class="feature-card h-100">
-                <span class="badge-soft">Etapa 1</span>
-                <h3 class="h6 section-title mt-3">Registrar</h3>
-                <p class="section-subtitle small mb-0">A EFS registra uma experi&ecirc;ncia com dados t&eacute;cnicos e institucionais.</p>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl">
-            <div class="feature-card h-100">
-                <span class="badge-soft">Etapa 2</span>
-                <h3 class="h6 section-title mt-3">Classificar</h3>
-                <p class="section-subtitle small mb-0">A plataforma organiza por setor, dimens&atilde;o, pa&iacute;s e grupos afetados.</p>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl">
-            <div class="feature-card h-100">
-                <span class="badge-soft">Etapa 3</span>
-                <h3 class="h6 section-title mt-3">Consultar</h3>
-                <p class="section-subtitle small mb-0">Usu&aacute;rios exploram o cat&aacute;logo por filtros e busca textual.</p>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl">
-            <div class="feature-card h-100">
-                <span class="badge-soft">Etapa 4</span>
-                <h3 class="h6 section-title mt-3">Replicar</h3>
-                <p class="section-subtitle small mb-0">Equipes identificam aprendizados e elementos adapt&aacute;veis a outros contextos.</p>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl">
-            <div class="feature-card h-100">
-                <span class="badge-soft">Etapa 5</span>
-                <h3 class="h6 section-title mt-3">Evoluir</h3>
-                <p class="section-subtitle small mb-0">O banco t&eacute;cnico apoia guias, capacita&ccedil;&otilde;es e novos ciclos de auditoria.</p>
-            </div>
-        </div>
+        <div class="col-md-6 col-xl"><div class="feature-card h-100"><span class="badge-soft">01</span><h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Register{% elif LANGUAGE_CODE == 'es' %}Registrar{% else %}Registrar{% endif %}</h3><p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}The SAI registers an experience with technical and institutional data.{% elif LANGUAGE_CODE == 'es' %}La EFS registra una experiencia con datos t&eacute;cnicos e institucionales.{% else %}A EFS registra uma experi&ecirc;ncia com dados t&eacute;cnicos e institucionais.{% endif %}</p></div></div>
+        <div class="col-md-6 col-xl"><div class="feature-card h-100"><span class="badge-soft">02</span><h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Classify{% elif LANGUAGE_CODE == 'es' %}Clasificar{% else %}Classificar{% endif %}</h3><p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}The platform organizes information by sector, dimension, country and affected groups.{% elif LANGUAGE_CODE == 'es' %}La plataforma organiza por sector, dimensi&oacute;n, pa&iacute;s y grupos afectados.{% else %}A plataforma organiza por setor, dimens&atilde;o, pa&iacute;s e grupos afetados.{% endif %}</p></div></div>
+        <div class="col-md-6 col-xl"><div class="feature-card h-100"><span class="badge-soft">03</span><h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Consultar{% else %}Consultar{% endif %}</h3><p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Users explore the catalog through filters and text search.{% elif LANGUAGE_CODE == 'es' %}Usuarios exploran el cat&aacute;logo por filtros y b&uacute;squeda textual.{% else %}Usu&aacute;rios exploram o cat&aacute;logo por filtros e busca textual.{% endif %}</p></div></div>
+        <div class="col-md-6 col-xl"><div class="feature-card h-100"><span class="badge-soft">04</span><h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Replicate{% elif LANGUAGE_CODE == 'es' %}Replicar{% else %}Replicar{% endif %}</h3><p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Teams identify lessons and elements adaptable to other contexts.{% elif LANGUAGE_CODE == 'es' %}Equipos identifican aprendizajes y elementos adaptables a otros contextos.{% else %}Equipes identificam aprendizados e elementos adapt&aacute;veis a outros contextos.{% endif %}</p></div></div>
     </div>
 </section>
 
 <section>
     <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-end mb-3">
-        <div>
-            <div class="section-kicker">Em destaque</div>
-            <h2 class="section-title h3 mb-1">&Uacute;ltimas experi&ecirc;ncias publicadas</h2>
-            <p class="section-subtitle mb-0">Exemplos de boas pr&aacute;ticas organizadas para consulta r&aacute;pida.</p>
-        </div>
-        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-primary">Ver todas</a>
+        <div><div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Highlights{% elif LANGUAGE_CODE == 'es' %}Destacadas{% else %}Em destaque{% endif %}</div><h2 class="section-title h3 mb-1">{% if LANGUAGE_CODE == 'en' %}Latest published experiences{% elif LANGUAGE_CODE == 'es' %}&Uacute;ltimas experiencias publicadas{% else %}&Uacute;ltimas experi&ecirc;ncias publicadas{% endif %}</h2></div>
+        <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}View all{% else %}Ver todas{% endif %}</a>
     </div>
-
     <div class="row g-3">
         {% for experiencia in ultimas_experiencias %}
-            <div class="col-md-4">
-                <article class="catalog-card h-100">
-                    <div class="d-flex justify-content-between gap-2 mb-3">
-                        <span class="badge-soft">{{ experiencia.setor.nome }}</span>
-                        <span class="badge-soft badge-yellow">{{ experiencia.ano_execucao }}</span>
-                    </div>
-                    <h3 class="h5 section-title">{{ experiencia.titulo }}</h3>
-                    <p class="section-subtitle small">{{ experiencia.descricao|truncatechars:150 }}</p>
-                    <div class="text-muted small mb-3">
-                        {{ experiencia.pais.nome }} &bull; {{ experiencia.efs.nome }}
-                    </div>
-                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary btn-sm">
-                        Ver detalhes
-                    </a>
-                </article>
-            </div>
+        <div class="col-md-4">
+            <article class="catalog-card h-100">
+                <div class="d-flex justify-content-between gap-2 mb-3"><span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span><span class="badge-soft badge-yellow">{{ experiencia.ano_execucao }}</span></div>
+                <h3 class="h5 section-title">{{ experiencia.titulo_exibicao }}</h3>
+                <p class="section-subtitle small">{{ experiencia.descricao_exibicao|truncatechars:150 }}</p>
+                <div class="text-muted small mb-3">{{ experiencia.pais.nome_exibicao }} &bull; {{ experiencia.efs.nome_exibicao }}</div>
+                <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary btn-sm">{% if LANGUAGE_CODE == 'en' %}View details{% elif LANGUAGE_CODE == 'es' %}Ver detalles{% else %}Ver detalhes{% endif %}</a>
+            </article>
+        </div>
         {% empty %}
-            <div class="col-12">
-                <div class="feature-card">
-                    <p class="mb-0 text-muted">Nenhuma experi&ecirc;ncia publicada ainda.</p>
-                </div>
-            </div>
+        <div class="col-12"><div class="feature-card"><p class="mb-0 text-muted">{% if LANGUAGE_CODE == 'en' %}No published experience yet.{% elif LANGUAGE_CODE == 'es' %}Ninguna experiencia publicada todav&iacute;a.{% else %}Nenhuma experi&ecirc;ncia publicada ainda.{% endif %}</p></div></div>
         {% endfor %}
     </div>
 </section>
