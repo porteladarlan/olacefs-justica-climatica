@@ -156,6 +156,37 @@ def catalogo_experiencias(request):
     return render(request, "praticas/catalogo_experiencias.html", contexto)
 
 
+def comparar_experiencias(request):
+    ids = request.GET.getlist("experiencias")
+    experiencias_selecionadas = (
+        experiencias_publicas()
+        .filter(id__in=ids)
+        .select_related("efs", "pais", "tipo_experiencia", "setor")
+        .prefetch_related(
+            "temas_transversais",
+            "normas_internacionais",
+            "dimensoes_consideradas",
+            "grupos_vulneraveis",
+            "anexos",
+        )
+        .order_by("-ano_execucao", "titulo")
+    )
+
+    experiencias_disponiveis = (
+        experiencias_publicas()
+        .select_related("efs", "pais", "tipo_experiencia", "setor")
+        .order_by("-ano_execucao", "titulo")
+    )
+
+    contexto = {
+        "experiencias_disponiveis": experiencias_disponiveis,
+        "experiencias_selecionadas": experiencias_selecionadas,
+        "ids_selecionados": [str(item) for item in ids],
+        "limite_comparacao": 3,
+    }
+    return render(request, "praticas/comparar_experiencias.html", contexto)
+
+
 def detalhe_experiencia(request, pk):
     experiencia = get_object_or_404(
         experiencias_publicas()

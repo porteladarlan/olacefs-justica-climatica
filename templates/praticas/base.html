@@ -480,6 +480,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'comparar_experiencias' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Compare{% elif LANGUAGE_CODE == 'es' %}Comparar{% else %}Comparar{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'normas_internacionais' %}">
                         {% if LANGUAGE_CODE == 'en' %}Standards{% elif LANGUAGE_CODE == 'es' %}Normas{% else %}Normas{% endif %}
                     </a>

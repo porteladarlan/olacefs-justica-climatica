@@ -131,6 +131,15 @@ class RotasPublicasTests(TestCase):
     def test_catalogo_retorna_200(self):
         self.assertEqual(self.client.get(reverse("catalogo_experiencias")).status_code, 200)
 
+    def test_comparar_experiencias_retorna_200(self):
+        self.assertEqual(self.client.get(reverse("comparar_experiencias")).status_code, 200)
+
+    def test_comparar_experiencias_com_item(self):
+        experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
+        response = self.client.get(reverse("comparar_experiencias"), {"experiencias": [experiencia.pk]})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "TCU")
+
     def test_normas_retorna_200(self):
         self.assertEqual(self.client.get(reverse("normas_internacionais")).status_code, 200)
 
