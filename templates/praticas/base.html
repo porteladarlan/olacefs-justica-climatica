@@ -485,6 +485,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'favoritos_experiencias' %}">
+                        {% if LANGUAGE_CODE == 'en' %}Favorites{% elif LANGUAGE_CODE == 'es' %}Favoritos{% else %}Favoritos{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'normas_internacionais' %}">
                         {% if LANGUAGE_CODE == 'en' %}Standards{% elif LANGUAGE_CODE == 'es' %}Normas{% else %}Normas{% endif %}
                     </a>

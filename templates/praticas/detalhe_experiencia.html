@@ -16,6 +16,17 @@
         <span class="badge-soft badge-yellow">{{ experiencia.setor.nome_exibicao }}</span>
         {% if experiencia.contribui_para_guia %}<span class="badge-soft badge-yellow">{% if LANGUAGE_CODE == 'en' %}Guide input{% elif LANGUAGE_CODE == 'es' %}Insumo para la Gu&iacute;a{% else %}Insumo para a Guia{% endif %}</span>{% endif %}
     </div>
+    <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}" class="mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-brand">
+            {% if experiencia.pk in favoritos_ids %}
+                {% if LANGUAGE_CODE == 'en' %}Remove from favorites{% elif LANGUAGE_CODE == 'es' %}Quitar de favoritos{% else %}Remover dos favoritos{% endif %}
+            {% else %}
+                {% if LANGUAGE_CODE == 'en' %}Add to favorites{% elif LANGUAGE_CODE == 'es' %}Agregar a favoritos{% else %}Adicionar aos favoritos{% endif %}
+            {% endif %}
+        </button>
+    </form>
 </section>
 
 <section class="row g-3 mb-4">

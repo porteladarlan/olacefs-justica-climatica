@@ -70,9 +70,23 @@
                     {% for norma in experiencia.normas_internacionais.all|slice:":3" %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% endfor %}
                 </div>
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mt-4">
                 <span class="text-muted small">{% if experiencia.contribui_para_guia %}{% if LANGUAGE_CODE == 'en' %}Contributes to the Guide{% elif LANGUAGE_CODE == 'es' %}Contribuye a la Gu&iacute;a{% else %}Contribui para a Guia{% endif %}{% endif %}</span>
-                <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
+                <div class="d-flex flex-wrap gap-2">
+
+                <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn btn-sm {% if experiencia.pk in favoritos_ids %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+                        {% if experiencia.pk in favoritos_ids %}
+                            {% if LANGUAGE_CODE == 'en' %}Favorited{% elif LANGUAGE_CODE == 'es' %}Favorita{% else %}Favorita{% endif %}
+                        {% else %}
+                            {% if LANGUAGE_CODE == 'en' %}Favorite{% elif LANGUAGE_CODE == 'es' %}Favoritar{% else %}Favoritar{% endif %}
+                        {% endif %}
+                    </button>
+                </form>
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
+                </div>
             </div>
         </article>
     </div>

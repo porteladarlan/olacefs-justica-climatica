@@ -86,7 +86,14 @@
                         <div class="text-muted small mb-2">
                             {{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }} · {{ experiencia.pais.nome_exibicao }}
                         </div>
-                        <p class="section-subtitle small mb-0">{{ experiencia.descricao_exibicao|truncatechars:150 }}</p>
+                        <p class="section-subtitle small mb-2">{{ experiencia.descricao_exibicao|truncatechars:150 }}</p>
+                        <span class="badge-soft {% if experiencia.pk in favoritos_ids %}badge-yellow{% endif %}">
+                            {% if experiencia.pk in favoritos_ids %}
+                                {% if LANGUAGE_CODE == 'en' %}Favorited{% elif LANGUAGE_CODE == 'es' %}Favorita{% else %}Favorita{% endif %}
+                            {% else %}
+                                {% if LANGUAGE_CODE == 'en' %}Available{% elif LANGUAGE_CODE == 'es' %}Disponible{% else %}Disponível{% endif %}
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
             </label>
