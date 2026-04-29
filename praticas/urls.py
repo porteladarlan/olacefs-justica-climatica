@@ -9,10 +9,13 @@ urlpatterns = [
     path("normas-internacionais/", views.normas_internacionais, name="normas_internacionais"),
     path("adicionar-boa-pratica/", views.adicionar_boa_pratica, name="adicionar_boa_pratica"),
     path("editar-boa-pratica/<int:pk>/", views.editar_boa_pratica, name="editar_boa_pratica"),
+    path("solicitar-edicao-publicada/<int:pk>/", views.solicitar_edicao_publicada, name="solicitar_edicao_publicada"),
     path("envio-confirmado/", views.confirmacao_envio, name="confirmacao_envio"),
     path("status-envio/", views.status_envio, name="status_envio"),
     path("painel-revisao/", views.painel_revisao, name="painel_revisao"),
     path("painel-revisao/<int:pk>/", views.revisar_experiencia, name="revisar_experiencia"),
+    path("painel-revisao-edicoes/", views.painel_revisao_edicoes, name="painel_revisao_edicoes"),
+    path("painel-revisao-edicoes/<int:pk>/", views.revisar_edicao_publicada, name="revisar_edicao_publicada"),
     path("banco-tecnico/", views.banco_tecnico, name="banco_tecnico"),
     path("sobre/", views.sobre_plataforma, name="sobre_plataforma"),
 ]

@@ -8,7 +8,7 @@
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Track submission{% elif LANGUAGE_CODE == 'es' %}Seguimiento del env&iacute;o{% else %}Acompanhar envio{% endif %}</div>
     <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Check the status of submitted good practices{% elif LANGUAGE_CODE == 'es' %}Consulte el estado de buenas pr&aacute;cticas enviadas{% else %}Consulte o status das boas pr&aacute;ticas enviadas{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Enter the institutional e-mail used in the submission form to view submitted items, reviewer comments and editing options before publication.{% elif LANGUAGE_CODE == 'es' %}Ingrese el correo institucional usado en el formulario para ver los env&iacute;os, comentarios de revisi&oacute;n y opciones de edici&oacute;n antes de la publicaci&oacute;n.{% else %}Informe o e-mail institucional usado no formul&aacute;rio para visualizar envios, coment&aacute;rios de revis&atilde;o e op&ccedil;&otilde;es de edi&ccedil;&atilde;o antes da publica&ccedil;&atilde;o.{% endif %}</p>
+    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Enter the institutional e-mail used in the submission form to view submissions, reviewer comments and editing options.{% elif LANGUAGE_CODE == 'es' %}Ingrese el correo institucional usado en el formulario para ver env&iacute;os, comentarios y opciones de edici&oacute;n.{% else %}Informe o e-mail institucional usado no formul&aacute;rio para visualizar envios, coment&aacute;rios e op&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}</p>
 </section>
 
 <form method="get" class="filter-panel row g-3 mb-4">
@@ -23,8 +23,8 @@
 </form>
 
 {% if consulta_realizada %}
-<section>
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Results{% else %}Resultados{% endif %}</div>
+<section class="mb-4">
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os{% else %}Envios{% endif %}</div>
     <div class="row g-3">
         {% for experiencia in experiencias %}
         <div class="col-lg-6">
@@ -36,10 +36,6 @@
                 </div>
                 <h2 class="h4 section-title">{{ experiencia.titulo_exibicao }}</h2>
                 <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:260 }}</p>
-                <div class="text-muted small mb-3">
-                    <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }} &bull;
-                    <strong>Atualizado em:</strong> {{ experiencia.atualizado_em|date:"d/m/Y H:i" }}
-                </div>
                 {% if experiencia.comentario_revisor %}
                     <div class="alert alert-light border small">
                         <strong>{% if LANGUAGE_CODE == 'en' %}Reviewer comment{% elif LANGUAGE_CODE == 'es' %}Comentario de revisi&oacute;n{% else %}Coment&aacute;rio da revis&atilde;o{% endif %}:</strong>
@@ -48,25 +44,43 @@
                 {% endif %}
 
                 <div class="d-flex flex-wrap gap-2">
-                    {% if experiencia.status_publicacao != "publicado" %}
+                    {% if experiencia.status_publicacao == "publicado" %}
+                        <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}?email={{ form.cleaned_data.email_contato }}">
+                            {% if LANGUAGE_CODE == 'en' %}Request edit{% elif LANGUAGE_CODE == 'es' %}Solicitar edici&oacute;n{% else %}Solicitar edi&ccedil;&atilde;o{% endif %}
+                        </a>
+                    {% else %}
                         <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}?email={{ form.cleaned_data.email_contato }}">
                             {% if LANGUAGE_CODE == 'en' %}Edit / resubmit{% elif LANGUAGE_CODE == 'es' %}Editar / reenviar{% else %}Editar / reenviar{% endif %}
                         </a>
-                    {% else %}
-                        <span class="text-muted small">
-                            {% if LANGUAGE_CODE == 'en' %}Published content changes must be requested from the administration in this MVP.{% elif LANGUAGE_CODE == 'es' %}En este MVP, los cambios en contenido publicado deben solicitarse a la administraci&oacute;n.{% else %}Neste MVP, altera&ccedil;&otilde;es em conte&uacute;do publicado devem ser solicitadas &agrave; administra&ccedil;&atilde;o.{% endif %}
-                        </span>
                     {% endif %}
                 </div>
             </article>
         </div>
         {% empty %}
-        <div class="col-12">
-            <div class="feature-card">
-                <h2 class="h5 section-title mb-1">{% if LANGUAGE_CODE == 'en' %}No submission found{% elif LANGUAGE_CODE == 'es' %}Ning&uacute;n env&iacute;o encontrado{% else %}Nenhum envio encontrado{% endif %}</h2>
-                <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No good practice was found for the informed e-mail.{% elif LANGUAGE_CODE == 'es' %}No se encontr&oacute; ninguna buena pr&aacute;ctica para el correo informado.{% else %}Nenhuma boa pr&aacute;tica foi encontrada para o e-mail informado.{% endif %}</p>
-            </div>
+        <div class="col-12"><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submission found for this e-mail.{% elif LANGUAGE_CODE == 'es' %}No se encontraron env&iacute;os para este correo.{% else %}Nenhum envio encontrado para este e-mail.{% endif %}</p></div></div>
+        {% endfor %}
+    </div>
+</section>
+
+<section>
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Published edit requests{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n publicadas{% else %}Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o em publicados{% endif %}</div>
+    <div class="row g-3">
+        {% for proposta in propostas %}
+        <div class="col-lg-6">
+            <article class="catalog-card h-100">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge-status status-{{ proposta.status }}">{{ proposta.get_status_display }}</span>
+                    <span class="badge-soft">{{ proposta.criado_em|date:"d/m/Y" }}</span>
+                </div>
+                <h2 class="h5 section-title">{{ proposta.experiencia.titulo_exibicao }}</h2>
+                {% if proposta.comentario_autor %}<p class="section-subtitle">{{ proposta.comentario_autor }}</p>{% endif %}
+                {% if proposta.comentario_revisor %}
+                    <div class="alert alert-light border small mb-0"><strong>Revisão:</strong> {{ proposta.comentario_revisor }}</div>
+                {% endif %}
+            </article>
         </div>
+        {% empty %}
+        <div class="col-12"><p class="text-muted small mb-0">{% if LANGUAGE_CODE == 'en' %}No edit request found.{% elif LANGUAGE_CODE == 'es' %}No hay solicitudes de edici&oacute;n.{% else %}Nenhuma solicita&ccedil;&atilde;o de edi&ccedil;&atilde;o encontrada.{% endif %}</p></div>
         {% endfor %}
     </div>
 </section>
