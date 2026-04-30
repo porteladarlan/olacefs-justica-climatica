@@ -16,6 +16,19 @@
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
     <div class="col-12">
+        <div class="alert alert-warning mb-0">
+            <strong>{% if LANGUAGE_CODE == 'en' %}Before submitting:{% elif LANGUAGE_CODE == 'es' %}Antes de enviar:{% else %}Antes de enviar:{% endif %}</strong>
+            {% if LANGUAGE_CODE == 'en' %}
+                submit only content related to audit, oversight or climate justice, authorized for public disclosure by the corresponding SAI. Do not include confidential information, offensive or discriminatory content, restricted copyrighted material, private advertising or experiences that cannot be verified by a SAI.
+            {% elif LANGUAGE_CODE == 'es' %}
+                env&iacute;e solo contenido relacionado con auditor&iacute;a, fiscalizaci&oacute;n o justicia clim&aacute;tica, autorizado para divulgaci&oacute;n p&uacute;blica por la EFS correspondiente. No incluya informaci&oacute;n confidencial, contenido ofensivo o discriminatorio, materiales con derechos de autor restringidos, publicidad privada o experiencias que no puedan ser verificadas por una EFS.
+            {% else %}
+                envie somente conte&uacute;dos relacionados a auditoria, fiscaliza&ccedil;&atilde;o ou justi&ccedil;a clim&aacute;tica, autorizados para divulga&ccedil;&atilde;o p&uacute;blica pela EFS correspondente. N&atilde;o inclua informa&ccedil;&otilde;es confidenciais, conte&uacute;do ofensivo ou discriminat&oacute;rio, materiais com direitos autorais restritos, publicidade privada ou experi&ecirc;ncias que n&atilde;o possam ser verificadas por uma EFS.
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-12">
         <div class="form-section">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Required identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n obligatoria{% else %}Identifica&ccedil;&atilde;o obrigat&oacute;ria{% endif %}</h2>
             <div class="row g-3">
@@ -74,7 +87,7 @@
     <div class="col-12">
         <div class="form-section">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Attachments and external links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces externos{% else %}Anexos e links externos{% endif %}</h2>
-            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Up to three attachments are allowed. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each. You may also provide external links.{% elif LANGUAGE_CODE == 'es' %}Se permiten hasta tres anexos. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno. Tambi&eacute;n puede informar enlaces externos.{% else %}S&atilde;o permitidos at&eacute; tr&ecirc;s anexos. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada. Tamb&eacute;m &eacute; poss&iacute;vel informar links externos.{% endif %}</p>
+            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Up to three attachments are allowed. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each. You may also provide external links. Use self-explanatory titles, such as &ldquo;Audit report&rdquo;, &ldquo;Criteria matrix&rdquo; or &ldquo;Methodological report&rdquo;.{% elif LANGUAGE_CODE == 'es' %}Se permiten hasta tres anexos. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno. Tambi&eacute;n puede informar enlaces externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditor&iacute;a&rdquo;, &ldquo;Matriz de criterios&rdquo; o &ldquo;Informe metodol&oacute;gico&rdquo;.{% else %}S&atilde;o permitidos at&eacute; tr&ecirc;s anexos. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada. Tamb&eacute;m &eacute; poss&iacute;vel informar links externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditoria&rdquo;, &ldquo;Matriz de crit&eacute;rios&rdquo; ou &ldquo;Relat&oacute;rio metodol&oacute;gico&rdquo;.{% endif %}</p>
             {% for indice in "123" %}
             <div class="row g-2 align-items-end mb-3">
                 <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}Attachment title{% elif LANGUAGE_CODE == 'es' %}T&iacute;tulo del anexo{% else %}T&iacute;tulo do anexo{% endif %} {{ indice }}</label><input class="form-control" type="text" name="anexo_titulo_{{ indice }}"></div>

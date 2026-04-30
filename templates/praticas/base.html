@@ -56,6 +56,38 @@
             color: var(--blue-900);
         }
 
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        .btn:focus-visible,
+        .nav-link:focus-visible,
+        .dropdown-item:focus-visible {
+            outline: 3px solid rgba(242, 194, 48, 0.95);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 0.2rem rgba(18, 106, 132, 0.12);
+        }
+
+        .skip-link {
+            position: absolute;
+            left: 1rem;
+            top: -4rem;
+            z-index: 2000;
+            background: var(--blue-950);
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.65rem 1rem;
+            font-weight: 800;
+            text-decoration: none;
+            transition: top 0.15s ease;
+        }
+
+        .skip-link:focus {
+            top: 0.85rem;
+            color: #fff;
+        }
+
         .brand-strip {
             height: 5px;
             background: linear-gradient(90deg, var(--red-500) 0 22%, var(--yellow-500) 22% 52%, var(--green-500) 52% 76%, var(--blue-700) 76% 100%);
@@ -462,6 +494,17 @@
             font-weight: 700;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+
         @media (max-width: 991.98px) {
             .brand-lockup {
                 min-width: 0;
@@ -501,11 +544,15 @@
     </style>
 </head>
 <body>
+<a class="skip-link" href="#conteudo-principal">
+    {% if LANGUAGE_CODE == 'en' %}Skip to main content{% elif LANGUAGE_CODE == 'es' %}Saltar al contenido principal{% else %}Pular para o conteúdo principal{% endif %}
+</a>
+
 <div class="brand-strip"></div>
 
-<nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top" aria-label="{% if LANGUAGE_CODE == 'en' %}Main navigation{% elif LANGUAGE_CODE == 'es' %}Navegación principal{% else %}Navegação principal{% endif %}">
     <div class="container">
-        <a class="brand-lockup" href="{% url 'pagina_inicial' %}">
+        <a class="brand-lockup" href="{% url 'pagina_inicial' %}" aria-label="Plataforma Regional OLACEFS">
             <span class="brand-name">Plataforma Regional OLACEFS</span>
             <span class="brand-caption">
                 {% if LANGUAGE_CODE == 'en' %}
@@ -518,7 +565,7 @@
             </span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Menu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="{% if LANGUAGE_CODE == 'en' %}Open navigation menu{% elif LANGUAGE_CODE == 'es' %}Abrir menú de navegación{% else %}Abrir menu de navegação{% endif %}">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -638,7 +685,7 @@
 
                 <li class="nav-item">
                     <div class="ms-lg-1 mt-2 mt-lg-0">
-                        <select id="languageSwitcher" class="form-select form-select-sm language-select" aria-label="Selecionar idioma">
+                        <select id="languageSwitcher" class="form-select form-select-sm language-select" aria-label="{% if LANGUAGE_CODE == 'en' %}Select language{% elif LANGUAGE_CODE == 'es' %}Seleccionar idioma{% else %}Selecionar idioma{% endif %}">
                             <option value="pt-br" {% if LANGUAGE_CODE == 'pt-br' %}selected{% endif %}>PT</option>
                             <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>ES</option>
                             <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
@@ -650,13 +697,15 @@
     </div>
 </nav>
 
-<main class="container main-shell">
+<main class="container main-shell" id="conteudo-principal" tabindex="-1">
     <div class="page-shell">
         <div class="page-inner">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'info' }} mb-4">{{ message }}</div>
-                {% endfor %}
+                <div aria-live="polite" aria-atomic="true">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} mb-4">{{ message }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
             {% block content %}{% endblock %}
         </div>

@@ -19,11 +19,11 @@
         </h1>
         <p class="hero-subtitle">
             {% if LANGUAGE_CODE == 'en' %}
-                Find good practices, audit questions, criteria, methodologies and international frameworks used by SAIs in Latin America and the Caribbean.
+                This platform gathers experiences, tools and methodologies from Supreme Audit Institutions in Latin America and the Caribbean that incorporate a climate justice perspective into audit work.
             {% elif LANGUAGE_CODE == 'es' %}
-                Encuentre buenas pr&aacute;cticas, preguntas de auditor&iacute;a, criterios, metodolog&iacute;as y marcos internacionales utilizados por las EFS de Am&eacute;rica Latina y el Caribe.
+                Esta plataforma re&uacute;ne experiencias, herramientas y metodolog&iacute;as de las Entidades Fiscalizadoras Superiores de Am&eacute;rica Latina y el Caribe que incorporan la perspectiva de justicia clim&aacute;tica en su trabajo de auditor&iacute;a.
             {% else %}
-                Encontre boas pr&aacute;ticas, perguntas de auditoria, crit&eacute;rios, metodologias e marcos internacionais utilizados pelas EFS da Am&eacute;rica Latina e do Caribe.
+                Esta plataforma re&uacute;ne experi&ecirc;ncias, ferramentas e metodologias das Entidades Fiscalizadoras Superiores da Am&eacute;rica Latina e do Caribe que incorporam a perspectiva de justi&ccedil;a clim&aacute;tica no trabalho de auditoria.
             {% endif %}
         </p>
 
@@ -34,6 +34,45 @@
             <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-brand-outline">
                 {% if LANGUAGE_CODE == 'en' %}Submit a practice{% elif LANGUAGE_CODE == 'es' %}Enviar una pr&aacute;ctica{% else %}Enviar uma pr&aacute;tica{% endif %}
             </a>
+        </div>
+    </div>
+</section>
+
+<section class="feature-card mb-4">
+    <div class="section-kicker">
+        {% if LANGUAGE_CODE == 'en' %}Institutional coordination{% elif LANGUAGE_CODE == 'es' %}Coordinaci&oacute;n institucional{% else %}Coordena&ccedil;&atilde;o institucional{% endif %}
+    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-lg-4">
+            <h2 class="section-title h4 mb-2">
+                {% if LANGUAGE_CODE == 'en' %}A regional initiative{% elif LANGUAGE_CODE == 'es' %}Una iniciativa regional{% else %}Uma iniciativa regional{% endif %}
+            </h2>
+            <p class="section-subtitle mb-0">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Created by COMTEMA and CGID within the regional AdaptaInfra OLACEFS-GIZ project.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Creada por la COMTEMA y la CGID, en el marco del Proyecto regional AdaptaInfra OLACEFS-GIZ.
+                {% else %}
+                    Criada pela COMTEMA e pela CGID, no marco do Projeto regional AdaptaInfra OLACEFS-GIZ.
+                {% endif %}
+            </p>
+        </div>
+        <div class="col-lg-8">
+            <div class="row g-2">
+                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">OLACEFS</div></div></div>
+                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">COMTEMA</div></div></div>
+                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">CGID</div></div></div>
+                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">GIZ</div></div></div>
+            </div>
+            <p class="text-muted small mb-0 mt-2">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Logo placeholders for the MVP. Replace with official image files during institutional visual review.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Marcadores de logo para el MVP. Sustituir por los archivos oficiales durante la revisi&oacute;n visual institucional.
+                {% else %}
+                    Marcadores de logo para o MVP. Substituir pelos arquivos oficiais durante a revis&atilde;o visual institucional.
+                {% endif %}
+            </p>
         </div>
     </div>
 </section>
@@ -78,13 +117,22 @@
                     O que &eacute; justi&ccedil;a clim&aacute;tica?
                 {% endif %}
             </h2>
+            <p class="section-subtitle">
+                {% if LANGUAGE_CODE == 'en' %}
+                    The impacts of climate change do not affect all people equally. Communities that have historically contributed least to the climate crisis — Indigenous peoples, Afro-descendant communities, women, persons with disabilities and low-income families — often face its consequences most intensely.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Los impactos del cambio clim&aacute;tico no afectan a todas las personas por igual. Las comunidades que hist&oacute;ricamente menos han contribuido a la crisis clim&aacute;tica — pueblos ind&iacute;genas, afrodescendientes, mujeres, personas con discapacidad y familias de bajos ingresos — son quienes enfrentan sus consecuencias con mayor intensidad.
+                {% else %}
+                    Os impactos da mudan&ccedil;a do clima n&atilde;o afetam todas as pessoas da mesma forma. Comunidades que historicamente menos contribu&iacute;ram para a crise clim&aacute;tica — povos ind&iacute;genas, afrodescendentes, mulheres, pessoas com defici&ecirc;ncia e fam&iacute;lias de baixa renda — frequentemente enfrentam suas consequ&ecirc;ncias com maior intensidade.
+                {% endif %}
+            </p>
             <p class="section-subtitle mb-0">
                 {% if LANGUAGE_CODE == 'en' %}
-                    Climate justice places equity and human rights at the center of climate action. In infrastructure, it asks who benefits, who bears the risks and whether public decisions reduce structural inequalities.
+                    Climate justice means placing equity and human rights at the center of climate action. In infrastructure, it asks not only whether a project is efficient, but who benefits, who bears the risks and whether decisions reduce structural inequalities.
                 {% elif LANGUAGE_CODE == 'es' %}
-                    La justicia clim&aacute;tica coloca la equidad y los derechos humanos en el centro de la acci&oacute;n clim&aacute;tica. En infraestructura, pregunta qui&eacute;nes se benefician, qu&eacute; grupos asumen los riesgos y si las decisiones reducen desigualdades estructurales.
+                    La justicia clim&aacute;tica significa colocar la equidad y los derechos humanos en el n&uacute;cleo de la acci&oacute;n clim&aacute;tica. En infraestructura, implica preguntarse no solo si una obra es eficiente, sino qui&eacute;nes se benefician, qu&eacute; grupos asumen los mayores riesgos y si las decisiones reducen desigualdades estructurales.
                 {% else %}
-                    A justi&ccedil;a clim&aacute;tica coloca equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica. Em infraestrutura, pergunta quem se beneficia, quais grupos assumem os riscos e se as decis&otilde;es reduzem desigualdades estruturais.
+                    A justi&ccedil;a clim&aacute;tica significa colocar equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica. Na infraestrutura, implica perguntar n&atilde;o apenas se uma obra &eacute; eficiente, mas quem se beneficia, quais grupos assumem os maiores riscos e se as decis&otilde;es reduzem desigualdades estruturais.
                 {% endif %}
             </p>
         </div>
@@ -97,18 +145,27 @@
                 {% if LANGUAGE_CODE == 'en' %}
                     What is this platform for?
                 {% elif LANGUAGE_CODE == 'es' %}
-                    &iquest;Para qu&eacute; sirve esta plataforma?
+                    &iquest;Qu&eacute; es esta plataforma y para qu&eacute; sirve?
                 {% else %}
-                    Para que serve esta plataforma?
+                    O que &eacute; esta plataforma e para que serve?
                 {% endif %}
             </h2>
+            <p class="section-subtitle">
+                {% if LANGUAGE_CODE == 'en' %}
+                    It is a living space for collective learning: here, SAIs can consult good practices, find audit questions and criteria with a climate justice perspective, and share experiences from their own institutions.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Es un espacio vivo de aprendizaje colectivo: aqu&iacute; se pueden consultar buenas pr&aacute;cticas de otras EFS, encontrar preguntas y criterios de auditor&iacute;a con enfoque de justicia clim&aacute;tica, y compartir experiencias de la propia instituci&oacute;n.
+                {% else %}
+                    &Eacute; um espa&ccedil;o vivo de aprendizagem coletiva: aqui &eacute; poss&iacute;vel consultar boas pr&aacute;ticas de outras EFS, encontrar perguntas e crit&eacute;rios de auditoria com enfoque de justi&ccedil;a clim&aacute;tica e compartilhar experi&ecirc;ncias da pr&oacute;pria institui&ccedil;&atilde;o.
+                {% endif %}
+            </p>
             <p class="section-subtitle mb-0">
                 {% if LANGUAGE_CODE == 'en' %}
-                    The platform compiles experiences, tools and methodologies from SAIs. The Guide provides conceptual orientation; the platform demonstrates it with concrete cases and practical references.
+                    The Guide provides orientation; the platform demonstrates. When SAIs audit with a climate justice perspective, public oversight becomes a tool for transformation.
                 {% elif LANGUAGE_CODE == 'es' %}
-                    La plataforma re&uacute;ne experiencias, herramientas y metodolog&iacute;as de las EFS. La Gu&iacute;a orienta; la plataforma demuestra con casos concretos y referencias pr&aacute;cticas.
+                    La Gu&iacute;a orienta; la plataforma demuestra. Cuando las EFS auditan con perspectiva de justicia clim&aacute;tica, la fiscalizaci&oacute;n p&uacute;blica se convierte en una herramienta de transformaci&oacute;n.
                 {% else %}
-                    A plataforma re&uacute;ne experi&ecirc;ncias, ferramentas e metodologias das EFS. A Guia orienta; a plataforma demonstra com casos concretos e refer&ecirc;ncias pr&aacute;ticas.
+                    A Guia orienta; a plataforma demonstra. Quando as EFS auditam com perspectiva de justi&ccedil;a clim&aacute;tica, a fiscaliza&ccedil;&atilde;o p&uacute;blica se transforma em ferramenta de transforma&ccedil;&atilde;o.
                 {% endif %}
             </p>
         </div>
@@ -155,7 +212,7 @@
             <div class="feature-card h-100">
                 <span class="badge-soft badge-yellow">02</span>
                 <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Cross-cutting themes{% elif LANGUAGE_CODE == 'es' %}Temas transversales{% else %}Temas transversais{% endif %}</h3>
-                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Gender, women, vulnerable populations, Indigenous peoples, LGBTQI+ and human rights.{% elif LANGUAGE_CODE == 'es' %}G&eacute;nero, mujeres, poblaciones vulnerables, pueblos ind&iacute;genas, LGBTQI+ y derechos humanos.{% else %}G&ecirc;nero, mulheres, popula&ccedil;&otilde;es vulner&aacute;veis, povos ind&iacute;genas, LGBTQI+ e direitos humanos.{% endif %}</p>
+                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Gender, women, vulnerable populations, Indigenous peoples, quilombola communities, LGBTQI+ and human rights.{% elif LANGUAGE_CODE == 'es' %}G&eacute;nero, mujeres, poblaciones vulnerables, pueblos ind&iacute;genas, comunidades quilombolas, LGBTQI+ y derechos humanos.{% else %}G&ecirc;nero, mulheres, popula&ccedil;&otilde;es vulner&aacute;veis, povos ind&iacute;genas, comunidades quilombolas, LGBTQI+ e direitos humanos.{% endif %}</p>
             </div>
         </div>
         <div class="col-md-6 col-xl">
@@ -169,7 +226,7 @@
             <div class="feature-card h-100">
                 <span class="badge-soft badge-yellow">04</span>
                 <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Frameworks{% elif LANGUAGE_CODE == 'es' %}Normativas{% else %}Normativas{% endif %}</h3>
-                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Paris Agreement, SDGs, Sendai Framework and other international references.{% elif LANGUAGE_CODE == 'es' %}Acuerdo de Par&iacute;s, ODS, Marco de Sendai y otras referencias internacionales.{% else %}Acordo de Paris, ODS, Marco de Sendai e outras refer&ecirc;ncias internacionais.{% endif %}</p>
+                <p class="section-subtitle small mb-0">{% if LANGUAGE_CODE == 'en' %}Paris Agreement, SDGs, Sendai Framework, Escazú Agreement and other international references.{% elif LANGUAGE_CODE == 'es' %}Acuerdo de Par&iacute;s, ODS, Marco de Sendai, Acuerdo de Escaz&uacute; y otras referencias internacionales.{% else %}Acordo de Paris, ODS, Marco de Sendai, Acordo de Escaz&uacute; e outras refer&ecirc;ncias internacionais.{% endif %}</p>
             </div>
         </div>
     </div>
