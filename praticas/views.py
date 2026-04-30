@@ -610,6 +610,118 @@ def solicitar_edicao_publicada(request, pk):
     )
 
 
+
+CAMPOS_COMPARACAO_EDICAO = [
+    ("titulo", "Nome da boa prática / iniciativa"),
+    ("efs", "EFS"),
+    ("pais", "País"),
+    ("tipo_experiencia", "Tipo de boa prática"),
+    ("setor", "Setor"),
+    ("temas_transversais", "Temas transversais"),
+    ("normas_internacionais", "Normas internacionais"),
+    ("contato_referencia", "Contato de referência"),
+    ("email_contato", "E-mail institucional"),
+    ("pessoa_responsavel", "Pessoa responsável"),
+    ("descricao", "Resumo da boa prática"),
+    ("enfoque_justica_climatica", "Vínculo com justiça climática"),
+    ("objetivo", "Objetivo"),
+    ("perguntas_chave", "Perguntas de auditoria"),
+    ("criterios_utilizados", "Critérios utilizados"),
+    ("metodologia", "Metodologia"),
+    ("ferramentas_utilizadas", "Ferramentas utilizadas"),
+    ("resultados", "Resultados"),
+    ("recomendacoes", "Recomendações"),
+    ("replicabilidade", "Replicabilidade"),
+    ("ano_execucao", "Ano"),
+    ("contribui_para_guia", "Contribui para a Guia"),
+]
+
+
+def texto_booleano(valor):
+    return "Sim" if valor else "Não"
+
+
+def texto_lista_objetos(objetos):
+    nomes = [getattr(item, "nome_exibicao", str(item)) for item in objetos]
+    return ", ".join(nomes) if nomes else "-"
+
+
+def valor_atual_para_comparacao(experiencia, campo):
+    if campo in {"efs", "pais", "tipo_experiencia", "setor"}:
+        objeto = getattr(experiencia, campo, None)
+        return getattr(objeto, "nome_exibicao", str(objeto)) if objeto else "-"
+
+    if campo in {"temas_transversais", "normas_internacionais"}:
+        return texto_lista_objetos(getattr(experiencia, campo).all())
+
+    valor = getattr(experiencia, campo, "")
+
+    if campo == "contribui_para_guia":
+        return texto_booleano(bool(valor))
+
+    if valor is None or valor == "":
+        return "-"
+
+    return str(valor)
+
+
+def valor_proposto_para_comparacao(proposta, campo):
+    dados = proposta.dados_json or {}
+    valor = dados.get(campo)
+
+    if campo == "efs":
+        objeto = EFS.objects.filter(pk=valor).first()
+        return getattr(objeto, "nome_exibicao", "-") if objeto else "-"
+
+    if campo == "pais":
+        objeto = Pais.objects.filter(pk=valor).first()
+        return getattr(objeto, "nome_exibicao", "-") if objeto else "-"
+
+    if campo == "tipo_experiencia":
+        objeto = TipoExperiencia.objects.filter(pk=valor).first()
+        return getattr(objeto, "nome_exibicao", "-") if objeto else "-"
+
+    if campo == "setor":
+        objeto = Setor.objects.filter(pk=valor).first()
+        return getattr(objeto, "nome_exibicao", "-") if objeto else "-"
+
+    if campo == "temas_transversais":
+        return texto_lista_objetos(TemaTransversal.objects.filter(pk__in=valor or []))
+
+    if campo == "normas_internacionais":
+        return texto_lista_objetos(NormaInternacional.objects.filter(pk__in=valor or []))
+
+    if campo == "contribui_para_guia":
+        return texto_booleano(bool(valor))
+
+    if valor is None or valor == "":
+        return "-"
+
+    return str(valor)
+
+
+def montar_comparativo_proposta_edicao(proposta):
+    experiencia = proposta.experiencia
+    linhas = []
+
+    for campo, rotulo in CAMPOS_COMPARACAO_EDICAO:
+        valor_atual = valor_atual_para_comparacao(experiencia, campo)
+        valor_proposto = valor_proposto_para_comparacao(proposta, campo)
+        alterado = valor_atual.strip() != valor_proposto.strip()
+
+        linhas.append(
+            {
+                "campo": campo,
+                "rotulo": rotulo,
+                "valor_atual": valor_atual,
+                "valor_proposto": valor_proposto,
+                "alterado": alterado,
+            }
+        )
+
+    return linhas
+
+
 def aplicar_proposta_edicao(proposta):
     experiencia = proposta.experiencia
     dados = proposta.dados_json
@@ -822,6 +934,7 @@ def revisar_edicao_publicada(request, pk):
         {
             "proposta": proposta,
             "form": form,
+            "comparativo": montar_comparativo_proposta_edicao(proposta),
         },
     )
 

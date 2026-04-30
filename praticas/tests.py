@@ -12,6 +12,7 @@ from .models import (
     GrupoVulneravel,
     NormaInternacional,
     Pais,
+    PropostaEdicaoExperiencia,
     Setor,
     TemaTransversal,
     TipoExperiencia,
@@ -399,4 +400,109 @@ class RotasPublicasTests(TestCase):
         response = self.client.post(reverse("adicionar_boa_pratica"), dados)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Anexo.objects.filter(titulo="Relatorio PDF").exists())
+
+    def test_revisao_edicao_publicada_exibe_comparativo_visual(self):
+        usuario = get_user_model().objects.create_user(
+            username="revisor_comparativo",
+            password="teste123",
+            is_staff=True,
+        )
+        self.client.force_login(usuario)
+
+        experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
+        tema = experiencia.temas_transversais.first()
+        norma = experiencia.normas_internacionais.first()
+
+        proposta = PropostaEdicaoExperiencia.objects.create(
+            experiencia=experiencia,
+            email_contato=experiencia.email_contato,
+            comentario_autor="Atualização do título e dos resultados.",
+            dados_json={
+                "efs": experiencia.efs_id,
+                "pais": experiencia.pais_id,
+                "titulo": "Titulo atualizado para comparativo",
+                "tipo_experiencia": experiencia.tipo_experiencia_id,
+                "setor": experiencia.setor_id,
+                "temas_transversais": [tema.id],
+                "normas_internacionais": [norma.id],
+                "contato_referencia": experiencia.contato_referencia,
+                "email_contato": experiencia.email_contato,
+                "pessoa_responsavel": experiencia.pessoa_responsavel,
+                "descricao": experiencia.descricao,
+                "enfoque_justica_climatica": experiencia.enfoque_justica_climatica,
+                "objetivo": experiencia.objetivo,
+                "perguntas_chave": experiencia.perguntas_chave,
+                "criterios_utilizados": experiencia.criterios_utilizados,
+                "metodologia": experiencia.metodologia,
+                "ferramentas_utilizadas": experiencia.ferramentas_utilizadas,
+                "resultados": "Resultados atualizados para revisão visual.",
+                "recomendacoes": experiencia.recomendacoes,
+                "replicabilidade": experiencia.replicabilidade,
+                "ano_execucao": experiencia.ano_execucao,
+                "contribui_para_guia": experiencia.contribui_para_guia,
+            },
+        )
+
+        response = self.client.get(reverse("revisar_edicao_publicada", args=[proposta.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Valor atual")
+        self.assertContains(response, "Valor proposto")
+        self.assertContains(response, "Titulo atualizado para comparativo")
+        self.assertContains(response, "Resultados atualizados para revisão visual.")
+
+    def test_aprovar_proposta_edicao_aplica_valor_proposto(self):
+        usuario = get_user_model().objects.create_user(
+            username="revisor_aprovacao_comparativo",
+            password="teste123",
+            is_staff=True,
+        )
+        self.client.force_login(usuario)
+
+        experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
+        tema = experiencia.temas_transversais.first()
+        norma = experiencia.normas_internacionais.first()
+
+        proposta = PropostaEdicaoExperiencia.objects.create(
+            experiencia=experiencia,
+            email_contato=experiencia.email_contato,
+            comentario_autor="Atualização aprovada.",
+            dados_json={
+                "efs": experiencia.efs_id,
+                "pais": experiencia.pais_id,
+                "titulo": "Titulo aprovado no fluxo visual",
+                "tipo_experiencia": experiencia.tipo_experiencia_id,
+                "setor": experiencia.setor_id,
+                "temas_transversais": [tema.id],
+                "normas_internacionais": [norma.id],
+                "contato_referencia": experiencia.contato_referencia,
+                "email_contato": experiencia.email_contato,
+                "pessoa_responsavel": experiencia.pessoa_responsavel,
+                "descricao": experiencia.descricao,
+                "enfoque_justica_climatica": experiencia.enfoque_justica_climatica,
+                "objetivo": experiencia.objetivo,
+                "perguntas_chave": experiencia.perguntas_chave,
+                "criterios_utilizados": experiencia.criterios_utilizados,
+                "metodologia": experiencia.metodologia,
+                "ferramentas_utilizadas": experiencia.ferramentas_utilizadas,
+                "resultados": experiencia.resultados,
+                "recomendacoes": experiencia.recomendacoes,
+                "replicabilidade": experiencia.replicabilidade,
+                "ano_execucao": experiencia.ano_execucao,
+                "contribui_para_guia": experiencia.contribui_para_guia,
+            },
+        )
+
+        response = self.client.post(
+            reverse("revisar_edicao_publicada", args=[proposta.pk]),
+            {
+                "acao": "aprovar",
+                "comentario_revisor": "Aprovado com base no comparativo.",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        experiencia.refresh_from_db()
+        proposta.refresh_from_db()
+        self.assertEqual(experiencia.titulo, "Titulo aprovado no fluxo visual")
+        self.assertEqual(proposta.status, PropostaEdicaoExperiencia.Status.APROVADA)
 
