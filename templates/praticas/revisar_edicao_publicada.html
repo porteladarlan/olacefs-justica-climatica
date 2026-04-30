@@ -1,4 +1,7 @@
 {% extends 'praticas/base.html' %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
 {% block title %}Revisar edição publicada | Plataforma Regional{% endblock %}
 
 {% block content %}
@@ -8,7 +11,10 @@
     <div class="hero-content">
         <span class="hero-eyebrow">Proposta de edição publicada</span>
         <h1 class="hero-title">{{ proposta.experiencia.titulo_exibicao }}</h1>
-        <p class="hero-subtitle">Status da proposta: {{ proposta.get_status_display }} &bull; Autor: {{ proposta.email_contato }}</p>
+        <p class="hero-subtitle">
+            Status da proposta: {{ proposta.get_status_display }} &bull;
+            Autor: {{ proposta.email_contato }}
+        </p>
     </div>
 </section>
 
@@ -19,15 +25,55 @@
             <p class="section-subtitle mb-0">{{ proposta.comentario_autor|default:"Sem comentário." }}</p>
         </section>
 
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Resumo técnico da proposta</div>
-            <h2 class="section-title h4">Campos propostos</h2>
-            <pre class="bg-light border rounded p-3 small" style="white-space: pre-wrap;">{{ proposta.dados_json }}</pre>
+        <section class="detail-section">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-end mb-3">
+                <div>
+                    <div class="section-kicker">Comparativo da alteração</div>
+                    <h2 class="section-title h4 mb-1">Valor atual x valor proposto</h2>
+                    <p class="section-subtitle mb-0">
+                        A experiência publicada permanece ativa. Somente os campos aprovados nesta proposta serão aplicados ao conteúdo público.
+                    </p>
+                </div>
+                <span class="badge-soft badge-yellow">Revisão editorial</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle bg-white">
+                    <thead>
+                        <tr>
+                            <th style="width: 18%;">Campo</th>
+                            <th style="width: 38%;">Valor atual</th>
+                            <th style="width: 38%;">Valor proposto</th>
+                            <th style="width: 6%;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for linha in comparativo %}
+                        <tr {% if linha.alterado %}class="table-warning"{% endif %}>
+                            <th class="small text-muted">{{ linha.rotulo }}</th>
+                            <td style="white-space: pre-line;">{{ linha.valor_atual }}</td>
+                            <td style="white-space: pre-line;">{{ linha.valor_proposto }}</td>
+                            <td>
+                                {% if linha.alterado %}
+                                    <span class="badge-soft badge-yellow">Alterado</span>
+                                {% else %}
+                                    <span class="text-muted small">Sem mudança</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-muted">Nenhum dado disponível para comparação.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </section>
     </div>
 
     <aside class="col-lg-4">
-        <section class="form-section">
+        <section class="form-section position-sticky" style="top: 6rem;">
             <div class="section-kicker">Decisão do revisor</div>
             <h2 class="section-title h4 mb-3">Registrar decisão</h2>
             <form method="post">
