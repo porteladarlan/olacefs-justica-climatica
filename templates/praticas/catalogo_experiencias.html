@@ -50,7 +50,13 @@
         <article class="catalog-card h-100 catalog-card-compare" data-experiencia-id="{{ experiencia.id }}">
             <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
                 <div class="d-flex flex-wrap gap-2">
-                    <span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
+                    <span class="type-badge
+                        {% if 'Auditoria' in experiencia.tipo_experiencia.nome_exibicao or 'Audit' in experiencia.tipo_experiencia.nome_exibicao %}type-auditoria{% endif %}
+                        {% if 'Pesquisa' in experiencia.tipo_experiencia.nome_exibicao or 'Investigaci' in experiencia.tipo_experiencia.nome_exibicao or 'Research' in experiencia.tipo_experiencia.nome_exibicao %}type-pesquisa{% endif %}
+                        {% if 'Avalia' in experiencia.tipo_experiencia.nome_exibicao or 'Evaluaci' in experiencia.tipo_experiencia.nome_exibicao %}type-avaliacao{% endif %}
+                        {% if 'Capacita' in experiencia.tipo_experiencia.nome_exibicao or 'Training' in experiencia.tipo_experiencia.nome_exibicao %}type-capacitacao{% endif %}
+                        {% if 'Ferramenta' in experiencia.tipo_experiencia.nome_exibicao or 'Herramienta' in experiencia.tipo_experiencia.nome_exibicao or 'Tool' in experiencia.tipo_experiencia.nome_exibicao or 'metodologia' in experiencia.tipo_experiencia.nome_exibicao %}type-ferramenta{% endif %}
+                    ">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
                     <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
                     <span class="badge-soft">{{ experiencia.pais.nome_exibicao }}</span>
                     <span class="badge-soft">{{ experiencia.ano_execucao }}</span>

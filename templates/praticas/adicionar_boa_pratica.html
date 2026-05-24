@@ -29,13 +29,13 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Required identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n obligatoria{% else %}Identifica&ccedil;&atilde;o obrigat&oacute;ria{% endif %}</h2>
+        <div class="form-section form-step">
+            <h2 class="h4 section-title mb-3"><span class="step-number">4</span><span class="step-number">3</span><span class="step-number">2</span><span class="step-number">1</span>{% if LANGUAGE_CODE == 'en' %}Required identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n obligatoria{% else %}Identifica&ccedil;&atilde;o obrigat&oacute;ria{% endif %}</h2>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
                     <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        <label class="form-label fw-semibold">{{ field.label }}{% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}</label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
@@ -47,7 +47,7 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
+        <div class="form-section form-step">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Filters and classification{% elif LANGUAGE_CODE == 'es' %}Filtros y clasificaci&oacute;n{% else %}Filtros e classifica&ccedil;&atilde;o{% endif %}</h2>
             <div class="row g-3">
                 <div class="col-lg-6">
@@ -67,13 +67,13 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
+        <div class="form-section form-step">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Audit questions, criteria and tools{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y herramientas{% else %}Perguntas, crit&eacute;rios e ferramentas{% endif %}</h2>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "pessoa_responsavel,objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade,contribui_para_guia" %}
                     <div class="col-12">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        <label class="form-label fw-semibold">{{ field.label }}{% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}</label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
@@ -85,7 +85,7 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
+        <div class="form-section form-step">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Attachments and external links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces externos{% else %}Anexos e links externos{% endif %}</h2>
             <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Up to three attachments are allowed. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each. You may also provide external links. Use self-explanatory titles, such as &ldquo;Audit report&rdquo;, &ldquo;Criteria matrix&rdquo; or &ldquo;Methodological report&rdquo;.{% elif LANGUAGE_CODE == 'es' %}Se permiten hasta tres anexos. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno. Tambi&eacute;n puede informar enlaces externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditor&iacute;a&rdquo;, &ldquo;Matriz de criterios&rdquo; o &ldquo;Informe metodol&oacute;gico&rdquo;.{% else %}S&atilde;o permitidos at&eacute; tr&ecirc;s anexos. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada. Tamb&eacute;m &eacute; poss&iacute;vel informar links externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditoria&rdquo;, &ldquo;Matriz de crit&eacute;rios&rdquo; ou &ldquo;Relat&oacute;rio metodol&oacute;gico&rdquo;.{% endif %}</p>
             {% for indice in "123" %}
