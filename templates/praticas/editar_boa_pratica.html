@@ -46,13 +46,13 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n{% else %}Identifica&ccedil;&atilde;o{% endif %}</h2>
+        <div class="form-section form-step">
+            <h2 class="h4 section-title mb-3"><span class="step-number">4</span><span class="step-number">3</span><span class="step-number">2</span><span class="step-number">1</span>{% if LANGUAGE_CODE == 'en' %}Identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n{% else %}Identifica&ccedil;&atilde;o{% endif %}</h2>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
                     <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        <label class="form-label fw-semibold">{{ field.label }}{% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}</label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
@@ -64,7 +64,7 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
+        <div class="form-section form-step">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Filters and classification{% elif LANGUAGE_CODE == 'es' %}Filtros y clasificaci&oacute;n{% else %}Filtros e classifica&ccedil;&atilde;o{% endif %}</h2>
             <div class="row g-3">
                 <div class="col-lg-6">
@@ -82,13 +82,13 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
+        <div class="form-section form-step">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Audit content{% elif LANGUAGE_CODE == 'es' %}Contenido de auditor&iacute;a{% else %}Conte&uacute;do de auditoria{% endif %}</h2>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "pessoa_responsavel,objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade,contribui_para_guia" %}
                     <div class="col-12">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        <label class="form-label fw-semibold">{{ field.label }}{% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}</label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
@@ -100,7 +100,7 @@
     </div>
 
     <div class="col-12">
-        <div class="form-section">
+        <div class="form-section form-step">
             <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Manage attachments{% elif LANGUAGE_CODE == 'es' %}Gestionar anexos{% else %}Gerenciar anexos{% endif %}</h2>
             <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Keep up to three attachments per experience. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each.{% elif LANGUAGE_CODE == 'es' %}Mantenga hasta tres anexos por experiencia. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno.{% else %}Mantenha at&eacute; tr&ecirc;s anexos por experi&ecirc;ncia. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada.{% endif %}</p>
 

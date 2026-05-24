@@ -2,7 +2,65 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %} | Plataforma Regional
+<div class="modal fade" id="modalJusticaClimatica" tabindex="-1" aria-labelledby="modalJusticaClimaticaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 24px; border: 1px solid var(--line);">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Climate justice{% elif LANGUAGE_CODE == 'es' %}Justicia clim&aacute;tica{% else %}Justi&ccedil;a clim&aacute;tica{% endif %}</div>
+                    <h2 class="modal-title section-title h3" id="modalJusticaClimaticaLabel">
+                        {% if LANGUAGE_CODE == 'en' %}What is this platform for?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; es esta plataforma y para qu&eacute; sirve?{% else %}O que &eacute; esta plataforma e para que serve?{% endif %}
+                    </h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p class="section-subtitle">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        Climate justice places equity and human rights at the center of climate action. In infrastructure, it asks who benefits, who bears the greatest risks and whether public decisions reduce or deepen structural inequalities.
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        La justicia clim&aacute;tica coloca la equidad y los derechos humanos en el n&uacute;cleo de la acci&oacute;n clim&aacute;tica. En infraestructura, implica preguntarse qui&eacute;nes se benefician, qu&eacute; grupos asumen los mayores riesgos y si las decisiones reducen o profundizan desigualdades estructurales.
+                    {% else %}
+                        A justi&ccedil;a clim&aacute;tica coloca equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica. Na infraestrutura, pergunta quem se beneficia, quais grupos assumem os maiores riscos e se as decis&otilde;es reduzem ou aprofundam desigualdades estruturais.
+                    {% endif %}
+                </p>
+                <p class="section-subtitle mb-0">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        The Guide provides orientation; the platform demonstrates through concrete cases, audit questions, criteria, tools and methodologies shared by SAIs.
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        La Gu&iacute;a orienta; la plataforma demuestra mediante casos concretos, preguntas de auditor&iacute;a, criterios, herramientas y metodolog&iacute;as compartidas por las EFS.
+                    {% else %}
+                        A Guia orienta; a plataforma demonstra por meio de casos concretos, perguntas de auditoria, crit&eacute;rios, ferramentas e metodologias compartilhadas pelas EFS.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    {% if LANGUAGE_CODE == 'en' %}Understood{% elif LANGUAGE_CODE == 'es' %}Entendido{% else %}Entendi{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalElement = document.getElementById("modalJusticaClimatica");
+        if (!modalElement || !window.bootstrap) return;
+
+        const storageKey = "jc_modal_visto";
+        if (!localStorage.getItem(storageKey)) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            modalElement.addEventListener("hidden.bs.modal", function () {
+                localStorage.setItem(storageKey, "1");
+            });
+        }
+    });
+</script>
+
+{% endblock %}
 
 {% block content %}
 <section class="page-hero mb-4">
@@ -38,45 +96,6 @@
     </div>
 </section>
 
-<section class="feature-card mb-4">
-    <div class="section-kicker">
-        {% if LANGUAGE_CODE == 'en' %}Institutional coordination{% elif LANGUAGE_CODE == 'es' %}Coordinaci&oacute;n institucional{% else %}Coordena&ccedil;&atilde;o institucional{% endif %}
-    </div>
-    <div class="row g-3 align-items-center">
-        <div class="col-lg-4">
-            <h2 class="section-title h4 mb-2">
-                {% if LANGUAGE_CODE == 'en' %}A regional initiative{% elif LANGUAGE_CODE == 'es' %}Una iniciativa regional{% else %}Uma iniciativa regional{% endif %}
-            </h2>
-            <p class="section-subtitle mb-0">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Created by COMTEMA and CGID within the regional AdaptaInfra OLACEFS-GIZ project.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Creada por la COMTEMA y la CGID, en el marco del Proyecto regional AdaptaInfra OLACEFS-GIZ.
-                {% else %}
-                    Criada pela COMTEMA e pela CGID, no marco do Projeto regional AdaptaInfra OLACEFS-GIZ.
-                {% endif %}
-            </p>
-        </div>
-        <div class="col-lg-8">
-            <div class="row g-2">
-                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">OLACEFS</div></div></div>
-                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">COMTEMA</div></div></div>
-                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">CGID</div></div></div>
-                <div class="col-6 col-md-3"><div class="metric-card text-center"><div class="metric-label mb-0">GIZ</div></div></div>
-            </div>
-            <p class="text-muted small mb-0 mt-2">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Logo placeholders for the MVP. Replace with official image files during institutional visual review.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Marcadores de logo para el MVP. Sustituir por los archivos oficiales durante la revisi&oacute;n visual institucional.
-                {% else %}
-                    Marcadores de logo para o MVP. Substituir pelos arquivos oficiais durante a revis&atilde;o visual institucional.
-                {% endif %}
-            </p>
-        </div>
-    </div>
-</section>
-
 <section class="row g-3 mb-4">
     <div class="col-6 col-lg-3">
         <div class="metric-card">
@@ -105,69 +124,44 @@
 </section>
 
 <section class="row g-3 mb-4">
-    <div class="col-lg-6">
+    <div class="col-lg-7">
         <div class="knowledge-card">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Concept{% elif LANGUAGE_CODE == 'es' %}Concepto{% else %}Conceito{% endif %}</div>
-            <h2 class="section-title h3">
-                {% if LANGUAGE_CODE == 'en' %}
-                    What is climate justice?
-                {% elif LANGUAGE_CODE == 'es' %}
-                    &iquest;Qu&eacute; es la justicia clim&aacute;tica?
-                {% else %}
-                    O que &eacute; justi&ccedil;a clim&aacute;tica?
-                {% endif %}
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Start here{% elif LANGUAGE_CODE == 'es' %}Empiece aqu&iacute;{% else %}Comece por aqui{% endif %}</div>
+            <h2 class="section-title h3 mb-2">
+                {% if LANGUAGE_CODE == 'en' %}Find practical references in a few clicks{% elif LANGUAGE_CODE == 'es' %}Encuentre referencias pr&aacute;cticas en pocos clics{% else %}Encontre refer&ecirc;ncias pr&aacute;ticas em poucos cliques{% endif %}
             </h2>
-            <p class="section-subtitle">
+            <p class="section-subtitle mb-3">
                 {% if LANGUAGE_CODE == 'en' %}
-                    The impacts of climate change do not affect all people equally. Communities that have historically contributed least to the climate crisis — Indigenous peoples, Afro-descendant communities, women, persons with disabilities and low-income families — often face its consequences most intensely.
+                    Use filters to locate experiences by type, sector, theme, SAI, country and international framework.
                 {% elif LANGUAGE_CODE == 'es' %}
-                    Los impactos del cambio clim&aacute;tico no afectan a todas las personas por igual. Las comunidades que hist&oacute;ricamente menos han contribuido a la crisis clim&aacute;tica — pueblos ind&iacute;genas, afrodescendientes, mujeres, personas con discapacidad y familias de bajos ingresos — son quienes enfrentan sus consecuencias con mayor intensidad.
+                    Use los filtros para localizar experiencias por tipo, sector, tema, EFS, pa&iacute;s y marco internacional.
                 {% else %}
-                    Os impactos da mudan&ccedil;a do clima n&atilde;o afetam todas as pessoas da mesma forma. Comunidades que historicamente menos contribu&iacute;ram para a crise clim&aacute;tica — povos ind&iacute;genas, afrodescendentes, mulheres, pessoas com defici&ecirc;ncia e fam&iacute;lias de baixa renda — frequentemente enfrentam suas consequ&ecirc;ncias com maior intensidade.
+                    Use os filtros para localizar experi&ecirc;ncias por tipo, setor, tema, EFS, pa&iacute;s e marco internacional.
                 {% endif %}
             </p>
-            <p class="section-subtitle mb-0">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Climate justice means placing equity and human rights at the center of climate action. In infrastructure, it asks not only whether a project is efficient, but who benefits, who bears the risks and whether decisions reduce structural inequalities.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    La justicia clim&aacute;tica significa colocar la equidad y los derechos humanos en el n&uacute;cleo de la acci&oacute;n clim&aacute;tica. En infraestructura, implica preguntarse no solo si una obra es eficiente, sino qui&eacute;nes se benefician, qu&eacute; grupos asumen los mayores riesgos y si las decisiones reducen desigualdades estructurales.
-                {% else %}
-                    A justi&ccedil;a clim&aacute;tica significa colocar equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica. Na infraestrutura, implica perguntar n&atilde;o apenas se uma obra &eacute; eficiente, mas quem se beneficia, quais grupos assumem os maiores riscos e se as decis&otilde;es reduzem desigualdades estruturais.
-                {% endif %}
-            </p>
+            <a href="{% url 'catalogo_experiencias' %}" class="btn btn-primary">
+                {% if LANGUAGE_CODE == 'en' %}Open catalog{% elif LANGUAGE_CODE == 'es' %}Abrir cat&aacute;logo{% else %}Abrir cat&aacute;logo{% endif %}
+            </a>
         </div>
     </div>
-
-    <div class="col-lg-6">
-        <div class="knowledge-card">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Purpose{% elif LANGUAGE_CODE == 'es' %}Prop&oacute;sito{% else %}Prop&oacute;sito{% endif %}</div>
-            <h2 class="section-title h3">
-                {% if LANGUAGE_CODE == 'en' %}
-                    What is this platform for?
-                {% elif LANGUAGE_CODE == 'es' %}
-                    &iquest;Qu&eacute; es esta plataforma y para qu&eacute; sirve?
-                {% else %}
-                    O que &eacute; esta plataforma e para que serve?
-                {% endif %}
+    <div class="col-lg-5">
+        <div class="knowledge-card h-100">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Concept{% elif LANGUAGE_CODE == 'es' %}Concepto{% else %}Conceito{% endif %}</div>
+            <h2 class="section-title h4 mb-2">
+                {% if LANGUAGE_CODE == 'en' %}Why climate justice?{% elif LANGUAGE_CODE == 'es' %}&iquest;Por qu&eacute; justicia clim&aacute;tica?{% else %}Por que justi&ccedil;a clim&aacute;tica?{% endif %}
             </h2>
-            <p class="section-subtitle">
+            <p class="section-subtitle small mb-3">
                 {% if LANGUAGE_CODE == 'en' %}
-                    It is a living space for collective learning: here, SAIs can consult good practices, find audit questions and criteria with a climate justice perspective, and share experiences from their own institutions.
+                    Equity and human rights help audit teams identify who benefits, who bears the risks and whether public decisions reduce inequalities.
                 {% elif LANGUAGE_CODE == 'es' %}
-                    Es un espacio vivo de aprendizaje colectivo: aqu&iacute; se pueden consultar buenas pr&aacute;cticas de otras EFS, encontrar preguntas y criterios de auditor&iacute;a con enfoque de justicia clim&aacute;tica, y compartir experiencias de la propia instituci&oacute;n.
+                    La equidad y los derechos humanos ayudan a identificar qui&eacute;nes se benefician, qui&eacute;nes asumen riesgos y si las decisiones reducen desigualdades.
                 {% else %}
-                    &Eacute; um espa&ccedil;o vivo de aprendizagem coletiva: aqui &eacute; poss&iacute;vel consultar boas pr&aacute;ticas de outras EFS, encontrar perguntas e crit&eacute;rios de auditoria com enfoque de justi&ccedil;a clim&aacute;tica e compartilhar experi&ecirc;ncias da pr&oacute;pria institui&ccedil;&atilde;o.
+                    Equidade e direitos humanos ajudam a identificar quem se beneficia, quem assume riscos e se as decis&otilde;es reduzem desigualdades.
                 {% endif %}
             </p>
-            <p class="section-subtitle mb-0">
-                {% if LANGUAGE_CODE == 'en' %}
-                    The Guide provides orientation; the platform demonstrates. When SAIs audit with a climate justice perspective, public oversight becomes a tool for transformation.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    La Gu&iacute;a orienta; la plataforma demuestra. Cuando las EFS auditan con perspectiva de justicia clim&aacute;tica, la fiscalizaci&oacute;n p&uacute;blica se convierte en una herramienta de transformaci&oacute;n.
-                {% else %}
-                    A Guia orienta; a plataforma demonstra. Quando as EFS auditam com perspectiva de justi&ccedil;a clim&aacute;tica, a fiscaliza&ccedil;&atilde;o p&uacute;blica se transforma em ferramenta de transforma&ccedil;&atilde;o.
-                {% endif %}
-            </p>
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalJusticaClimatica">
+                {% if LANGUAGE_CODE == 'en' %}Understand the platform{% elif LANGUAGE_CODE == 'es' %}Entender la plataforma{% else %}Entender a plataforma{% endif %}
+            </button>
         </div>
     </div>
 </section>
@@ -231,4 +225,62 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="modalJusticaClimatica" tabindex="-1" aria-labelledby="modalJusticaClimaticaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 24px; border: 1px solid var(--line);">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Climate justice{% elif LANGUAGE_CODE == 'es' %}Justicia clim&aacute;tica{% else %}Justi&ccedil;a clim&aacute;tica{% endif %}</div>
+                    <h2 class="modal-title section-title h3" id="modalJusticaClimaticaLabel">
+                        {% if LANGUAGE_CODE == 'en' %}What is this platform for?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; es esta plataforma y para qu&eacute; sirve?{% else %}O que &eacute; esta plataforma e para que serve?{% endif %}
+                    </h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p class="section-subtitle">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        Climate justice places equity and human rights at the center of climate action. In infrastructure, it asks who benefits, who bears the greatest risks and whether public decisions reduce or deepen structural inequalities.
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        La justicia clim&aacute;tica coloca la equidad y los derechos humanos en el n&uacute;cleo de la acci&oacute;n clim&aacute;tica. En infraestructura, implica preguntarse qui&eacute;nes se benefician, qu&eacute; grupos asumen los mayores riesgos y si las decisiones reducen o profundizan desigualdades estructurales.
+                    {% else %}
+                        A justi&ccedil;a clim&aacute;tica coloca equidade e direitos humanos no centro da a&ccedil;&atilde;o clim&aacute;tica. Na infraestrutura, pergunta quem se beneficia, quais grupos assumem os maiores riscos e se as decis&otilde;es reduzem ou aprofundam desigualdades estruturais.
+                    {% endif %}
+                </p>
+                <p class="section-subtitle mb-0">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        The Guide provides orientation; the platform demonstrates through concrete cases, audit questions, criteria, tools and methodologies shared by SAIs.
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        La Gu&iacute;a orienta; la plataforma demuestra mediante casos concretos, preguntas de auditor&iacute;a, criterios, herramientas y metodolog&iacute;as compartidas por las EFS.
+                    {% else %}
+                        A Guia orienta; a plataforma demonstra por meio de casos concretos, perguntas de auditoria, crit&eacute;rios, ferramentas e metodologias compartilhadas pelas EFS.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    {% if LANGUAGE_CODE == 'en' %}Understood{% elif LANGUAGE_CODE == 'es' %}Entendido{% else %}Entendi{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalElement = document.getElementById("modalJusticaClimatica");
+        if (!modalElement || !window.bootstrap) return;
+
+        const storageKey = "jc_modal_visto";
+        if (!localStorage.getItem(storageKey)) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            modalElement.addEventListener("hidden.bs.modal", function () {
+                localStorage.setItem(storageKey, "1");
+            });
+        }
+    });
+</script>
+
 {% endblock %}
