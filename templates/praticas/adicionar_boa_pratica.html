@@ -30,7 +30,13 @@
 
     <div class="col-12">
         <div class="form-section form-step">
-            <h2 class="h4 section-title mb-3"><span class="step-number">4</span><span class="step-number">3</span><span class="step-number">2</span><span class="step-number">1</span>{% if LANGUAGE_CODE == 'en' %}Required identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n obligatoria{% else %}Identifica&ccedil;&atilde;o obrigat&oacute;ria{% endif %}</h2>
+            <div class="form-step-header">
+                <span class="step-number">1</span>
+                <div>
+                    <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n{% else %}Identifica&ccedil;&atilde;o{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Basic information about the SAI, practice and contact.{% elif LANGUAGE_CODE == 'es' %}Informaci&oacute;n b&aacute;sica sobre la EFS, la pr&aacute;ctica y el contacto.{% else %}Informa&ccedil;&otilde;es b&aacute;sicas sobre a EFS, a pr&aacute;tica e o contato.{% endif %}</p>
+                </div>
+            </div>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
@@ -48,7 +54,13 @@
 
     <div class="col-12">
         <div class="form-section form-step">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Filters and classification{% elif LANGUAGE_CODE == 'es' %}Filtros y clasificaci&oacute;n{% else %}Filtros e classifica&ccedil;&atilde;o{% endif %}</h2>
+            <div class="form-step-header">
+                <span class="step-number">2</span>
+                <div>
+                    <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Classification{% elif LANGUAGE_CODE == 'es' %}Clasificaci&oacute;n{% else %}Classifica&ccedil;&atilde;o{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Themes, sectors and standards used for filtering and comparison.{% elif LANGUAGE_CODE == 'es' %}Temas, sectores y normas usados para filtros y comparaci&oacute;n.{% else %}Temas, setores e normas usados para filtros e compara&ccedil;&atilde;o.{% endif %}</p>
+                </div>
+            </div>
             <div class="row g-3">
                 <div class="col-lg-6">
                     <label class="form-label fw-semibold">{{ form.temas_transversais.label }}</label>
@@ -68,7 +80,13 @@
 
     <div class="col-12">
         <div class="form-section form-step">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Audit questions, criteria and tools{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y herramientas{% else %}Perguntas, crit&eacute;rios e ferramentas{% endif %}</h2>
+            <div class="form-step-header">
+                <span class="step-number">3</span>
+                <div>
+                    <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Technical details{% elif LANGUAGE_CODE == 'es' %}Detalles t&eacute;cnicos{% else %}Detalhes t&eacute;cnicos{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Audit questions, criteria, methodology, tools and learning points.{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditor&iacute;a, criterios, metodolog&iacute;a, herramientas y aprendizajes.{% else %}Perguntas de auditoria, crit&eacute;rios, metodologia, ferramentas e aprendizados.{% endif %}</p>
+                </div>
+            </div>
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name in "pessoa_responsavel,objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade,contribui_para_guia" %}
@@ -86,7 +104,13 @@
 
     <div class="col-12">
         <div class="form-section form-step">
-            <h2 class="h4 section-title mb-3">{% if LANGUAGE_CODE == 'en' %}Attachments and external links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces externos{% else %}Anexos e links externos{% endif %}</h2>
+            <div class="form-step-header">
+                <span class="step-number">4</span>
+                <div>
+                    <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Attachments and links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces{% else %}Anexos e links{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Optional public files and external references.{% elif LANGUAGE_CODE == 'es' %}Archivos p&uacute;blicos opcionales y referencias externas.{% else %}Arquivos p&uacute;blicos opcionais e refer&ecirc;ncias externas.{% endif %}</p>
+                </div>
+            </div>
             <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Up to three attachments are allowed. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each. You may also provide external links. Use self-explanatory titles, such as &ldquo;Audit report&rdquo;, &ldquo;Criteria matrix&rdquo; or &ldquo;Methodological report&rdquo;.{% elif LANGUAGE_CODE == 'es' %}Se permiten hasta tres anexos. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno. Tambi&eacute;n puede informar enlaces externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditor&iacute;a&rdquo;, &ldquo;Matriz de criterios&rdquo; o &ldquo;Informe metodol&oacute;gico&rdquo;.{% else %}S&atilde;o permitidos at&eacute; tr&ecirc;s anexos. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada. Tamb&eacute;m &eacute; poss&iacute;vel informar links externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditoria&rdquo;, &ldquo;Matriz de crit&eacute;rios&rdquo; ou &ldquo;Relat&oacute;rio metodol&oacute;gico&rdquo;.{% endif %}</p>
             {% for indice in "123" %}
             <div class="row g-2 align-items-end mb-3">
