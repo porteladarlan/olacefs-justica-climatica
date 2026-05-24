@@ -11,6 +11,22 @@
     <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Enter the institutional e-mail used in the submission form to view submissions, reviewer comments and editing options.{% elif LANGUAGE_CODE == 'es' %}Ingrese el correo institucional usado en el formulario para ver env&iacute;os, comentarios y opciones de edici&oacute;n.{% else %}Informe o e-mail institucional usado no formul&aacute;rio para visualizar envios, coment&aacute;rios e op&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}</p>
 </section>
 
+
+<section class="status-help-grid mb-4">
+    <div class="status-help-card">
+        <span class="status-pill status-enviado">🟡 {% if LANGUAGE_CODE == 'en' %}Awaiting technical review{% elif LANGUAGE_CODE == 'es' %}En espera de revisión técnica{% else %}Aguardando revisão técnica{% endif %}</span>
+        <p class="text-muted small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}The submission was received and is waiting for review.{% elif LANGUAGE_CODE == 'es' %}El envío fue recibido y espera revisión.{% else %}O envio foi recebido e aguarda revisão.{% endif %}</p>
+    </div>
+    <div class="status-help-card">
+        <span class="status-pill status-publicado">🟢 {% if LANGUAGE_CODE == 'en' %}Published on the platform{% elif LANGUAGE_CODE == 'es' %}Publicado en la plataforma{% else %}Publicado na plataforma{% endif %}</span>
+        <p class="text-muted small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}The good practice is publicly available.{% elif LANGUAGE_CODE == 'es' %}La buena práctica está disponible públicamente.{% else %}A boa prática está disponível publicamente.{% endif %}</p>
+    </div>
+    <div class="status-help-card">
+        <span class="status-pill status-rejeitado">🔴 {% if LANGUAGE_CODE == 'en' %}Needs adjustments{% elif LANGUAGE_CODE == 'es' %}Necesita ajustes{% else %}Necessita de ajustes{% endif %}</span>
+        <p class="text-muted small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Review comments indicate what should be corrected.{% elif LANGUAGE_CODE == 'es' %}Los comentarios indican qué debe corregirse.{% else %}Os comentários indicam o que deve ser corrigido.{% endif %}</p>
+    </div>
+</section>
+
 <form method="get" class="filter-panel row g-3 mb-4">
     <div class="col-md-8">
         <label class="form-label fw-semibold">{{ form.email_contato.label }}</label>
@@ -30,7 +46,19 @@
         <div class="col-lg-6">
             <article class="catalog-card h-100">
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                    <span class="badge-status status-{{ experiencia.status_publicacao }}">{{ experiencia.get_status_publicacao_display }}</span>
+                    {% if experiencia.status_publicacao == 'publicado' %}
+                        <span class="status-pill status-publicado">🟢 {% if LANGUAGE_CODE == 'en' %}Published on the platform{% elif LANGUAGE_CODE == 'es' %}Publicado en la plataforma{% else %}Publicado na plataforma{% endif %}</span>
+                    {% elif experiencia.status_publicacao == 'enviado' %}
+                        <span class="status-pill status-enviado">🟡 {% if LANGUAGE_CODE == 'en' %}Awaiting technical review{% elif LANGUAGE_CODE == 'es' %}En espera de revisión técnica{% else %}Aguardando revisão técnica{% endif %}</span>
+                    {% elif experiencia.status_publicacao == 'em_revisao' %}
+                        <span class="status-pill status-em_revisao">🔵 {% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</span>
+                    {% elif experiencia.status_publicacao == 'rejeitado' %}
+                        <span class="status-pill status-rejeitado">🔴 {% if LANGUAGE_CODE == 'en' %}Needs adjustments / corrections{% elif LANGUAGE_CODE == 'es' %}Necesita ajustes / correcciones{% else %}Necessita de ajustes / correções{% endif %}</span>
+                    {% elif experiencia.status_publicacao == 'rascunho' %}
+                        <span class="status-pill status-rascunho">⚪ {% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</span>
+                    {% else %}
+                        <span class="status-pill status-pendente">🟡 {{ experiencia.get_status_publicacao_display }}</span>
+                    {% endif %}
                     <span class="badge-soft">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
                     <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
                 </div>
@@ -69,7 +97,13 @@
         <div class="col-lg-6">
             <article class="catalog-card h-100">
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                    <span class="badge-status status-{{ proposta.status }}">{{ proposta.get_status_display }}</span>
+                    {% if proposta.status == 'aprovada' or proposta.status == 'aprovado' %}
+                        <span class="status-pill status-aprovado">🟢 {{ proposta.get_status_display }}</span>
+                    {% elif proposta.status == 'rejeitada' or proposta.status == 'rejeitado' %}
+                        <span class="status-pill status-rejeitado">🔴 {{ proposta.get_status_display }}</span>
+                    {% else %}
+                        <span class="status-pill status-pendente">🟡 {{ proposta.get_status_display }}</span>
+                    {% endif %}
                     <span class="badge-soft">{{ proposta.criado_em|date:"d/m/Y" }}</span>
                 </div>
                 <h2 class="h5 section-title">{{ proposta.experiencia.titulo_exibicao }}</h2>
