@@ -9,7 +9,7 @@
 
 <section class="page-hero mb-4">
     <div class="hero-content">
-        <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Structured good practice profile{% elif LANGUAGE_CODE == 'es' %}Ficha estructurada{% else %}Ficha estruturada{% endif %}</span>
+        <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Good practice profile{% elif LANGUAGE_CODE == 'es' %}Ficha de buena pr&aacute;ctica{% else %}Ficha da boa pr&aacute;tica{% endif %}</span>
         <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
         <p class="hero-subtitle">{{ experiencia.descricao_exibicao|truncatechars:260 }}</p>
         <div class="d-flex flex-wrap gap-2 mt-4">
@@ -21,7 +21,9 @@
                 {% if 'Ferramenta' in experiencia.tipo_experiencia.nome_exibicao or 'Herramienta' in experiencia.tipo_experiencia.nome_exibicao or 'Tool' in experiencia.tipo_experiencia.nome_exibicao or 'metodologia' in experiencia.tipo_experiencia.nome_exibicao %}type-ferramenta{% endif %}
             ">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
             <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
-            {% if experiencia.contribui_para_guia %}<span class="badge-soft badge-yellow">{% if LANGUAGE_CODE == 'en' %}Guide input{% elif LANGUAGE_CODE == 'es' %}Insumo para la Gu&iacute;a{% else %}Insumo para a Guia{% endif %}</span>{% endif %}
+            {% if experiencia.contribui_para_guia %}
+                <span class="badge-soft badge-yellow">{% if LANGUAGE_CODE == 'en' %}Guide input{% elif LANGUAGE_CODE == 'es' %}Insumo para la Gu&iacute;a{% else %}Insumo para a Guia{% endif %}</span>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -45,94 +47,134 @@
     </div>
 </section>
 
-<div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center mb-3">
-    <ul class="nav nav-pills detail-tabs" id="detalheTabs" role="tablist">
-        <li class="nav-item" role="presentation"><button class="nav-link active" id="visao-tab" data-bs-toggle="tab" data-bs-target="#visao" type="button" role="tab">{% if LANGUAGE_CODE == 'en' %}Overview{% elif LANGUAGE_CODE == 'es' %}Visi&oacute;n general{% else %}Vis&atilde;o geral{% endif %}</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="justica-tab" data-bs-toggle="tab" data-bs-target="#justica" type="button" role="tab">{% if LANGUAGE_CODE == 'en' %}Climate justice{% elif LANGUAGE_CODE == 'es' %}Justicia clim&aacute;tica{% else %}Justi&ccedil;a clim&aacute;tica{% endif %}</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="auditoria-tab" data-bs-toggle="tab" data-bs-target="#auditoria" type="button" role="tab">{% if LANGUAGE_CODE == 'en' %}Audit inputs{% elif LANGUAGE_CODE == 'es' %}Insumos de auditor&iacute;a{% else %}Insumos de auditoria{% endif %}</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="resultados-tab" data-bs-toggle="tab" data-bs-target="#resultados" type="button" role="tab">{% if LANGUAGE_CODE == 'en' %}Results{% elif LANGUAGE_CODE == 'es' %}Resultados{% else %}Resultados{% endif %}</button></li>
-        <li class="nav-item" role="presentation"><button class="nav-link" id="anexos-tab" data-bs-toggle="tab" data-bs-target="#anexos" type="button" role="tab">{% if LANGUAGE_CODE == 'en' %}Attachments{% elif LANGUAGE_CODE == 'es' %}Anexos{% else %}Anexos{% endif %}</button></li>
-    </ul>
-
-    <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn btn-outline-primary">
-            {% if experiencia.pk in favoritos_ids %}
-                ★ {% if LANGUAGE_CODE == 'en' %}Remove favorite{% elif LANGUAGE_CODE == 'es' %}Quitar favorito{% else %}Remover favorito{% endif %}
-            {% else %}
-                ☆ {% if LANGUAGE_CODE == 'en' %}Favorite{% elif LANGUAGE_CODE == 'es' %}Favorito{% else %}Favoritar{% endif %}
-            {% endif %}
-        </button>
-    </form>
-</div>
-
-<section class="detail-section">
-    <div class="tab-content" id="detalheTabsContent">
-        <div class="tab-pane fade show active" id="visao" role="tabpanel" aria-labelledby="visao-tab" tabindex="0">
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="detail-layout-card mb-3">
             <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Summary{% elif LANGUAGE_CODE == 'es' %}Resumen{% else %}Resumo{% endif %}</div>
-            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Good practice overview{% elif LANGUAGE_CODE == 'es' %}Visi&oacute;n general de la buena pr&aacute;ctica{% else %}Vis&atilde;o geral da boa pr&aacute;tica{% endif %}</h2>
-            <p class="section-subtitle">{{ experiencia.descricao_exibicao }}</p>
+            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Good practice overview{% elif LANGUAGE_CODE == 'es' %}Visi&oacute;n general{% else %}Vis&atilde;o geral{% endif %}</h2>
+            <p class="section-subtitle mb-0">{{ experiencia.descricao_exibicao }}</p>
+        </section>
 
-            <div class="row g-3 mt-2">
-                <div class="col-lg-4">
-                    <div class="compact-summary-card h-100">
-                        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Cross-cutting themes{% elif LANGUAGE_CODE == 'es' %}Temas transversales{% else %}Temas transversais{% endif %}</div>
-                        <div class="d-flex flex-wrap gap-2">{% for tema in experiencia.temas_transversais.all %}<span class="badge-soft">{{ tema.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
+        <div class="accordion detail-accordion" id="detalheAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingJustica">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseJustica" aria-expanded="true" aria-controls="collapseJustica">
+                        {% if LANGUAGE_CODE == 'en' %}Climate justice link{% elif LANGUAGE_CODE == 'es' %}V&iacute;nculo con justicia clim&aacute;tica{% else %}V&iacute;nculo com justi&ccedil;a clim&aacute;tica{% endif %}
+                    </button>
+                </h2>
+                <div id="collapseJustica" class="accordion-collapse collapse show" aria-labelledby="headingJustica" data-bs-parent="#detalheAccordion">
+                    <div class="accordion-body">
+                        <p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica_exibicao }}</p>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="compact-summary-card h-100">
-                        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normativas{% else %}Normas{% endif %}</div>
-                        <div class="d-flex flex-wrap gap-2">{% for norma in experiencia.normas_internacionais.all %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAuditoria">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAuditoria" aria-expanded="false" aria-controls="collapseAuditoria">
+                        {% if LANGUAGE_CODE == 'en' %}Audit questions, criteria and tools{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y herramientas{% else %}Perguntas, crit&eacute;rios e ferramentas{% endif %}
+                    </button>
+                </h2>
+                <div id="collapseAuditoria" class="accordion-collapse collapse" aria-labelledby="headingAuditoria" data-bs-parent="#detalheAccordion">
+                    <div class="accordion-body">
+                        {% if experiencia.perguntas_chave_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditor&iacute;a{% else %}Perguntas de auditoria{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.criterios_utilizados_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Criteria{% elif LANGUAGE_CODE == 'es' %}Criterios{% else %}Crit&eacute;rios{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.criterios_utilizados_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.metodologia_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Methodology{% elif LANGUAGE_CODE == 'es' %}Metodolog&iacute;a{% else %}Metodologia{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.metodologia_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.ferramentas_utilizadas_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.ferramentas_utilizadas_exibicao }}</p>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="compact-summary-card h-100">
-                        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Vulnerable groups{% elif LANGUAGE_CODE == 'es' %}Grupos vulnerables{% else %}Grupos vulner&aacute;veis{% endif %}</div>
-                        <div class="d-flex flex-wrap gap-2">{% for grupo in experiencia.grupos_vulneraveis.all %}<span class="badge-soft">{{ grupo.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingResultados">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResultados" aria-expanded="false" aria-controls="collapseResultados">
+                        {% if LANGUAGE_CODE == 'en' %}Results, recommendations and replicability{% elif LANGUAGE_CODE == 'es' %}Resultados, recomendaciones y replicabilidad{% else %}Resultados, recomenda&ccedil;&otilde;es e replicabilidade{% endif %}
+                    </button>
+                </h2>
+                <div id="collapseResultados" class="accordion-collapse collapse" aria-labelledby="headingResultados" data-bs-parent="#detalheAccordion">
+                    <div class="accordion-body">
+                        {% if experiencia.resultados_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Results{% elif LANGUAGE_CODE == 'es' %}Resultados{% else %}Resultados{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.resultados_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.recomendacoes_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Recommendations{% elif LANGUAGE_CODE == 'es' %}Recomendaciones{% else %}Recomenda&ccedil;&otilde;es{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.recomendacoes_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.replicabilidade_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.replicabilidade_exibicao }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAnexos">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnexos" aria-expanded="false" aria-controls="collapseAnexos">
+                        {% if LANGUAGE_CODE == 'en' %}Attachments and external links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces externos{% else %}Anexos e links externos{% endif %}
+                    </button>
+                </h2>
+                <div id="collapseAnexos" class="accordion-collapse collapse" aria-labelledby="headingAnexos" data-bs-parent="#detalheAccordion">
+                    <div class="accordion-body">
+                        {% for anexo in experiencia.anexos.all %}
+                            <div class="compact-summary-card mb-2">
+                                <strong>{{ anexo.titulo_exibicao }}</strong><br>
+                                {% if anexo.arquivo %}
+                                    <a href="{{ anexo.arquivo.url }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}Download file{% elif LANGUAGE_CODE == 'es' %}Descargar archivo{% else %}Baixar arquivo{% endif %}</a>
+                                {% endif %}
+                                {% if anexo.url_externa %}
+                                    <br><a href="{{ anexo.url_externa }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <p class="text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}No public attachments registered.{% elif LANGUAGE_CODE == 'es' %}No hay anexos p&uacute;blicos registrados.{% else %}N&atilde;o h&aacute; anexos p&uacute;blicos cadastrados.{% endif %}</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="justica" role="tabpanel" aria-labelledby="justica-tab" tabindex="0">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Climate justice link{% elif LANGUAGE_CODE == 'es' %}V&iacute;nculo con justicia clim&aacute;tica{% else %}V&iacute;nculo com justi&ccedil;a clim&aacute;tica{% endif %}</div>
-            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}How this perspective was incorporated{% elif LANGUAGE_CODE == 'es' %}C&oacute;mo se incorpor&oacute; esta perspectiva{% else %}Como essa perspectiva foi incorporada{% endif %}</h2>
-            <p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica_exibicao }}</p>
-        </div>
-
-        <div class="tab-pane fade" id="auditoria" role="tabpanel" aria-labelledby="auditoria-tab" tabindex="0">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Questions, criteria and tools{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y herramientas{% else %}Perguntas, crit&eacute;rios e ferramentas{% endif %}</div>
-            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Audit inputs used by the SAI{% elif LANGUAGE_CODE == 'es' %}Insumos de auditor&iacute;a utilizados por la EFS{% else %}Insumos de auditoria utilizados pela EFS{% endif %}</h2>
-
-            {% if experiencia.perguntas_chave_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditor&iacute;a{% else %}Perguntas de auditoria{% endif %}</h3><p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao }}</p>{% endif %}
-            {% if experiencia.criterios_utilizados_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Criteria{% elif LANGUAGE_CODE == 'es' %}Criterios{% else %}Crit&eacute;rios{% endif %}</h3><p class="section-subtitle">{{ experiencia.criterios_utilizados_exibicao }}</p>{% endif %}
-            {% if experiencia.metodologia_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Methodology{% elif LANGUAGE_CODE == 'es' %}Metodolog&iacute;a{% else %}Metodologia{% endif %}</h3><p class="section-subtitle">{{ experiencia.metodologia_exibicao }}</p>{% endif %}
-            {% if experiencia.ferramentas_utilizadas_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</h3><p class="section-subtitle mb-0">{{ experiencia.ferramentas_utilizadas_exibicao }}</p>{% endif %}
-        </div>
-
-        <div class="tab-pane fade" id="resultados" role="tabpanel" aria-labelledby="resultados-tab" tabindex="0">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Results and recommendations{% elif LANGUAGE_CODE == 'es' %}Resultados y recomendaciones{% else %}Resultados e recomenda&ccedil;&otilde;es{% endif %}</div>
-            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}What can other SAIs learn?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; pueden aprender otras EFS?{% else %}O que outras EFS podem aprender?{% endif %}</h2>
-            {% if experiencia.resultados_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Results{% elif LANGUAGE_CODE == 'es' %}Resultados{% else %}Resultados{% endif %}</h3><p class="section-subtitle">{{ experiencia.resultados_exibicao }}</p>{% endif %}
-            {% if experiencia.recomendacoes_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Recommendations{% elif LANGUAGE_CODE == 'es' %}Recomendaciones{% else %}Recomenda&ccedil;&otilde;es{% endif %}</h3><p class="section-subtitle">{{ experiencia.recomendacoes_exibicao }}</p>{% endif %}
-            {% if experiencia.replicabilidade_exibicao %}<h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</h3><p class="section-subtitle mb-0">{{ experiencia.replicabilidade_exibicao }}</p>{% endif %}
-        </div>
-
-        <div class="tab-pane fade" id="anexos" role="tabpanel" aria-labelledby="anexos-tab" tabindex="0">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Attachments and links{% elif LANGUAGE_CODE == 'es' %}Anexos y enlaces{% else %}Anexos e links{% endif %}</div>
-            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Public supporting materials{% elif LANGUAGE_CODE == 'es' %}Materiales p&uacute;blicos de apoyo{% else %}Materiais p&uacute;blicos de apoio{% endif %}</h2>
-            {% for anexo in experiencia.anexos.all %}
-                <div class="compact-summary-card mb-2">
-                    <strong>{{ anexo.titulo_exibicao }}</strong><br>
-                    {% if anexo.arquivo %}<a href="{{ anexo.arquivo.url }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}Download file{% elif LANGUAGE_CODE == 'es' %}Descargar archivo{% else %}Baixar arquivo{% endif %}</a>{% endif %}
-                    {% if anexo.url_externa %}<br><a href="{{ anexo.url_externa }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>{% endif %}
-                </div>
-            {% empty %}
-                <p class="text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}No public attachments registered.{% elif LANGUAGE_CODE == 'es' %}No hay anexos p&uacute;blicos registrados.{% else %}N&atilde;o h&aacute; anexos p&uacute;blicos cadastrados.{% endif %}</p>
-            {% endfor %}
-        </div>
     </div>
-</section>
+
+    <aside class="col-lg-4">
+        <section class="detail-layout-card mb-3">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Cross-cutting themes{% elif LANGUAGE_CODE == 'es' %}Temas transversales{% else %}Temas transversais{% endif %}</div>
+            <div class="d-flex flex-wrap gap-2">{% for tema in experiencia.temas_transversais.all %}<span class="badge-soft">{{ tema.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
+        </section>
+
+        <section class="detail-layout-card mb-3">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normativas internacionales{% else %}Normas internacionais{% endif %}</div>
+            <div class="d-flex flex-wrap gap-2">{% for norma in experiencia.normas_internacionais.all %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
+        </section>
+
+        <section class="detail-layout-card mb-3">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Vulnerable groups{% elif LANGUAGE_CODE == 'es' %}Grupos vulnerables{% else %}Grupos vulner&aacute;veis{% endif %}</div>
+            <div class="d-flex flex-wrap gap-2">{% for grupo in experiencia.grupos_vulneraveis.all %}<span class="badge-soft">{{ grupo.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
+        </section>
+
+        <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn btn-outline-primary w-100">
+                {% if experiencia.pk in favoritos_ids %}
+                    ★ {% if LANGUAGE_CODE == 'en' %}Remove from favorites{% elif LANGUAGE_CODE == 'es' %}Quitar de favoritos{% else %}Remover dos favoritos{% endif %}
+                {% else %}
+                    ☆ {% if LANGUAGE_CODE == 'en' %}Add to favorites{% elif LANGUAGE_CODE == 'es' %}Agregar a favoritos{% else %}Adicionar aos favoritos{% endif %}
+                {% endif %}
+            </button>
+        </form>
+    </aside>
+</div>
 {% endblock %}
