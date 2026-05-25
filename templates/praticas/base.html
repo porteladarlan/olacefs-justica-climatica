@@ -1012,6 +1012,19 @@
             padding: 1.15rem;
         }
 
+
+        .footer-logo-bar {
+            width: min(100%, 920px);
+            height: auto;
+            display: block;
+        }
+
+        .footer-logo-wrap {
+            border-top: 1px solid var(--line);
+            padding-top: 1.25rem;
+            margin-top: 1rem;
+        }
+
     </style>
 </head>
 <body>
@@ -1184,42 +1197,36 @@
 </main>
 
 <footer class="footer-institutional py-4 mt-auto">
-    <div class="container d-flex flex-column flex-lg-row justify-content-between gap-3">
-        <div>
-            <div class="footer-title">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Regional Good Practices Platform
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Plataforma Regional de Buenas Pr&aacute;cticas
-                {% else %}
-                    Plataforma Regional de Boas Pr&aacute;ticas
-                {% endif %}
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-start">
+            <div>
+                <div class="footer-title">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        Regional Good Practices Platform
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        Plataforma Regional de Buenas Pr&aacute;cticas
+                    {% else %}
+                        Plataforma Regional de Boas Pr&aacute;ticas
+                    {% endif %}
+                </div>
+                <div class="text-muted small">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        The Guide provides orientation; the platform demonstrates.
+                    {% elif LANGUAGE_CODE == 'es' %}
+                        La Gu&iacute;a orienta; la plataforma demuestra.
+                    {% else %}
+                        A Guia orienta; a plataforma demonstra.
+                    {% endif %}
+                </div>
             </div>
-            <div class="text-muted small">
-                {% if LANGUAGE_CODE == 'en' %}
-                    The Guide provides orientation; the platform demonstrates.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    La Gu&iacute;a orienta; la plataforma demuestra.
-                {% else %}
-                    A Guia orienta; a plataforma demonstra.
-                {% endif %}
-            </div>
-        </div>
-        <div class="text-muted small">
-            {% if LANGUAGE_CODE == 'en' %}
-                Local MVP &bull; Demonstration environment
-            {% elif LANGUAGE_CODE == 'es' %}
-                MVP local &bull; Ambiente de demostraci&oacute;n
-            {% else %}
-                MVP local &bull; Ambiente de demonstra&ccedil;&atilde;o
-            {% endif %}
         </div>
 
-        <div class="partner-grid w-100 mt-3">
-            <div class="partner-pill">OLACEFS</div>
-            <div class="partner-pill">COMTEMA</div>
-            <div class="partner-pill">CGID</div>
-            <div class="partner-pill">GIZ</div>
+        <div class="footer-logo-wrap">
+            <img
+                src="/static/praticas/img/barra-logos-comtema-cgid.png"
+                alt="Coopera&ccedil;&atilde;o Alem&atilde;, GIZ, AdaptaInfra, OLACEFS, COMTEMA e CGID"
+                class="footer-logo-bar"
+            >
         </div>
     </div>
 </footer>
