@@ -1,0 +1,104 @@
+{% extends 'praticas/base.html' %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Favorites{% elif LANGUAGE_CODE == 'es' %}Favoritos{% else %}Favoritos{% endif %} | Plataforma Regional{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <div class="section-kicker">
+        {% if LANGUAGE_CODE == 'en' %}Personal selection{% elif LANGUAGE_CODE == 'es' %}Selecci&oacute;n personal{% else %}Sele&ccedil;&atilde;o pessoal{% endif %}
+    </div>
+    <h1 class="section-title display-6 mb-2">
+        {% if LANGUAGE_CODE == 'en' %}
+            Favorite good practices
+        {% elif LANGUAGE_CODE == 'es' %}
+            Buenas pr&aacute;cticas favoritas
+        {% else %}
+            Boas pr&aacute;ticas favoritas
+        {% endif %}
+    </h1>
+    <p class="section-subtitle mb-0">
+        {% if LANGUAGE_CODE == 'en' %}
+            Use favorites to mark experiences that may be useful as sources of questions, criteria, tools or examples for the Guide.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Use favoritos para marcar experiencias que pueden servir como fuentes de preguntas, criterios, herramientas o ejemplos para la Gu&iacute;a.
+        {% else %}
+            Use favoritos para marcar experi&ecirc;ncias que podem servir como fontes de perguntas, crit&eacute;rios, ferramentas ou exemplos para a Guia.
+        {% endif %}
+    </p>
+</section>
+
+{% if experiencias %}
+<section class="mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-md-center mb-3">
+        <div class="text-muted small">
+            {{ experiencias|length }}
+            {% if LANGUAGE_CODE == 'en' %}selected experience(s){% elif LANGUAGE_CODE == 'es' %}experiencia(s) seleccionada(s){% else %}experi&ecirc;ncia(s) selecionada(s){% endif %}
+        </div>
+        <a class="btn btn-outline-primary" href="{% url 'comparar_experiencias' %}{% for experiencia in experiencias|slice:':3' %}{% if forloop.first %}?{% else %}&{% endif %}experiencias={{ experiencia.id }}{% endfor %}">
+            {% if LANGUAGE_CODE == 'en' %}Compare first three{% elif LANGUAGE_CODE == 'es' %}Comparar las tres primeras{% else %}Comparar as tr&ecirc;s primeiras{% endif %}
+        </a>
+    </div>
+
+    <div class="row g-3">
+        {% for experiencia in experiencias %}
+        <div class="col-lg-6">
+            <article class="catalog-card h-100">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge-soft badge-yellow">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
+                    <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
+                    <span class="badge-soft">{{ experiencia.pais.nome_exibicao }}</span>
+                    <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
+                </div>
+                <h2 class="h4 section-title mb-2">{{ experiencia.titulo_exibicao }}</h2>
+                <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:320 }}</p>
+                <div class="text-muted small mb-3">
+                    <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }}
+                    {% if experiencia.contato_referencia %}
+                        &bull; <strong>{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}:</strong> {{ experiencia.contato_referencia }}
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            {% if LANGUAGE_CODE == 'en' %}Remove favorite{% elif LANGUAGE_CODE == 'es' %}Quitar favorito{% else %}Remover favorito{% endif %}
+                        </button>
+                    </form>
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">
+                        {% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}
+                    </a>
+                </div>
+            </article>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<section class="feature-card">
+    <h2 class="section-title h5">
+        {% if LANGUAGE_CODE == 'en' %}
+            No favorites yet
+        {% elif LANGUAGE_CODE == 'es' %}
+            A&uacute;n no hay favoritos
+        {% else %}
+            Ainda n&atilde;o h&aacute; favoritos
+        {% endif %}
+    </h2>
+    <p class="section-subtitle mb-3">
+        {% if LANGUAGE_CODE == 'en' %}
+            Open the catalog and mark relevant experiences as favorites.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Abra el cat&aacute;logo y marque experiencias relevantes como favoritas.
+        {% else %}
+            Abra o cat&aacute;logo e marque experi&ecirc;ncias relevantes como favoritas.
+        {% endif %}
+    </p>
+    <a href="{% url 'catalogo_experiencias' %}" class="btn btn-primary">
+        {% if LANGUAGE_CODE == 'en' %}Open catalog{% elif LANGUAGE_CODE == 'es' %}Abrir cat&aacute;logo{% else %}Abrir cat&aacute;logo{% endif %}
+    </a>
+</section>
+{% endif %}
+{% endblock %}
