@@ -1017,12 +1017,16 @@
             width: min(100%, 920px);
             height: auto;
             display: block;
+            margin: 0 auto;
         }
 
         .footer-logo-wrap {
             border-top: 1px solid var(--line);
             padding-top: 1.25rem;
             margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
     </style>
@@ -1198,7 +1202,7 @@
 
 <footer class="footer-institutional py-4 mt-auto">
     <div class="container">
-        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-start">
+        <div class="d-flex flex-column gap-3 align-items-center text-center">
             <div>
                 <div class="footer-title">
                     {% if LANGUAGE_CODE == 'en' %}
