@@ -16,11 +16,11 @@
 <div class="row g-4">
     <div class="col-lg-8">
         <section class="detail-section mb-3">
-            <div class="section-kicker">Resumo e vínculo com justiça climática</div>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Summary and climate justice link{% elif LANGUAGE_CODE == 'es' %}Resumen y vínculo con justicia climática{% else %}Resumo e vínculo com justiça climática{% endif %}</div>
             <h2 class="section-title h4">Conteúdo submetido</h2>
-            <h3 class="h6 section-title mt-3">Resumo</h3>
+            <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Brief description{% elif LANGUAGE_CODE == 'es' %}Breve descripción{% else %}Breve descrição{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.descricao_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">Vínculo com justiça climática</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Climate justice link{% elif LANGUAGE_CODE == 'es' %}Vínculo con justicia climática{% else %}Vínculo com justiça climática{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.enfoque_justica_climatica_exibicao|default:"-" }}</p>
         </section>
 
@@ -72,7 +72,7 @@
                 <div class="mb-3">
                     <strong>{{ anexo.titulo_exibicao }}</strong><br>
                     {% if anexo.arquivo %}<a href="{{ anexo.arquivo.url }}" target="_blank">Baixar arquivo</a><br>{% endif %}
-                    {% if anexo.url_externa %}<a href="{{ anexo.url_externa }}" target="_blank">Link externo</a>{% endif %}
+                    {% if anexo.url_externa %}<a href="{{ anexo.url_externa }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>{% endif %}
                 </div>
             {% empty %}
                 <p class="section-subtitle small mb-0">Nenhum anexo informado.</p>
@@ -80,7 +80,7 @@
         </section>
 
         <section class="form-section">
-            <div class="section-kicker">Decisão do revisor</div>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Reviewer decision{% elif LANGUAGE_CODE == 'es' %}Decisión del revisor{% else %}Decisão do revisor{% endif %}</div>
             <h2 class="section-title h4 mb-3">Registrar decisão</h2>
             <form method="post">
                 {% csrf_token %}

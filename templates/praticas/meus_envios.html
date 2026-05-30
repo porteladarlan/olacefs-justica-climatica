@@ -41,7 +41,7 @@
                 <h2 class="h4 section-title">{{ experiencia.titulo_exibicao }}</h2>
                 <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:240 }}</p>
                 {% if experiencia.comentario_revisor %}
-                    <div class="alert alert-light border small"><strong>Comentário da revisão:</strong> {{ experiencia.comentario_revisor }}</div>
+                    <div class="alert alert-light border small"><strong>{% if LANGUAGE_CODE == 'en' %}Review comment:{% elif LANGUAGE_CODE == 'es' %}Comentario de la revisión:{% else %}Comentário da revisão:{% endif %}</strong> {{ experiencia.comentario_revisor }}</div>
                 {% endif %}
                 {% if experiencia.status_publicacao == 'publicado' %}
                     <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}?email={{ user.email }}">Solicitar edição</a>
