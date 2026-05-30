@@ -1029,6 +1029,231 @@
             align-items: center;
         }
 
+
+        /* Fase 15A: nova home e navega&ccedil;&atilde;o simplificada */
+        .nav-search-form {
+            min-width: 150px;
+        }
+
+        .nav-search-input {
+            border-radius: 999px;
+            border-color: var(--line);
+            background: #fff;
+        }
+
+        .jc-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            background:
+                linear-gradient(90deg, rgba(67, 32, 84, 0.94), rgba(105, 81, 115, 0.88)),
+                radial-gradient(circle at 85% 20%, rgba(163, 191, 186, 0.55), transparent 28rem);
+            color: #fff;
+            padding: clamp(2.3rem, 5vw, 4.5rem);
+            min-height: 360px;
+            display: flex;
+            align-items: center;
+        }
+
+        .jc-hero::after {
+            content: "";
+            position: absolute;
+            right: -6rem;
+            bottom: -8rem;
+            width: 24rem;
+            height: 24rem;
+            border-radius: 50%;
+            background: rgba(163, 191, 186, 0.22);
+        }
+
+        .jc-hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+        }
+
+        .jc-hero-kicker {
+            display: inline-flex;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            padding: 0.48rem 0.78rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .jc-hero-title {
+            font-size: clamp(2.1rem, 5vw, 4rem);
+            line-height: 0.98;
+            letter-spacing: -0.055em;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .jc-hero-subtitle {
+            font-size: clamp(1.05rem, 2.2vw, 1.45rem);
+            font-weight: 600;
+            max-width: 760px;
+            margin-bottom: 1rem;
+        }
+
+        .jc-hero-text {
+            color: rgba(255, 255, 255, 0.86);
+            max-width: 760px;
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .info-tabs-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        .info-tabs .nav-link {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--purple-900);
+            background: #fff;
+            font-weight: 700;
+            margin: 0 0.45rem 0.6rem 0;
+            padding: 0.68rem 1rem;
+        }
+
+        .info-tabs .nav-link.active {
+            background: var(--purple-900);
+            border-color: var(--purple-900);
+            color: #fff;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .strategy-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .strategy-button {
+            width: 100%;
+            min-height: 5.4rem;
+            border-radius: 18px;
+            border: 1px solid #e0d2e8;
+            background: var(--soft-purple);
+            color: var(--purple-900);
+            text-align: left;
+            padding: 0.95rem;
+            font-weight: 800;
+            line-height: 1.32;
+        }
+
+        .strategy-button:hover,
+        .strategy-button:focus-visible {
+            background: var(--purple-900);
+            color: #fff;
+            border-color: var(--purple-900);
+        }
+
+        .dimension-card,
+        .reference-card,
+        .home-cta-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 1.1rem;
+            height: 100%;
+            box-shadow: none;
+        }
+
+        .dimension-card h3,
+        .reference-card h3,
+        .home-cta-card h3 {
+            color: var(--purple-900);
+            font-size: 1.02rem;
+            font-weight: 800;
+            margin-bottom: 0.45rem;
+        }
+
+        .home-cta-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .home-cta-icon {
+            width: 2.6rem;
+            height: 2.6rem;
+            border-radius: 999px;
+            background: var(--soft-purple);
+            color: var(--purple-900);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .soon-badge {
+            display: inline-flex;
+            border-radius: 999px;
+            background: var(--soft-teal);
+            color: #315f5d;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.74rem;
+            font-weight: 800;
+        }
+
+
+        /* Correção Fase 15A: abas informativas padronizadas */
+        .info-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .info-tabs .nav-item {
+            width: 100%;
+        }
+
+        .info-tabs .nav-link {
+            width: 100%;
+            min-height: 4.25rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: normal;
+            line-height: 1.18;
+            padding: 0.9rem 1rem;
+            border-radius: 999px;
+        }
+
+        @media (max-width: 1199.98px) {
+            .info-tabs {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .info-tabs {
+                grid-template-columns: 1fr;
+            }
+
+            .info-tabs .nav-link {
+                min-height: 3.5rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1038,94 +1263,69 @@
 
 <div class="brand-strip"></div>
 
-<nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top" aria-label="{% if LANGUAGE_CODE == 'en' %}Main navigation{% elif LANGUAGE_CODE == 'es' %}Navegación principal{% else %}Navegação principal{% endif %}">
+<nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top" aria-label="{% if LANGUAGE_CODE == 'en' %}Main navigation{% elif LANGUAGE_CODE == 'es' %}Navegaci&oacute;n principal{% else %}Navega&ccedil;&atilde;o principal{% endif %}">
     <div class="container">
-        <a class="brand-lockup" href="{% url 'pagina_inicial' %}" aria-label="Plataforma Regional OLACEFS">
-            <span class="brand-name">Plataforma Regional OLACEFS</span>
+        <a class="brand-lockup" href="{% url 'pagina_inicial' %}" aria-label="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform{% elif LANGUAGE_CODE == 'es' %}Plataforma de Justicia Clim&aacute;tica{% else %}Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}">
+            <span class="brand-name">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Climate Justice Platform
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Plataforma de Justicia Clim&aacute;tica
+                {% else %}
+                    Plataforma de Justi&ccedil;a Clim&aacute;tica
+                {% endif %}
+            </span>
             <span class="brand-caption">
                 {% if LANGUAGE_CODE == 'en' %}
-                    Audit and Climate Justice
+                    Regional knowledge hub
                 {% elif LANGUAGE_CODE == 'es' %}
-                    Auditor&iacute;a y Justicia Clim&aacute;tica
+                    Auditor&iacute;as m&aacute;s equitativas, inclusivas y sostenibles
                 {% else %}
-                    Auditoria e Justi&ccedil;a Clim&aacute;tica
+                    Auditorias mais equitativas, inclusivas e sustent&aacute;veis
                 {% endif %}
             </span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="{% if LANGUAGE_CODE == 'en' %}Open navigation menu{% elif LANGUAGE_CODE == 'es' %}Abrir menú de navegación{% else %}Abrir menu de navegação{% endif %}">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="{% if LANGUAGE_CODE == 'en' %}Open navigation menu{% elif LANGUAGE_CODE == 'es' %}Abrir men&uacute; de navegaci&oacute;n{% else %}Abrir menu de navega&ccedil;&atilde;o{% endif %}">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="menuPrincipal">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1 align-items-lg-center">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'pagina_inicial' %}">
                         {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'catalogo_experiencias' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Practices{% elif LANGUAGE_CODE == 'es' %}Pr&aacute;cticas{% else %}Pr&aacute;ticas{% endif %}
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'normas_internacionais' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Standards{% elif LANGUAGE_CODE == 'es' %}Normas{% else %}Normas{% endif %}
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'banco_tecnico' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link nav-primary-action" href="{% url 'adicionar_boa_pratica' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Submit{% elif LANGUAGE_CODE == 'es' %}Enviar{% else %}Enviar{% endif %}
-                    </a>
-                </li>
-
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle nav-secondary-action" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if LANGUAGE_CODE == 'en' %}My area{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}
+                        {% if LANGUAGE_CODE == 'en' %}My space{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li class="dropdown-header">
-                            {% if LANGUAGE_CODE == 'en' %}User tools{% elif LANGUAGE_CODE == 'es' %}Herramientas de usuario{% else %}Ferramentas do usu&aacute;rio{% endif %}
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'favoritos_experiencias' %}">
-                                {% if LANGUAGE_CODE == 'en' %}Favorites{% elif LANGUAGE_CODE == 'es' %}Favoritos{% else %}Favoritos{% endif %}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'comparar_experiencias' %}">
-                                {% if LANGUAGE_CODE == 'en' %}Compare practices{% elif LANGUAGE_CODE == 'es' %}Comparar pr&aacute;cticas{% else %}Comparar pr&aacute;ticas{% endif %}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'status_envio' %}">
-                                {% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %}
-                            </a>
-                        </li>
-                        {% if request.user.is_authenticated %}
-                            <li>
-                                <a class="dropdown-item" href="{% url 'meus_envios' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li><hr class="dropdown-divider"></li>
                         {% if request.user.is_authenticated %}
                             <li>
                                 <span class="dropdown-item-text small text-muted d-block px-3 py-2">
                                     {{ request.user.get_full_name|default:request.user.username }}
                                 </span>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'meus_envios' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'status_envio' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'favoritos_experiencias' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}Favorites{% elif LANGUAGE_CODE == 'es' %}Favoritos{% else %}Favoritos{% endif %}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="{% url 'logout_usuario' %}">
                                     {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
@@ -1139,21 +1339,25 @@
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{% url 'registrar_usuario' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}
+                                    {% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Registrarse{% else %}Cadastrar-se{% endif %}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'status_envio' %}">
+                                    {% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %}
                                 </a>
                             </li>
                         {% endif %}
                     </ul>
                 </li>
 
+                {% if request.user.is_staff or request.user.is_superuser %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle nav-secondary-action" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if LANGUAGE_CODE == 'en' %}Governance{% elif LANGUAGE_CODE == 'es' %}Gesti&oacute;n{% else %}Gest&atilde;o{% endif %}
+                        {% if LANGUAGE_CODE == 'en' %}Management{% elif LANGUAGE_CODE == 'es' %}Gesti&oacute;n{% else %}Gest&atilde;o{% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li class="dropdown-header">
-                            {% if LANGUAGE_CODE == 'en' %}Restricted area{% elif LANGUAGE_CODE == 'es' %}Área restringida{% else %}Área restrita{% endif %}
-                        </li>
                         <li>
                             <a class="dropdown-item" href="{% url 'painel_revisao' %}">
                                 {% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n{% else %}Painel de revis&atilde;o{% endif %}
@@ -1165,10 +1369,16 @@
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="/admin/">Admin Django</a>
-                        </li>
+                        <li><a class="dropdown-item" href="/admin/">Admin Django</a></li>
                     </ul>
+                </li>
+                {% endif %}
+
+                <li class="nav-item">
+                    <form method="get" action="{% url 'catalogo_experiencias' %}" class="nav-search-form" role="search">
+                        <label class="visually-hidden" for="buscaGlobal">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</label>
+                        <input id="buscaGlobal" class="form-control form-control-sm nav-search-input" type="search" name="q" placeholder="{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}">
+                    </form>
                 </li>
 
                 <li class="nav-item">
