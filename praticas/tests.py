@@ -275,11 +275,31 @@ class RotasPublicasTests(TestCase):
         self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
         self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
 
-    def test_catalogo_tem_selecao_para_comparacao(self):
+    def test_catalogo_exibe_popup_boa_pratica_e_oculta_comparador(self):
         response = self.client.get(reverse("catalogo_experiencias"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "catalog-compare-checkbox")
-        self.assertContains(response, "catalogoCompararSelecionadas")
+        self.assertContains(response, "modalBoaPratica")
+        self.assertContains(response, "What is a good practice")
+        self.assertNotContains(response, "catalog-compare-checkbox")
+        self.assertNotContains(response, "catalogoCompararSelecionadas")
+        self.assertNotContains(response, "Open comparison page")
+
+    def test_login_com_next_redireciona_para_formulario(self):
+        usuario = get_user_model().objects.create_user(
+            username="autor_next",
+            email="autor_next@example.org",
+            password="teste123",
+        )
+        response = self.client.post(
+            f"{reverse('login_usuario')}?next={reverse('adicionar_boa_pratica')}",
+            {
+                "username": "autor_next",
+                "password": "teste123",
+                "next": reverse("adicionar_boa_pratica"),
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("adicionar_boa_pratica"))
 
 
     def test_favoritos_retorna_200(self):

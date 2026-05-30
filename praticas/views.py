@@ -11,6 +11,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import (
     ConsultaStatusForm,
@@ -33,6 +34,18 @@ from .models import (
     TemaTransversal,
     TipoExperiencia,
 )
+
+
+
+def obter_destino_seguro(request, padrao="meus_envios"):
+    destino = request.POST.get("next") or request.GET.get("next")
+    if destino and url_has_allowed_host_and_scheme(
+        url=destino,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return destino
+    return padrao
 
 
 def experiencias_publicas():
@@ -126,7 +139,7 @@ def estilizar_formulario_autenticacao(form):
 
 def registrar_usuario(request):
     if request.user.is_authenticated:
-        return redirect("meus_envios")
+        return redirect(obter_destino_seguro(request))
 
     if request.method == "POST":
         form = estilizar_formulario_autenticacao(UserCreationForm(request.POST))
@@ -144,11 +157,15 @@ def registrar_usuario(request):
             user.save()
             login(request, user)
             messages.success(request, "Cadastro realizado com sucesso.")
-            return redirect("meus_envios")
+            return redirect(obter_destino_seguro(request))
     else:
         form = estilizar_formulario_autenticacao(UserCreationForm())
 
-    return render(request, "praticas/registrar_usuario.html", {"form": form})
+    return render(
+        request,
+        "praticas/registrar_usuario.html",
+        {"form": form, "next": request.GET.get("next", "")},
+    )
 
 
 def login_usuario(request):
@@ -159,8 +176,7 @@ def login_usuario(request):
         form = estilizar_formulario_autenticacao(AuthenticationForm(request, data=request.POST))
         if form.is_valid():
             login(request, form.get_user())
-            destino = request.POST.get("next") or request.GET.get("next") or "meus_envios"
-            return redirect(destino)
+            return redirect(obter_destino_seguro(request))
     else:
         form = estilizar_formulario_autenticacao(AuthenticationForm(request))
 
@@ -424,6 +440,7 @@ def salvar_anexos_submissao(experiencia, anexos):
         )
 
 
+@login_required(login_url="login_usuario")
 @login_required(login_url="login_usuario")
 def adicionar_boa_pratica(request):
     acao = request.POST.get("acao_envio", "enviar")
