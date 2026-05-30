@@ -1,6 +1,177 @@
 from django import forms
+from django.utils.translation import get_language
 
 from .models import Anexo, Experiencia, PropostaEdicaoExperiencia
+
+
+def idioma_atual():
+    idioma = (get_language() or "pt-br").lower()
+    if idioma.startswith("en"):
+        return "en"
+    if idioma.startswith("es"):
+        return "es"
+    return "pt"
+
+
+def texto_idioma(pt, es=None, en=None):
+    idioma = idioma_atual()
+    if idioma == "en":
+        return en or pt
+    if idioma == "es":
+        return es or pt
+    return pt
+
+
+EXPERIENCIA_LABELS = {
+    "efs": {
+        "pt": "EFS",
+        "es": "EFS",
+        "en": "SAI",
+    },
+    "pais": {
+        "pt": "País",
+        "es": "País",
+        "en": "Country",
+    },
+    "titulo": {
+        "pt": "Nome da boa prática / iniciativa",
+        "es": "Nombre de la buena práctica / iniciativa",
+        "en": "Name of the good practice / initiative",
+    },
+    "tipo_experiencia": {
+        "pt": "Tipo de boa prática",
+        "es": "Tipo de buena práctica",
+        "en": "Type of good practice",
+    },
+    "setor": {
+        "pt": "Setor",
+        "es": "Sector",
+        "en": "Sector",
+    },
+    "temas_transversais": {
+        "pt": "Temas transversais",
+        "es": "Temas transversales",
+        "en": "Cross-cutting themes",
+    },
+    "normas_internacionais": {
+        "pt": "Normas internacionais relacionadas",
+        "es": "Normas internacionales relacionadas",
+        "en": "Related international standards",
+    },
+    "contato_referencia": {
+        "pt": "Contato de referência da EFS",
+        "es": "Contacto de referencia de la EFS",
+        "en": "SAI reference contact",
+    },
+    "email_contato": {
+        "pt": "E-mail institucional de referência",
+        "es": "Correo institucional de referencia",
+        "en": "Reference institutional e-mail",
+    },
+    "pessoa_responsavel": {
+        "pt": "Pessoa responsável",
+        "es": "Persona responsable",
+        "en": "Responsible person",
+    },
+    "descricao": {
+        "pt": "Breve descrição da boa prática",
+        "es": "Breve descripción de la buena práctica",
+        "en": "Brief description of the good practice",
+    },
+    "enfoque_justica_climatica": {
+        "pt": "Vínculo com justiça climática",
+        "es": "Vínculo con justicia climática",
+        "en": "Climate justice link",
+    },
+    "objetivo": {
+        "pt": "Objetivo",
+        "es": "Objetivo",
+        "en": "Objective",
+    },
+    "perguntas_chave": {
+        "pt": "Perguntas de auditoria utilizadas",
+        "es": "Preguntas de auditoría utilizadas",
+        "en": "Audit questions used",
+    },
+    "criterios_utilizados": {
+        "pt": "Critérios utilizados",
+        "es": "Criterios utilizados",
+        "en": "Criteria used",
+    },
+    "metodologia": {
+        "pt": "Metodologia",
+        "es": "Metodología",
+        "en": "Methodology",
+    },
+    "ferramentas_utilizadas": {
+        "pt": "Metodologias, matrizes ou instrumentos utilizados",
+        "es": "Metodologías, matrices o instrumentos utilizados",
+        "en": "Methodologies, matrices or instruments used",
+    },
+    "resultados": {
+        "pt": "Resultados",
+        "es": "Resultados",
+        "en": "Results",
+    },
+    "recomendacoes": {
+        "pt": "Recomendações",
+        "es": "Recomendaciones",
+        "en": "Recommendations",
+    },
+    "replicabilidade": {
+        "pt": "Replicabilidade",
+        "es": "Replicabilidad",
+        "en": "Replicability",
+    },
+    "ano_execucao": {
+        "pt": "Ano",
+        "es": "Año",
+        "en": "Year",
+    },
+    "contribui_para_guia": {
+        "pt": "Esta experiência pode contribuir como exemplo para a Guia?",
+        "es": "¿Esta experiencia puede contribuir como ejemplo para la Guía?",
+        "en": "Can this experience contribute as an example for the Guide?",
+    },
+}
+
+EXPERIENCIA_HELP_TEXTS = {
+    "descricao": {
+        "pt": "Inclua uma descrição objetiva, suficiente para que outra EFS entenda o que foi feito.",
+        "es": "Incluya una descripción objetiva, suficiente para que otra EFS entienda lo que se hizo.",
+        "en": "Include an objective description, sufficient for another SAI to understand what was done.",
+    },
+    "enfoque_justica_climatica": {
+        "pt": "Explique como a experiência considera equidade, direitos humanos, vulnerabilidades ou impactos diferenciados.",
+        "es": "Explique cómo la experiencia considera equidad, derechos humanos, vulnerabilidades o impactos diferenciados.",
+        "en": "Explain how the experience considers equity, human rights, vulnerabilities or differentiated impacts.",
+    },
+    "temas_transversais": {
+        "pt": "Marque todos os temas aplicáveis.",
+        "es": "Marque todos los temas aplicables.",
+        "en": "Select all applicable themes.",
+    },
+    "normas_internacionais": {
+        "pt": "Marque os marcos internacionais relacionados, como Acordo de Paris ou ODS.",
+        "es": "Marque los marcos internacionales relacionados, como el Acuerdo de París o los ODS.",
+        "en": "Select related international frameworks, such as the Paris Agreement or the SDGs.",
+    },
+    "ferramentas_utilizadas": {
+        "pt": "Exemplos: perguntas, matrizes, checklists, metodologias, painéis ou bases de dados.",
+        "es": "Ejemplos: preguntas, matrices, listas de verificación, metodologías, paneles o bases de datos.",
+        "en": "Examples: questions, matrices, checklists, methodologies, dashboards or databases.",
+    },
+}
+
+
+def aplicar_textos_experiencia(form):
+    idioma = idioma_atual()
+    for campo, traducoes in EXPERIENCIA_LABELS.items():
+        if campo in form.fields:
+            form.fields[campo].label = traducoes[idioma]
+    for campo, traducoes in EXPERIENCIA_HELP_TEXTS.items():
+        if campo in form.fields:
+            form.fields[campo].help_text = traducoes[idioma]
 
 
 class ExperienciaSubmissaoForm(forms.ModelForm):
@@ -54,41 +225,11 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "ano_execucao": forms.NumberInput(attrs={"class": "form-control"}),
             "contribui_para_guia": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
-        labels = {
-            "efs": "EFS",
-            "pais": "País",
-            "titulo": "Nome da boa prática / iniciativa",
-            "tipo_experiencia": "Tipo de boa prática",
-            "setor": "Setor",
-            "temas_transversais": "Temas transversais",
-            "normas_internacionais": "Normas internacionais relacionadas",
-            "contato_referencia": "Contato de referência da EFS",
-            "email_contato": "E-mail institucional de referência",
-            "pessoa_responsavel": "Pessoa responsável",
-            "descricao": "Resumo da boa prática",
-            "enfoque_justica_climatica": "Vínculo com justiça climática",
-            "objetivo": "Objetivo",
-            "perguntas_chave": "Perguntas de auditoria utilizadas",
-            "criterios_utilizados": "Critérios utilizados",
-            "metodologia": "Metodologia",
-            "ferramentas_utilizadas": "Ferramentas, matrizes ou instrumentos utilizados",
-            "resultados": "Resultados",
-            "recomendacoes": "Recomendações",
-            "replicabilidade": "Replicabilidade",
-            "ano_execucao": "Ano",
-            "contribui_para_guia": "Esta experiência pode contribuir como exemplo para a Guia?",
-        }
-        help_texts = {
-            "descricao": "Inclua um resumo objetivo, suficiente para que outra EFS entenda o que foi feito.",
-            "enfoque_justica_climatica": "Explique como a experiência considera equidade, direitos humanos, vulnerabilidades ou impactos diferenciados.",
-            "temas_transversais": "Marque todos os temas aplicáveis.",
-            "normas_internacionais": "Marque os marcos internacionais relacionados, como Acordo de Paris ou ODS.",
-            "ferramentas_utilizadas": "Exemplos: perguntas, matrizes, checklists, metodologias, painéis ou bases de dados.",
-        }
 
     def __init__(self, *args, obrigatorio_para_envio=True, **kwargs):
         self.obrigatorio_para_envio = obrigatorio_para_envio
         super().__init__(*args, **kwargs)
+        aplicar_textos_experiencia(self)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -110,11 +251,32 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
         ]
         for campo in obrigatorios:
             if not cleaned_data.get(campo):
-                self.add_error(campo, "Campo obrigatório para envio da boa prática.")
+                self.add_error(
+                    campo,
+                    texto_idioma(
+                        "Campo obrigatório para envio da boa prática.",
+                        "Campo obligatorio para enviar la buena práctica.",
+                        "Required field to submit the good practice.",
+                    ),
+                )
         if not cleaned_data.get("temas_transversais"):
-            self.add_error("temas_transversais", "Selecione pelo menos um tema transversal.")
+            self.add_error(
+                "temas_transversais",
+                texto_idioma(
+                    "Selecione pelo menos um tema transversal.",
+                    "Seleccione al menos un tema transversal.",
+                    "Select at least one cross-cutting theme.",
+                ),
+            )
         if not cleaned_data.get("normas_internacionais"):
-            self.add_error("normas_internacionais", "Selecione pelo menos uma norma internacional.")
+            self.add_error(
+                "normas_internacionais",
+                texto_idioma(
+                    "Selecione pelo menos uma norma internacional.",
+                    "Seleccione al menos una norma internacional.",
+                    "Select at least one international standard.",
+                ),
+            )
         return cleaned_data
 
 
@@ -128,16 +290,38 @@ class AnexoSubmissaoForm(forms.ModelForm):
             "url_externa": forms.URLInput(attrs={"class": "form-control"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        idioma = idioma_atual()
+        textos = {
+            "titulo": {
+                "pt": "Título do anexo",
+                "es": "Título del anexo",
+                "en": "Attachment title",
+            },
+            "arquivo": {
+                "pt": "Arquivo",
+                "es": "Archivo",
+                "en": "File",
+            },
+            "url_externa": {
+                "pt": "Link externo",
+                "es": "Enlace externo",
+                "en": "External link",
+            },
+        }
+        for campo, traducoes in textos.items():
+            self.fields[campo].label = traducoes[idioma]
+
 
 class RevisaoExperienciaForm(forms.ModelForm):
     acao = forms.ChoiceField(
-        label="Decisão da revisão",
         choices=[
-            ("em_revisao", "Marcar como em revisão"),
-            ("aprovar", "Aprovar"),
-            ("publicar", "Publicar"),
-            ("devolver", "Devolver para ajuste"),
-            ("rejeitar", "Rejeitar"),
+            ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
+            ("aprovar", texto_idioma("Aprovar", "Aprobar", "Approve")),
+            ("publicar", texto_idioma("Publicar", "Publicar", "Publish")),
+            ("devolver", texto_idioma("Devolver para ajuste", "Devolver para ajustes", "Return for adjustments")),
+            ("rejeitar", texto_idioma("Rejeitar", "Rechazar", "Reject")),
         ],
         widget=forms.Select(attrs={"class": "form-select"}),
     )
@@ -150,18 +334,23 @@ class RevisaoExperienciaForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 5,
-                    "placeholder": "Registre comentários para o autor ou justificativa da decisão.",
+                    "placeholder": texto_idioma(
+                        "Registre comentários para o autor ou justificativa da decisão.",
+                        "Registre comentarios para el autor o la justificación de la decisión.",
+                        "Record comments for the author or the reason for the decision.",
+                    ),
                 }
             )
         }
-        labels = {
-            "comentario_revisor": "Comentário do revisor",
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["acao"].label = texto_idioma("Decisão da revisão", "Decisión de la revisión", "Review decision")
+        self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")
 
 
 class ConsultaStatusForm(forms.Form):
     email_contato = forms.EmailField(
-        label="E-mail institucional informado no envio",
         widget=forms.EmailInput(
             attrs={
                 "class": "form-control",
@@ -170,28 +359,46 @@ class ConsultaStatusForm(forms.Form):
         ),
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email_contato"].label = texto_idioma(
+            "E-mail institucional informado no envio",
+            "Correo institucional informado en el envío",
+            "Institutional e-mail provided in the submission",
+        )
+
 
 class PropostaEdicaoPublicadaForm(ExperienciaSubmissaoForm):
     comentario_autor = forms.CharField(
-        label="Comentário sobre a alteração solicitada",
         required=False,
         widget=forms.Textarea(
             attrs={
                 "class": "form-control",
                 "rows": 4,
-                "placeholder": "Explique resumidamente o que mudou e por que a alteração é necessária.",
+                "placeholder": texto_idioma(
+                    "Explique resumidamente o que mudou e por que a alteração é necessária.",
+                    "Explique brevemente qué cambió y por qué la modificación es necesaria.",
+                    "Briefly explain what changed and why the adjustment is necessary.",
+                ),
             }
         ),
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["comentario_autor"].label = texto_idioma(
+            "Comentário sobre a alteração solicitada",
+            "Comentario sobre la modificación solicitada",
+            "Comment on the requested change",
+        )
+
 
 class RevisaoPropostaEdicaoForm(forms.ModelForm):
     acao = forms.ChoiceField(
-        label="Decisão sobre a proposta",
         choices=[
-            ("em_revisao", "Marcar como em revisão"),
-            ("aprovar", "Aprovar e aplicar edição"),
-            ("rejeitar", "Rejeitar proposta"),
+            ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
+            ("aprovar", texto_idioma("Aprovar e aplicar edição", "Aprobar y aplicar edición", "Approve and apply edit")),
+            ("rejeitar", texto_idioma("Rejeitar proposta", "Rechazar propuesta", "Reject proposal")),
         ],
         widget=forms.Select(attrs={"class": "form-select"}),
     )
@@ -204,10 +411,16 @@ class RevisaoPropostaEdicaoForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "rows": 5,
-                    "placeholder": "Registre a justificativa da decisão ou orientação ao autor.",
+                    "placeholder": texto_idioma(
+                        "Registre a justificativa da decisão ou orientação ao autor.",
+                        "Registre la justificación de la decisión u orientación al autor.",
+                        "Record the reason for the decision or guidance to the author.",
+                    ),
                 }
             )
         }
-        labels = {
-            "comentario_revisor": "Comentário do revisor",
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["acao"].label = texto_idioma("Decisão sobre a proposta", "Decisión sobre la propuesta", "Decision on the proposal")
+        self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")

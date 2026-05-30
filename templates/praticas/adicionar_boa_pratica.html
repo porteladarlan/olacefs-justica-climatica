@@ -115,8 +115,8 @@
             {% for indice in "123" %}
             <div class="row g-2 align-items-end mb-3">
                 <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}Attachment title{% elif LANGUAGE_CODE == 'es' %}T&iacute;tulo del anexo{% else %}T&iacute;tulo do anexo{% endif %} {{ indice }}</label><input class="form-control" type="text" name="anexo_titulo_{{ indice }}"></div>
-                <div class="col-md-4"><label class="form-label small">Arquivo</label><input class="form-control" type="file" name="anexo_arquivo_{{ indice }}" accept=".pdf,.doc,.docx,.xls,.xlsx"></div>
-                <div class="col-md-4"><label class="form-label small">Link externo</label><input class="form-control" type="url" name="anexo_url_{{ indice }}"></div>
+                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}File{% elif LANGUAGE_CODE == 'es' %}Archivo{% else %}Arquivo{% endif %}</label><input class="form-control" type="file" name="anexo_arquivo_{{ indice }}" accept=".pdf,.doc,.docx,.xls,.xlsx"></div>
+                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</label><input class="form-control" type="url" name="anexo_url_{{ indice }}"></div>
             </div>
             {% endfor %}
         </div>

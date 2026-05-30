@@ -21,7 +21,7 @@
 <div class="row g-4">
     <div class="col-lg-8">
         <section class="detail-section mb-3">
-            <div class="section-kicker">Comentário do autor</div>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Author comment{% elif LANGUAGE_CODE == 'es' %}Comentario del autor{% else %}Comentário do autor{% endif %}</div>
             <p class="section-subtitle mb-0">{{ proposta.comentario_autor|default:"Sem comentário." }}</p>
         </section>
 
@@ -74,7 +74,7 @@
 
     <aside class="col-lg-4">
         <section class="form-section position-sticky" style="top: 6rem;">
-            <div class="section-kicker">Decisão do revisor</div>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Reviewer decision{% elif LANGUAGE_CODE == 'es' %}Decisión del revisor{% else %}Decisão do revisor{% endif %}</div>
             <h2 class="section-title h4 mb-3">Registrar decisão</h2>
             <form method="post">
                 {% csrf_token %}
