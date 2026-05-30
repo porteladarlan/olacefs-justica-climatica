@@ -70,33 +70,38 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
 
-        # O idioma padrão do teste pode variar entre pt-br, es e en.
-        # Além disso, acentos podem aparecer como entidades HTML.
-        # Por isso validamos alternativas equivalentes por idioma.
+        # Validação estrutural: evita falhas por idioma ativo, entidades HTML
+        # ou escolha de campos traduzidos no template.
+        self.assertIn("detail-layout-card", conteudo)
+        self.assertIn("metadata-grid", conteudo)
+        self.assertIn("headingJustica", conteudo)
+        self.assertIn("collapseJustica", conteudo)
+        self.assertIn("headingAuditoria", conteudo)
+        self.assertIn("collapseAuditoria", conteudo)
+
+        # Validação de que a ficha exibe os dados principais da experiência.
+        self.assertIn("Auditoria climatica", conteudo)
+        self.assertIn("TC", conteudo)
+        self.assertIn("Brasil", conteudo)
+        self.assertIn("2026", conteudo)
+        self.assertIn("Contato", conteudo)
+        self.assertIn("contato@example.org", conteudo)
+
+        # Validação dos novos blocos da retroalimentação sem fixar idioma.
         self.assertTrue(
             "Breve descri" in conteudo
             or "Brief description" in conteudo
         )
         self.assertTrue(
-            "problema clim" in conteudo
-            or "climate problem" in conteudo
-        )
-        self.assertTrue(
-            "Riscos clim" in conteudo
-            or "Riesgos clim" in conteudo
-            or "climate risks" in conteudo
-        )
-        self.assertTrue(
-            "enfoque de justi" in conteudo
-            or "justice approach" in conteudo
-        )
-        self.assertTrue(
-            "Dimens" in conteudo
-            or "Dimensions" in conteudo
+            "V&iacute;nculo com justi" in conteudo
+            or "V&iacute;nculo con justicia" in conteudo
+            or "Climate justice link" in conteudo
         )
         self.assertTrue(
             "metodologias" in conteudo
             or "metodolog&iacute;as" in conteudo
             or "methodologies" in conteudo
         )
+
+        # A retroalimentação pediu remover a referência visual à Guia.
         self.assertNotIn("Insumo para", conteudo)
