@@ -13,18 +13,19 @@
 
 <form method="post" class="form-section mx-auto" style="max-width: 720px;">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
     {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
     <div class="row g-3">
         <div class="col-md-6">
-            <label class="form-label fw-semibold">Nome</label>
+            <label class="form-label fw-semibold">{% if LANGUAGE_CODE == 'en' %}First name{% elif LANGUAGE_CODE == 'es' %}Nombre{% else %}Nome{% endif %}</label>
             <input type="text" name="first_name" class="form-control" value="{{ request.POST.first_name }}" required>
         </div>
         <div class="col-md-6">
-            <label class="form-label fw-semibold">Sobrenome</label>
+            <label class="form-label fw-semibold">{% if LANGUAGE_CODE == 'en' %}Last name{% elif LANGUAGE_CODE == 'es' %}Apellido{% else %}Sobrenome{% endif %}</label>
             <input type="text" name="last_name" class="form-control" value="{{ request.POST.last_name }}">
         </div>
         <div class="col-12">
-            <label class="form-label fw-semibold">E-mail institucional</label>
+            <label class="form-label fw-semibold">{% if LANGUAGE_CODE == 'en' %}Institutional e-mail{% elif LANGUAGE_CODE == 'es' %}Correo institucional{% else %}E-mail institucional{% endif %}</label>
             <input type="email" name="email" class="form-control" value="{{ request.POST.email }}" placeholder="nome@efs.gob" required>
         </div>
         {% for field in form %}
@@ -37,7 +38,7 @@
         {% endfor %}
     </div>
     <div class="d-flex flex-column flex-md-row gap-2 justify-content-end mt-4">
-        <a href="{% url 'login_usuario' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}I already have an account{% elif LANGUAGE_CODE == 'es' %}Ya tengo cuenta{% else %}Já tenho conta{% endif %}</a>
+        <a href="{% url 'login_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}I already have an account{% elif LANGUAGE_CODE == 'es' %}Ya tengo cuenta{% else %}Já tenho conta{% endif %}</a>
         <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</button>
     </div>
 </form>

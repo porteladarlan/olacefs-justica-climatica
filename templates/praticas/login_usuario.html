@@ -23,7 +23,7 @@
         </div>
     {% endfor %}
     <div class="d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'registrar_usuario' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</a>
+        <a href="{% url 'registrar_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</a>
         <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</button>
     </div>
 </form>
