@@ -5,37 +5,40 @@
 {% block title %}{{ experiencia.titulo_exibicao }} | Plataforma Regional{% endblock %}
 
 {% block content %}
-<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to good practices{% elif LANGUAGE_CODE == 'es' %}Volver a buenas pr&aacute;cticas{% else %}Voltar para boas pr&aacute;ticas{% endif %}</a>
+<a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0 text-decoration-none mb-3">
+    &larr; {% if LANGUAGE_CODE == 'en' %}Back to good practices{% elif LANGUAGE_CODE == 'es' %}Volver a buenas pr&aacute;cticas{% else %}Voltar para boas pr&aacute;ticas{% endif %}
+</a>
 
 <section class="page-hero mb-4">
     <div class="hero-content">
-        <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Good practice profile{% elif LANGUAGE_CODE == 'es' %}Ficha de buena pr&aacute;ctica{% else %}Ficha da boa pr&aacute;tica{% endif %}</span>
+        <span class="hero-eyebrow">
+            {% if LANGUAGE_CODE == 'en' %}Good practice profile{% elif LANGUAGE_CODE == 'es' %}Ficha de buena pr&aacute;ctica{% else %}Ficha da boa pr&aacute;tica{% endif %}
+        </span>
         <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
-        <p class="hero-subtitle">{{ experiencia.descricao_exibicao|truncatechars:260 }}</p>
-        <div class="d-flex flex-wrap gap-2 mt-4">
-            <span class="type-badge
-                {% if 'Auditoria' in experiencia.tipo_experiencia.nome_exibicao or 'Audit' in experiencia.tipo_experiencia.nome_exibicao %}type-auditoria{% endif %}
-                {% if 'Pesquisa' in experiencia.tipo_experiencia.nome_exibicao or 'Investigaci' in experiencia.tipo_experiencia.nome_exibicao or 'Research' in experiencia.tipo_experiencia.nome_exibicao %}type-pesquisa{% endif %}
-                {% if 'Avalia' in experiencia.tipo_experiencia.nome_exibicao or 'Evaluaci' in experiencia.tipo_experiencia.nome_exibicao %}type-avaliacao{% endif %}
-                {% if 'Capacita' in experiencia.tipo_experiencia.nome_exibicao or 'Training' in experiencia.tipo_experiencia.nome_exibicao %}type-capacitacao{% endif %}
-                {% if 'Ferramenta' in experiencia.tipo_experiencia.nome_exibicao or 'Herramienta' in experiencia.tipo_experiencia.nome_exibicao or 'Tool' in experiencia.tipo_experiencia.nome_exibicao or 'metodologia' in experiencia.tipo_experiencia.nome_exibicao %}type-ferramenta{% endif %}
-            ">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
-            <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
-            {% if experiencia.contribui_para_guia %}
-                <span class="badge-soft badge-yellow">{% if LANGUAGE_CODE == 'en' %}Guide input{% elif LANGUAGE_CODE == 'es' %}Insumo para la Gu&iacute;a{% else %}Insumo para a Guia{% endif %}</span>
-            {% endif %}
-        </div>
+        <p class="hero-subtitle mb-0">
+            <strong>{{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }}</strong>
+            &bull; {{ experiencia.pais.nome_exibicao }}
+            &bull; {{ experiencia.tipo_experiencia.nome_exibicao }}
+        </p>
     </div>
 </section>
 
 <section class="metadata-grid mb-4">
     <div class="metadata-item">
         <div class="metadata-label">EFS</div>
-        <div class="metadata-value">{{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }}</div>
+        <div class="metadata-value">{{ experiencia.efs.nome_exibicao }}</div>
     </div>
     <div class="metadata-item">
         <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;s{% else %}Pa&iacute;s{% endif %}</div>
         <div class="metadata-value">{{ experiencia.pais.nome_exibicao }}</div>
+    </div>
+    <div class="metadata-item">
+        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Type{% elif LANGUAGE_CODE == 'es' %}Tipo{% else %}Tipo{% endif %}</div>
+        <div class="metadata-value">{{ experiencia.tipo_experiencia.nome_exibicao }}</div>
+    </div>
+    <div class="metadata-item">
+        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</div>
+        <div class="metadata-value">{{ experiencia.setor.nome_exibicao }}</div>
     </div>
     <div class="metadata-item">
         <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}A&ntilde;o{% else %}Ano{% endif %}</div>
@@ -45,13 +48,25 @@
         <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}</div>
         <div class="metadata-value">{{ experiencia.contato_referencia|default:"-" }}</div>
     </div>
+    <div class="metadata-item">
+        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Responsible person{% elif LANGUAGE_CODE == 'es' %}Persona responsable{% else %}Pessoa respons&aacute;vel{% endif %}</div>
+        <div class="metadata-value">{{ experiencia.pessoa_responsavel|default:"-" }}</div>
+    </div>
+    <div class="metadata-item">
+        <div class="metadata-label">E-mail</div>
+        <div class="metadata-value">{{ experiencia.email_contato|default:"-" }}</div>
+    </div>
 </section>
 
 <div class="row g-4">
     <div class="col-lg-8">
         <section class="detail-layout-card mb-3">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Summary{% elif LANGUAGE_CODE == 'es' %}Resumen{% else %}Resumo{% endif %}</div>
-            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Good practice overview{% elif LANGUAGE_CODE == 'es' %}Visi&oacute;n general{% else %}Vis&atilde;o geral{% endif %}</h2>
+            <div class="section-kicker">
+                {% if LANGUAGE_CODE == 'en' %}Brief description{% elif LANGUAGE_CODE == 'es' %}Breve descripci&oacute;n{% else %}Breve descri&ccedil;&atilde;o{% endif %}
+            </div>
+            <h2 class="section-title h4">
+                {% if LANGUAGE_CODE == 'en' %}Overview of the experience{% elif LANGUAGE_CODE == 'es' %}Descripci&oacute;n de la experiencia{% else %}Descri&ccedil;&atilde;o da experi&ecirc;ncia{% endif %}
+            </h2>
             <p class="section-subtitle mb-0">{{ experiencia.descricao_exibicao }}</p>
         </section>
 
@@ -64,19 +79,77 @@
                 </h2>
                 <div id="collapseJustica" class="accordion-collapse collapse show" aria-labelledby="headingJustica" data-bs-parent="#detalheAccordion">
                     <div class="accordion-body">
-                        <p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica_exibicao }}</p>
+                        <div class="mb-3">
+                            <h3 class="h6 section-title">
+                                {% if LANGUAGE_CODE == 'en' %}What climate problem does the experience address?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; problema clim&aacute;tico aborda la experiencia?{% else %}Que problema clim&aacute;tico a experi&ecirc;ncia aborda?{% endif %}
+                            </h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.problema_climatico_exibicao|default:"-" }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h3 class="h6 section-title">
+                                {% if LANGUAGE_CODE == 'en' %}Identified climate risks{% elif LANGUAGE_CODE == 'es' %}Riesgos clim&aacute;ticos identificados{% else %}Riscos clim&aacute;ticos identificados{% endif %}
+                            </h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.riscos_climaticos_exibicao|default:"-" }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h3 class="h6 section-title">
+                                {% if LANGUAGE_CODE == 'en' %}Was a climate justice approach incorporated?{% elif LANGUAGE_CODE == 'es' %}&iquest;Se incorpor&oacute; un enfoque de justicia clim&aacute;tica?{% else %}Foi incorporado um enfoque de justi&ccedil;a clim&aacute;tica?{% endif %}
+                            </h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica_exibicao|default:"-" }}</p>
+                        </div>
+
+                        <div class="mb-0">
+                            <h3 class="h6 section-title">
+                                {% if LANGUAGE_CODE == 'en' %}Dimensions considered{% elif LANGUAGE_CODE == 'es' %}Dimensiones consideradas{% else %}Dimens&otilde;es consideradas{% endif %}
+                            </h3>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for dimensao in experiencia.dimensoes_consideradas.all %}
+                                    <span class="badge-soft">{{ dimensao.nome_exibicao }}</span>
+                                {% empty %}
+                                    <span class="text-muted">-</span>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {% if experiencia.relacao_adaptacao_mitigacao_gestao_desastres_exibicao or experiencia.impactos_diferenciados_exibicao %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingContexto">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContexto" aria-expanded="false" aria-controls="collapseContexto">
+                        {% if LANGUAGE_CODE == 'en' %}Climate context and differentiated impacts{% elif LANGUAGE_CODE == 'es' %}Contexto clim&aacute;tico e impactos diferenciados{% else %}Contexto clim&aacute;tico e impactos diferenciados{% endif %}
+                    </button>
+                </h2>
+                <div id="collapseContexto" class="accordion-collapse collapse" aria-labelledby="headingContexto" data-bs-parent="#detalheAccordion">
+                    <div class="accordion-body">
+                        {% if experiencia.relacao_adaptacao_mitigacao_gestao_desastres_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Relation with adaptation, mitigation or disaster management{% elif LANGUAGE_CODE == 'es' %}Relaci&oacute;n con adaptaci&oacute;n, mitigaci&oacute;n o gesti&oacute;n de desastres{% else %}Rela&ccedil;&atilde;o com adapta&ccedil;&atilde;o, mitiga&ccedil;&atilde;o ou gest&atilde;o de desastres{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.relacao_adaptacao_mitigacao_gestao_desastres_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.impactos_diferenciados_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Differentiated impacts{% elif LANGUAGE_CODE == 'es' %}Impactos diferenciados{% else %}Impactos diferenciados{% endif %}</h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.impactos_diferenciados_exibicao }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingAuditoria">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAuditoria" aria-expanded="false" aria-controls="collapseAuditoria">
-                        {% if LANGUAGE_CODE == 'en' %}Audit questions, criteria and tools{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y herramientas{% else %}Perguntas, crit&eacute;rios e ferramentas{% endif %}
+                        {% if LANGUAGE_CODE == 'en' %}Audit questions, criteria and methodologies{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y metodolog&iacute;as{% else %}Perguntas, crit&eacute;rios e metodologias{% endif %}
                     </button>
                 </h2>
                 <div id="collapseAuditoria" class="accordion-collapse collapse" aria-labelledby="headingAuditoria" data-bs-parent="#detalheAccordion">
                     <div class="accordion-body">
+                        {% if experiencia.objetivo_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Objective{% elif LANGUAGE_CODE == 'es' %}Objetivo{% else %}Objetivo{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.objetivo_exibicao }}</p>
+                        {% endif %}
                         {% if experiencia.perguntas_chave_exibicao %}
                             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditor&iacute;a{% else %}Perguntas de auditoria{% endif %}</h3>
                             <p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao }}</p>
@@ -90,7 +163,7 @@
                             <p class="section-subtitle">{{ experiencia.metodologia_exibicao }}</p>
                         {% endif %}
                         {% if experiencia.ferramentas_utilizadas_exibicao %}
-                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</h3>
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Useful methodologies or instruments{% elif LANGUAGE_CODE == 'es' %}Metodolog&iacute;as o instrumentos utilizados{% else %}Metodologias ou instrumentos utilizados{% endif %}</h3>
                             <p class="section-subtitle mb-0">{{ experiencia.ferramentas_utilizadas_exibicao }}</p>
                         {% endif %}
                     </div>
@@ -113,6 +186,10 @@
                             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Recommendations{% elif LANGUAGE_CODE == 'es' %}Recomendaciones{% else %}Recomenda&ccedil;&otilde;es{% endif %}</h3>
                             <p class="section-subtitle">{{ experiencia.recomendacoes_exibicao }}</p>
                         {% endif %}
+                        {% if experiencia.mudancas_ou_impactos_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Changes or impacts observed{% elif LANGUAGE_CODE == 'es' %}Cambios o impactos observados{% else %}Mudan&ccedil;as ou impactos observados{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.mudancas_ou_impactos_exibicao }}</p>
+                        {% endif %}
                         {% if experiencia.replicabilidade_exibicao %}
                             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</h3>
                             <p class="section-subtitle mb-0">{{ experiencia.replicabilidade_exibicao }}</p>
@@ -120,6 +197,36 @@
                     </div>
                 </div>
             </div>
+
+            {% if experiencia.motivo_boa_pratica_exibicao or experiencia.elementos_replicaveis_exibicao or experiencia.licoes_aprendidas_exibicao or experiencia.necessidades_para_replicacao_exibicao %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAprendizados">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAprendizados" aria-expanded="false" aria-controls="collapseAprendizados">
+                        {% if LANGUAGE_CODE == 'en' %}Lessons learned and regional value{% elif LANGUAGE_CODE == 'es' %}Aprendizajes y valor regional{% else %}Aprendizados e valor regional{% endif %}
+                    </button>
+                </h2>
+                <div id="collapseAprendizados" class="accordion-collapse collapse" aria-labelledby="headingAprendizados" data-bs-parent="#detalheAccordion">
+                    <div class="accordion-body">
+                        {% if experiencia.motivo_boa_pratica_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Why is this a good practice?{% elif LANGUAGE_CODE == 'es' %}&iquest;Por qu&eacute; es una buena pr&aacute;ctica?{% else %}Por que esta &eacute; uma boa pr&aacute;tica?{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.motivo_boa_pratica_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.elementos_replicaveis_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Replicable elements{% elif LANGUAGE_CODE == 'es' %}Elementos replicables{% else %}Elementos replic&aacute;veis{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.elementos_replicaveis_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.licoes_aprendidas_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Lessons learned{% elif LANGUAGE_CODE == 'es' %}Lecciones aprendidas{% else %}Li&ccedil;&otilde;es aprendidas{% endif %}</h3>
+                            <p class="section-subtitle">{{ experiencia.licoes_aprendidas_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.necessidades_para_replicacao_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Conditions for replication{% elif LANGUAGE_CODE == 'es' %}Condiciones para replicaci&oacute;n{% else %}Condi&ccedil;&otilde;es para replica&ccedil;&atilde;o{% endif %}</h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.necessidades_para_replicacao_exibicao }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingAnexos">

@@ -338,6 +338,22 @@ class Experiencia(models.Model):
         return texto_por_idioma(self.problema_climatico, self.problema_climatico_es, self.problema_climatico_en)
 
     @property
+    def relacao_adaptacao_mitigacao_gestao_desastres_exibicao(self):
+        return texto_por_idioma(
+            self.relacao_adaptacao_mitigacao_gestao_desastres,
+            self.relacao_adaptacao_mitigacao_gestao_desastres_es,
+            self.relacao_adaptacao_mitigacao_gestao_desastres_en,
+        )
+
+    @property
+    def riscos_climaticos_exibicao(self):
+        return texto_por_idioma(self.riscos_climaticos, self.riscos_climaticos_es, self.riscos_climaticos_en)
+
+    @property
+    def impactos_diferenciados_exibicao(self):
+        return texto_por_idioma(self.impactos_diferenciados, self.impactos_diferenciados_es, self.impactos_diferenciados_en)
+
+    @property
     def objetivo_exibicao(self):
         return texto_por_idioma(self.objetivo, self.objetivo_es, self.objetivo_en)
 
@@ -388,6 +404,30 @@ class Experiencia(models.Model):
     @property
     def elementos_replicaveis_exibicao(self):
         return texto_por_idioma(self.elementos_replicaveis, self.elementos_replicaveis_es, self.elementos_replicaveis_en)
+
+    @property
+    def motivo_boa_pratica_exibicao(self):
+        return texto_por_idioma(self.motivo_boa_pratica, self.motivo_boa_pratica_es, self.motivo_boa_pratica_en)
+
+    @property
+    def dificuldades_exibicao(self):
+        return texto_por_idioma(self.dificuldades, self.dificuldades_es, self.dificuldades_en)
+
+    @property
+    def necessidades_para_replicacao_exibicao(self):
+        return texto_por_idioma(
+            self.necessidades_para_replicacao,
+            self.necessidades_para_replicacao_es,
+            self.necessidades_para_replicacao_en,
+        )
+
+    @property
+    def ferramentas_metodologias_uteis_exibicao(self):
+        return texto_por_idioma(
+            self.ferramentas_metodologias_uteis,
+            self.ferramentas_metodologias_uteis_es,
+            self.ferramentas_metodologias_uteis_en,
+        )
 
 
 class Anexo(models.Model):
