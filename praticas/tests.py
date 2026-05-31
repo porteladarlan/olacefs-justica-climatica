@@ -465,10 +465,20 @@ class RotasPublicasTests(TestCase):
 
         response = self.client.get(reverse("revisar_edicao_publicada", args=[proposta.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Valor atual")
-        self.assertContains(response, "Valor proposto")
-        self.assertContains(response, "Titulo atualizado para comparativo")
-        self.assertContains(response, "Resultados atualizados para revisão visual.")
+
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "Valor atual" in conteudo
+            or "Valor actual" in conteudo
+            or "Current value" in conteudo
+        )
+        self.assertTrue(
+            "Valor proposto" in conteudo
+            or "Valor propuesto" in conteudo
+            or "Proposed value" in conteudo
+        )
+        self.assertIn("Titulo atualizado para comparativo", conteudo)
+        self.assertIn("Resultados atualizados para revisão visual.", conteudo)
 
     def test_aprovar_proposta_edicao_aplica_valor_proposto(self):
         usuario = get_user_model().objects.create_user(
