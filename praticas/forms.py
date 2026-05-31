@@ -128,11 +128,6 @@ EXPERIENCIA_LABELS = {
         "es": "Año",
         "en": "Year",
     },
-    "contribui_para_guia": {
-        "pt": "Esta experiência pode contribuir como exemplo para a Guia?",
-        "es": "¿Esta experiencia puede contribuir como ejemplo para la Guía?",
-        "en": "Can this experience contribute as an example for the Guide?",
-    },
 }
 
 EXPERIENCIA_HELP_TEXTS = {
@@ -160,6 +155,26 @@ EXPERIENCIA_HELP_TEXTS = {
         "pt": "Exemplos: perguntas, matrizes, checklists, metodologias, painéis ou bases de dados.",
         "es": "Ejemplos: preguntas, matrices, listas de verificación, metodologías, paneles o bases de datos.",
         "en": "Examples: questions, matrices, checklists, methodologies, dashboards or databases.",
+    },
+    "titulo": {
+        "pt": "Use um título curto e específico, que identifique claramente a experiência.",
+        "es": "Use un título breve y específico, que identifique claramente la experiencia.",
+        "en": "Use a short and specific title that clearly identifies the experience.",
+    },
+    "contato_referencia": {
+        "pt": "Informe a pessoa ou área de referência para eventuais contatos institucionais.",
+        "es": "Indique la persona o área de referencia para eventuales contactos institucionales.",
+        "en": "Provide the reference person or unit for possible institutional contact.",
+    },
+    "email_contato": {
+        "pt": "Use preferencialmente um e-mail institucional vinculado à EFS.",
+        "es": "Use preferentemente un correo institucional vinculado a la EFS.",
+        "en": "Preferably use an institutional e-mail linked to the SAI.",
+    },
+    "ano_execucao": {
+        "pt": "Informe o ano principal de execução ou conclusão da experiência.",
+        "es": "Indique el año principal de ejecución o conclusión de la experiencia.",
+        "en": "Provide the main year of implementation or completion of the experience.",
     },
 }
 
@@ -199,7 +214,6 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "recomendacoes",
             "replicabilidade",
             "ano_execucao",
-            "contribui_para_guia",
         ]
         widgets = {
             "efs": forms.Select(attrs={"class": "form-select"}),
@@ -223,7 +237,6 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "recomendacoes": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "replicabilidade": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "ano_execucao": forms.NumberInput(attrs={"class": "form-control"}),
-            "contribui_para_guia": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
     def __init__(self, *args, obrigatorio_para_envio=True, **kwargs):
