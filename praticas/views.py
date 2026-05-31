@@ -639,18 +639,17 @@ CAMPOS_COMPARACAO_EDICAO = [
     ("contato_referencia", "Contato de referência"),
     ("email_contato", "E-mail institucional"),
     ("pessoa_responsavel", "Pessoa responsável"),
-    ("descricao", "Resumo da boa prática"),
+    ("descricao", "Breve descrição da boa prática"),
     ("enfoque_justica_climatica", "Vínculo com justiça climática"),
     ("objetivo", "Objetivo"),
     ("perguntas_chave", "Perguntas de auditoria"),
     ("criterios_utilizados", "Critérios utilizados"),
     ("metodologia", "Metodologia"),
-    ("ferramentas_utilizadas", "Ferramentas utilizadas"),
+    ("ferramentas_utilizadas", "Metodologias e instrumentos utilizados"),
     ("resultados", "Resultados"),
     ("recomendacoes", "Recomendações"),
     ("replicabilidade", "Replicabilidade"),
     ("ano_execucao", "Ano"),
-    ("contribui_para_guia", "Contribui para a Guia"),
 ]
 
 

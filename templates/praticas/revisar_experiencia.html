@@ -2,100 +2,65 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}Revisar | {{ experiencia.titulo_exibicao }}{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Review{% elif LANGUAGE_CODE == 'es' %}Revisar{% else %}Revisar{% endif %} | {{ experiencia.titulo_exibicao }}{% endblock %}
 
 {% block content %}
-<a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; Voltar ao painel</a>
+<a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">
+    &larr; {% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel{% else %}Voltar ao painel{% endif %}
+</a>
 
 <section class="page-hero mb-4">
-    <span class="hero-eyebrow">Revisão de submissão</span>
+    <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Submission review{% elif LANGUAGE_CODE == 'es' %}Revisi&oacute;n de env&iacute;o{% else %}Revis&atilde;o de submiss&atilde;o{% endif %}</span>
     <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
-    <p class="hero-subtitle">{{ experiencia.efs.nome_exibicao }} &bull; {{ experiencia.pais.nome_exibicao }} &bull; Status atual: {{ experiencia.get_status_publicacao_display }}</p>
+    <p class="hero-subtitle">
+        {{ experiencia.efs.nome_exibicao }} &bull; {{ experiencia.pais.nome_exibicao }} &bull;
+        {% if LANGUAGE_CODE == 'en' %}Current status{% elif LANGUAGE_CODE == 'es' %}Estado actual{% else %}Status atual{% endif %}: {{ experiencia.get_status_publicacao_display }}
+    </p>
 </section>
 
 <div class="row g-4">
     <div class="col-lg-8">
         <section class="detail-section mb-3">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Summary and climate justice link{% elif LANGUAGE_CODE == 'es' %}Resumen y vínculo con justicia climática{% else %}Resumo e vínculo com justiça climática{% endif %}</div>
-            <h2 class="section-title h4">Conteúdo submetido</h2>
-            <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Brief description{% elif LANGUAGE_CODE == 'es' %}Breve descripción{% else %}Breve descrição{% endif %}</h3>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Brief description and climate justice link{% elif LANGUAGE_CODE == 'es' %}Breve descripci&oacute;n y v&iacute;nculo con justicia clim&aacute;tica{% else %}Breve descri&ccedil;&atilde;o e v&iacute;nculo com justi&ccedil;a clim&aacute;tica{% endif %}</div>
+            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Submitted content{% elif LANGUAGE_CODE == 'es' %}Contenido enviado{% else %}Conte&uacute;do submetido{% endif %}</h2>
+            <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Brief description{% elif LANGUAGE_CODE == 'es' %}Breve descripci&oacute;n{% else %}Breve descri&ccedil;&atilde;o{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.descricao_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Climate justice link{% elif LANGUAGE_CODE == 'es' %}Vínculo con justicia climática{% else %}Vínculo com justiça climática{% endif %}</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Climate justice link{% elif LANGUAGE_CODE == 'es' %}V&iacute;nculo con justicia clim&aacute;tica{% else %}V&iacute;nculo com justi&ccedil;a clim&aacute;tica{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.enfoque_justica_climatica_exibicao|default:"-" }}</p>
         </section>
 
         <section class="detail-section mb-3">
-            <div class="section-kicker">Perguntas, critérios e ferramentas</div>
-            <h2 class="section-title h4">Insumos metodológicos</h2>
-            <h3 class="h6 section-title mt-3">Perguntas de auditoria</h3>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Questions, criteria and methodologies{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y metodolog&iacute;as{% else %}Perguntas, crit&eacute;rios e metodologias{% endif %}</div>
+            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Methodological inputs{% elif LANGUAGE_CODE == 'es' %}Insumos metodol&oacute;gicos{% else %}Insumos metodol&oacute;gicos{% endif %}</h2>
+            <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditor&iacute;a{% else %}Perguntas de auditoria{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">Critérios utilizados</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Criteria used{% elif LANGUAGE_CODE == 'es' %}Criterios utilizados{% else %}Crit&eacute;rios utilizados{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.criterios_utilizados_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">Ferramentas e metodologias</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Methodologies and instruments{% elif LANGUAGE_CODE == 'es' %}Metodolog&iacute;as e instrumentos{% else %}Metodologias e instrumentos{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.ferramentas_utilizadas_exibicao|default:"-" }}</p>
         </section>
 
         <section class="detail-section mb-3">
-            <div class="section-kicker">Resultados e replicabilidade</div>
-            <h2 class="section-title h4">Aprendizagens para outras EFS</h2>
-            <h3 class="h6 section-title mt-3">Resultados</h3>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Results and replicability{% elif LANGUAGE_CODE == 'es' %}Resultados y replicabilidad{% else %}Resultados e replicabilidade{% endif %}</div>
+            <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Learning for other SAIs{% elif LANGUAGE_CODE == 'es' %}Aprendizajes para otras EFS{% else %}Aprendizagens para outras EFS{% endif %}</h2>
+            <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Results{% elif LANGUAGE_CODE == 'es' %}Resultados{% else %}Resultados{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.resultados_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">Recomendações</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Recommendations{% elif LANGUAGE_CODE == 'es' %}Recomendaciones{% else %}Recomenda&ccedil;&otilde;es{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.recomendacoes_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">Replicabilidade</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.replicabilidade_exibicao|default:"-" }}</p>
         </section>
     </div>
 
     <aside class="col-lg-4">
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Classificação</div>
-            <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="badge-status status-{{ experiencia.status_publicacao }}">{{ experiencia.get_status_publicacao_display }}</span>
-                <span class="badge-soft">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
-                <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
-            </div>
-
-            <h3 class="h6 section-title">Temas transversais</h3>
-            <div class="d-flex flex-wrap gap-2 mb-3">{% for tema in experiencia.temas_transversais.all %}<span class="badge-soft">{{ tema.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
-
-            <h3 class="h6 section-title">Normas internacionais</h3>
-            <div class="d-flex flex-wrap gap-2 mb-3">{% for norma in experiencia.normas_internacionais.all %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
-
-            <h3 class="h6 section-title">Contato</h3>
-            <p class="section-subtitle small mb-0">{{ experiencia.contato_referencia|default:"-" }}<br>{{ experiencia.email_contato|default:"-" }}</p>
-        </section>
-
-        <section class="detail-section mb-3">
-            <div class="section-kicker">Anexos e links</div>
-            {% for anexo in experiencia.anexos.all %}
-                <div class="mb-3">
-                    <strong>{{ anexo.titulo_exibicao }}</strong><br>
-                    {% if anexo.arquivo %}<a href="{{ anexo.arquivo.url }}" target="_blank">Baixar arquivo</a><br>{% endif %}
-                    {% if anexo.url_externa %}<a href="{{ anexo.url_externa }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>{% endif %}
-                </div>
-            {% empty %}
-                <p class="section-subtitle small mb-0">Nenhum anexo informado.</p>
-            {% endfor %}
-        </section>
-
-        <section class="form-section">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Reviewer decision{% elif LANGUAGE_CODE == 'es' %}Decisión del revisor{% else %}Decisão do revisor{% endif %}</div>
-            <h2 class="section-title h4 mb-3">Registrar decisão</h2>
+        <section class="form-section position-sticky" style="top: 6rem;">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Reviewer decision{% elif LANGUAGE_CODE == 'es' %}Decisi&oacute;n del revisor{% else %}Decis&atilde;o do revisor{% endif %}</div>
+            <h2 class="section-title h4 mb-3">{% if LANGUAGE_CODE == 'en' %}Register decision{% elif LANGUAGE_CODE == 'es' %}Registrar decisi&oacute;n{% else %}Registrar decis&atilde;o{% endif %}</h2>
             <form method="post">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">{{ form.acao.label }}</label>
-                    {{ form.acao }}
-                    {% for error in form.acao.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">{{ form.comentario_revisor.label }}</label>
-                    {{ form.comentario_revisor }}
-                    <div class="form-text">Use este campo para justificar rejeição ou orientar ajustes.</div>
-                    {% for error in form.comentario_revisor.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Salvar decisão</button>
+                <div class="mb-3"><label class="form-label fw-semibold">{{ form.acao.label }}</label>{{ form.acao }}{% for error in form.acao.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+                <div class="mb-3"><label class="form-label fw-semibold">{{ form.comentario_revisor.label }}</label>{{ form.comentario_revisor }}{% for error in form.comentario_revisor.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+                <button type="submit" class="btn btn-primary w-100">{% if LANGUAGE_CODE == 'en' %}Save decision{% elif LANGUAGE_CODE == 'es' %}Guardar decisi&oacute;n{% else %}Salvar decis&atilde;o{% endif %}</button>
             </form>
         </section>
     </aside>
