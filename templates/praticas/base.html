@@ -1254,6 +1254,127 @@
             }
         }
 
+
+        /* Fase 15G: revisão visual pública */
+        .page-shell {
+            border-radius: 28px;
+        }
+
+        .page-inner {
+            padding: clamp(1rem, 2.6vw, 2rem);
+        }
+
+        .jc-hero {
+            box-shadow: 0 18px 44px rgba(67, 32, 84, 0.12);
+        }
+
+        .jc-hero-title {
+            max-width: 980px;
+        }
+
+        .jc-hero-subtitle,
+        .jc-hero-text {
+            max-width: 840px;
+        }
+
+        .home-action-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            min-height: 100%;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .home-action-card:hover {
+            border-color: rgba(67, 32, 84, 0.25);
+            box-shadow: 0 14px 30px rgba(67, 32, 84, 0.07);
+            transform: translateY(-2px);
+        }
+
+        .home-action-card h2,
+        .home-action-card h3 {
+            color: var(--purple-900);
+            font-size: 1.08rem;
+            line-height: 1.25;
+            margin-bottom: 0;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .home-action-card p {
+            flex: 1;
+            font-size: 0.92rem;
+        }
+
+        .dimension-grid,
+        .reference-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .dimension-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .reference-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .dimension-card,
+        .reference-card {
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .dimension-card:hover,
+        .reference-card:hover {
+            border-color: rgba(105, 81, 115, 0.32);
+            background: #fffefe;
+        }
+
+        .clean-list {
+            padding-left: 1.15rem;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .clean-list li + li {
+            margin-top: 0.45rem;
+        }
+
+        .catalog-card,
+        .resource-card,
+        .detail-layout-card,
+        .info-tabs-card {
+            box-shadow: 0 10px 24px rgba(67, 32, 84, 0.04);
+        }
+
+        .filter-panel {
+            border-left-color: var(--purple-900);
+        }
+
+        @media (max-width: 575.98px) {
+            .jc-hero {
+                min-height: auto;
+                padding: 2rem 1.2rem;
+                border-radius: 22px;
+            }
+
+            .jc-hero-title {
+                font-size: 2rem;
+            }
+
+            .home-action-grid {
+                gap: 0.75rem;
+            }
+
+            .page-inner {
+                padding: 0.8rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1438,7 +1559,7 @@
         <div class="footer-logo-wrap">
             <img
                 src="/static/praticas/img/barra-logos-comtema-cgid.png"
-                alt="Coopera&ccedil;&atilde;o Alem&atilde;, GIZ, AdaptaInfra, OLACEFS, COMTEMA e CGID"
+                alt="{% if LANGUAGE_CODE == 'en' %}German Cooperation, GIZ, AdaptaInfra, OLACEFS, COMTEMA and CGID{% elif LANGUAGE_CODE == 'es' %}Cooperaci&oacute;n Alemana, GIZ, AdaptaInfra, OLACEFS, COMTEMA y CGID{% else %}Coopera&ccedil;&atilde;o Alem&atilde;, GIZ, AdaptaInfra, OLACEFS, COMTEMA e CGID{% endif %}"
                 class="footer-logo-bar"
             >
         </div>
