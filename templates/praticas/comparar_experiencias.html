@@ -20,11 +20,11 @@
     </h1>
     <p class="section-subtitle mb-0">
         {% if LANGUAGE_CODE == 'en' %}
-            Select up to three published experiences to compare their SAI, sector, type of practice, climate justice approach, tools, criteria and replicability.
+            Select up to three published experiences to compare their SAI, sector, type of practice, climate justice approach, methodologies, criteria and replicability.
         {% elif LANGUAGE_CODE == 'es' %}
-            Seleccione hasta tres experiencias publicadas para comparar EFS, sector, tipo de pr&aacute;ctica, enfoque de justicia clim&aacute;tica, herramientas, criterios y replicabilidad.
+            Seleccione hasta tres experiencias publicadas para comparar EFS, sector, tipo de pr&aacute;ctica, enfoque de justicia clim&aacute;tica, metodolog&iacute;as, criterios y replicabilidad.
         {% else %}
-            Selecione at&eacute; tr&ecirc;s experi&ecirc;ncias publicadas para comparar EFS, setor, tipo de pr&aacute;tica, enfoque de justi&ccedil;a clim&aacute;tica, ferramentas, crit&eacute;rios e replicabilidade.
+            Selecione at&eacute; tr&ecirc;s experi&ecirc;ncias publicadas para comparar EFS, setor, tipo de pr&aacute;tica, enfoque de justi&ccedil;a clim&aacute;tica, metodologias, crit&eacute;rios e replicabilidade.
         {% endif %}
     </p>
 </section>
@@ -237,7 +237,7 @@
                         {% endfor %}
                     </tr>
                     <tr>
-                        <th>{% if LANGUAGE_CODE == 'en' %}Tools and methodologies{% elif LANGUAGE_CODE == 'es' %}Herramientas y metodolog&iacute;as{% else %}Ferramentas e metodologias{% endif %}</th>
+                        <th>{% if LANGUAGE_CODE == 'en' %}Methodologies and instruments{% elif LANGUAGE_CODE == 'es' %}Metodolog&iacute;as e instrumentos{% else %}Metodologias e instrumentos{% endif %}</th>
                         {% for experiencia in experiencias_selecionadas|slice:":3" %}
                             <td>{{ experiencia.ferramentas_utilizadas_exibicao|default:"-" }}</td>
                         {% endfor %}
@@ -252,18 +252,6 @@
                         <th>{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</th>
                         {% for experiencia in experiencias_selecionadas|slice:":3" %}
                             <td>{{ experiencia.replicabilidade_exibicao|default:"-" }}</td>
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th>{% if LANGUAGE_CODE == 'en' %}Contribution to the Guide{% elif LANGUAGE_CODE == 'es' %}Contribuci&oacute;n a la Gu&iacute;a{% else %}Contribui&ccedil;&atilde;o para a Guia{% endif %}</th>
-                        {% for experiencia in experiencias_selecionadas|slice:":3" %}
-                            <td>
-                                {% if experiencia.contribui_para_guia %}
-                                    <span class="badge-soft badge-yellow">{% if LANGUAGE_CODE == 'en' %}Yes{% elif LANGUAGE_CODE == 'es' %}S&iacute;{% else %}Sim{% endif %}</span>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
                         {% endfor %}
                     </tr>
                 </tbody>

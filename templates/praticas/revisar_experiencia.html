@@ -25,13 +25,13 @@
         </section>
 
         <section class="detail-section mb-3">
-            <div class="section-kicker">Perguntas, critérios e ferramentas</div>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Questions, criteria and methodologies{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y metodologías{% else %}Perguntas, critérios e metodologias{% endif %}</div>
             <h2 class="section-title h4">Insumos metodológicos</h2>
             <h3 class="h6 section-title mt-3">Perguntas de auditoria</h3>
             <p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao|default:"-" }}</p>
             <h3 class="h6 section-title">Critérios utilizados</h3>
             <p class="section-subtitle">{{ experiencia.criterios_utilizados_exibicao|default:"-" }}</p>
-            <h3 class="h6 section-title">Ferramentas e metodologias</h3>
+            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Methodologies and instruments{% elif LANGUAGE_CODE == 'es' %}Metodologías e instrumentos{% else %}Metodologias e instrumentos{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.ferramentas_utilizadas_exibicao|default:"-" }}</p>
         </section>
 
