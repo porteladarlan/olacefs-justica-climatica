@@ -128,6 +128,11 @@ EXPERIENCIA_LABELS = {
         "es": "Año",
         "en": "Year",
     },
+    "contribui_para_guia": {
+        "pt": "Esta experiência pode contribuir como exemplo para a Guia?",
+        "es": "¿Esta experiencia puede contribuir como ejemplo para la Guía?",
+        "en": "Can this experience contribute as an example for the Guide?",
+    },
 }
 
 EXPERIENCIA_HELP_TEXTS = {
@@ -194,6 +199,7 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "recomendacoes",
             "replicabilidade",
             "ano_execucao",
+            "contribui_para_guia",
         ]
         widgets = {
             "efs": forms.Select(attrs={"class": "form-select"}),
@@ -217,6 +223,7 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "recomendacoes": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "replicabilidade": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "ano_execucao": forms.NumberInput(attrs={"class": "form-control"}),
+            "contribui_para_guia": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
     def __init__(self, *args, obrigatorio_para_envio=True, **kwargs):

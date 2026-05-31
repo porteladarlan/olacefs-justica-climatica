@@ -650,6 +650,7 @@ CAMPOS_COMPARACAO_EDICAO = [
     ("recomendacoes", "Recomendações"),
     ("replicabilidade", "Replicabilidade"),
     ("ano_execucao", "Ano"),
+    ("contribui_para_guia", "Contribui para a Guia"),
 ]
 
 
