@@ -16,6 +16,23 @@
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
     <div class="col-12">
+        <div class="status-help-grid">
+            <div class="status-help-card">
+                <strong>{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</strong>
+                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Use this option to save partial information and continue later.{% elif LANGUAGE_CODE == 'es' %}Use esta opción para guardar información parcial y continuar después.{% else %}Use esta opção para salvar informações parciais e continuar depois.{% endif %}</p>
+            </div>
+            <div class="status-help-card">
+                <strong>{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</strong>
+                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Required fields are validated before the experience is sent to the editorial workflow.{% elif LANGUAGE_CODE == 'es' %}Los campos obligatorios se validan antes de enviar la experiencia al flujo editorial.{% else %}Os campos obrigatórios são validados antes de enviar a experiência ao fluxo editorial.{% endif %}</p>
+            </div>
+            <div class="status-help-card">
+                <strong>{% if LANGUAGE_CODE == 'en' %}Public content{% elif LANGUAGE_CODE == 'es' %}Contenido público{% else %}Conteúdo público{% endif %}</strong>
+                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Only approved content will become visible in the public catalog.{% elif LANGUAGE_CODE == 'es' %}Solo el contenido aprobado será visible en el catálogo público.{% else %}Somente o conteúdo aprovado ficará visível no catálogo público.{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
         <div class="alert alert-warning mb-0">
             <strong>{% if LANGUAGE_CODE == 'en' %}Before submitting:{% elif LANGUAGE_CODE == 'es' %}Antes de enviar:{% else %}Antes de enviar:{% endif %}</strong>
             {% if LANGUAGE_CODE == 'en' %}
@@ -39,9 +56,15 @@
             </div>
             <div class="row g-3">
                 {% for field in form %}
-                    {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
+                    {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
                     <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
-                        <label class="form-label fw-semibold">{{ field.label }}{% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}</label>
+                        <label class="form-label fw-semibold">
+                            {{ field.label }}
+                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                                <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
+                            {% endif %}
+                            {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}
+                        </label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
@@ -58,7 +81,7 @@
                 <span class="step-number">2</span>
                 <div>
                     <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Classification{% elif LANGUAGE_CODE == 'es' %}Clasificaci&oacute;n{% else %}Classifica&ccedil;&atilde;o{% endif %}</h2>
-                    <p>{% if LANGUAGE_CODE == 'en' %}Themes, sectors and standards used for filtering and comparison.{% elif LANGUAGE_CODE == 'es' %}Temas, sectores y normas usados para filtros y comparaci&oacute;n.{% else %}Temas, setores e normas usados para filtros e compara&ccedil;&atilde;o.{% endif %}</p>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Themes and standards used to organize and find the experience in the catalog.{% elif LANGUAGE_CODE == 'es' %}Temas y normas usados para organizar y localizar la experiencia en el cat&aacute;logo.{% else %}Temas e normas usados para organizar e localizar a experi&ecirc;ncia no cat&aacute;logo.{% endif %}</p>
                 </div>
             </div>
             <div class="row g-3">
@@ -89,9 +112,15 @@
             </div>
             <div class="row g-3">
                 {% for field in form %}
-                    {% if field.name in "pessoa_responsavel,objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade" %}
+                    {% if field.name in "objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade" %}
                     <div class="col-12">
-                        <label class="form-label fw-semibold">{{ field.label }}{% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}</label>
+                        <label class="form-label fw-semibold">
+                            {{ field.label }}
+                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                                <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
+                            {% endif %}
+                            {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}
+                        </label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
