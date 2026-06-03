@@ -2,44 +2,76 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n{% else %}Painel de revis&atilde;o{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisión{% else %}Painel de revisão{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Restricted review area{% elif LANGUAGE_CODE == 'es' %}Área restringida de revisi&oacute;n{% else %}Área restrita de revis&atilde;o{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Good practice review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n de buenas pr&aacute;cticas{% else %}Painel de revis&atilde;o de boas pr&aacute;ticas{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Submissions remain internal until reviewed and published. Published edit requests are reviewed separately.{% elif LANGUAGE_CODE == 'es' %}Los env&iacute;os permanecen internos hasta ser revisados y publicados. Las solicitudes de edici&oacute;n de contenidos publicados se revisan por separado.{% else %}Os envios permanecem internos at&eacute; serem revisados e publicados. Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o de conte&uacute;dos publicados s&atilde;o revisadas separadamente.{% endif %}</p>
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Restricted review area{% elif LANGUAGE_CODE == 'es' %}Área restringida de revisión{% else %}Área restrita de revisão{% endif %}</div>
+    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Good practice review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisión de buenas prácticas{% else %}Painel de revisão de boas práticas{% endif %}</h1>
+    <p class="section-subtitle mb-0">
+        {% if LANGUAGE_CODE == 'en' %}
+            Review submitted practices, request adjustments, approve content and publish validated experiences in the public catalog.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Revise las buenas prácticas enviadas, solicite ajustes, apruebe contenidos y publique experiencias validadas en el catálogo público.
+        {% else %}
+            Revise boas práticas enviadas, solicite ajustes, aprove conteúdos e publique experiências validadas no catálogo público.
+        {% endif %}
+    </p>
+</section>
+
+<section class="status-help-grid mb-4">
+    <article class="status-help-card">
+        <span class="status-pill status-enviado">{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}</span>
+        <p class="section-subtitle small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Waiting for technical review.{% elif LANGUAGE_CODE == 'es' %}En espera de revisión técnica.{% else %}Aguardando revisão técnica.{% endif %}</p>
+    </article>
+    <article class="status-help-card">
+        <span class="status-pill status-em_revisao">{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</span>
+        <p class="section-subtitle small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Being checked by the review team.{% elif LANGUAGE_CODE == 'es' %}En análisis por el equipo revisor.{% else %}Em análise pela equipe revisora.{% endif %}</p>
+    </article>
+    <article class="status-help-card">
+        <span class="status-pill status-aprovado">{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}</span>
+        <p class="section-subtitle small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Validated but not necessarily public yet.{% elif LANGUAGE_CODE == 'es' %}Validado, pero no necesariamente público todavía.{% else %}Validado, mas ainda não necessariamente público.{% endif %}</p>
+    </article>
 </section>
 
 <section class="row g-3 mb-4">
-    <div class="col-md"><div class="metric-card"><div class="metric-label">Enviado</div><p class="metric-value">{{ contadores.enviado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">Em revisão</div><p class="metric-value">{{ contadores.em_revisao }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">Aprovado</div><p class="metric-value">{{ contadores.aprovado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">Rascunho</div><p class="metric-value">{{ contadores.rascunho }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">Edições pendentes</div><p class="metric-value">{{ contadores.edicoes_pendentes }}</p></div></div>
+    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}</div><p class="metric-value">{{ contadores.enviado }}</p></div></div>
+    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</div><p class="metric-value">{{ contadores.em_revisao }}</p></div></div>
+    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}</div><p class="metric-value">{{ contadores.aprovado }}</p></div></div>
+    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</div><p class="metric-value">{{ contadores.rascunho }}</p></div></div>
+    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Pending edits{% elif LANGUAGE_CODE == 'es' %}Ediciones pendientes{% else %}Edições pendentes{% endif %}</div><p class="metric-value">{{ contadores.edicoes_pendentes }}</p></div></div>
 </section>
 
 <div class="mb-4">
-    <a href="{% url 'painel_revisao_edicoes' %}" class="btn btn-outline-primary">Revisar edições de conteúdos publicados</a>
+    <a href="{% url 'painel_revisao_edicoes' %}" class="btn btn-outline-primary">
+        {% if LANGUAGE_CODE == 'en' %}Review published content edits{% elif LANGUAGE_CODE == 'es' %}Revisar ediciones de contenidos publicados{% else %}Revisar edições de conteúdos publicados{% endif %}
+    </a>
 </div>
 
 <form method="get" class="filter-panel row g-3 mb-4">
     <div class="col-md-6">
-        <label class="form-label small fw-semibold text-muted">Filtrar por status</label>
+        <label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Filter by status{% elif LANGUAGE_CODE == 'es' %}Filtrar por estado{% else %}Filtrar por status{% endif %}</label>
         <select class="form-select" name="status">
-            <option value="">Todos os pendentes</option>
+            <option value="">{% if LANGUAGE_CODE == 'en' %}All pending items{% elif LANGUAGE_CODE == 'es' %}Todos los pendientes{% else %}Todos os pendentes{% endif %}</option>
             {% for valor, rotulo in status_choices %}
                 {% if valor != "publicado" %}
-                    <option value="{{ valor }}" {% if status_atual == valor %}selected{% endif %}>{{ rotulo }}</option>
+                    <option value="{{ valor }}" {% if status_atual == valor %}selected{% endif %}>
+                        {% if valor == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
+                        {% elif valor == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}
+                        {% elif valor == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
+                        {% elif valor == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}
+                        {% elif valor == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}
+                        {% else %}{{ rotulo }}{% endif %}
+                    </option>
                 {% endif %}
             {% endfor %}
         </select>
     </div>
     <div class="col-md-3 d-grid align-self-end">
-        <button class="btn btn-primary" type="submit">Filtrar</button>
+        <button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Filter{% elif LANGUAGE_CODE == 'es' %}Filtrar{% else %}Filtrar{% endif %}</button>
     </div>
     <div class="col-md-3 d-grid align-self-end">
-        <a class="btn btn-outline-secondary" href="{% url 'painel_revisao' %}">Limpar</a>
+        <a class="btn btn-outline-secondary" href="{% url 'painel_revisao' %}">{% if LANGUAGE_CODE == 'en' %}Clear{% elif LANGUAGE_CODE == 'es' %}Limpiar{% else %}Limpar{% endif %}</a>
     </div>
 </form>
 
@@ -48,27 +80,28 @@
     <div class="col-lg-6">
         <article class="catalog-card h-100">
             <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="badge-status status-{{ experiencia.status_publicacao }}">{{ experiencia.get_status_publicacao_display }}</span>
-                <span class="badge-soft">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
-                <span class="badge-soft">{{ experiencia.setor.nome_exibicao }}</span>
-                <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
+                <span class="status-pill status-{{ experiencia.status_publicacao }}">{{ experiencia.get_status_publicacao_display }}</span>
+                <span class="badge-soft">{{ experiencia.atualizado_em|date:"d/m/Y H:i" }}</span>
             </div>
             <h2 class="h4 section-title">{{ experiencia.titulo_exibicao }}</h2>
-            <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:260 }}</p>
+            <p class="section-subtitle">{{ experiencia.descricao_exibicao|default:"-"|truncatechars:260 }}</p>
             <div class="text-muted small mb-3">
                 <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }} &bull;
-                <strong>Contato:</strong> {{ experiencia.contato_referencia|default:"-" }} &bull;
-                <strong>E-mail:</strong> {{ experiencia.email_contato|default:"-" }}
+                <strong>{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}:</strong> {{ experiencia.pais.nome_exibicao }}<br>
+                <strong>{% if LANGUAGE_CODE == 'en' %}Author/contact{% elif LANGUAGE_CODE == 'es' %}Autor/contacto{% else %}Autor/contato{% endif %}:</strong> {{ experiencia.email_contato|default:"-" }}
             </div>
-            <a href="{% url 'revisar_experiencia' experiencia.pk %}" class="btn btn-primary">Abrir revisão</a>
+            {% if experiencia.comentario_revisor %}
+                <div class="compact-summary-card mb-3">
+                    <strong>{% if LANGUAGE_CODE == 'en' %}Last reviewer comment{% elif LANGUAGE_CODE == 'es' %}Último comentario del revisor{% else %}Último comentário do revisor{% endif %}</strong>
+                    <p class="section-subtitle small mb-0">{{ experiencia.comentario_revisor|truncatechars:220 }}</p>
+                </div>
+            {% endif %}
+            <a href="{% url 'revisar_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %}</a>
         </article>
     </div>
     {% empty %}
     <div class="col-12">
-        <div class="feature-card">
-            <h2 class="h5 section-title mb-1">Nenhuma experiência pendente</h2>
-            <p class="section-subtitle mb-0">Não há submissões para o filtro selecionado.</p>
-        </div>
+        <div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submissions found for the selected filter.{% elif LANGUAGE_CODE == 'es' %}No se encontraron envíos para el filtro seleccionado.{% else %}Nenhum envio encontrado para o filtro selecionado.{% endif %}</p></div>
     </div>
     {% endfor %}
 </div>

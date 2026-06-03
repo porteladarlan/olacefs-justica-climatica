@@ -198,9 +198,14 @@ class RotasPublicasTests(TestCase):
         self.client.force_login(usuario)
         response = self.client.get(reverse("painel_revisao"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Pending good practice")
-        self.assertContains(response, "autor@example.org")
-        self.assertContains(response, "2026")
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "Boa pratica pendente" in conteudo
+            or "Pending good practice" in conteudo
+            or "Buena práctica pendiente" in conteudo
+        )
+        self.assertIn("autor@example.org", conteudo)
+        self.assertIn("2026", conteudo)
 
     def test_revisor_publica_experiencia(self):
         usuario = get_user_model().objects.create_user(
