@@ -2,13 +2,43 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normas internacionales{% else %}Normas internacionais{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}International frameworks{% elif LANGUAGE_CODE == 'es' %}Marcos internacionales{% else %}Marcos internacionais{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
-<section class="page-hero mb-5">
-    <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Standards and frameworks{% elif LANGUAGE_CODE == 'es' %}Normativas y marcos internacionales{% else %}Normativas e marcos internacionais{% endif %}</span>
-    <h1 class="hero-title">{% if LANGUAGE_CODE == 'en' %}Connect audits to global climate and rights frameworks.{% elif LANGUAGE_CODE == 'es' %}Conecte auditor&iacute;as con marcos globales de clima y derechos.{% else %}Conecte auditorias com marcos globais de clima e direitos.{% endif %}</h1>
-    <p class="hero-subtitle">{% if LANGUAGE_CODE == 'en' %}Each standard below can lead to good practices that reference or operationalize that framework.{% elif LANGUAGE_CODE == 'es' %}Cada normativa abajo puede conducir a buenas pr&aacute;cticas que referencian u operacionalizan ese marco.{% else %}Cada normativa abaixo pode conduzir a boas pr&aacute;ticas que referenciam ou operacionalizam esse marco.{% endif %}</p>
+<section class="page-hero mb-4">
+    <span class="hero-eyebrow">
+        {% if LANGUAGE_CODE == 'en' %}Standards, rights and climate frameworks{% elif LANGUAGE_CODE == 'es' %}Normas, derechos y marcos climáticos{% else %}Normas, direitos e marcos climáticos{% endif %}
+    </span>
+    <h1 class="hero-title">
+        {% if LANGUAGE_CODE == 'en' %}Normative references as anchors for good practices.{% elif LANGUAGE_CODE == 'es' %}Referencias normativas como anclajes para buenas prácticas.{% else %}Referências normativas como âncoras para boas práticas.{% endif %}
+    </h1>
+    <p class="hero-subtitle">
+        {% if LANGUAGE_CODE == 'en' %}
+            International frameworks help explain why a practice is relevant, which rights or commitments it relates to and how it can support audit criteria.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Los marcos internacionales ayudan a explicar por qué una práctica es relevante, con qué derechos o compromisos se relaciona y cómo puede apoyar criterios de auditoría.
+        {% else %}
+            Os marcos internacionais ajudam a explicar por que uma prática é relevante, com quais direitos ou compromissos ela se relaciona e como pode apoiar critérios de auditoria.
+        {% endif %}
+    </p>
+</section>
+
+<section class="detail-layout-card mb-4">
+    <div class="section-kicker">
+        {% if LANGUAGE_CODE == 'en' %}How this area should be read{% elif LANGUAGE_CODE == 'es' %}Cómo leer esta área{% else %}Como ler esta área{% endif %}
+    </div>
+    <h2 class="section-title h3 mb-2">
+        {% if LANGUAGE_CODE == 'en' %}The platform is not a legal repository{% elif LANGUAGE_CODE == 'es' %}La plataforma no es un repositorio jurídico{% else %}A plataforma não é um repositório jurídico{% endif %}
+    </h2>
+    <p class="section-subtitle mb-0">
+        {% if LANGUAGE_CODE == 'en' %}
+            This section organizes frameworks as references connected to the experiences. The complete legal and methodological curation will be refined in the specialized technical stage.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Esta sección organiza marcos como referencias conectadas a las experiencias. La curaduría jurídica y metodológica completa será refinada en la etapa técnica especializada.
+        {% else %}
+            Esta seção organiza marcos como referências conectadas às experiências. A curadoria jurídica e metodológica completa será refinada na etapa técnica especializada.
+        {% endif %}
+    </p>
 </section>
 
 <div class="row g-4">
@@ -19,13 +49,26 @@
             <h2 class="h4 section-title">{{ norma.nome_exibicao }}</h2>
             <p class="section-subtitle">{{ norma.resumo_exibicao|truncatechars:420 }}</p>
             <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-primary" href="{% url 'catalogo_experiencias' %}?norma={{ norma.id }}">{% if LANGUAGE_CODE == 'en' %}Access experiences{% elif LANGUAGE_CODE == 'es' %}Acceder a experiencias{% else %}Acessar experi&ecirc;ncias{% endif %}</a>
-                {% if norma.url_referencia %}<a class="btn btn-outline-secondary" href="{{ norma.url_referencia }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External reference{% elif LANGUAGE_CODE == 'es' %}Referencia externa{% else %}Refer&ecirc;ncia externa{% endif %}</a>{% endif %}
+                <a class="btn btn-primary" href="{% url 'catalogo_experiencias' %}?norma={{ norma.id }}">{% if LANGUAGE_CODE == 'en' %}See related experiences{% elif LANGUAGE_CODE == 'es' %}Ver experiencias relacionadas{% else %}Ver experiências relacionadas{% endif %}</a>
+                {% if norma.url_referencia %}<a class="btn btn-outline-secondary" href="{{ norma.url_referencia }}" target="_blank" rel="noopener">{% if LANGUAGE_CODE == 'en' %}External reference{% elif LANGUAGE_CODE == 'es' %}Referencia externa{% else %}Referência externa{% endif %}</a>{% endif %}
             </div>
         </article>
     </div>
     {% empty %}
-    <div class="col-12"><div class="feature-card"><p class="mb-0 text-muted">{% if LANGUAGE_CODE == 'en' %}No international standard registered yet.{% elif LANGUAGE_CODE == 'es' %}Ninguna normativa internacional registrada todav&iacute;a.{% else %}Nenhuma normativa internacional cadastrada ainda.{% endif %}</p></div></div>
+    <div class="col-12">
+        <div class="feature-card">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}No frameworks registered yet{% elif LANGUAGE_CODE == 'es' %}Sin marcos registrados todavía{% else %}Sem marcos cadastrados ainda{% endif %}</div>
+            <p class="mb-0 text-muted">
+                {% if LANGUAGE_CODE == 'en' %}
+                    The normative list will be completed after the technical curation process.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La lista normativa será completada después del proceso de curaduría técnica.
+                {% else %}
+                    A lista normativa será completada após o processo de curadoria técnica.
+                {% endif %}
+            </p>
+        </div>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
