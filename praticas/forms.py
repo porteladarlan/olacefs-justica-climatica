@@ -358,6 +358,13 @@ class RevisaoExperienciaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["acao"].choices = [
+            ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
+            ("aprovar", texto_idioma("Aprovar", "Aprobar", "Approve")),
+            ("publicar", texto_idioma("Publicar", "Publicar", "Publish")),
+            ("devolver", texto_idioma("Devolver para ajuste", "Devolver para ajustes", "Return for adjustments")),
+            ("rejeitar", texto_idioma("Rejeitar", "Rechazar", "Reject")),
+        ]
         self.fields["acao"].label = texto_idioma("Decisão da revisão", "Decisión de la revisión", "Review decision")
         self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")
 
@@ -435,5 +442,10 @@ class RevisaoPropostaEdicaoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["acao"].choices = [
+            ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
+            ("aprovar", texto_idioma("Aprovar e aplicar edição", "Aprobar y aplicar edición", "Approve and apply edit")),
+            ("rejeitar", texto_idioma("Rejeitar proposta", "Rechazar propuesta", "Reject proposal")),
+        ]
         self.fields["acao"].label = texto_idioma("Decisão sobre a proposta", "Decisión sobre la propuesta", "Decision on the proposal")
         self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")

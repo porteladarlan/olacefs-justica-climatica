@@ -22,7 +22,7 @@
     <div class="col-lg-8">
         <section class="detail-section mb-3">
             <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Author comment{% elif LANGUAGE_CODE == 'es' %}Comentario del autor{% else %}Comentário do autor{% endif %}</div>
-            <p class="section-subtitle mb-0">{{ proposta.comentario_autor|default:"Sem comentário." }}</p>
+            <p class="section-subtitle mb-0">{% if proposta.comentario_autor %}{{ proposta.comentario_autor }}{% else %}{% if LANGUAGE_CODE == 'en' %}No comment provided.{% elif LANGUAGE_CODE == 'es' %}Sin comentario registrado.{% else %}Sem comentário registrado.{% endif %}{% endif %}</p>
         </section>
 
         <section class="detail-section">
