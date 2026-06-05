@@ -1,0 +1,67 @@
+# Variáveis de ambiente recomendadas
+
+## Ambiente de desenvolvimento local
+
+Exemplo básico:
+
+```env
+SECRET_KEY=dev-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+## Ambiente de teste/homologação
+
+```env
+SECRET_KEY=<valor-seguro>
+DEBUG=False
+ALLOWED_HOSTS=<dominio-do-ambiente>,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=https://<dominio-do-ambiente>
+DATABASE_URL=<url-do-banco-persistente>
+```
+
+## Ambiente de produção futura
+
+```env
+SECRET_KEY=<valor-seguro-e-unico>
+DEBUG=False
+ALLOWED_HOSTS=<dominio-oficial>
+CSRF_TRUSTED_ORIGINS=https://<dominio-oficial>
+DATABASE_URL=<url-do-banco-producao>
+STATIC_ROOT=<caminho-ou-configuracao-static>
+MEDIA_ROOT=<caminho-ou-configuracao-media>
+```
+
+## Variáveis para anexos/storage externo
+
+Caso a produção use storage externo, prever variáveis como:
+
+```env
+STORAGE_BACKEND=<backend>
+AWS_ACCESS_KEY_ID=<valor>
+AWS_SECRET_ACCESS_KEY=<valor>
+AWS_STORAGE_BUCKET_NAME=<valor>
+AWS_S3_REGION_NAME=<valor>
+```
+
+ou equivalentes para Azure Blob, Google Cloud Storage ou infraestrutura institucional.
+
+## Variáveis de e-mail
+
+Se houver envio de notificações:
+
+```env
+EMAIL_HOST=<host>
+EMAIL_PORT=<porta>
+EMAIL_HOST_USER=<usuario>
+EMAIL_HOST_PASSWORD=<senha>
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=<email-institucional>
+```
+
+## Observações
+
+- Nunca commitar `.env` com valores reais.
+- Manter segredos no painel do provedor de hospedagem ou cofre institucional.
+- Separar variáveis de desenvolvimento, teste e produção.
+- Não reutilizar `SECRET_KEY` entre ambientes.
