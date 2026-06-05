@@ -1375,6 +1375,219 @@
             }
         }
 
+        /* Fase 15L: usabilidade e acessibilidade */
+        .a11y-touch-target,
+        .btn,
+        .nav-link,
+        .dropdown-item,
+        .language-select,
+        .form-control,
+        .form-select {
+            min-height: 44px;
+        }
+
+        .form-label,
+        label {
+            color: var(--ink);
+        }
+
+        .form-text,
+        .helptext {
+            color: #5f5866;
+            line-height: 1.55;
+        }
+
+        .invalid-feedback,
+        .errorlist {
+            color: #8f1f1f;
+            font-weight: 700;
+        }
+
+        .errorlist {
+            list-style: none;
+            padding-left: 0;
+            margin: 0.35rem 0 0;
+        }
+
+        .form-control[aria-invalid="true"],
+        .form-select[aria-invalid="true"],
+        .is-invalid {
+            border-color: #b42318;
+        }
+
+        .alert {
+            border-radius: 18px;
+            border-width: 1px;
+        }
+
+        .table-responsive {
+            border-radius: 18px;
+        }
+
+        .catalog-card,
+        .resource-card,
+        .detail-section,
+        .form-section,
+        .filter-panel,
+        .status-help-card,
+        .metadata-item {
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 767.98px) {
+            body {
+                font-size: 0.96rem;
+            }
+
+            .main-shell {
+                padding-top: 0.85rem;
+                padding-bottom: 1.8rem;
+            }
+
+            .container {
+                padding-left: 0.85rem;
+                padding-right: 0.85rem;
+            }
+
+            .page-shell {
+                border-radius: 20px;
+            }
+
+            .page-inner {
+                padding: 0.85rem;
+            }
+
+            .section-spacious {
+                margin-top: 1.75rem;
+                margin-bottom: 1.75rem;
+            }
+
+            .section-title {
+                letter-spacing: -0.025em;
+            }
+
+            .hero-title,
+            .jc-hero-title {
+                font-size: clamp(1.8rem, 9vw, 2.35rem);
+                line-height: 1.05;
+            }
+
+            .hero-subtitle,
+            .jc-hero-subtitle,
+            .jc-hero-text,
+            .section-subtitle {
+                font-size: 0.95rem;
+                line-height: 1.62;
+            }
+
+            .btn,
+            .btn-brand,
+            .btn-brand-outline,
+            .btn-outline-primary,
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+                white-space: normal;
+                line-height: 1.25;
+                padding-top: 0.78rem;
+                padding-bottom: 0.78rem;
+            }
+
+            .d-flex.flex-wrap.gap-2 .btn,
+            .d-flex.flex-wrap.gap-3 .btn {
+                width: auto;
+                flex: 1 1 220px;
+            }
+
+            .filter-panel .btn,
+            .form-section .btn {
+                width: 100%;
+            }
+
+            .catalog-card,
+            .resource-card,
+            .detail-section,
+            .form-section,
+            .filter-panel,
+            .knowledge-card,
+            .status-help-card {
+                padding: 1rem;
+                border-radius: 18px;
+            }
+
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-value {
+                font-size: 1.55rem;
+            }
+
+            .badge-soft,
+            .badge-status,
+            .status-pill,
+            .type-badge {
+                white-space: normal;
+                text-align: left;
+                line-height: 1.25;
+            }
+
+            .footer-logo-bar {
+                width: 100%;
+                max-width: 720px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .brand-lockup {
+                max-width: 68%;
+            }
+
+            .brand-name {
+                font-size: 0.9rem;
+            }
+
+            .brand-caption {
+                font-size: 0.68rem;
+            }
+
+            .navbar-toggler {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+            }
+
+            .form-control,
+            .form-select {
+                font-size: 1rem;
+            }
+
+            .table {
+                font-size: 0.88rem;
+            }
+        }
+
+        @media (prefers-contrast: more) {
+            :root {
+                --muted: #453d4c;
+                --line: #bdb4c7;
+            }
+
+            .badge-soft,
+            .filter-panel,
+            .catalog-card,
+            .resource-card,
+            .detail-section,
+            .form-section,
+            .metadata-item,
+            .status-help-card {
+                border-color: #8f829b;
+            }
+        }
+
     </style>
 </head>
 <body>
