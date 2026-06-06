@@ -1,134 +1,152 @@
-# olacefs-justica-climatica
+# Plataforma Regional de Boas Práticas em Auditoria com Perspectiva de Justiça Climática
 
-MVP local da **Plataforma Regional de Boas Práticas em Auditoria com Perspectiva de Justiça Climática** para a OLACEFS.
+Plataforma web trilíngue da OLACEFS/AdaptaInfra para reunir, consultar, submeter e revisar boas práticas de auditoria com perspectiva de justiça climática.
 
-## Contexto institucional
+A versão atual é uma **versão de validação** preparada para demonstração institucional, teste externo controlado com EFS e planejamento de ambiente de produção futura. Ela não deve ser tratada como produção institucional definitiva sem a implantação de banco persistente, storage de anexos, backup, domínio oficial, governança editorial e hardening final de segurança.
 
-A plataforma foi concebida para apoiar o intercâmbio técnico entre Entidades Fiscalizadoras Superiores (EFS) da América Latina e Caribe, com foco em auditorias relacionadas à agenda climática e à justiça climática.
+## Mensagem central
 
-## Objetivo do MVP
-
-Disponibilizar uma base funcional para:
-
-- registrar boas práticas de auditoria;
-- consultar experiências por múltiplos filtros;
-- visualizar detalhes técnicos das iniciativas;
-- concentrar referências metodológicas em um banco técnico;
-- apoiar a validação visual e funcional antes de uma futura integração institucional.
+> A Guia orienta; a plataforma demonstra experiências concretas.
 
 ## Escopo funcional atual
 
-O MVP está preparado para uso local, com navegação pública, administração via Django Admin e carga de dados fictícios para demonstração.
+A plataforma contempla:
 
-## Funcionalidades implementadas
+- página inicial institucional;
+- catálogo público de boas práticas;
+- filtros por país, EFS, setor, tipo, tema transversal, dimensão, grupo vulnerável, norma e ano;
+- ficha estruturada da boa prática;
+- recursos técnicos em curadoria;
+- normas internacionais como referências interpretativas;
+- cadastro e login de usuários;
+- formulário de envio de boa prática;
+- salvamento como rascunho e envio para revisão;
+- área “Meus envios”;
+- painel de revisão para staff/revisor;
+- painel de revisão de edições publicadas;
+- favoritos por sessão;
+- comparação de experiências;
+- suporte a português, espanhol e inglês;
+- dados demonstrativos para apresentação;
+- comandos de auditoria e validação da versão.
 
-- Página inicial com visão geral e métricas.
-- Catálogo público de experiências com filtros.
-- Página de detalhe de cada experiência.
-- Banco técnico com recursos de apoio.
-- Página institucional “Sobre”.
-- Administração de dados pelo Django Admin.
-- Comando de carga de dados fictícios.
+## Status da versão
 
-## Estrutura do projeto
+Esta base já passou por uma rodada ampla de retroalimentação e consolidação funcional:
+
+| Fase | Entrega principal |
+|---|---|
+| 15G | Revisão visual das páginas públicas |
+| 15H | Ajustes no formulário de envio |
+| 15I | Revisão/aprovação e edições publicadas |
+| 15J | Conteúdo institucional, recursos técnicos e normas |
+| 15K | Dados demonstrativos para apresentação |
+| 15L | Usabilidade e acessibilidade |
+| 15M | Auditoria trilíngue final |
+| 15N | Autenticação, perfis e permissões |
+| 15O | Validação funcional ponta a ponta |
+| 15P | Materiais de teste externo |
+| 15Q | Documentação técnica de ambiente |
+| 15R | Consolidação da versão de validação |
+| 15S | Entrega final da versão de validação |
+| 16A | Preparação Render/teste externo |
+| 16B | Validação pública do Render |
+
+## Stack
+
+- Python 3.12+ / 3.13 em testes locais;
+- Django 6.x;
+- Django Templates;
+- Bootstrap via CDN;
+- SQLite em ambiente local;
+- PostgreSQL recomendado para teste robusto/produção;
+- Gunicorn + WhiteNoise para deploy;
+- Render como ambiente atual de teste.
+
+## Estrutura principal
 
 ```text
 olacefs-justica-climatica/
-├── config/                         # Configuração Django
+├── config/                         # Configurações Django
 ├── praticas/                       # App principal
-│   ├── management/commands/        # Comandos customizados
-│   ├── migrations/                 # Migrações
+│   ├── management/commands/        # Comandos de carga, auditoria e validação
+│   ├── migrations/                 # Migrações do banco
 │   ├── admin.py
+│   ├── forms.py
 │   ├── models.py
+│   ├── tests*.py
 │   ├── urls.py
 │   └── views.py
 ├── templates/praticas/             # Templates HTML
-├── manage.py
-├── README.md
-├── .gitignore
-├── .editorconfig
-└── .gitattributes
+├── static/                         # Arquivos estáticos versionados
+├── docs/                           # Documentação funcional, técnica e release
+├── .github/workflows/              # GitHub Actions
+├── build.sh
+├── render.yaml
+├── requirements.txt
+└── manage.py
 ```
-
-## Stack utilizada
-
-- Python
-- Django
-- SQLite para ambiente local
-- Django Templates
-- Bootstrap 5 via CDN
-
-## Requisitos locais
-
-- Python 3.10 ou superior
-- pip atualizado
-- Ambiente virtual com `venv`
 
 ## Instalação local
 
-### 1. Clonar o repositório
+### 1. Clonar repositório
 
 ```powershell
 git clone <url-do-repositorio>
 cd olacefs-justica-climatica
 ```
 
-### 2. Criar o ambiente virtual
+### 2. Criar e ativar ambiente virtual
 
 ```powershell
 python -m venv venv
+.env\Scripts\Activate.ps1
 ```
 
-### 3. Ativar o ambiente virtual no Windows PowerShell
+### 3. Instalar dependências
 
 ```powershell
-.\venv\Scripts\Activate.ps1
-```
-
-Se o PowerShell bloquear a execução do script, rode:
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-.\venv\Scripts\Activate.ps1
-```
-
-### 4. Instalar dependências
-
-```powershell
-pip install django
-```
-
-Se existir um arquivo `requirements.txt`, use:
-
-```powershell
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 5. Rodar as migrações
+### 4. Configurar variáveis locais
+
+Para desenvolvimento local simples, as configurações padrão permitem rodar a aplicação. Para simular ambiente mais próximo de teste/produção, defina:
+
+```powershell
+$env:SECRET_KEY="dev-secret-key-local"
+$env:DEBUG="True"
+$env:ALLOWED_HOSTS="127.0.0.1,localhost"
+```
+
+Para produção/teste hospedado, use variáveis reais no provedor e mantenha `DEBUG=False`.
+
+### 5. Aplicar migrações
 
 ```powershell
 python manage.py migrate
 ```
 
-### 6. Carregar dados fictícios
+### 6. Carregar dados demonstrativos
 
 ```powershell
-python manage.py carregar_dados_ficticios
+python manage.py carregar_dados_ficticios --limpar-demo
 ```
 
-### 7. Criar superusuário
+### 7. Criar usuário administrador
 
 ```powershell
 python manage.py createsuperuser
 ```
 
-### 8. Rodar o servidor local
+### 8. Rodar servidor local
 
 ```powershell
 python manage.py runserver
 ```
 
-A aplicação ficará disponível em:
+Acesse:
 
 ```text
 http://127.0.0.1:8000/
@@ -139,130 +157,162 @@ http://127.0.0.1:8000/
 | Rota | Descrição |
 |---|---|
 | `/` | Página inicial |
-| `/catalogo/` | Catálogo de experiências |
-| `/experiencias/<int:pk>/` | Detalhe da experiência |
-| `/banco-tecnico/` | Banco técnico |
+| `/catalogo/` | Catálogo de boas práticas |
+| `/experiencias/<id>/` | Ficha da boa prática |
+| `/banco-tecnico/` | Recursos técnicos |
+| `/normas-internacionais/` | Normas internacionais |
 | `/sobre/` | Sobre a plataforma |
+| `/cadastro/` | Cadastro de usuário |
+| `/entrar/` | Login |
+| `/adicionar-boa-pratica/` | Envio de boa prática, exige login |
+| `/meus-envios/` | Envios do usuário autenticado |
+| `/painel-revisao/` | Painel de revisão, exige staff |
+| `/painel-revisao-edicoes/` | Revisão de edições publicadas, exige staff |
 | `/admin/` | Django Admin |
+| `/en/` | Versão em inglês |
+| `/es/` | Versão em espanhol |
 
-## Como acessar o Django Admin
+## Comandos úteis
 
-1. Crie um superusuário:
-
-```powershell
-python manage.py createsuperuser
-```
-
-2. Rode o servidor:
+### Testes
 
 ```powershell
-python manage.py runserver
+python manage.py test
 ```
 
-3. Acesse:
-
-```text
-http://127.0.0.1:8000/admin/
-```
-
-4. Entre com o usuário e senha criados.
-
-## Dados fictícios
-
-O comando abaixo popula o banco com conteúdo de demonstração:
+### Auditoria trilíngue
 
 ```powershell
-python manage.py carregar_dados_ficticios
+python manage.py auditar_traducoes_trilingues
 ```
 
-Esses dados não representam uma base oficial institucional. Eles servem apenas para validação visual, funcional e técnica do MVP.
-
-Caso seja necessário reiniciar a base local:
+### Auditoria de autenticação e perfis
 
 ```powershell
-Remove-Item db.sqlite3 -ErrorAction SilentlyContinue
+python manage.py auditar_autenticacao_perfis
+```
+
+### Validação ponta a ponta
+
+```powershell
+python manage.py validar_fluxo_ponta_a_ponta
+```
+
+### Checagem técnica de ambiente
+
+```powershell
+python manage.py checar_prontidao_ambiente
+```
+
+### Validação de release
+
+```powershell
+python manage.py validar_release_validacao
+```
+
+### Entrega final
+
+```powershell
+python manage.py validar_entrega_final
+```
+
+### Preparação Render/teste externo
+
+```powershell
+python manage.py preparar_checklist_render
+```
+
+### Auditoria da URL pública do Render
+
+```powershell
+python manage.py auditar_render_publico --url https://olacefs-justica-climatica.onrender.com/
+```
+
+Se houver cold start no Render gratuito:
+
+```powershell
+python manage.py auditar_render_publico --url https://olacefs-justica-climatica.onrender.com/ --timeout 90 --tentativas 5
+```
+
+## Deploy no Render
+
+Arquivos relacionados:
+
+- `render.yaml`;
+- `build.sh`;
+- `Procfile`;
+- `DEPLOY_RENDER.md`;
+- `ADMIN_RENDER.md`;
+- `docs/render/`.
+
+Comandos executados no build atual:
+
+```bash
+pip install -r requirements.txt
+python manage.py collectstatic --no-input
 python manage.py migrate
 python manage.py carregar_dados_ficticios
+python manage.py criar_admin_render
 ```
 
-## Migração futura para PostgreSQL/RDS
+Para ambiente de teste externo, recomenda-se revisar `docs/render/checklist_render_teste_externo.md`.
 
-Para evolução do ambiente local para ambiente institucional, recomenda-se:
+## Segurança: estado atual e limites
 
-- migrar de SQLite para PostgreSQL;
-- externalizar credenciais em variáveis de ambiente;
-- preparar o uso de banco gerenciado, como RDS ou equivalente;
-- revisar políticas de backup, monitoramento e segurança;
-- definir estratégia de armazenamento para anexos e arquivos;
-- estruturar ambiente de homologação antes de produção.
+A base possui controles importantes:
 
-## Boas práticas para desenvolvimento local
+- `DEBUG=False` por padrão;
+- `ALLOWED_HOSTS` configurável por ambiente;
+- `CSRF_TRUSTED_ORIGINS` configurável;
+- cookies seguros quando `DEBUG=False`;
+- validação de upload por extensão e tamanho;
+- limite de 3 anexos por experiência;
+- painéis de revisão protegidos por `staff_member_required`;
+- ações de favoritos via POST;
+- auditorias automatizadas de autenticação/perfis e fluxo ponta a ponta.
 
-- Não versionar `venv/`, `db.sqlite3`, `media/`, `__pycache__/` e arquivos temporários.
-- Executar `python manage.py check` antes de validar entregas.
-- Testar as rotas principais após alterações de templates.
-- Evitar mudanças em modelos sem necessidade real de migração.
-- Fazer alterações incrementais e fáceis de revisar.
-- Preferir VS Code em vez de Bloco de Notas para edições maiores.
+Pontos que ainda exigem atenção antes de produção real:
 
-## Cuidados com encoding no Windows
+- substituir edição baseada apenas em e-mail/link por autenticação/autorização mais forte;
+- validar vínculo institucional da pessoa usuária com uma EFS;
+- migrar para banco persistente;
+- configurar storage persistente para anexos;
+- revisar política de privacidade/termos de uso;
+- definir governança editorial formal;
+- habilitar HSTS/SSL redirect apenas após domínio HTTPS definitivo;
+- usar antivírus ou serviço de varredura para anexos em produção;
+- remover artefatos de desenvolvimento indevidos, se aparecerem em `templates/` ou em diretórios duplicados.
 
-Em alguns ambientes Windows podem ocorrer textos com encoding quebrado, por exemplo:
+## Dados demonstrativos
 
-```text
-JustiÃ§a
-ClimÃ¡tica
-CatÃ¡logo
-PaÃ­ses
-```
-
-Recomendações:
-
-- manter arquivos em UTF-8;
-- usar VS Code com encoding UTF-8;
-- revisar acentuação ao editar templates e comandos;
-- nos templates HTML, priorizar entidades HTML quando necessário, como:
-  - `&ccedil;`
-  - `&aacute;`
-  - `&otilde;es`
-  - `&agrave;`
-  - `&ecirc;`
-
-## Validação antes de commit
-
-Antes de subir alterações para o GitHub, rode:
+Os dados gerados por `carregar_dados_ficticios` são apenas para validação e apresentação. Eles não constituem conteúdo oficial da OLACEFS ou das EFS.
 
 ```powershell
-python manage.py check
+python manage.py carregar_dados_ficticios --limpar-demo
 ```
 
-Verifique se há resíduos de encoding:
+## Teste externo
+
+Materiais de apoio:
+
+- `docs/teste_externo/roteiro_teste_externo.md`;
+- `docs/teste_externo/checklist_teste_externo.md`;
+- `docs/teste_externo/perguntas_feedback_teste_externo.md`;
+- `docs/teste_externo/preparacao_ambiente_teste_externo.md`;
+- `docs/teste_externo/mensagem_envio_link_teste.md`.
+
+## Checklist antes de enviar link externo
 
 ```powershell
-Select-String -Path .\templates\praticas\*.html,.\praticas\*.py,.\praticas\management\commands\*.py -Pattern "Ã","Â","â","�" | Select-Object Path,LineNumber,Line
+python manage.py test
+python manage.py auditar_traducoes_trilingues
+python manage.py auditar_autenticacao_perfis
+python manage.py validar_fluxo_ponta_a_ponta
+python manage.py checar_prontidao_ambiente
+python manage.py validar_entrega_final
+python manage.py auditar_render_publico --url https://olacefs-justica-climatica.onrender.com/
 ```
 
-O ideal é esse comando não retornar nenhum resultado.
+## Licença e governança
 
-Depois teste localmente:
-
-```powershell
-python manage.py runserver
-```
-
-E acesse:
-
-```text
-http://127.0.0.1:8000/
-```
-
-## Próximos passos sugeridos
-
-- Melhorar o design visual da interface pública.
-- Adicionar paginação no catálogo.
-- Evoluir filtros com melhorias de performance.
-- Adicionar autenticação por perfis de usuário.
-- Incorporar trilha de auditoria de alterações.
-- Criar fluxo de validação/publicação de experiências.
-- Preparar integração com base de dados institucional.
-- Avaliar migração para PostgreSQL/RDS.
+Definir conforme orientação institucional da OLACEFS/GIZ antes de publicação ampla ou produção oficial.
