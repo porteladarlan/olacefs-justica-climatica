@@ -12,6 +12,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
 
 from .forms import (
     ConsultaStatusForm,
@@ -212,6 +213,7 @@ def salvar_favoritos_ids(request, ids):
     request.session.modified = True
 
 
+@require_POST
 def alternar_favorito(request, pk):
     experiencia = get_object_or_404(experiencias_publicas(), pk=pk)
     ids = favoritos_ids(request)
