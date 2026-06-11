@@ -123,6 +123,11 @@ EXPERIENCIA_LABELS = {
         "es": "Replicabilidad",
         "en": "Replicability",
     },
+    "informacoes_adicionais": {
+        "pt": "Informações adicionais",
+        "es": "Información adicional",
+        "en": "Additional information",
+    },
     "ano_execucao": {
         "pt": "Ano",
         "es": "Año",
@@ -151,10 +156,25 @@ EXPERIENCIA_HELP_TEXTS = {
         "es": "Marque los marcos internacionales relacionados, como el Acuerdo de París o los ODS.",
         "en": "Select related international frameworks, such as the Paris Agreement or the SDGs.",
     },
+    "criterios_utilizados": {
+        "pt": "Critérios não são apenas normas. Inclua normas, políticas, planos, parâmetros técnicos, indicadores, linhas de base ou referências usadas para avaliar a prática.",
+        "es": "Los criterios no son solamente normas. Incluya normas, políticas, planes, parámetros técnicos, indicadores, líneas de base o referencias usadas para evaluar la práctica.",
+        "en": "Criteria are not only legal standards. Include standards, policies, plans, technical parameters, indicators, baselines or references used to assess the practice.",
+    },
+    "metodologia": {
+        "pt": "Descreva a abordagem geral do trabalho: como a experiência foi planejada, executada e analisada.",
+        "es": "Describa el enfoque general del trabajo: cómo se planificó, ejecutó y analizó la experiencia.",
+        "en": "Describe the overall work approach: how the experience was planned, implemented and analysed.",
+    },
     "ferramentas_utilizadas": {
-        "pt": "Exemplos: perguntas, matrizes, checklists, metodologias, painéis ou bases de dados.",
-        "es": "Ejemplos: preguntas, matrices, listas de verificación, metodologías, paneles o bases de datos.",
-        "en": "Examples: questions, matrices, checklists, methodologies, dashboards or databases.",
+        "pt": "Liste instrumentos específicos usados dentro da metodologia, como matrizes, checklists, bases de dados, painéis, roteiros ou modelos.",
+        "es": "Enumere instrumentos específicos usados dentro de la metodología, como matrices, listas de verificación, bases de datos, paneles, guías o modelos.",
+        "en": "List specific instruments used within the methodology, such as matrices, checklists, databases, dashboards, guides or templates.",
+    },
+    "informacoes_adicionais": {
+        "pt": "Use este campo para registrar observações complementares, contexto institucional ou informações que não se encaixem nos campos anteriores.",
+        "es": "Use este campo para registrar observaciones complementarias, contexto institucional o información que no encaje en los campos anteriores.",
+        "en": "Use this field to record complementary observations, institutional context or information that does not fit the previous fields.",
     },
     "titulo": {
         "pt": "Use um título curto e específico, que identifique claramente a experiência.",
@@ -213,6 +233,7 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "resultados",
             "recomendacoes",
             "replicabilidade",
+            "informacoes_adicionais",
             "ano_execucao",
         ]
         widgets = {
@@ -236,6 +257,7 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "resultados": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "recomendacoes": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "replicabilidade": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "informacoes_adicionais": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
             "ano_execucao": forms.NumberInput(attrs={"class": "form-control"}),
         }
 

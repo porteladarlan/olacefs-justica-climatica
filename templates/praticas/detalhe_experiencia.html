@@ -192,7 +192,11 @@
                         {% endif %}
                         {% if experiencia.replicabilidade_exibicao %}
                             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</h3>
-                            <p class="section-subtitle mb-0">{{ experiencia.replicabilidade_exibicao }}</p>
+                            <p class="section-subtitle">{{ experiencia.replicabilidade_exibicao }}</p>
+                        {% endif %}
+                        {% if experiencia.informacoes_adicionais_exibicao %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Additional information{% elif LANGUAGE_CODE == 'es' %}Informaci&oacute;n adicional{% else %}Informa&ccedil;&otilde;es adicionais{% endif %}</h3>
+                            <p class="section-subtitle mb-0">{{ experiencia.informacoes_adicionais_exibicao }}</p>
                         {% endif %}
                     </div>
                 </div>

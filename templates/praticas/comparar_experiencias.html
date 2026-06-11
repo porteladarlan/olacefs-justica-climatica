@@ -249,6 +249,12 @@
                         {% endfor %}
                     </tr>
                     <tr>
+                        <th>{% if LANGUAGE_CODE == 'en' %}Additional information{% elif LANGUAGE_CODE == 'es' %}Informaci&oacute;n adicional{% else %}Informa&ccedil;&otilde;es adicionais{% endif %}</th>
+                        {% for experiencia in experiencias_selecionadas|slice:":3" %}
+                            <td>{{ experiencia.informacoes_adicionais_exibicao|default:"-" }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
                         <th>{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</th>
                         {% for experiencia in experiencias_selecionadas|slice:":3" %}
                             <td>{{ experiencia.replicabilidade_exibicao|default:"-" }}</td>
