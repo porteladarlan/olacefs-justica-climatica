@@ -85,14 +85,14 @@ class Command(BaseCommand):
 
     def criar_efs(self, paises):
         dados = [
-            ("TCU", "Tribunal de Cuentas de la Unión de Brasil", "Tribunal de Cuentas de la Unión de Brasil", "Tribunal de Cuentas de la Unión de Brasil", "BRA"),
-            ("CGR Chile", "Contraloria General de la República de Chile", "Contraloria General de la República de Chile", "Contraloria General de la República de Chile", "CHL"),
-            ("CGR Colombia", "Contraloria General de la República de Colombia", "Contraloria General de la República de Colombia", "Contraloria General de la República de Colombia", "COL"),
-            ("CGE Ecuador", "Contraloría General del Estado de Ecuador", "Contraloría General del Estado de Ecuador", "Contraloría General del Estado de Ecuador", "ECU"),
-            ("CGR Paraguay", "Contraloría General de la República de Paraguay", "Contraloría General de la República de Paraguay", "Contraloría General de la República de Paraguay", "PRY"),
-            ("ASF", "Auditoría Superior de la Federación de México", "Auditoría Superior de la Federación de México", "Auditoría Superior de la Federación de México", "MEX"),
-            ("CGR Costa Rica", "Contraloria General de la República de Costa Rica", "Contraloria General de la República de Costa Rica", "Contraloria General de la República de Costa Rica", "CRI"),
-            ("SOAB Curaçao", "Contraloria General de la República de Curazao", "Contraloria General de la República de Curazao", "Contraloria General de la República de Curazao", "CUW"),
+            ("TCU", "Tribunal de Contas da União do Brasil", "Tribunal de Cuentas de la Unión de Brasil", "Federal Court of Accounts of Brazil", "BRA"),
+            ("CGR Chile", "Controladoria Geral da República do Chile", "Contraloria General de la República de Chile", "Comptroller General of the Republic of Chile", "CHL"),
+            ("CGR Colombia", "Controladoria Geral da República da Colômbia", "Contraloria General de la República de Colombia", "Comptroller General of the Republic of Colombia", "COL"),
+            ("CGE Ecuador", "Controladoria Geral do Estado do Equador", "Contraloría General del Estado de Ecuador", "Comptroller General of the State of Ecuador", "ECU"),
+            ("CGR Paraguay", "Controladoria Geral da República do Paraguai", "Contraloría General de la República de Paraguay", "Comptroller General of the Republic of Paraguay", "PRY"),
+            ("ASF", "Auditoria Superior da Federação do México", "Auditoría Superior de la Federación de México", "Superior Audit Office of the Federation of Mexico", "MEX"),
+            ("CGR Costa Rica", "Controladoria Geral da República da Costa Rica", "Contraloria General de la República de Costa Rica", "Comptroller General of the Republic of Costa Rica", "CRI"),
+            ("SOAB Curaçao", "Controladoria Geral da República de Curaçao", "Contraloria General de la República de Curazao", "Comptroller General of the Republic of Curaçao", "CUW"),
         ]
         objetos = {}
         for sigla, nome, nome_es, nome_en, pais_sigla in dados:
