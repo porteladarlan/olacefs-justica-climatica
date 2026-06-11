@@ -651,6 +651,7 @@ CAMPOS_COMPARACAO_EDICAO = [
     ("resultados", "Resultados"),
     ("recomendacoes", "Recomendações"),
     ("replicabilidade", "Replicabilidade"),
+    ("informacoes_adicionais", "Informações adicionais"),
     ("ano_execucao", "Ano"),
     ("contribui_para_guia", "Contribui para a Guia"),
 ]
@@ -764,7 +765,23 @@ def aplicar_proposta_edicao(proposta):
     for campo in ExperienciaSubmissaoForm.Meta.fields:
         if campo in campos_fk or campo in campos_many_to_many:
             continue
-        setattr(experiencia, campo, dados.get(campo))
+
+        # Propostas criadas antes da inclusão de novos campos podem não trazer
+        # todas as chaves no JSON. Nesses casos, preserva-se o valor atual para
+        # evitar sobrescrever campos novos com None e violar restrições NOT NULL.
+        if campo not in dados:
+            continue
+
+        valor = dados.get(campo)
+        try:
+            campo_modelo = Experiencia._meta.get_field(campo)
+        except Exception:
+            campo_modelo = None
+
+        if valor is None and campo_modelo is not None and not getattr(campo_modelo, "null", False):
+            valor = ""
+
+        setattr(experiencia, campo, valor)
 
     experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
     experiencia.save()
