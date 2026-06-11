@@ -151,6 +151,30 @@
         </div>
     </div>
 
+
+    <div class="col-12">
+        <div class="form-section form-step">
+            <div class="form-step-header">
+                <span class="step-number">5</span>
+                <div>
+                    <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Additional information{% elif LANGUAGE_CODE == 'es' %}Informaci&oacute;n adicional{% else %}Informa&ccedil;&otilde;es adicionais{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Optional space for complementary comments that do not fit the previous fields.{% elif LANGUAGE_CODE == 'es' %}Espacio opcional para comentarios complementarios que no encajen en los campos anteriores.{% else %}Espa&ccedil;o opcional para coment&aacute;rios complementares que n&atilde;o se encaixem nos campos anteriores.{% endif %}</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-semibold">
+                        {{ form.informacoes_adicionais.label }}
+                        {% if form.informacoes_adicionais.help_text %}<span class="info-hint" title="{{ form.informacoes_adicionais.help_text }}">i</span>{% endif %}
+                    </label>
+                    {{ form.informacoes_adicionais }}
+                    {% if form.informacoes_adicionais.help_text %}<div class="form-text">{{ form.informacoes_adicionais.help_text }}</div>{% endif %}
+                    {% for error in form.informacoes_adicionais.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
         <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
         <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>

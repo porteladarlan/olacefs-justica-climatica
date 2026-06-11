@@ -291,6 +291,10 @@ class Experiencia(models.Model):
     replicabilidade_es = models.TextField(blank=True)
     replicabilidade_en = models.TextField(blank=True)
 
+    informacoes_adicionais = models.TextField(blank=True)
+    informacoes_adicionais_es = models.TextField(blank=True)
+    informacoes_adicionais_en = models.TextField(blank=True)
+
     necessidades_para_replicacao = models.TextField(blank=True)
     necessidades_para_replicacao_es = models.TextField(blank=True)
     necessidades_para_replicacao_en = models.TextField(blank=True)
@@ -427,6 +431,14 @@ class Experiencia(models.Model):
             self.ferramentas_metodologias_uteis,
             self.ferramentas_metodologias_uteis_es,
             self.ferramentas_metodologias_uteis_en,
+        )
+
+    @property
+    def informacoes_adicionais_exibicao(self):
+        return texto_por_idioma(
+            self.informacoes_adicionais,
+            self.informacoes_adicionais_es,
+            self.informacoes_adicionais_en,
         )
 
 
