@@ -14,7 +14,7 @@ class Fase16FRetroalimentacaoTests(TestCase):
     def test_taxonomias_da_retroalimentacao_estao_disponiveis(self):
         self.assertTrue(Pais.objects.filter(sigla="BLZ", nome_es="Bélice").exists())
         self.assertTrue(Pais.objects.filter(sigla="OUTRO", nome_es="Otro").exists())
-        self.assertTrue(EFS.objects.filter(sigla="ASF-MEX", nome__icontains="Federación de México").exists())
+        self.assertTrue(EFS.objects.filter(sigla="ASF", nome__icontains="Federación de México").exists())
         self.assertTrue(EFS.objects.filter(sigla="TCE-PA", nome__icontains="Estado de Pará").exists())
         self.assertTrue(Setor.objects.filter(nome="Outro", nome_es="Otro", nome_en="Other").exists())
         self.assertTrue(TemaTransversal.objects.filter(nome="Crianças", nome_es__icontains="Niños").exists())
