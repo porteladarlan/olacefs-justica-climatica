@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import get_language
 
@@ -185,6 +186,14 @@ class Experiencia(models.Model):
         APROVADO = "aprovado", "Aprovado"
         PUBLICADO = "publicado", "Publicado"
         REJEITADO = "rejeitado", "Rejeitado"
+
+    autor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="boas_praticas_enviadas",
+    )
 
     titulo = models.CharField(max_length=220)
     titulo_es = models.CharField(max_length=220, blank=True)
@@ -493,6 +502,7 @@ class PropostaEdicaoExperiencia(models.Model):
 
 
 class BancoTecnico(models.Model):
+
     titulo = models.CharField(max_length=220)
     titulo_es = models.CharField(max_length=220, blank=True)
     titulo_en = models.CharField(max_length=220, blank=True)
