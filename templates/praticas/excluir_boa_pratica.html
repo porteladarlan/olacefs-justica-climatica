@@ -1,0 +1,61 @@
+{% extends 'praticas/base.html' %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %} | Plataforma Regional{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <div class="section-kicker">
+        {% if LANGUAGE_CODE == 'en' %}Restricted administrative action{% elif LANGUAGE_CODE == 'es' %}Acción administrativa restringida{% else %}Ação administrativa restrita{% endif %}
+    </div>
+    <h1 class="section-title display-6 mb-2">
+        {% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}
+    </h1>
+    <p class="section-subtitle mb-0">
+        {% if LANGUAGE_CODE == 'en' %}
+            This action permanently removes the record from the platform, including related review data and attachments registered in the system.
+        {% elif LANGUAGE_CODE == 'es' %}
+            Esta acción elimina permanentemente el registro de la plataforma, incluidos los datos de revisión y anexos registrados en el sistema.
+        {% else %}
+            Esta ação remove permanentemente o registro da plataforma, incluindo dados de revisão e anexos cadastrados no sistema.
+        {% endif %}
+    </p>
+</section>
+
+<section class="detail-section mb-4">
+    <div class="alert alert-danger mb-4">
+        <strong>
+            {% if LANGUAGE_CODE == 'en' %}Attention:{% elif LANGUAGE_CODE == 'es' %}Atención:{% else %}Atenção:{% endif %}
+        </strong>
+        {% if LANGUAGE_CODE == 'en' %}
+            deletion cannot be undone through the platform interface.
+        {% elif LANGUAGE_CODE == 'es' %}
+            la eliminación no se puede deshacer desde la interfaz de la plataforma.
+        {% else %}
+            a exclusão não poderá ser desfeita pela interface da plataforma.
+        {% endif %}
+    </div>
+
+    <h2 class="section-title h4 mb-2">{{ experiencia.titulo_exibicao }}</h2>
+    <p class="section-subtitle mb-3">{{ experiencia.descricao_exibicao|truncatechars:360 }}</p>
+
+    <div class="text-muted small mb-4">
+        <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }} &bull;
+        <strong>{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}:</strong> {{ experiencia.pais.nome_exibicao }} &bull;
+        <strong>Status:</strong> {{ experiencia.get_status_publicacao_display }}
+    </div>
+
+    <form method="post" class="d-flex flex-column flex-sm-row gap-2">
+        {% csrf_token %}
+        <input type="hidden" name="confirmar_exclusao" value="sim">
+        <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+        <button type="submit" class="btn btn-danger">
+            {% if LANGUAGE_CODE == 'en' %}Yes, delete permanently{% elif LANGUAGE_CODE == 'es' %}Sí, eliminar definitivamente{% else %}Sim, excluir definitivamente{% endif %}
+        </button>
+        <a href="{{ request.GET.next|default:'javascript:history.back()' }}" class="btn btn-outline-secondary">
+            {% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}
+        </a>
+    </form>
+</section>
+{% endblock %}

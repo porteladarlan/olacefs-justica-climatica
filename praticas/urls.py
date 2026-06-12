@@ -13,6 +13,7 @@ urlpatterns = [
     path("favoritos/", views.favoritos_experiencias, name="favoritos_experiencias"),
     path("favoritos/alternar/<int:pk>/", views.alternar_favorito, name="alternar_favorito"),
     path("experiencias/<int:pk>/", views.detalhe_experiencia, name="detalhe_experiencia"),
+    path("excluir-boa-pratica/<int:pk>/", views.excluir_boa_pratica, name="excluir_boa_pratica"),
     path("normas-internacionais/", views.normas_internacionais, name="normas_internacionais"),
     path("adicionar-boa-pratica/", views.adicionar_boa_pratica, name="adicionar_boa_pratica"),
     path("editar-boa-pratica/<int:pk>/", views.editar_boa_pratica, name="editar_boa_pratica"),

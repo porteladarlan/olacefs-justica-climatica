@@ -975,6 +975,44 @@ def revisar_edicao_publicada(request, pk):
     )
 
 
+@staff_member_required
+def excluir_boa_pratica(request, pk):
+    experiencia = get_object_or_404(
+        Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related("anexos"),
+        pk=pk,
+    )
+
+    proximo = request.POST.get("next") or request.GET.get("next")
+    if proximo and not url_has_allowed_host_and_scheme(
+        proximo,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        proximo = None
+
+    if request.method == "POST":
+        if request.POST.get("confirmar_exclusao") != "sim":
+            messages.error(request, "Confirmação de exclusão inválida.")
+            return redirect("excluir_boa_pratica", pk=experiencia.pk)
+
+        titulo = experiencia.titulo_exibicao
+        for anexo in experiencia.anexos.all():
+            if anexo.arquivo:
+                anexo.arquivo.delete(save=False)
+        experiencia.delete()
+        messages.success(request, f"Boa prática excluída com sucesso: {titulo}")
+        if proximo:
+            return redirect(proximo)
+        return redirect("catalogo_experiencias")
+
+    return render(
+        request,
+        "praticas/excluir_boa_pratica.html",
+        {
+            "experiencia": experiencia,
+        },
+    )
+
 def banco_tecnico(request):
     recursos = (
         BancoTecnico.objects.select_related("setor")
