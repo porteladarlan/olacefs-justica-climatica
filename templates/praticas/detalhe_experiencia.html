@@ -15,6 +15,11 @@
             {% if LANGUAGE_CODE == 'en' %}Good practice profile{% elif LANGUAGE_CODE == 'es' %}Ficha de buena pr&aacute;ctica{% else %}Ficha da boa pr&aacute;tica{% endif %}
         </span>
         <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
+{% if experiencia.ano_execucao %}
+<div class="mt-2">
+    <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
+</div>
+{% endif %}
         <p class="hero-subtitle mb-0">
             <strong>{{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }}</strong>
             &bull; {{ experiencia.pais.nome_exibicao }}
@@ -24,30 +29,6 @@
 </section>
 
 <section class="metadata-grid mb-4">
-    <div class="metadata-item">
-        <div class="metadata-label">EFS</div>
-        <div class="metadata-value">{{ experiencia.efs.nome_exibicao }}</div>
-    </div>
-    <div class="metadata-item">
-        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;s{% else %}Pa&iacute;s{% endif %}</div>
-        <div class="metadata-value">{{ experiencia.pais.nome_exibicao }}</div>
-    </div>
-    <div class="metadata-item">
-        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Type{% elif LANGUAGE_CODE == 'es' %}Tipo{% else %}Tipo{% endif %}</div>
-        <div class="metadata-value">{{ experiencia.tipo_experiencia.nome_exibicao }}</div>
-    </div>
-    <div class="metadata-item">
-        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</div>
-        <div class="metadata-value">{{ experiencia.setor.nome_exibicao }}</div>
-    </div>
-    <div class="metadata-item">
-        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}A&ntilde;o{% else %}Ano{% endif %}</div>
-        <div class="metadata-value">{{ experiencia.ano_execucao }}</div>
-    </div>
-    <div class="metadata-item">
-        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}</div>
-        <div class="metadata-value">{{ experiencia.contato_referencia|default:"-" }}</div>
-    </div>
     <div class="metadata-item">
         <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Responsible person{% elif LANGUAGE_CODE == 'es' %}Persona responsable{% else %}Pessoa respons&aacute;vel{% endif %}</div>
         <div class="metadata-value">{{ experiencia.pessoa_responsavel|default:"-" }}</div>
