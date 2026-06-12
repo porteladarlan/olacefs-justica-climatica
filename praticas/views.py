@@ -1,4 +1,4 @@
-import json
+﻿import json
 from pathlib import Path
 
 from django.core.exceptions import ValidationError
@@ -36,7 +36,30 @@ from .models import (
     TipoExperiencia,
 )
 
-
+# ConfiguraÃ§Ãµes padrÃ£o para anexos.
+# MantÃ©m compatibilidade com validaÃ§Ãµes de upload em testes e ambiente local.
+ANEXO_LIMITE_POR_EXPERIENCIA = 5
+ANEXO_TAMANHO_MAX_MB = 10
+ANEXO_TAMANHO_MAX_BYTES = ANEXO_TAMANHO_MAX_MB * 1024 * 1024
+ANEXO_TAMANHO_MAXIMO_BYTES = ANEXO_TAMANHO_MAX_BYTES
+ANEXO_EXTENSOES_PERMITIDAS = {
+    ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv",
+    ".png", ".jpg", ".jpeg", ".geojson", ".zip",
+}
+ANEXO_CONTENT_TYPES_PERMITIDOS = {
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/csv",
+    "image/png",
+    "image/jpeg",
+    "application/geo+json",
+    "application/json",
+    "application/zip",
+    "application/x-zip-compressed",
+}
 
 def obter_destino_seguro(request, padrao="meus_envios"):
     destino = request.POST.get("next") or request.GET.get("next")
@@ -64,11 +87,12 @@ STATUS_VISIVEIS_REVISAO = [
 
 
 def experiencia_pertence_ao_usuario(experiencia, usuario, email_informado=None):
+    if usuario and usuario.is_authenticated and usuario.is_staff:
+        return True
+
     email_experiencia = (experiencia.email_contato or "").strip().lower()
     email_informado = (email_informado or "").strip().lower()
 
-    # Mantém compatibilidade com o fluxo legado por e-mail.
-    # Este caso precisa vir antes do bloqueio de usuário anônimo.
     if email_informado and email_experiencia and email_informado == email_experiencia:
         return True
 
@@ -81,25 +105,21 @@ def experiencia_pertence_ao_usuario(experiencia, usuario, email_informado=None):
     email_usuario = (getattr(usuario, "email", "") or "").strip().lower()
     return bool(email_usuario and email_experiencia and email_usuario == email_experiencia)
 
-
 def queryset_meus_envios(usuario):
-    filtros = Q(autor=usuario)
-    email_usuario = (getattr(usuario, "email", "") or "").strip()
-    if email_usuario:
-        filtros |= Q(email_contato__iexact=email_usuario)
+    if not usuario or not usuario.is_authenticated:
+        return Experiencia.objects.none()
+
+    filtros = Q()
+    if getattr(usuario, "email", ""):
+        filtros |= Q(email_contato__iexact=usuario.email)
+    filtros |= Q(autor=usuario)
+
     return (
         Experiencia.objects.filter(filtros)
         .select_related("efs", "pais", "tipo_experiencia", "setor")
-        .order_by("-atualizado_em")
         .distinct()
+        .order_by("-atualizado_em")
     )
-
-
-ANEXO_EXTENSOES_PERMITIDAS = {".pdf", ".doc", ".docx", ".xls", ".xlsx"}
-ANEXO_TAMANHO_MAXIMO_MB = 10
-ANEXO_TAMANHO_MAXIMO_BYTES = ANEXO_TAMANHO_MAXIMO_MB * 1024 * 1024
-ANEXO_LIMITE_POR_EXPERIENCIA = 3
-
 
 def obter_anexos_do_request(request):
     anexos = []
@@ -129,7 +149,7 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
     quantidade_final = quantidade_existente - len(ids_remover) + len(anexos)
     if quantidade_final > ANEXO_LIMITE_POR_EXPERIENCIA:
         erros.append(
-            f"É permitido manter no máximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiência."
+            f"Ã‰ permitido manter no mÃ¡ximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiÃªncia."
         )
 
     for anexo in anexos:
@@ -141,7 +161,7 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
             extensao = Path(arquivo.name).suffix.lower()
             if extensao not in ANEXO_EXTENSOES_PERMITIDAS:
                 erros.append(
-                    f"Anexo {indice}: tipo de arquivo não permitido. Use PDF, Word ou Excel."
+                    f"Anexo {indice}: tipo de arquivo nÃ£o permitido. Use PDF, Word ou Excel."
                 )
             if arquivo.size > ANEXO_TAMANHO_MAXIMO_BYTES:
                 erros.append(
@@ -153,7 +173,7 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
                 validador_url(url)
             except ValidationError:
                 erros.append(
-                    f"Anexo {indice}: informe uma URL válida iniciada por http:// ou https://."
+                    f"Anexo {indice}: informe uma URL vÃ¡lida iniciada por http:// ou https://."
                 )
 
         if not arquivo and not url:
@@ -226,21 +246,18 @@ def login_usuario(request):
 
 def logout_usuario(request):
     logout(request)
-    messages.success(request, "Sessão encerrada com sucesso.")
+    messages.success(request, "SessÃ£o encerrada com sucesso.")
     return redirect("pagina_inicial")
 
 
 @login_required(login_url="login_usuario")
 def meus_envios(request):
     experiencias = queryset_meus_envios(request.user)
-    email_usuario = (request.user.email or "").strip()
-    propostas = PropostaEdicaoExperiencia.objects.none()
-    if email_usuario:
-        propostas = (
-            PropostaEdicaoExperiencia.objects.filter(email_contato__iexact=email_usuario)
-            .select_related("experiencia")
-            .order_by("-atualizado_em")
-        )
+    propostas = (
+        PropostaEdicaoExperiencia.objects.filter(email_contato__iexact=request.user.email)
+        .select_related("experiencia")
+        .order_by("-atualizado_em")
+    )
     return render(request, "praticas/meus_envios.html", {"experiencias": experiencias, "propostas": propostas})
 
 def favoritos_ids(request):
@@ -259,10 +276,10 @@ def alternar_favorito(request, pk):
 
     if experiencia.pk in ids:
         ids = [item for item in ids if item != experiencia.pk]
-        messages.success(request, "Experiência removida dos favoritos.")
+        messages.success(request, "ExperiÃªncia removida dos favoritos.")
     else:
         ids.append(experiencia.pk)
-        messages.success(request, "Experiência adicionada aos favoritos.")
+        messages.success(request, "ExperiÃªncia adicionada aos favoritos.")
 
     salvar_favoritos_ids(request, ids)
     destino = request.POST.get("next") or request.GET.get("next") or "catalogo_experiencias"
@@ -504,10 +521,10 @@ def adicionar_boa_pratica(request):
                 experiencia.pessoa_responsavel = request.user.get_full_name() or request.user.username
             if acao == "rascunho":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão."
+                mensagem = "Rascunho salvo com sucesso. Ele ainda nÃ£o foi enviado para revisÃ£o."
             else:
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
+                mensagem = "Boa prÃ¡tica enviada com sucesso. Ela ficarÃ¡ pendente atÃ© a revisÃ£o."
             experiencia.save()
             form.save_m2m()
             salvar_anexos_submissao(experiencia, anexos)
@@ -543,7 +560,7 @@ def editar_boa_pratica(request, pk):
     if not experiencia_pertence_ao_usuario(experiencia, request.user, email):
         messages.error(
             request,
-            "Não foi possível validar sua permissão para edição deste envio.",
+            "NÃ£o foi possÃ­vel validar sua permissÃ£o para ediÃ§Ã£o deste envio.",
         )
         return redirect("meus_envios" if request.user.is_authenticated else "status_envio")
 
@@ -581,16 +598,16 @@ def editar_boa_pratica(request, pk):
                 experiencia.autor = request.user
             if acao == "rascunho":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = "Alterações salvas como rascunho."
+                mensagem = "AlteraÃ§Ãµes salvas como rascunho."
             else:
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                mensagem = "Boa prática reenviada para revisão."
+                mensagem = "Boa prÃ¡tica reenviada para revisÃ£o."
             experiencia.save()
             form.save_m2m()
             salvar_anexos_submissao(experiencia, anexos)
 
             messages.success(request, mensagem)
-            return redirect(f"/status-envio/?email_contato={experiencia.email_contato}")
+            return redirect("painel_revisao") if request.user.is_authenticated and request.user.is_staff else redirect(f"/status-envio/?email_contato={experiencia.email_contato}")
         adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
         form = ExperienciaSubmissaoForm(instance=experiencia)
@@ -636,7 +653,7 @@ def solicitar_edicao_publicada(request, pk):
 
     email = request.GET.get("email") or request.POST.get("email_contato_original")
     if not email or email.lower() != (experiencia.email_contato or "").lower():
-        messages.error(request, "Não foi possível validar o e-mail informado para solicitar edição.")
+        messages.error(request, "NÃ£o foi possÃ­vel validar o e-mail informado para solicitar ediÃ§Ã£o.")
         return redirect("status_envio")
 
     if request.method == "POST":
@@ -655,7 +672,7 @@ def solicitar_edicao_publicada(request, pk):
             )
             messages.success(
                 request,
-                "Proposta de edição enviada para revisão. A versão publicada permanecerá ativa até aprovação.",
+                "Proposta de ediÃ§Ã£o enviada para revisÃ£o. A versÃ£o publicada permanecerÃ¡ ativa atÃ© aprovaÃ§Ã£o.",
             )
             return redirect(f"/status-envio/?email_contato={email}")
     else:
@@ -674,34 +691,33 @@ def solicitar_edicao_publicada(request, pk):
 
 
 CAMPOS_COMPARACAO_EDICAO = [
-    ("titulo", "Nome da boa prática / iniciativa"),
+    ("titulo", "Nome da boa prÃ¡tica / iniciativa"),
     ("efs", "EFS"),
-    ("pais", "País"),
-    ("tipo_experiencia", "Tipo de boa prática"),
+    ("pais", "PaÃ­s"),
+    ("tipo_experiencia", "Tipo de boa prÃ¡tica"),
     ("setor", "Setor"),
     ("temas_transversais", "Temas transversais"),
     ("normas_internacionais", "Normas internacionais"),
-    ("contato_referencia", "Contato de referência"),
     ("email_contato", "E-mail institucional"),
-    ("pessoa_responsavel", "Pessoa responsável"),
-    ("descricao", "Breve descrição da boa prática"),
-    ("enfoque_justica_climatica", "Vínculo com justiça climática"),
+    ("pessoa_responsavel", "Pessoa responsÃ¡vel"),
+    ("descricao", "Breve descriÃ§Ã£o da boa prÃ¡tica"),
+    ("enfoque_justica_climatica", "VÃ­nculo com justiÃ§a climÃ¡tica"),
     ("objetivo", "Objetivo"),
     ("perguntas_chave", "Perguntas de auditoria"),
-    ("criterios_utilizados", "Critérios utilizados"),
+    ("criterios_utilizados", "CritÃ©rios utilizados"),
     ("metodologia", "Metodologia"),
     ("ferramentas_utilizadas", "Metodologias e instrumentos utilizados"),
     ("resultados", "Resultados"),
-    ("recomendacoes", "Recomendações"),
+    ("recomendacoes", "RecomendaÃ§Ãµes"),
     ("replicabilidade", "Replicabilidade"),
-    ("informacoes_adicionais", "Informações adicionais"),
+    ("informacoes_adicionais", "InformaÃ§Ãµes adicionais"),
     ("ano_execucao", "Ano"),
     ("contribui_para_guia", "Contribui para a Guia"),
 ]
 
 
 def texto_booleano(valor):
-    return "Sim" if valor else "Não"
+    return "Sim" if valor else "NÃ£o"
 
 
 def texto_lista_objetos(objetos):
@@ -809,9 +825,9 @@ def aplicar_proposta_edicao(proposta):
         if campo in campos_fk or campo in campos_many_to_many:
             continue
 
-        # Propostas criadas antes da inclusão de novos campos podem não trazer
+        # Propostas criadas antes da inclusÃ£o de novos campos podem nÃ£o trazer
         # todas as chaves no JSON. Nesses casos, preserva-se o valor atual para
-        # evitar sobrescrever campos novos com None e violar restrições NOT NULL.
+        # evitar sobrescrever campos novos com None e violar restriÃ§Ãµes NOT NULL.
         if campo not in dados:
             continue
 
@@ -927,21 +943,21 @@ def revisar_experiencia(request, pk):
 
             if acao == "em_revisao":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.EM_REVISAO
-                mensagem = "Experiência marcada como em revisão."
+                mensagem = "ExperiÃªncia marcada como em revisÃ£o."
             elif acao == "aprovar":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.APROVADO
-                mensagem = "Experiência aprovada. Ela ainda não está pública."
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
+                mensagem = "ExperiÃªncia aprovada e publicada no catÃ¡logo pÃºblico."
             elif acao == "publicar":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
-                mensagem = "Experiência publicada no catálogo público."
+                mensagem = "ExperiÃªncia publicada no catÃ¡logo pÃºblico."
             elif acao == "devolver":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = "Experiência devolvida para ajustes."
+                mensagem = "ExperiÃªncia devolvida para ajustes."
             elif acao == "rejeitar":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.REJEITADO
-                mensagem = "Experiência rejeitada."
+                mensagem = "ExperiÃªncia rejeitada."
             else:
-                mensagem = "Revisão registrada."
+                mensagem = "RevisÃ£o registrada."
 
             experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
             messages.success(request, mensagem)
@@ -995,16 +1011,16 @@ def revisar_edicao_publicada(request, pk):
 
             if acao == "em_revisao":
                 proposta.status = PropostaEdicaoExperiencia.Status.EM_REVISAO
-                mensagem = "Proposta marcada como em revisão."
+                mensagem = "Proposta marcada como em revisÃ£o."
             elif acao == "aprovar":
                 aplicar_proposta_edicao(proposta)
                 proposta.status = PropostaEdicaoExperiencia.Status.APROVADA
-                mensagem = "Proposta aprovada e aplicada à experiência publicada."
+                mensagem = "Proposta aprovada e aplicada Ã  experiÃªncia publicada."
             elif acao == "rejeitar":
                 proposta.status = PropostaEdicaoExperiencia.Status.REJEITADA
-                mensagem = "Proposta de edição rejeitada."
+                mensagem = "Proposta de ediÃ§Ã£o rejeitada."
             else:
-                mensagem = "Revisão registrada."
+                mensagem = "RevisÃ£o registrada."
 
             proposta.save(update_fields=["status", "comentario_revisor", "atualizado_em"])
             messages.success(request, mensagem)
@@ -1040,7 +1056,7 @@ def excluir_boa_pratica(request, pk):
 
     if request.method == "POST":
         if request.POST.get("confirmar_exclusao") != "sim":
-            messages.error(request, "Confirmação de exclusão inválida.")
+            messages.error(request, "ConfirmaÃ§Ã£o de exclusÃ£o invÃ¡lida.")
             return redirect("excluir_boa_pratica", pk=experiencia.pk)
 
         titulo = experiencia.titulo_exibicao
@@ -1048,7 +1064,7 @@ def excluir_boa_pratica(request, pk):
             if anexo.arquivo:
                 anexo.arquivo.delete(save=False)
         experiencia.delete()
-        messages.success(request, f"Boa prática excluída com sucesso: {titulo}")
+        messages.success(request, f"Boa prÃ¡tica excluÃ­da com sucesso: {titulo}")
         if proximo:
             return redirect(proximo)
         return redirect("catalogo_experiencias")
@@ -1072,3 +1088,4 @@ def banco_tecnico(request):
 
 def sobre_plataforma(request):
     return render(request, "praticas/sobre_plataforma.html")
+

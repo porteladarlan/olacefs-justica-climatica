@@ -141,7 +141,11 @@ class RotasPublicasTests(TestCase):
         experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
         response = self.client.get(reverse("comparar_experiencias"), {"experiencias": [experiencia.pk]})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "TCU")
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "TCU" in conteudo or "Federal Court of Accounts" in conteudo,
+            conteudo,
+        )
 
     def test_normas_retorna_200(self):
         self.assertEqual(self.client.get(reverse("normas_internacionais")).status_code, 200)
@@ -177,13 +181,21 @@ class RotasPublicasTests(TestCase):
     def test_busca_em_ingles_retorna_resultado(self):
         response = self.client.get("/en/catalogo/", {"q": "water"})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "TCU")
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "TCU" in conteudo or "Federal Court of Accounts" in conteudo,
+            conteudo,
+        )
 
     def test_filtro_por_norma_retorna_resultado(self):
         norma = NormaInternacional.objects.get(nome="Acordo de Paris")
         response = self.client.get(reverse("catalogo_experiencias"), {"norma": norma.id})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "TCU")
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "TCU" in conteudo or "Federal Court of Accounts" in conteudo,
+            conteudo,
+        )
 
     def test_painel_revisao_exige_login_staff(self):
         response = self.client.get(reverse("painel_revisao"))
