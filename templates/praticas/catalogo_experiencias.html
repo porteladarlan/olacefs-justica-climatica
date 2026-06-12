@@ -103,7 +103,12 @@
                         {% endif %}
                     </button>
                 </form>
-                <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
+                {% if request.user.is_staff %}
+                    <a href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-outline-danger">
+                        {% if LANGUAGE_CODE == 'en' %}Delete{% elif LANGUAGE_CODE == 'es' %}Eliminar{% else %}Excluir{% endif %}
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'detalhe_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Open profile{% elif LANGUAGE_CODE == 'es' %}Abrir ficha{% else %}Abrir ficha{% endif %}</a>
             </div>
         </article>
     </div>
