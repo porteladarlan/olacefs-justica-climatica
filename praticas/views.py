@@ -524,7 +524,7 @@ def adicionar_boa_pratica(request):
                 mensagem = "Rascunho salvo com sucesso. Ele ainda nÃ£o foi enviado para revisÃ£o."
             else:
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                mensagem = "Boa prÃ¡tica enviada com sucesso. Ela ficarÃ¡ pendente atÃ© a revisÃ£o."
+                mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
             experiencia.save()
             form.save_m2m()
             salvar_anexos_submissao(experiencia, anexos)
@@ -1088,4 +1088,5 @@ def banco_tecnico(request):
 
 def sobre_plataforma(request):
     return render(request, "praticas/sobre_plataforma.html")
+
 
