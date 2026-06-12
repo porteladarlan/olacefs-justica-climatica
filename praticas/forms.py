@@ -58,15 +58,10 @@ EXPERIENCIA_LABELS = {
         "es": "Normas internacionales relacionadas",
         "en": "Related international standards",
     },
-    "contato_referencia": {
-        "pt": "Contato de referência da EFS",
-        "es": "Contacto de referencia de la EFS",
-        "en": "SAI reference contact",
-    },
-    "email_contato": {
-        "pt": "E-mail institucional de referência",
-        "es": "Correo institucional de referencia",
-        "en": "Reference institutional e-mail",
+        "email_contato": {
+        "pt": "E-mail",
+        "es": "Correo electrónico",
+        "en": "E-mail",
     },
     "pessoa_responsavel": {
         "pt": "Pessoa responsável",
@@ -181,15 +176,10 @@ EXPERIENCIA_HELP_TEXTS = {
         "es": "Use un título breve y específico, que identifique claramente la experiencia.",
         "en": "Use a short and specific title that clearly identifies the experience.",
     },
-    "contato_referencia": {
-        "pt": "Informe a pessoa ou área de referência para eventuais contatos institucionais.",
-        "es": "Indique la persona o área de referencia para eventuales contactos institucionales.",
-        "en": "Provide the reference person or unit for possible institutional contact.",
-    },
     "email_contato": {
-        "pt": "Use preferencialmente um e-mail institucional vinculado à EFS.",
-        "es": "Use preferentemente un correo institucional vinculado a la EFS.",
-        "en": "Preferably use an institutional e-mail linked to the SAI.",
+        "pt": "Informe o e-mail institucional para acompanhar o envio e receber orientações de revisão.",
+        "es": "Informe el correo institucional para acompañar el envío y recibir orientaciones de revisión.",
+        "en": "Provide the institutional e-mail to track the submission and receive review guidance.",
     },
     "ano_execucao": {
         "pt": "Informe o ano principal de execução ou conclusão da experiência.",
@@ -210,6 +200,22 @@ def aplicar_textos_experiencia(form):
 
 
 class ExperienciaSubmissaoForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Fase 16K: manter apenas e-mail no formulario publico de envio.
+        # O campo legado contato_referencia pode continuar no modelo/banco,
+        # mas nao deve ser exibido nem validado no formulario publico.
+        self.fields.pop("contato_referencia", None)
+
+        if "email_contato" in self.fields:
+            self.fields["email_contato"].label = "E-mail"
+            self.fields["email_contato"].help_text = (
+                "Provide the institutional e-mail to track the submission "
+                "and receive review guidance."
+            )
+
     class Meta:
         model = Experiencia
         fields = [
@@ -220,7 +226,6 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "setor",
             "temas_transversais",
             "normas_internacionais",
-            "contato_referencia",
             "email_contato",
             "pessoa_responsavel",
             "descricao",
@@ -244,7 +249,6 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "setor": forms.Select(attrs={"class": "form-select"}),
             "temas_transversais": forms.CheckboxSelectMultiple(),
             "normas_internacionais": forms.CheckboxSelectMultiple(),
-            "contato_referencia": forms.TextInput(attrs={"class": "form-control"}),
             "email_contato": forms.EmailInput(attrs={"class": "form-control"}),
             "pessoa_responsavel": forms.TextInput(attrs={"class": "form-control"}),
             "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
@@ -278,7 +282,6 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "titulo",
             "tipo_experiencia",
             "setor",
-            "contato_referencia",
             "email_contato",
             "descricao",
             "enfoque_justica_climatica",
