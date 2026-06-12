@@ -55,6 +55,46 @@ def experiencias_publicas():
     )
 
 
+STATUS_VISIVEIS_REVISAO = [
+    Experiencia.StatusPublicacao.ENVIADO,
+    Experiencia.StatusPublicacao.EM_REVISAO,
+    Experiencia.StatusPublicacao.APROVADO,
+    Experiencia.StatusPublicacao.REJEITADO,
+]
+
+
+def experiencia_pertence_ao_usuario(experiencia, usuario, email_informado=None):
+    email_experiencia = (experiencia.email_contato or "").strip().lower()
+    email_informado = (email_informado or "").strip().lower()
+
+    # Mantém compatibilidade com o fluxo legado por e-mail.
+    # Este caso precisa vir antes do bloqueio de usuário anônimo.
+    if email_informado and email_experiencia and email_informado == email_experiencia:
+        return True
+
+    if not usuario or not usuario.is_authenticated:
+        return False
+
+    if getattr(experiencia, "autor_id", None) and experiencia.autor_id == usuario.id:
+        return True
+
+    email_usuario = (getattr(usuario, "email", "") or "").strip().lower()
+    return bool(email_usuario and email_experiencia and email_usuario == email_experiencia)
+
+
+def queryset_meus_envios(usuario):
+    filtros = Q(autor=usuario)
+    email_usuario = (getattr(usuario, "email", "") or "").strip()
+    if email_usuario:
+        filtros |= Q(email_contato__iexact=email_usuario)
+    return (
+        Experiencia.objects.filter(filtros)
+        .select_related("efs", "pais", "tipo_experiencia", "setor")
+        .order_by("-atualizado_em")
+        .distinct()
+    )
+
+
 ANEXO_EXTENSOES_PERMITIDAS = {".pdf", ".doc", ".docx", ".xls", ".xlsx"}
 ANEXO_TAMANHO_MAXIMO_MB = 10
 ANEXO_TAMANHO_MAXIMO_BYTES = ANEXO_TAMANHO_MAXIMO_MB * 1024 * 1024
@@ -192,16 +232,15 @@ def logout_usuario(request):
 
 @login_required(login_url="login_usuario")
 def meus_envios(request):
-    experiencias = (
-        Experiencia.objects.filter(email_contato__iexact=request.user.email)
-        .select_related("efs", "pais", "tipo_experiencia", "setor")
-        .order_by("-atualizado_em")
-    )
-    propostas = (
-        PropostaEdicaoExperiencia.objects.filter(email_contato__iexact=request.user.email)
-        .select_related("experiencia")
-        .order_by("-atualizado_em")
-    )
+    experiencias = queryset_meus_envios(request.user)
+    email_usuario = (request.user.email or "").strip()
+    propostas = PropostaEdicaoExperiencia.objects.none()
+    if email_usuario:
+        propostas = (
+            PropostaEdicaoExperiencia.objects.filter(email_contato__iexact=email_usuario)
+            .select_related("experiencia")
+            .order_by("-atualizado_em")
+        )
     return render(request, "praticas/meus_envios.html", {"experiencias": experiencias, "propostas": propostas})
 
 def favoritos_ids(request):
@@ -443,7 +482,6 @@ def salvar_anexos_submissao(experiencia, anexos):
 
 
 @login_required(login_url="login_usuario")
-@login_required(login_url="login_usuario")
 def adicionar_boa_pratica(request):
     acao = request.POST.get("acao_envio", "enviar")
     obrigatorio_para_envio = acao != "rascunho"
@@ -458,6 +496,7 @@ def adicionar_boa_pratica(request):
 
         if form.is_valid() and not erros_anexos:
             experiencia = form.save(commit=False)
+            experiencia.autor = request.user
             experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
             if request.user.is_authenticated and not experiencia.email_contato:
                 experiencia.email_contato = request.user.email
@@ -475,7 +514,7 @@ def adicionar_boa_pratica(request):
 
             messages.success(request, mensagem)
             if acao == "rascunho":
-                return redirect(f"{request.path}?rascunho_salvo=1")
+                return redirect("meus_envios")
             return redirect("confirmacao_envio")
 
         adicionar_erros_anexos_ao_formulario(form, erros_anexos)
@@ -501,12 +540,14 @@ def editar_boa_pratica(request, pk):
     )
 
     email = request.GET.get("email") or request.POST.get("email_contato_original")
-    if not email or email.lower() != (experiencia.email_contato or "").lower():
+    if not experiencia_pertence_ao_usuario(experiencia, request.user, email):
         messages.error(
             request,
-            "Não foi possível validar o e-mail informado para edição deste envio.",
+            "Não foi possível validar sua permissão para edição deste envio.",
         )
-        return redirect("status_envio")
+        return redirect("meus_envios" if request.user.is_authenticated else "status_envio")
+
+    email = email or experiencia.email_contato or request.user.email
 
     if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
         return redirect(f"/solicitar-edicao-publicada/{experiencia.pk}/?email={email}")
@@ -536,6 +577,8 @@ def editar_boa_pratica(request, pk):
         if form.is_valid() and not erros_anexos:
             Anexo.objects.filter(experiencia=experiencia, id__in=ids_remover).delete()
             experiencia = form.save(commit=False)
+            if request.user.is_authenticated and not experiencia.autor_id:
+                experiencia.autor = request.user
             if acao == "rascunho":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
                 mensagem = "Alterações salvas como rascunho."
@@ -828,20 +871,25 @@ def status_envio(request):
 @staff_member_required
 def painel_revisao(request):
     status = request.GET.get("status", "")
+    status_choices_revisao = [
+        item for item in Experiencia.StatusPublicacao.choices
+        if item[0] in STATUS_VISIVEIS_REVISAO
+    ]
     experiencias = (
-        Experiencia.objects.exclude(status_publicacao=Experiencia.StatusPublicacao.PUBLICADO)
+        Experiencia.objects.filter(status_publicacao__in=STATUS_VISIVEIS_REVISAO)
         .select_related("efs", "pais", "tipo_experiencia", "setor")
         .order_by("-atualizado_em")
     )
 
-    if status:
+    if status in STATUS_VISIVEIS_REVISAO:
         experiencias = experiencias.filter(status_publicacao=status)
+    else:
+        status = ""
 
     contadores = {
         "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
         "em_revisao": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.EM_REVISAO).count(),
         "aprovado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.APROVADO).count(),
-        "rascunho": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.RASCUNHO).count(),
         "rejeitado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.REJEITADO).count(),
         "edicoes_pendentes": PropostaEdicaoExperiencia.objects.filter(status=PropostaEdicaoExperiencia.Status.PENDENTE).count(),
     }
@@ -852,7 +900,7 @@ def painel_revisao(request):
         {
             "experiencias": experiencias,
             "status_atual": status,
-            "status_choices": Experiencia.StatusPublicacao.choices,
+            "status_choices": status_choices_revisao,
             "contadores": contadores,
         },
     )
