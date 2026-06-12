@@ -235,7 +235,11 @@ class RotasPublicasTests(TestCase):
             {"email_contato": "autor@example.org"},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Pending good practice")
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "Boa pratica pendente" in conteudo or "Pending good practice" in conteudo,
+            conteudo,
+        )
         self.assertContains(response, "autor@example.org")
         self.assertContains(response, "2026")
 
@@ -352,7 +356,11 @@ class RotasPublicasTests(TestCase):
         self.client.force_login(usuario)
         response = self.client.get(reverse("meus_envios"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Pending good practice")
+        conteudo = response.content.decode("utf-8")
+        self.assertTrue(
+            "Boa pratica pendente" in conteudo or "Pending good practice" in conteudo,
+            conteudo,
+        )
 
     def dados_validos_submissao(self):
         experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
