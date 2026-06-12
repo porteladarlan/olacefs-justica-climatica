@@ -2,7 +2,11 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %} | {{ experiencia.titulo_exibicao }}{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %} | {{ experiencia.titulo_exibicao }}
+<div class="mt-3">
+    <a class="btn btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">Editar boa prática</a>
+</div>
+{% endblock %}
 
 {% block content %}
 <a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de revisión{% else %}Voltar ao painel de revisão{% endif %}</a>
@@ -19,12 +23,6 @@
 </section>
 
 <section class="metadata-grid mb-4">
-    <div class="metadata-item"><div class="metadata-label">EFS</div><div class="metadata-value">{{ experiencia.efs.nome_exibicao }}</div></div>
-    <div class="metadata-item"><div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}</div><div class="metadata-value">{{ experiencia.pais.nome_exibicao }}</div></div>
-    <div class="metadata-item"><div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Type{% elif LANGUAGE_CODE == 'es' %}Tipo{% else %}Tipo{% endif %}</div><div class="metadata-value">{{ experiencia.tipo_experiencia.nome_exibicao }}</div></div>
-    <div class="metadata-item"><div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</div><div class="metadata-value">{{ experiencia.setor.nome_exibicao }}</div></div>
-    <div class="metadata-item"><div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}Año{% else %}Ano{% endif %}</div><div class="metadata-value">{{ experiencia.ano_execucao }}</div></div>
-    <div class="metadata-item"><div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}</div><div class="metadata-value">{{ experiencia.contato_referencia|default:"-" }}</div></div>
     <div class="metadata-item"><div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Responsible person{% elif LANGUAGE_CODE == 'es' %}Persona responsable{% else %}Pessoa responsável{% endif %}</div><div class="metadata-value">{{ experiencia.pessoa_responsavel|default:"-" }}</div></div>
     <div class="metadata-item"><div class="metadata-label">E-mail</div><div class="metadata-value">{{ experiencia.email_contato|default:"-" }}</div></div>
 </section>
@@ -111,5 +109,9 @@
             </form>
         </section>
     </aside>
+</div>
+
+<div class="mt-3">
+    <a class="btn btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">Editar boa prática</a>
 </div>
 {% endblock %}
