@@ -51,16 +51,16 @@
                 <span class="step-number">1</span>
                 <div>
                     <h2 class="h4 section-title">{% if LANGUAGE_CODE == 'en' %}Identification{% elif LANGUAGE_CODE == 'es' %}Identificaci&oacute;n{% else %}Identifica&ccedil;&atilde;o{% endif %}</h2>
-                    <p>{% if LANGUAGE_CODE == 'en' %}Basic information about the SAI, practice and contact.{% elif LANGUAGE_CODE == 'es' %}Informaci&oacute;n b&aacute;sica sobre la EFS, la pr&aacute;ctica y el contacto.{% else %}Informa&ccedil;&otilde;es b&aacute;sicas sobre a EFS, a pr&aacute;tica e o contato.{% endif %}</p>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Basic information about the SAI, practice and e-mail.{% elif LANGUAGE_CODE == 'es' %}Informaci&oacute;n b&aacute;sica sobre la EFS, la pr&aacute;ctica y el contacto.{% else %}Informa&ccedil;&otilde;es b&aacute;sicas sobre a EFS, a pr&aacute;tica e o contato.{% endif %}</p>
                 </div>
             </div>
             <div class="row g-3">
                 {% for field in form %}
-                    {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                    {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
                     <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
                         <label class="form-label fw-semibold">
                             {{ field.label }}
-                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
                                 <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
                             {% endif %}
                             {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}
@@ -116,7 +116,7 @@
                     <div class="col-12">
                         <label class="form-label fw-semibold">
                             {{ field.label }}
-                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,contato_referencia,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
                                 <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
                             {% endif %}
                             {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}

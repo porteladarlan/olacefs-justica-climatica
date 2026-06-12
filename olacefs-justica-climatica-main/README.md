@@ -212,8 +212,8 @@ Em alguns ambientes Windows podem ocorrer textos com encoding quebrado, por exem
 ```text
 JustiÃ§a
 ClimÃ¡tica
-CatÃ¡logo
-PaÃ­ses
+Catálogo
+Países
 ```
 
 Recomendações:

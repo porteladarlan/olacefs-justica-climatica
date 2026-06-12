@@ -78,9 +78,6 @@
 
             <div class="text-muted small mb-3">
                 <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }}
-                {% if experiencia.contato_referencia %}
-                    &bull; <strong>{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}:</strong> {{ experiencia.contato_referencia }}
-                {% endif %}
             </div>
 
             <div class="border-top pt-3 mt-3">

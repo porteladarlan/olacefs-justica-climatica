@@ -38,7 +38,6 @@
     <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}</div><p class="metric-value">{{ contadores.enviado }}</p></div></div>
     <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</div><p class="metric-value">{{ contadores.em_revisao }}</p></div></div>
     <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}</div><p class="metric-value">{{ contadores.aprovado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</div><p class="metric-value">{{ contadores.rascunho }}</p></div></div>
     <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Pending edits{% elif LANGUAGE_CODE == 'es' %}Ediciones pendientes{% else %}Edições pendentes{% endif %}</div><p class="metric-value">{{ contadores.edicoes_pendentes }}</p></div></div>
 </section>
 
@@ -54,16 +53,13 @@
         <select class="form-select" name="status">
             <option value="">{% if LANGUAGE_CODE == 'en' %}All pending items{% elif LANGUAGE_CODE == 'es' %}Todos los pendientes{% else %}Todos os pendentes{% endif %}</option>
             {% for valor, rotulo in status_choices %}
-                {% if valor != "publicado" %}
-                    <option value="{{ valor }}" {% if status_atual == valor %}selected{% endif %}>
-                        {% if valor == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
-                        {% elif valor == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}
-                        {% elif valor == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
-                        {% elif valor == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}
-                        {% elif valor == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}
-                        {% else %}{{ rotulo }}{% endif %}
-                    </option>
-                {% endif %}
+                <option value="{{ valor }}" {% if status_atual == valor %}selected{% endif %}>
+                    {% if valor == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}
+                    {% elif valor == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
+                    {% elif valor == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}
+                    {% elif valor == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}
+                    {% else %}{{ rotulo }}{% endif %}
+                </option>
             {% endfor %}
         </select>
     </div>
@@ -88,7 +84,7 @@
             <div class="text-muted small mb-3">
                 <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }} &bull;
                 <strong>{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}:</strong> {{ experiencia.pais.nome_exibicao }}<br>
-                <strong>{% if LANGUAGE_CODE == 'en' %}Author/contact{% elif LANGUAGE_CODE == 'es' %}Autor/contacto{% else %}Autor/contato{% endif %}:</strong> {{ experiencia.email_contato|default:"-" }}
+                <strong>E-mail:</strong> {{ experiencia.email_contato|default:"-" }}
             </div>
             {% if experiencia.comentario_revisor %}
                 <div class="compact-summary-card mb-3">
@@ -96,7 +92,8 @@
                     <p class="section-subtitle small mb-0">{{ experiencia.comentario_revisor|truncatechars:220 }}</p>
                 </div>
             {% endif %}
-            <a href="{% url 'revisar_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %}</a>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">Editar boa prática</a>
+                <a href="{% url 'revisar_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %}</a>
         </article>
     </div>
     {% empty %}
