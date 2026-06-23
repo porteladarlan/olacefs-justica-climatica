@@ -5,4 +5,5 @@ pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py migrate
 python manage.py carregar_dados_ficticios
+python manage.py aplicar_retroalimentacao_formulario
 python manage.py criar_admin_render

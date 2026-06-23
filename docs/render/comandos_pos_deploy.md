@@ -15,7 +15,8 @@ python manage.py collectstatic --noinput
 ## 3. Carregar dados demonstrativos
 
 ```bash
-python manage.py carregar_dados_ficticios --limpar-demo
+python manage.py carregar_dados_ficticios
+python manage.py aplicar_retroalimentacao_formulario
 ```
 
 ## 4. Criar superusuário ou usuário staff
