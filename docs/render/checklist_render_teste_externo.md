@@ -46,7 +46,8 @@ Após deploy:
 ```bash
 python manage.py migrate
 python manage.py collectstatic --noinput
-python manage.py carregar_dados_ficticios --limpar-demo
+python manage.py carregar_dados_ficticios
+python manage.py aplicar_retroalimentacao_formulario
 ```
 
 ## Validação manual da URL pública
