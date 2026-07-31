@@ -1,0 +1,6 @@
+interface:
+  display_name: "Documentação"
+  short_description: "Decisões e rastreabilidade"
+  default_prompt: "Use $documentacao-rastreabilidade nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

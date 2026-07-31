@@ -1,0 +1,6 @@
+interface:
+  display_name: "Deploy Hetzner"
+  short_description: "Deploy seguro no AX42-1"
+  default_prompt: "Use $deploy-hetzner nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

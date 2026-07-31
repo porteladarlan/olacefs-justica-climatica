@@ -1,0 +1,6 @@
+interface:
+  display_name: "Frontend Acessível"
+  short_description: "UI trilíngue e acessível"
+  default_prompt: "Use $frontend-acessivel-i18n nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

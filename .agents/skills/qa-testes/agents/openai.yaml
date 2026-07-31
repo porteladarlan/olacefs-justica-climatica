@@ -1,0 +1,6 @@
+interface:
+  display_name: "QA e Testes"
+  short_description: "Testes por risco"
+  default_prompt: "Use $qa-testes nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

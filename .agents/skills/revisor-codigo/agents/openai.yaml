@@ -1,0 +1,6 @@
+interface:
+  display_name: "Revisor de Código"
+  short_description: "Revisão por severidade"
+  default_prompt: "Use $revisor-codigo nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

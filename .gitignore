@@ -25,3 +25,27 @@ scripts/setup/
 
 # Logs
 *.log
+
+# Codex Kit - segredos e artefatos locais
+.env.*
+!.env.example
+.local/
+credentials/
+secrets/
+*.pem
+*.key
+*.ppk
+id_rsa
+id_rsa.*
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+media/private/
+*.sqlite3
+.codex-log/
+.codex-install-backup-*/
+
+# Pacote local de instalação
+kit-codex/
+kit-codex-*.zip

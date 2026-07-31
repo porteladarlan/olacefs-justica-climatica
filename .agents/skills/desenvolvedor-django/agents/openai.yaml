@@ -1,0 +1,6 @@
+interface:
+  display_name: "Desenvolvedor Django"
+  short_description: "Implementação backend"
+  default_prompt: "Use $desenvolvedor-django nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

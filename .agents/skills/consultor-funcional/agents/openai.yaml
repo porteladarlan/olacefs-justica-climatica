@@ -1,0 +1,6 @@
+interface:
+  display_name: "Consultor Funcional"
+  short_description: "Requisitos e critérios"
+  default_prompt: "Use $consultor-funcional nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

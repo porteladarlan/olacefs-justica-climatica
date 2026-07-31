@@ -1,0 +1,6 @@
+interface:
+  display_name: "Modelagem PostgreSQL"
+  short_description: "Dados e migrations"
+  default_prompt: "Use $modelagem-postgresql nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

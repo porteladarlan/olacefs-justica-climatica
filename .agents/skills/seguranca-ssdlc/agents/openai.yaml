@@ -1,0 +1,6 @@
+interface:
+  display_name: "Segurança SSDLC"
+  short_description: "Segurança ponta a ponta"
+  default_prompt: "Use $seguranca-ssdlc nesta tarefa e siga as instruções do repositório."
+policy:
+  allow_implicit_invocation: true

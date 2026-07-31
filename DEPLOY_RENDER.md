@@ -48,7 +48,7 @@ Web Service:
 ```text
 Runtime: Python
 Build Command: bash build.sh
-Start Command: gunicorn config.wsgi:application
+Start Command: python manage.py migrate && python manage.py aplicar_retroalimentacao_formulario && python manage.py criar_usuarios_teste --confirmar --resetar-senha && gunicorn config.wsgi:application
 ```
 
 Variáveis:
