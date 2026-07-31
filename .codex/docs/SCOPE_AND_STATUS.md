@@ -8,6 +8,12 @@
 - servidor dedicado Hetzner AX42-1;
 - novo protótipo funcional/visual recebido.
 
+## Implementado nesta evolução
+
+- página inicial com propósito institucional preservado e acesso prioritário a Boas Práticas, Banco Técnico e Dimensões de Justiça Climática;
+- navegação responsiva e trilíngue, com ativação por teclado e direcionamento de foco para as dimensões;
+- implementação somente em templates, CSS e JavaScript existente, sem alteração do modelo de dados.
+
 ## Protótipo
 
 - portal de conhecimento;

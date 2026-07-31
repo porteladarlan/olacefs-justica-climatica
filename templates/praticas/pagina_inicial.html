@@ -54,6 +54,41 @@
     </div>
 </section>
 
+<section class="home-primary-access mb-5" aria-labelledby="home-primary-access-title">
+    <div class="section-kicker">
+        {% if LANGUAGE_CODE == 'en' %}Explore the Platform{% elif LANGUAGE_CODE == 'es' %}Explore la Plataforma{% else %}Explore a Plataforma{% endif %}
+    </div>
+    <h2 class="section-title h3" id="home-primary-access-title">
+        {% if LANGUAGE_CODE == 'en' %}Knowledge for climate-conscious auditing{% elif LANGUAGE_CODE == 'es' %}Conocimiento para auditor&iacute;as con perspectiva clim&aacute;tica{% else %}Conhecimento para auditorias com perspectiva clim&aacute;tica{% endif %}
+    </h2>
+    <p class="section-subtitle mb-4">
+        {% if LANGUAGE_CODE == 'en' %}Access regional experiences, technical references and the dimensions that guide a climate justice perspective in auditing.{% elif LANGUAGE_CODE == 'es' %}Acceda a experiencias regionales, referencias t&eacute;cnicas y dimensiones que orientan la perspectiva de justicia clim&aacute;tica en la auditor&iacute;a.{% else %}Acesse experi&ecirc;ncias regionais, refer&ecirc;ncias t&eacute;cnicas e dimens&otilde;es que orientam a perspectiva de justi&ccedil;a clim&aacute;tica na auditoria.{% endif %}
+    </p>
+
+    <div class="home-primary-access-grid">
+        <article class="home-primary-access-card">
+            <span class="home-primary-access-number" aria-hidden="true">01</span>
+            <h3>{% if LANGUAGE_CODE == 'en' %}Good Practices{% elif LANGUAGE_CODE == 'es' %}Buenas Pr&aacute;cticas{% else %}Boas Pr&aacute;ticas{% endif %}</h3>
+            <p>{% if LANGUAGE_CODE == 'en' %}Discover public audit and governance experiences shared by SAIs in the region.{% elif LANGUAGE_CODE == 'es' %}Descubra experiencias p&uacute;blicas de auditor&iacute;a y gobernanza compartidas por las EFS de la regi&oacute;n.{% else %}Conhe&ccedil;a experi&ecirc;ncias p&uacute;blicas de auditoria e governan&ccedil;a compartilhadas pelas EFS da regi&atilde;o.{% endif %}</p>
+            <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-primary mt-auto">{% if LANGUAGE_CODE == 'en' %}Browse practices{% elif LANGUAGE_CODE == 'es' %}Ver buenas pr&aacute;cticas{% else %}Ver boas pr&aacute;ticas{% endif %}</a>
+        </article>
+
+        <article class="home-primary-access-card">
+            <span class="home-primary-access-number" aria-hidden="true">02</span>
+            <h3>{% if LANGUAGE_CODE == 'en' %}Technical Bank{% elif LANGUAGE_CODE == 'es' %}Banco T&eacute;cnico{% else %}Banco T&eacute;cnico{% endif %}</h3>
+            <p>{% if LANGUAGE_CODE == 'en' %}Consult methodological guides, studies, tools and curated reference documents.{% elif LANGUAGE_CODE == 'es' %}Consulte gu&iacute;as metodol&oacute;gicas, estudios, herramientas y documentos de referencia seleccionados.{% else %}Consulte guias metodol&oacute;gicos, estudos, ferramentas e documentos de refer&ecirc;ncia selecionados.{% endif %}</p>
+            <a href="{% url 'banco_tecnico' %}" class="btn btn-outline-primary mt-auto">{% if LANGUAGE_CODE == 'en' %}Open Technical Bank{% elif LANGUAGE_CODE == 'es' %}Abrir Banco T&eacute;cnico{% else %}Abrir Banco T&eacute;cnico{% endif %}</a>
+        </article>
+
+        <article class="home-primary-access-card">
+            <span class="home-primary-access-number" aria-hidden="true">03</span>
+            <h3>{% if LANGUAGE_CODE == 'en' %}Climate Justice Dimensions{% elif LANGUAGE_CODE == 'es' %}Dimensiones de Justicia Clim&aacute;tica{% else %}Dimens&otilde;es de Justi&ccedil;a Clim&aacute;tica{% endif %}</h3>
+            <p>{% if LANGUAGE_CODE == 'en' %}Understand equity, participation, intersectional recognition and transformative infrastructure.{% elif LANGUAGE_CODE == 'es' %}Comprenda la equidad, la participaci&oacute;n, el reconocimiento interseccional y la infraestructura transformadora.{% else %}Compreenda equidade, participa&ccedil;&atilde;o, reconhecimento interseccional e infraestrutura transformadora.{% endif %}</p>
+            <a href="#concepto-tab" class="btn btn-outline-primary mt-auto" data-home-tab-target="#concepto-tab">{% if LANGUAGE_CODE == 'en' %}View dimensions{% elif LANGUAGE_CODE == 'es' %}Ver dimensiones{% else %}Ver dimens&otilde;es{% endif %}</a>
+        </article>
+    </div>
+</section>
+
 <section class="info-tabs-card mb-5">
     <ul class="nav nav-pills info-tabs mb-4" id="homeInfoTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -112,7 +147,7 @@
             </div>
         </div>
 
-        <div class="tab-pane fade" id="concepto-pane" role="tabpanel" aria-labelledby="concepto-tab" tabindex="0">
+        <div class="tab-pane fade" id="concepto-pane" role="tabpanel" aria-labelledby="concepto-tab" tabindex="-1">
             <h2 class="section-title h3">
                 {% if LANGUAGE_CODE == 'en' %}What is climate justice?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; es justicia clim&aacute;tica?{% else %}O que &eacute; justi&ccedil;a clim&aacute;tica?{% endif %}
             </h2>
