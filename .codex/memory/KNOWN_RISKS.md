@@ -10,3 +10,4 @@
 - anexos inseguros;
 - workflow indefinido;
 - servidor sem operação definida.
+- a primeira evolução da home foi verificada nos breakpoints documentados, mas auditoria completa com tecnologia assistiva e zoom de 200% permanece como validação manual.
