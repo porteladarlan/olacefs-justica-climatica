@@ -15,5 +15,5 @@
 - os textos institucionais e as identificações de nomes e cargos reproduzidos do protótipo ainda dependem de validação institucional final;
 - a fonte Raleway não foi adicionada ao repositório nem carregada por CDN; sua disponibilização institucional permanece pendente e a interface utiliza `Segoe UI` e Arial como fallbacks.
 - Ferramentas ainda não possui rota própria; o cabeçalho informa essa indisponibilidade de forma acessível, sem criar destino ou comportamento fictício.
-- a afiliação institucional usuário–EFS ainda não possui modelo aprovado; até essa decisão, objetos sem `autor` somente podem ser administrados por staff;
+- a fundação técnica da afiliação usuário–EFS existe, mas nomes/poderes dos papéis, aprovadores, retenção e autorização por objeto continuam pendentes; até decisões e fase específica, vínculo, episódio e papel não concedem acesso e objetos sem `autor` permanecem restritos a staff;
 - o limite de três anexos foi alinhado à interface atual; eventual alteração quantitativa depende de confirmação negocial e deve preservar os controles de segurança implementados.

@@ -29,6 +29,15 @@
 - mensagens executáveis sem sequências de mojibake detectadas;
 - nenhuma alteração de model, migration ou banco de dados.
 
+## Implementado na Fase 2A.1 — fundação usuário–EFS
+
+- models de lote/item de importação, papel institucional, vínculo canônico usuário–EFS, episódio histórico, atribuição temporal de papel e evento de vínculo;
+- constraints de unicidade, datas, decisão, revogação e coerência simples compatíveis com o SQLite atual;
+- validações relacionais em Python para impedir autoaprovação, autoatribuição e referências incoerentes entre evento, episódio, atribuição, item e lote;
+- duas migrations estruturais sem carga de dados e administração somente para inspeção;
+- autorização atual preservada: os novos models não são consultados por views, forms ou serviços de permissão;
+- `db.sqlite3` não foi migrado nesta execução; upgrade, rollback e re-upgrade foram ensaiados em banco temporário limpo.
+
 ## Protótipo
 
 - portal de conhecimento;

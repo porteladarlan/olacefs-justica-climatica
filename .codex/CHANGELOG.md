@@ -1,5 +1,11 @@
 # Changelog da base Codex
 
+## Não lançado — 2026-08-01
+
+- Criada a fundação de dados da Fase 2A.1 para vínculo usuário–EFS, com catálogo vazio de papéis, vínculo canônico, episódios históricos, atribuições temporais, eventos imutáveis e ledger de importação.
+- Adicionadas as migrations `0010_fase2a1_lote_importacao` e `0011_fase2a1_vinculo_efs`, sem `RunPython`, papéis, vínculos ou qualquer carga inicial.
+- Mantida integralmente a autorização vigente por `Experiencia.autor` ou staff; e-mail, domínio, vínculo, episódio e papel institucional ainda não concedem permissão.
+
 ## Não lançado — 2026-07-31
 
 - Reconstruídos o cabeçalho e a página inicial conforme o `index.html` do protótipo `plataforma-justicia-climatica 1.zip`, mantendo as rotas e funcionalidades existentes.
