@@ -8,7 +8,7 @@
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Track submission{% elif LANGUAGE_CODE == 'es' %}Seguimiento del env&iacute;o{% else %}Acompanhar envio{% endif %}</div>
     <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Check the status of submitted good practices{% elif LANGUAGE_CODE == 'es' %}Consulte el estado de buenas pr&aacute;cticas enviadas{% else %}Consulte o status das boas pr&aacute;ticas enviadas{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Enter the institutional e-mail used in the submission form to view submissions, reviewer comments and editing options.{% elif LANGUAGE_CODE == 'es' %}Ingrese el correo institucional usado en el formulario para ver env&iacute;os, comentarios y opciones de edici&oacute;n.{% else %}Informe o e-mail institucional usado no formul&aacute;rio para visualizar envios, coment&aacute;rios e op&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}</p>
+    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}View submissions, reviewer comments and editing options securely linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Consulte de forma segura los env&iacute;os, comentarios y opciones de edici&oacute;n vinculados a su cuenta autenticada.{% else %}Consulte com seguran&ccedil;a os envios, coment&aacute;rios e op&ccedil;&otilde;es de edi&ccedil;&atilde;o vinculados &agrave; sua conta autenticada.{% endif %}</p>
 </section>
 
 
@@ -27,18 +27,6 @@
     </div>
 </section>
 
-<form method="get" class="filter-panel row g-3 mb-4">
-    <div class="col-md-8">
-        <label class="form-label fw-semibold">{{ form.email_contato.label }}</label>
-        {{ form.email_contato }}
-        {% for error in form.email_contato.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-    </div>
-    <div class="col-md-4 d-grid align-self-end">
-        <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Check status{% elif LANGUAGE_CODE == 'es' %}Consultar estado{% else %}Consultar status{% endif %}</button>
-    </div>
-</form>
-
-{% if consulta_realizada %}
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os{% else %}Envios{% endif %}</div>
     <div class="row g-3">
@@ -73,11 +61,11 @@
 
                 <div class="d-flex flex-wrap gap-2">
                     {% if experiencia.status_publicacao == "publicado" %}
-                        <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}?email={{ form.cleaned_data.email_contato }}">
+                        <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}">
                             {% if LANGUAGE_CODE == 'en' %}Request edit{% elif LANGUAGE_CODE == 'es' %}Solicitar edici&oacute;n{% else %}Solicitar edi&ccedil;&atilde;o{% endif %}
                         </a>
                     {% else %}
-                        <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}?email={{ form.cleaned_data.email_contato }}">
+                        <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">
                             {% if LANGUAGE_CODE == 'en' %}Edit / resubmit{% elif LANGUAGE_CODE == 'es' %}Editar / reenviar{% else %}Editar / reenviar{% endif %}
                         </a>
                     {% endif %}
@@ -85,13 +73,13 @@
             </article>
         </div>
         {% empty %}
-        <div class="col-12"><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submission found for this e-mail.{% elif LANGUAGE_CODE == 'es' %}No se encontraron env&iacute;os para este correo.{% else %}Nenhum envio encontrado para este e-mail.{% endif %}</p></div></div>
+        <div class="col-12"><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submissions are linked to your authenticated account yet.{% elif LANGUAGE_CODE == 'es' %}Aún no hay envíos vinculados a su cuenta autenticada.{% else %}Ainda não há envios vinculados à sua conta autenticada.{% endif %}</p></div></div>
         {% endfor %}
     </div>
 </section>
 
 <section>
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Published edit requests{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n publicadas{% else %}Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o em publicados{% endif %}</div>
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Published edit requests{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n publicadas{% else %}Solicitações de edição de conteúdos publicados{% endif %}</div>
     <div class="row g-3">
         {% for proposta in propostas %}
         <div class="col-lg-6">
@@ -109,7 +97,7 @@
                 <h2 class="h5 section-title">{{ proposta.experiencia.titulo_exibicao }}</h2>
                 {% if proposta.comentario_autor %}<p class="section-subtitle">{{ proposta.comentario_autor }}</p>{% endif %}
                 {% if proposta.comentario_revisor %}
-                    <div class="alert alert-light border small mb-0"><strong>Revisão:</strong> {{ proposta.comentario_revisor }}</div>
+                    <div class="alert alert-light border small mb-0"><strong>{% if LANGUAGE_CODE == 'en' %}Review:{% elif LANGUAGE_CODE == 'es' %}Revisión:{% else %}Revisão:{% endif %}</strong> {{ proposta.comentario_revisor }}</div>
                 {% endif %}
             </article>
         </div>
@@ -118,5 +106,4 @@
         {% endfor %}
     </div>
 </section>
-{% endif %}
 {% endblock %}

@@ -1,4 +1,8 @@
+from uuid import uuid4
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.test import Client
 
 
@@ -76,8 +80,13 @@ class Command(BaseCommand):
         "/painel-revisao/",
         "/painel-revisao-edicoes/",
         "/entrar/",
-        "/registrar/",
+        "/cadastro/",
     ]
+    URLS_AUTENTICADAS = {
+        "/adicionar-boa-pratica/",
+        "/meus-envios/",
+        "/status-envio/",
+    }
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -87,41 +96,69 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        client = Client()
         total_alertas = 0
 
         self.stdout.write(self.style.MIGRATE_HEADING("Auditoria trilíngue de páginas renderizadas"))
 
-        for idioma in ["en", "es"]:
-            self.stdout.write("")
-            self.stdout.write(self.style.MIGRATE_LABEL(f"Idioma: {idioma.upper()}"))
+        with transaction.atomic():
+            usuario_auditoria = get_user_model().objects.create_user(
+                username=f"auditoria_trilingue_{uuid4().hex}",
+            )
+            client_publico = Client()
+            client_autenticado = Client()
+            client_autenticado.force_login(usuario_auditoria)
 
-            for url in self.URLS:
-                caminho = f"/{idioma}{url}" if url != "/" else f"/{idioma}/"
-                response = client.get(caminho)
+            for idioma in ["en", "es"]:
+                self.stdout.write("")
+                self.stdout.write(self.style.MIGRATE_LABEL(f"Idioma: {idioma.upper()}"))
 
-                if response.status_code in [301, 302, 403, 404]:
-                    self.stdout.write(f"  {caminho} -> {response.status_code} (ignorado)")
-                    continue
+                for url in self.URLS:
+                    caminho = f"/{idioma}{url}" if url != "/" else f"/{idioma}/"
+                    requer_autenticacao = url in self.URLS_AUTENTICADAS
+                    client = client_autenticado if requer_autenticacao else client_publico
+                    response = client.get(caminho)
 
-                if response.status_code >= 500:
-                    total_alertas += 1
-                    self.stdout.write(self.style.ERROR(f"  {caminho} -> {response.status_code}"))
-                    continue
+                    if response.status_code == 404:
+                        total_alertas += 1
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f"  {caminho} -> 404 (URL declarada não encontrada)"
+                            )
+                        )
+                        continue
 
-                conteudo = response.content.decode("utf-8", errors="ignore")
-                encontrados = [
-                    termo for termo in self.TERMOS_SUSPEITOS
-                    if termo in conteudo
-                ]
+                    if response.status_code in [301, 302, 403]:
+                        if requer_autenticacao:
+                            total_alertas += 1
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f"  {caminho} -> {response.status_code} com usuário autenticado"
+                                )
+                            )
+                        else:
+                            self.stdout.write(f"  {caminho} -> {response.status_code} (ignorado)")
+                        continue
 
-                if encontrados:
-                    total_alertas += len(encontrados)
-                    termos = ", ".join(encontrados[:12])
-                    extra = "" if len(encontrados) <= 12 else f" (+{len(encontrados) - 12})"
-                    self.stdout.write(self.style.WARNING(f"  {caminho} -> possíveis resíduos: {termos}{extra}"))
-                else:
-                    self.stdout.write(self.style.SUCCESS(f"  {caminho} -> OK"))
+                    if response.status_code >= 500:
+                        total_alertas += 1
+                        self.stdout.write(self.style.ERROR(f"  {caminho} -> {response.status_code}"))
+                        continue
+
+                    conteudo = response.content.decode("utf-8", errors="ignore")
+                    encontrados = [
+                        termo for termo in self.TERMOS_SUSPEITOS
+                        if termo in conteudo
+                    ]
+
+                    if encontrados:
+                        total_alertas += len(encontrados)
+                        termos = ", ".join(encontrados[:12])
+                        extra = "" if len(encontrados) <= 12 else f" (+{len(encontrados) - 12})"
+                        self.stdout.write(self.style.WARNING(f"  {caminho} -> possíveis resíduos: {termos}{extra}"))
+                    else:
+                        self.stdout.write(self.style.SUCCESS(f"  {caminho} -> OK"))
+
+            transaction.set_rollback(True)
 
         self.stdout.write("")
         if total_alertas:

@@ -1,0 +1,37 @@
+<section class="home-map-future home-block-alt" id="mapSection" aria-labelledby="home-map-title">
+    <div class="home-section-wrap">
+    <div class="home-map-future-grid">
+        <div>
+            <div class="section-kicker">
+                {% if LANGUAGE_CODE == 'en' %}Regional view{% elif LANGUAGE_CODE == 'es' %}Visi&oacute;n regional{% else %}Vis&atilde;o regional{% endif %}
+            </div>
+            <h2 class="section-title h3" id="home-map-title">
+                {% if LANGUAGE_CODE == 'en' %}Regional map of SAIs{% elif LANGUAGE_CODE == 'es' %}Mapa regional de las EFS{% else %}Mapa regional das EFS{% endif %}
+            </h2>
+            <p class="section-subtitle">
+                {% if LANGUAGE_CODE == 'en' %}
+                    In a future stage, this area will provide a regional view of SAIs, their published experiences and applicable normative frameworks. The implementation will include an accessible text alternative.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    En una etapa futura, esta &aacute;rea ofrecer&aacute; una visi&oacute;n regional de las EFS, sus experiencias publicadas y los marcos normativos aplicables. La implementaci&oacute;n incluir&aacute; una alternativa textual accesible.
+                {% else %}
+                    Em uma etapa futura, esta &aacute;rea oferecer&aacute; uma vis&atilde;o regional das EFS, suas experi&ecirc;ncias publicadas e os marcos normativos aplic&aacute;veis. A implementa&ccedil;&atilde;o incluir&aacute; uma alternativa textual acess&iacute;vel.
+                {% endif %}
+            </p>
+            <div class="home-map-actions">
+                <a class="btn btn-primary" href="{% url 'catalogo_experiencias' %}">{% if LANGUAGE_CODE == 'en' %}Browse current practices{% elif LANGUAGE_CODE == 'es' %}Consultar pr&aacute;cticas actuales{% else %}Consultar pr&aacute;ticas atuais{% endif %}</a>
+                <a class="btn btn-outline-primary" href="{% url 'normas_internacionais' %}">{% if LANGUAGE_CODE == 'en' %}Open normative frameworks{% elif LANGUAGE_CODE == 'es' %}Abrir marcos normativos{% else %}Abrir marcos normativos{% endif %}</a>
+            </div>
+        </div>
+
+        <aside class="home-map-status" aria-labelledby="home-map-status-title">
+            <span class="home-map-status-badge">{% if LANGUAGE_CODE == 'en' %}Future stage{% elif LANGUAGE_CODE == 'es' %}Etapa futura{% else %}Etapa futura{% endif %}</span>
+            <h3 id="home-map-status-title">{% if LANGUAGE_CODE == 'en' %}Planned content{% elif LANGUAGE_CODE == 'es' %}Contenido previsto{% else %}Conte&uacute;do previsto{% endif %}</h3>
+            <ul>
+                <li>{% if LANGUAGE_CODE == 'en' %}SAIs in the region{% elif LANGUAGE_CODE == 'es' %}EFS de la regi&oacute;n{% else %}EFS da regi&atilde;o{% endif %}</li>
+                <li>{% if LANGUAGE_CODE == 'en' %}Published good practices{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas publicadas{% else %}Boas pr&aacute;ticas publicadas{% endif %}</li>
+                <li>{% if LANGUAGE_CODE == 'en' %}Applicable normative references{% elif LANGUAGE_CODE == 'es' %}Referencias normativas aplicables{% else %}Refer&ecirc;ncias normativas aplic&aacute;veis{% endif %}</li>
+            </ul>
+        </aside>
+    </div>
+    </div>
+</section>

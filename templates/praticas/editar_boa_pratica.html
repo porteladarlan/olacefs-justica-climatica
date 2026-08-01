@@ -28,7 +28,6 @@
 
 <form method="post" enctype="multipart/form-data" class="row g-4">
     {% csrf_token %}
-    <input type="hidden" name="email_contato_original" value="{{ email_validado }}">
 
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
@@ -155,7 +154,7 @@
                     <p>{% if LANGUAGE_CODE == 'en' %}Optional public files and external references.{% elif LANGUAGE_CODE == 'es' %}Archivos p&uacute;blicos opcionales y referencias externas.{% else %}Arquivos p&uacute;blicos opcionais e refer&ecirc;ncias externas.{% endif %}</p>
                 </div>
             </div>
-            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Keep up to three attachments per experience. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each.{% elif LANGUAGE_CODE == 'es' %}Mantenga hasta tres anexos por experiencia. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno.{% else %}Mantenha at&eacute; tr&ecirc;s anexos por experi&ecirc;ncia. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada.{% endif %}</p>
+            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Keep up to three attachments per experience. Accepted formats: PDF, JPG and PNG, with a maximum of 10 MB each.{% elif LANGUAGE_CODE == 'es' %}Mantenga hasta tres anexos por experiencia. Formatos aceptados: PDF, JPG y PNG, con un m&aacute;ximo de 10 MB cada uno.{% else %}Mantenha at&eacute; tr&ecirc;s anexos por experi&ecirc;ncia. Formatos aceitos: PDF, JPG e PNG, com m&aacute;ximo de 10 MB cada.{% endif %}</p>
 
             {% if experiencia.anexos.all %}
                 <div class="mb-3">
@@ -179,7 +178,7 @@
             {% for indice in "123" %}
             <div class="row g-2 align-items-end mb-3">
                 <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}Attachment title{% elif LANGUAGE_CODE == 'es' %}T&iacute;tulo del anexo{% else %}T&iacute;tulo do anexo{% endif %} {{ indice }}</label><input class="form-control" type="text" name="anexo_titulo_{{ indice }}"></div>
-                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}File{% elif LANGUAGE_CODE == 'es' %}Archivo{% else %}Arquivo{% endif %}</label><input class="form-control" type="file" name="anexo_arquivo_{{ indice }}" accept=".pdf,.doc,.docx,.xls,.xlsx"></div>
+                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}File{% elif LANGUAGE_CODE == 'es' %}Archivo{% else %}Arquivo{% endif %}</label><input class="form-control" type="file" name="anexo_arquivo_{{ indice }}" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"></div>
                 <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</label><input class="form-control" type="url" name="anexo_url_{{ indice }}"></div>
             </div>
             {% endfor %}
@@ -211,7 +210,7 @@
     </div>
 
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'status_envio' %}?email_contato={{ email_validado }}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to status{% elif LANGUAGE_CODE == 'es' %}Volver al estado{% else %}Voltar ao status{% endif %}</a>
+        <a href="{% url 'status_envio' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to status{% elif LANGUAGE_CODE == 'es' %}Volver al estado{% else %}Voltar ao status{% endif %}</a>
         <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
         <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Resubmit for review{% elif LANGUAGE_CODE == 'es' %}Reenviar para revisi&oacute;n{% else %}Reenviar para revis&atilde;o{% endif %}</button>
     </div>

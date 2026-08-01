@@ -21,7 +21,6 @@
 
 <form method="post" class="row g-4">
     {% csrf_token %}
-    <input type="hidden" name="email_contato_original" value="{{ email_validado }}">
 
     <div class="col-12">
         <div class="form-section">
@@ -51,7 +50,7 @@
     </div>
 
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'status_envio' %}?email_contato={{ email_validado }}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back{% elif LANGUAGE_CODE == 'es' %}Volver{% else %}Voltar{% endif %}</a>
+        <a href="{% url 'status_envio' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back{% elif LANGUAGE_CODE == 'es' %}Volver{% else %}Voltar{% endif %}</a>
         <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Submit edit request{% elif LANGUAGE_CODE == 'es' %}Enviar solicitud de edici&oacute;n{% else %}Enviar solicita&ccedil;&atilde;o de edi&ccedil;&atilde;o{% endif %}</button>
     </div>
 </form>

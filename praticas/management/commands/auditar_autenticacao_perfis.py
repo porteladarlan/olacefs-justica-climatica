@@ -13,7 +13,6 @@ class Command(BaseCommand):
         "/normas-internacionais/",
         "/sobre/",
         "/entrar/",
-        "/status-envio/",
         "/favoritos/",
     ]
 
@@ -27,6 +26,7 @@ class Command(BaseCommand):
     URLS_RESTRITAS_AUTOR = [
         "/adicionar-boa-pratica/",
         "/meus-envios/",
+        "/status-envio/",
     ]
 
     URLS_RESTRITAS_REVISAO = [

@@ -10,9 +10,24 @@
 
 ## Implementado nesta evolução
 
-- página inicial com propósito institucional preservado e acesso prioritário a Boas Práticas, Banco Técnico e Dimensões de Justiça Climática;
-- navegação responsiva e trilíngue, com ativação por teclado e direcionamento de foco para as dimensões;
+- página inicial institucional reconstruída na ordem aprovada: hero, mensagens, fundamentos, área futura do mapa, conteúdo audiovisual futuro e rodapé;
+- hero aberto em duas colunas, sem contêiner externo arredondado, com CTAs reais para marcos normativos e para a área do mapa;
+- mensagens da COMTEMA e da CGID compostas com textos e fotografias locais fornecidos no protótipo;
+- fundamentos apresentados nas três abas do protótipo, com ARIA, navegação por teclado, painéis focalizáveis e fotografias locais;
+- seções semanticamente preparadas para o futuro mapa regional e conteúdo audiovisual, sem D3, TopoJSON, dados ou interações simuladas;
+- cabeçalho com acessos diretos a Boas Práticas e Marcos Normativos, indicação acessível da futura rota de Ferramentas, rotas reais de conta, idiomas e alto contraste;
+- rodapé e tipografia alinhados ao protótipo, usando assets e fallbacks locais;
 - implementação somente em templates, CSS e JavaScript existente, sem alteração do modelo de dados.
+
+## Implementado na fase de segurança crítica
+
+- edição de boa prática, solicitação de edição publicada e status restritos a usuário autenticado;
+- autorização de objeto limitada a staff ou `Experiencia.autor`, sem e-mail em query string ou campo oculto;
+- status e propostas filtrados pelo autor real, com registros legados sem autor acessíveis somente a staff;
+- redirecionamento de favoritos validado por `obter_destino_seguro`;
+- anexos limitados a três itens PDF/JPG/PNG de até 10 MB, com conferência de extensão, MIME informado e assinatura do conteúdo;
+- mensagens executáveis sem sequências de mojibake detectadas;
+- nenhuma alteração de model, migration ou banco de dados.
 
 ## Protótipo
 

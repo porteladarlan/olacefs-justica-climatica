@@ -8,7 +8,7 @@
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submitter area{% elif LANGUAGE_CODE == 'es' %}Área del usuario remitente{% else %}Área do usuário remetente{% endif %}</div>
     <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis envíos{% else %}Meus envios{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Track drafts, submitted practices, reviewer comments and edit requests linked to your institutional e-mail.{% elif LANGUAGE_CODE == 'es' %}Acompañe borradores, envíos, comentarios de revisión y solicitudes de edición vinculadas a su correo institucional.{% else %}Acompanhe rascunhos, envios, comentários de revisão e solicitações de edição vinculadas ao seu e-mail institucional.{% endif %}</p>
+    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Track drafts, submitted practices, reviewer comments and edit requests linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Acompañe borradores, envíos, comentarios de revisión y solicitudes de edición vinculados a su cuenta autenticada.{% else %}Acompanhe rascunhos, envios, comentários de revisão e solicitações de edição vinculados à sua conta autenticada.{% endif %}</p>
 </section>
 
 <div class="d-flex flex-column flex-md-row gap-2 justify-content-end mb-4">
@@ -44,14 +44,14 @@
                     <div class="alert alert-light border small"><strong>{% if LANGUAGE_CODE == 'en' %}Review comment:{% elif LANGUAGE_CODE == 'es' %}Comentario de la revisión:{% else %}Comentário da revisão:{% endif %}</strong> {{ experiencia.comentario_revisor }}</div>
                 {% endif %}
                 {% if experiencia.status_publicacao == 'publicado' %}
-                    <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}?email={{ user.email }}">Solicitar edição</a>
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Request edit{% elif LANGUAGE_CODE == 'es' %}Solicitar edición{% else %}Solicitar edição{% endif %}</a>
                 {% else %}
-                    <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}?email={{ user.email }}">Editar / reenviar</a>
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit / resubmit{% elif LANGUAGE_CODE == 'es' %}Editar / reenviar{% else %}Editar / reenviar{% endif %}</a>
                 {% endif %}
             </article>
         </div>
         {% empty %}
-        <div class="col-12"><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submissions linked to your account yet.{% elif LANGUAGE_CODE == 'es' %}Aún no hay envíos vinculados a su cuenta.{% else %}Ainda não há envios vinculados à sua conta.{% endif %}</p></div></div>
+        <div class="col-12"><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submissions are linked to your authenticated account yet.{% elif LANGUAGE_CODE == 'es' %}Aún no hay envíos vinculados a su cuenta autenticada.{% else %}Ainda não há envios vinculados à sua conta autenticada.{% endif %}</p></div></div>
         {% endfor %}
     </div>
 </section>
@@ -74,7 +74,7 @@
                 </div>
                 <h2 class="h5 section-title">{{ proposta.experiencia.titulo_exibicao }}</h2>
                 {% if proposta.comentario_autor %}<p class="section-subtitle">{{ proposta.comentario_autor }}</p>{% endif %}
-                {% if proposta.comentario_revisor %}<div class="alert alert-light border small mb-0"><strong>Revisão:</strong> {{ proposta.comentario_revisor }}</div>{% endif %}
+                {% if proposta.comentario_revisor %}<div class="alert alert-light border small mb-0"><strong>{% if LANGUAGE_CODE == 'en' %}Review:{% elif LANGUAGE_CODE == 'es' %}Revisión:{% else %}Revisão:{% endif %}</strong> {{ proposta.comentario_revisor }}</div>{% endif %}
             </article>
         </div>
         {% empty %}

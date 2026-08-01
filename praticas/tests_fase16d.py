@@ -22,12 +22,12 @@ class PolimentoHomeApresentacaoTests(TestCase):
         for termo in self.TERMOS_PROIBIDOS:
             self.assertNotIn(termo, conteudo)
 
-    def test_home_padroniza_ods_em_portugues(self):
+    def test_home_padroniza_conteudo_em_portugues(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
 
-        self.assertIn("ODS 13, 16 e 17", conteudo)
+        self.assertIn("Fundamentos e estrat&eacute;gias", conteudo)
         self.assertNotIn("ODS 13, 16 y 17", conteudo)
 
     def test_home_ingles_e_espanhol_nao_exibem_link_pendente(self):

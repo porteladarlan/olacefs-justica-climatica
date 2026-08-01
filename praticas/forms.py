@@ -394,25 +394,6 @@ class RevisaoExperienciaForm(forms.ModelForm):
         self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")
 
 
-class ConsultaStatusForm(forms.Form):
-    email_contato = forms.EmailField(
-        widget=forms.EmailInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "nome@efs.gob",
-            }
-        ),
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["email_contato"].label = texto_idioma(
-            "E-mail institucional informado no envio",
-            "Correo institucional informado en el envío",
-            "Institutional e-mail provided in the submission",
-        )
-
-
 class PropostaEdicaoPublicadaForm(ExperienciaSubmissaoForm):
     comentario_autor = forms.CharField(
         required=False,
