@@ -1,7 +1,7 @@
 .main-shell {
     width: 100%;
     max-width: var(--maxw);
-    padding: 0 32px 40px;
+    padding: 0 var(--layout-gutter) 40px;
 }
 
 .page-shell,
@@ -458,11 +458,6 @@
 }
 
 @media (max-width: 560px) {
-    .main-shell {
-        padding-right: 20px;
-        padding-left: 20px;
-    }
-
     .catalog-heading h1 {
         font-size: 26px;
     }

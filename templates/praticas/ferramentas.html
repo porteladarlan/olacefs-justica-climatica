@@ -48,8 +48,8 @@
             </article>
         {% empty %}
             <div class="tools-empty">
-                <h2>{% if LANGUAGE_CODE == 'en' %}No institutional tool is published yet{% elif LANGUAGE_CODE == 'es' %}Todav&iacute;a no hay herramientas institucionales publicadas{% else %}Ainda n&atilde;o h&aacute; ferramentas institucionais publicadas{% endif %}</h2>
-                <p>{% if LANGUAGE_CODE == 'en' %}The current technical records have no publication or origin marker and therefore are not presented as official content. Their curation is planned for Phase 2C.{% elif LANGUAGE_CODE == 'es' %}Los registros t&eacute;cnicos actuales no tienen marcador de publicaci&oacute;n u origen y, por eso, no se presentan como contenido oficial. Su curadur&iacute;a est&aacute; prevista para la Fase 2C.{% else %}Os registros t&eacute;cnicos atuais n&atilde;o possuem marcador de publica&ccedil;&atilde;o ou origem e, por isso, n&atilde;o s&atilde;o apresentados como conte&uacute;do oficial. A curadoria est&aacute; prevista para a Fase 2C.{% endif %}</p>
+                <h2>{% if LANGUAGE_CODE == 'en' %}The tools catalog is being prepared.{% elif LANGUAGE_CODE == 'es' %}El cat&aacute;logo de herramientas est&aacute; en preparaci&oacute;n.{% else %}O cat&aacute;logo de ferramentas est&aacute; em prepara&ccedil;&atilde;o.{% endif %}</h2>
+                <p>{% if LANGUAGE_CODE == 'en' %}Content will be published after institutional curation is complete.{% elif LANGUAGE_CODE == 'es' %}Los contenidos se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.{% else %}Os conte&uacute;dos ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.{% endif %}</p>
             </div>
         {% endfor %}
     </div>

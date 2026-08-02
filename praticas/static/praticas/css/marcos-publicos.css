@@ -1,7 +1,7 @@
 .main-shell {
     width: 100%;
     max-width: var(--maxw);
-    padding: 0 32px 40px;
+    padding: 0 var(--layout-gutter) 40px;
 }
 
 .page-shell,
@@ -44,7 +44,7 @@
     margin-bottom: 36px;
 }
 
-.library-heading > div {
+.library-heading-copy {
     max-width: 640px;
 }
 
@@ -89,7 +89,34 @@
     font: inherit;
     font-size: 14px;
     font-weight: 700;
-    opacity: 1;
+}
+
+.library-compendium-wrap {
+    display: flex;
+    max-width: 260px;
+    align-items: flex-end;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.library-compendium:disabled,
+.library-compendium:disabled:hover,
+.library-compendium:disabled:focus-visible {
+    border-color: var(--purple);
+    color: #fff;
+    background: var(--purple);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: .64;
+    transform: none;
+}
+
+.library-compendium-help {
+    color: var(--text-soft);
+    font-size: 12.5px;
+    line-height: 1.4;
+    text-align: right;
 }
 
 .library-toolbar {
@@ -466,17 +493,21 @@
         flex-direction: column;
     }
 
+    .library-compendium-wrap {
+        max-width: 100%;
+        align-items: flex-start;
+    }
+
+    .library-compendium-help {
+        text-align: left;
+    }
+
     .library-toolbar {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 560px) {
-    .main-shell {
-        padding-right: 20px;
-        padding-left: 20px;
-    }
-
     .library-heading h1 {
         font-size: 26px;
     }

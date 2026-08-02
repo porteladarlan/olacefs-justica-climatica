@@ -19,7 +19,11 @@ class RecursosTecnicosRetroalimentacaoTests(TestCase):
         self.assertIn('class="norm-library"', conteudo)
         self.assertIn('name="q"', conteudo)
         self.assertEqual(response.context["total_resultados"], 0)
-        self.assertIn("Ainda n&atilde;o h&aacute; recursos institucionais publicados", conteudo)
+        self.assertIn("O Banco T&eacute;cnico est&aacute; em prepara&ccedil;&atilde;o.", conteudo)
+        self.assertIn(
+            "Documentos e refer&ecirc;ncias ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.",
+            conteudo,
+        )
 
     def test_recursos_tecnicos_nao_chama_conteudo_provisorio_de_final(self):
         response = self.client.get(reverse("banco_tecnico"))

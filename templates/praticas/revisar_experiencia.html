@@ -2,11 +2,7 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %} | {{ experiencia.titulo_exibicao }}
-<div class="mt-3">
-    <a class="btn btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">Editar boa prática</a>
-</div>
-{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %} | {{ experiencia.titulo_exibicao }}{% endblock %}
 
 {% block content %}
 <a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de revisión{% else %}Voltar ao painel de revisão{% endif %}</a>
@@ -17,7 +13,8 @@
         <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
         <p class="hero-subtitle">
             {{ experiencia.efs.nome_exibicao }} &bull; {{ experiencia.pais.nome_exibicao }} &bull;
-            {% if LANGUAGE_CODE == 'en' %}Current status{% elif LANGUAGE_CODE == 'es' %}Estado actual{% else %}Status atual{% endif %}: {{ experiencia.get_status_publicacao_display }}
+            {% if LANGUAGE_CODE == 'en' %}Current status{% elif LANGUAGE_CODE == 'es' %}Estado actual{% else %}Status atual{% endif %}:
+            {% if experiencia.status_publicacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}{% elif experiencia.status_publicacao == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}{% elif experiencia.status_publicacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}{% elif experiencia.status_publicacao == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}{% elif experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}{% elif experiencia.status_publicacao == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}{% endif %}
         </p>
     </div>
 </section>
@@ -77,8 +74,8 @@
             {% for anexo in experiencia.anexos.all %}
                 <div class="compact-summary-card mb-2">
                     <strong>{{ anexo.titulo_exibicao }}</strong><br>
-                    {% if anexo.arquivo %}<a href="{{ anexo.arquivo.url }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}Download file{% elif LANGUAGE_CODE == 'es' %}Descargar archivo{% else %}Baixar arquivo{% endif %}</a>{% endif %}
-                    {% if anexo.url_externa %}<br><a href="{{ anexo.url_externa }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>{% endif %}
+                    {% if anexo.arquivo %}<a href="{{ anexo.arquivo.url }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Download file{% elif LANGUAGE_CODE == 'es' %}Descargar archivo{% else %}Baixar arquivo{% endif %}</a>{% endif %}
+                    {% if anexo.url_externa %}<br><a href="{{ anexo.url_externa }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>{% endif %}
                 </div>
             {% empty %}
                 <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No attachments registered.{% elif LANGUAGE_CODE == 'es' %}No hay anexos registrados.{% else %}Não há anexos cadastrados.{% endif %}</p>
@@ -96,12 +93,12 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">{{ form.acao.label }}</label>
+                    <label class="form-label fw-semibold" for="{{ form.acao.id_for_label }}">{{ form.acao.label }}</label>
                     {{ form.acao }}
                     {% for erro in form.acao.errors %}<div class="text-danger small">{{ erro }}</div>{% endfor %}
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">{{ form.comentario_revisor.label }}</label>
+                    <label class="form-label fw-semibold" for="{{ form.comentario_revisor.id_for_label }}">{{ form.comentario_revisor.label }}</label>
                     {{ form.comentario_revisor }}
                     {% for erro in form.comentario_revisor.errors %}<div class="text-danger small">{{ erro }}</div>{% endfor %}
                 </div>
@@ -112,6 +109,6 @@
 </div>
 
 <div class="mt-3">
-    <a class="btn btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">Editar boa prática</a>
+    <a class="btn btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
 </div>
 {% endblock %}

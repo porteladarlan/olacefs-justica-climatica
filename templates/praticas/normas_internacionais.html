@@ -16,7 +16,7 @@
 
     <section class="library-section" aria-labelledby="library-title">
         <header class="library-heading">
-            <div>
+            <div class="library-heading-copy">
                 <div class="library-eyebrow">
                     <svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15"><path d="M12 3v17M5 6h14M7 6l-4 7h8L7 6Zm10 0-4 7h8l-4-7ZM6 21h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span>{% if LANGUAGE_CODE == 'en' %}Normative library{% elif LANGUAGE_CODE == 'es' %}Biblioteca normativa{% else %}Biblioteca normativa{% endif %}</span>
@@ -24,11 +24,13 @@
                 <h1 id="library-title">{% if LANGUAGE_CODE == 'en' %}Normative frameworks for climate justice audits{% elif LANGUAGE_CODE == 'es' %}Marcos normativos para auditor&iacute;as de justicia clim&aacute;tica{% else %}Marcos normativos para auditorias de justi&ccedil;a clim&aacute;tica{% endif %}</h1>
                 <p>{% if LANGUAGE_CODE == 'en' %}Normative frameworks allow SAIs to connect oversight with international commitments and standards, incorporating them as practical criteria in audit matrices.{% elif LANGUAGE_CODE == 'es' %}Los marcos normativos permiten a las EFS vincular su fiscalizaci&oacute;n con los compromisos y est&aacute;ndares internacionales, incorpor&aacute;ndolos como criterios pr&aacute;cticos en sus matrices de auditor&iacute;a.{% else %}Os marcos normativos permitem que as EFS vinculem a fiscaliza&ccedil;&atilde;o a compromissos e padr&otilde;es internacionais, incorporando-os como crit&eacute;rios pr&aacute;ticos nas matrizes de auditoria.{% endif %}</p>
             </div>
-            <button class="library-compendium" type="button" disabled aria-describedby="compendium-help">
-                <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 17v3h14v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>{% if LANGUAGE_CODE == 'en' %}Download PDF compendium{% elif LANGUAGE_CODE == 'es' %}Descargar compendio en PDF{% else %}Baixar comp&ecirc;ndio em PDF{% endif %}</span>
-            </button>
-            <span class="visually-hidden" id="compendium-help">{% if LANGUAGE_CODE == 'en' %}The institutional compendium has not yet been published.{% elif LANGUAGE_CODE == 'es' %}El compendio institucional a&uacute;n no fue publicado.{% else %}O comp&ecirc;ndio institucional ainda n&atilde;o foi publicado.{% endif %}</span>
+            <div class="library-compendium-wrap">
+                <button class="library-compendium" type="button" disabled aria-describedby="compendium-help">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 17v3h14v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>{% if LANGUAGE_CODE == 'en' %}Download PDF compendium{% elif LANGUAGE_CODE == 'es' %}Descargar compendio en PDF{% else %}Baixar comp&ecirc;ndio em PDF{% endif %}</span>
+                </button>
+                <span class="library-compendium-help" id="compendium-help">{% if LANGUAGE_CODE == 'en' %}Institutional compendium in preparation.{% elif LANGUAGE_CODE == 'es' %}Compendio institucional en preparaci&oacute;n.{% else %}Comp&ecirc;ndio institucional em prepara&ccedil;&atilde;o.{% endif %}</span>
+            </div>
         </header>
 
         <form method="get" class="library-toolbar" role="search" aria-label="{% if LANGUAGE_CODE == 'en' %}Normative framework filters{% elif LANGUAGE_CODE == 'es' %}Filtros de marcos normativos{% else %}Filtros de marcos normativos{% endif %}">

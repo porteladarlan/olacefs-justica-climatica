@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
 
-from .models import EFS, Experiencia, Pais, PropostaEdicaoExperiencia, Setor, TipoExperiencia
+from .models import Anexo, EFS, Experiencia, Pais, PropostaEdicaoExperiencia, Setor, TipoExperiencia
 
 
 class FluxoRevisaoAprovacaoTests(TestCase):
@@ -48,6 +48,13 @@ class FluxoRevisaoAprovacaoTests(TestCase):
             },
             status=PropostaEdicaoExperiencia.Status.PENDENTE,
         )
+        cls.anexo = Anexo.objects.create(
+            experiencia=cls.experiencia,
+            titulo="Referência externa",
+            titulo_es="Referencia externa",
+            titulo_en="External reference",
+            url_externa="https://example.org/reference",
+        )
 
     def setUp(self):
         self.client.force_login(self.usuario)
@@ -71,12 +78,33 @@ class FluxoRevisaoAprovacaoTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
+        conteudo_normalizado = " ".join(conteudo.split())
         self.assertIn("Submission review", conteudo)
         self.assertIn("Submitted content", conteudo)
         self.assertIn("Methodological inputs", conteudo)
+        self.assertIn("Current status: Submitted", conteudo_normalizado)
         self.assertIn("Save review decision", conteudo)
         self.assertIn("Return for adjustments", conteudo)
+        self.assertIn('for="id_acao"', conteudo)
+        self.assertIn('for="id_comentario_revisor"', conteudo)
+        self.assertIn('target="_blank" rel="noopener noreferrer"', conteudo)
         self.assertNotIn("Devolver para ajuste", conteudo)
+
+    def test_acao_de_edicao_fica_no_conteudo_e_nao_no_title(self):
+        response = self.client.get(
+            reverse("revisar_experiencia", args=[self.experiencia.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        conteudo = response.content.decode("utf-8")
+        titulo = conteudo.split("<title>", 1)[1].split("</title>", 1)[0]
+        self.assertNotIn("<a", titulo)
+        self.assertContains(
+            response,
+            f'href="{reverse("editar_boa_pratica", args=[self.experiencia.pk])}"',
+            count=1,
+        )
+        self.assertContains(response, "Editar boa prática", html=False)
 
     def test_revisao_pode_devolver_para_ajuste_com_comentario(self):
         response = self.client.post(
