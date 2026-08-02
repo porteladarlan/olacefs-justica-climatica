@@ -22,6 +22,11 @@ from .models import (
 class RotasPublicasTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.autor_pendente = get_user_model().objects.create_user(
+            username="autor_pendente",
+            email="autor@example.org",
+            password="teste123",
+        )
         pais = Pais.objects.create(
             nome="Brasil",
             nome_es="Brasil",
@@ -92,6 +97,7 @@ class RotasPublicasTests(TestCase):
         experiencia.grupos_vulneraveis.add(grupo)
 
         pendente = Experiencia.objects.create(
+            autor=cls.autor_pendente,
             titulo="Boa pratica pendente",
             titulo_es="Buena practica pendiente",
             titulo_en="Pending good practice",
@@ -163,8 +169,8 @@ class RotasPublicasTests(TestCase):
         self.client.force_login(usuario)
         self.assertEqual(self.client.get(reverse("adicionar_boa_pratica")).status_code, 200)
 
-    def test_status_envio_retorna_200(self):
-        self.assertEqual(self.client.get(reverse("status_envio")).status_code, 200)
+    def test_status_envio_exige_login(self):
+        self.assertEqual(self.client.get(reverse("status_envio")).status_code, 302)
 
     def test_banco_tecnico_retorna_200(self):
         self.assertEqual(self.client.get(reverse("banco_tecnico")).status_code, 200)
@@ -241,29 +247,30 @@ class RotasPublicasTests(TestCase):
             Experiencia.StatusPublicacao.PUBLICADO,
         )
 
-    def test_consulta_status_por_email(self):
-        response = self.client.get(
-            reverse("status_envio"),
-            {"email_contato": "autor@example.org"},
-        )
+    def test_status_envio_exibe_registro_do_autor_autenticado(self):
+        self.client.force_login(self.autor_pendente)
+        response = self.client.get(reverse("status_envio"))
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
         self.assertTrue(
-            "Boa pratica pendente" in conteudo or "Pending good practice" in conteudo,
+            "Boa pratica pendente" in conteudo
+            or "Buena practica pendiente" in conteudo
+            or "Pending good practice" in conteudo,
             conteudo,
         )
-        self.assertContains(response, "autor@example.org")
+        self.assertNotContains(response, "autor@example.org")
         self.assertContains(response, "2026")
 
-    def test_edicao_exige_email_valido(self):
+    def test_edicao_exige_login(self):
         experiencia = Experiencia.objects.get(titulo="Boa pratica pendente")
         response = self.client.get(reverse("editar_boa_pratica", args=[experiencia.pk]))
         self.assertEqual(response.status_code, 302)
 
     def test_autor_edita_e_reenvia(self):
         experiencia = Experiencia.objects.get(titulo="Boa pratica pendente")
+        self.client.force_login(self.autor_pendente)
         response = self.client.post(
-            f"{reverse('editar_boa_pratica', args=[experiencia.pk])}?email=autor@example.org",
+            reverse("editar_boa_pratica", args=[experiencia.pk]),
             {
                 "efs": experiencia.efs_id,
                 "pais": experiencia.pais_id,
@@ -288,7 +295,6 @@ class RotasPublicasTests(TestCase):
                 "ano_execucao": 2026,
                 "contribui_para_guia": "on",
                 "acao_envio": "enviar",
-                "email_contato_original": "autor@example.org",
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -296,11 +302,12 @@ class RotasPublicasTests(TestCase):
         self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
         self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
 
-    def test_catalogo_exibe_popup_boa_pratica_e_oculta_comparador(self):
+    def test_catalogo_preserva_apenas_acoes_previstas_no_prototipo(self):
         response = self.client.get(reverse("catalogo_experiencias"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "modalBoaPratica")
-        self.assertContains(response, "What is a good practice")
+        self.assertNotContains(response, "modalBoaPratica")
+        self.assertNotContains(response, "What is a good practice")
+        self.assertNotContains(response, ">Favoritar<")
         self.assertNotContains(response, "catalog-compare-checkbox")
         self.assertNotContains(response, "catalogoCompararSelecionadas")
         self.assertNotContains(response, "Open comparison page")
@@ -359,7 +366,7 @@ class RotasPublicasTests(TestCase):
         response = self.client.get(reverse("meus_envios"))
         self.assertEqual(response.status_code, 302)
 
-    def test_meus_envios_logado_retorna_envios_do_email(self):
+    def test_meus_envios_nao_vincula_registro_apenas_por_email(self):
         usuario = get_user_model().objects.create_user(
             username="autor_envios",
             email="autor@example.org",
@@ -369,10 +376,9 @@ class RotasPublicasTests(TestCase):
         response = self.client.get(reverse("meus_envios"))
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
-        self.assertTrue(
-            "Boa pratica pendente" in conteudo or "Pending good practice" in conteudo,
-            conteudo,
-        )
+        self.assertNotIn("Boa pratica pendente", conteudo)
+        self.assertNotIn("Buena practica pendiente", conteudo)
+        self.assertNotIn("Pending good practice", conteudo)
 
     def dados_validos_submissao(self):
         experiencia = Experiencia.objects.get(titulo="Avaliacao da equidade no acesso a agua")
@@ -560,4 +566,3 @@ class RotasPublicasTests(TestCase):
         proposta.refresh_from_db()
         self.assertEqual(experiencia.titulo, "Titulo aprovado no fluxo visual")
         self.assertEqual(proposta.status, PropostaEdicaoExperiencia.Status.APROVADA)
-

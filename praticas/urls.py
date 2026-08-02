@@ -25,5 +25,6 @@ urlpatterns = [
     path("painel-revisao-edicoes/", views.painel_revisao_edicoes, name="painel_revisao_edicoes"),
     path("painel-revisao-edicoes/<int:pk>/", views.revisar_edicao_publicada, name="revisar_edicao_publicada"),
     path("banco-tecnico/", views.banco_tecnico, name="banco_tecnico"),
+    path("ferramentas/", views.ferramentas, name="ferramentas"),
     path("sobre/", views.sobre_plataforma, name="sobre_plataforma"),
 ]

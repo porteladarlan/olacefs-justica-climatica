@@ -1,289 +1,53 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}
-    {% if LANGUAGE_CODE == 'en' %}
-        Technical and normative resources | Climate Justice Platform
-    {% elif LANGUAGE_CODE == 'es' %}
-        Recursos técnicos y normativos | Plataforma de Justicia Climática
-    {% else %}
-        Recursos técnicos e normativos | Plataforma de Justiça Climática
-    {% endif %}
-{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Technical and normative resources{% elif LANGUAGE_CODE == 'es' %}Recursos t&eacute;cnicos y normativos{% else %}Recursos t&eacute;cnicos e normativos{% endif %} | Plataforma Regional{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/marcos-publicos.css' %}">{% endblock %}
 
 {% block content %}
-<section class="page-hero mb-4">
-    <div class="hero-content">
-        <span class="hero-eyebrow">
-            {% if LANGUAGE_CODE == 'en' %}
-                Technical support area
-            {% elif LANGUAGE_CODE == 'es' %}
-                Área de apoyo técnico
-            {% else %}
-                Área de apoio técnico
-            {% endif %}
-        </span>
-        <h1 class="hero-title">
-            {% if LANGUAGE_CODE == 'en' %}
-                Technical and normative resources
-            {% elif LANGUAGE_CODE == 'es' %}
-                Recursos técnicos y normativos
-            {% else %}
-                Recursos técnicos e normativos
-            {% endif %}
-        </h1>
-        <p class="hero-subtitle">
-            {% if LANGUAGE_CODE == 'en' %}
-                A prepared institutional space for methodological references, international frameworks and support materials related to audits with a climate justice perspective.
-            {% elif LANGUAGE_CODE == 'es' %}
-                Un espacio institucional preparado para referencias metodológicas, marcos internacionales y materiales de apoyo relacionados con auditorías con perspectiva de justicia climática.
-            {% else %}
-                Um espaço institucional preparado para referências metodológicas, marcos internacionais e materiais de apoio relacionados a auditorias com perspectiva de justiça climática.
-            {% endif %}
-        </p>
-    </div>
-</section>
+<div class="norm-library">
+    <nav class="library-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{% if LANGUAGE_CODE == 'en' %}Technical resources{% elif LANGUAGE_CODE == 'es' %}Recursos t&eacute;cnicos{% else %}Recursos t&eacute;cnicos{% endif %}</span>
+    </nav>
 
-<section class="detail-layout-card mb-4">
-    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+    <header class="library-heading">
         <div>
-            <div class="section-kicker">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Content under development · Content under technical curation
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Contenido en desarrollo · Contenido en curaduría técnica
-                {% else %}
-                    Conte&uacute;do em desenvolvimento · Conte&uacute;do em curadoria t&eacute;cnica
-                {% endif %}
-            </div>
-            <!-- fase15j-compat-consultoria-auditora -->
-            <p class="section-subtitle small mb-0 mt-2">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Content under development with support from a specialized audit consultancy and the climate justice laboratory.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Contenido en desarrollo con apoyo de una consultor&iacute;a auditora especializada y del laboratorio de justicia clim&aacute;tica.
-                {% else %}
-                    Conte&uacute;do em desenvolvimento com apoio de consultoria auditora especializada e do laborat&oacute;rio de justi&ccedil;a clim&aacute;tica.
-                {% endif %}
-            </p>
-            <!-- /fase15j-compat-consultoria-auditora -->
-
-            
-
-            <h2 class="section-title h3 mb-2">
-                {% if LANGUAGE_CODE == 'en' %}
-                    The area is ready, but the final collection is not closed
-                {% elif LANGUAGE_CODE == 'es' %}
-                    El área está preparada, pero la colección final no está cerrada
-                {% else %}
-                    A área está preparada, mas a coleção final ainda não está fechada
-                {% endif %}
-            </h2>
-            <p class="section-subtitle mb-0">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Following the feedback received, this section should not present provisional references as final. The definitive contents will be organized after the specialized audit consultancy and the climate justice laboratory, keeping consistency with the Guide and with the experiences published in the catalog.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    De acuerdo con la retroalimentación recibida, esta sección no debe presentar referencias provisionales como definitivas. Los contenidos finales serán organizados después de la consultoría auditora especializada y del laboratorio de justicia climática, manteniendo coherencia con la Guía y con las experiencias publicadas en el catálogo.
-                {% else %}
-                    Conforme a retroalimentação recebida, esta seção não deve apresentar referências provisórias como definitivas. Os conteúdos finais serão organizados após a consultoria auditora especializada e o laboratório de justiça climática, mantendo coerência com a Guia e com as experiências publicadas no catálogo.
-                {% endif %}
-            </p>
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Knowledge area{% elif LANGUAGE_CODE == 'es' %}&Aacute;rea de conocimiento{% else %}&Aacute;rea de conhecimento{% endif %}</div>
+            <h1>{% if LANGUAGE_CODE == 'en' %}Technical and normative resources{% elif LANGUAGE_CODE == 'es' %}Recursos t&eacute;cnicos y normativos{% else %}Recursos t&eacute;cnicos e normativos{% endif %}</h1>
+            <p>{% if LANGUAGE_CODE == 'en' %}Institutional documents and references supporting external audits with a climate justice perspective.{% elif LANGUAGE_CODE == 'es' %}Documentos y referencias institucionales de apoyo a auditor&iacute;as externas con perspectiva de justicia clim&aacute;tica.{% else %}Documentos e refer&ecirc;ncias institucionais de apoio a auditorias externas com perspectiva de justi&ccedil;a clim&aacute;tica.{% endif %}</p>
         </div>
-        <div class="align-self-lg-start">
-            <span class="soon-badge">
-                {% if LANGUAGE_CODE == 'en' %}
-                    In preparation
-                {% elif LANGUAGE_CODE == 'es' %}
-                    En preparación
-                {% else %}
-                    Em preparação
-                {% endif %}
-            </span>
-        </div>
-    </div>
-</section>
+    </header>
 
-<section class="row g-3 mb-4">
-    <div class="col-lg-4">
-        <article class="home-action-card h-100">
-            <div class="home-cta-icon">1</div>
-            <h2 class="h5">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Methodological references
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Referencias metodológicas
-                {% else %}
-                    Referências metodológicas
-                {% endif %}
-            </h2>
-            <p>
-                {% if LANGUAGE_CODE == 'en' %}
-                    Future space for audit approaches, questions, criteria, matrices and instruments validated by the technical process.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Espacio futuro para enfoques de auditoría, preguntas, criterios, matrices e instrumentos validados por el proceso técnico.
-                {% else %}
-                    Espaço futuro para abordagens de auditoria, perguntas, critérios, matrizes e instrumentos validados pelo processo técnico.
-                {% endif %}
-            </p>
-        </article>
-    </div>
-    <div class="col-lg-4">
-        <article class="home-action-card h-100">
-            <div class="home-cta-icon">2</div>
-            <h2 class="h5">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Normative frameworks
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Marcos normativos
-                {% else %}
-                    Marcos normativos
-                {% endif %}
-            </h2>
-            <p>
-                {% if LANGUAGE_CODE == 'en' %}
-                    Future space for international standards, rights-based frameworks and climate commitments connected to good practices.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Espacio futuro para normas internacionales, marcos basados en derechos y compromisos climáticos vinculados a buenas prácticas.
-                {% else %}
-                    Espaço futuro para normas internacionais, marcos baseados em direitos e compromissos climáticos vinculados às boas práticas.
-                {% endif %}
-            </p>
-        </article>
-    </div>
-    <div class="col-lg-4">
-        <article class="home-action-card h-100">
-            <div class="home-cta-icon">3</div>
-            <h2 class="h5">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Support documents
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Documentos de apoyo
-                {% else %}
-                    Documentos de apoio
-                {% endif %}
-            </h2>
-            <p>
-                {% if LANGUAGE_CODE == 'en' %}
-                    Future space for studies, technical notes, background documents and materials that help users interpret the experiences.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Espacio futuro para estudios, notas técnicas, documentos de contexto y materiales que ayuden a interpretar las experiencias.
-                {% else %}
-                    Espaço futuro para estudos, notas técnicas, documentos de contexto e materiais que ajudem a interpretar as experiências.
-                {% endif %}
-            </p>
-        </article>
-    </div>
-</section>
+    <form method="get" class="library-toolbar" role="search">
+        <label class="library-search">
+            <span class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Search technical resources{% elif LANGUAGE_CODE == 'es' %}Buscar recursos t&eacute;cnicos{% else %}Buscar recursos t&eacute;cnicos{% endif %}</span>
+            <input type="search" name="q" maxlength="200" value="{{ termo_busca }}" placeholder="{% if LANGUAGE_CODE == 'en' %}Search documents and references{% elif LANGUAGE_CODE == 'es' %}Buscar documentos y referencias{% else %}Buscar documentos e refer&ecirc;ncias{% endif %}">
+        </label>
+        <button class="btn btn-primary btn-sm" type="submit">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</button>
+        {% if termo_busca %}<a class="btn btn-outline-primary btn-sm" href="{% url 'banco_tecnico' %}">{% if LANGUAGE_CODE == 'en' %}Clear{% elif LANGUAGE_CODE == 'es' %}Limpiar{% else %}Limpar{% endif %}</a>{% endif %}
+    </form>
 
-<section class="detail-layout-card mb-4">
-    <div class="section-kicker">
-        {% if LANGUAGE_CODE == 'en' %}
-            Relationship with the catalog
-        {% elif LANGUAGE_CODE == 'es' %}
-            Relación con el catálogo
-        {% else %}
-            Relação com o catálogo
-        {% endif %}
-    </div>
-    <h2 class="section-title h3 mb-2">
-        {% if LANGUAGE_CODE == 'en' %}
-            Normative references help organize and interpret good practices
-        {% elif LANGUAGE_CODE == 'es' %}
-            Las referencias normativas ayudan a organizar e interpretar las buenas prácticas
-        {% else %}
-            As referências normativas ajudam a organizar e interpretar as boas práticas
-        {% endif %}
-    </h2>
-    <p class="section-subtitle mb-0">
-        {% if LANGUAGE_CODE == 'en' %}
-            In the platform, standards and frameworks are not presented as a separate legal repository. They work as metadata and interpretation anchors connected to each experience, supporting filters, comparison and regional learning.
-        {% elif LANGUAGE_CODE == 'es' %}
-            En la plataforma, las normas y marcos no se presentan como un repositorio legal separado. Funcionan como metadatos y anclajes de interpretación conectados a cada experiencia, apoyando filtros, comparación y aprendizaje regional.
-        {% else %}
-            Na plataforma, normas e marcos não são apresentados como um repositório jurídico separado. Eles funcionam como metadados e âncoras de interpretação conectados a cada experiência, apoiando filtros, comparação e aprendizagem regional.
-        {% endif %}
-    </p>
-</section>
+    <p class="library-counter" aria-live="polite"><strong>{{ total_resultados }}</strong> {% if LANGUAGE_CODE == 'en' %}resources available{% elif LANGUAGE_CODE == 'es' %}recursos disponibles{% else %}recursos dispon&iacute;veis{% endif %}</p>
 
-{% if recursos %}
-<section class="detail-layout-card mb-4">
-    <div class="section-kicker">
-        {% if LANGUAGE_CODE == 'en' %}
-            Available materials
-        {% elif LANGUAGE_CODE == 'es' %}
-            Materiales disponibles
-        {% else %}
-            Materiais disponíveis
-        {% endif %}
-    </div>
-    <h2 class="section-title h3 mb-3">
-        {% if LANGUAGE_CODE == 'en' %}
-            Curated technical resources
-        {% elif LANGUAGE_CODE == 'es' %}
-            Recursos técnicos curados
-        {% else %}
-            Recursos técnicos curados
-        {% endif %}
-    </h2>
-
-    <div class="row g-3">
+    <div class="library-grid">
         {% for recurso in recursos %}
-        <div class="col-lg-6">
-            <article class="resource-card h-100">
-                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
-                    <span class="badge-soft">{{ recurso.tipo_recurso_exibicao }}</span>
-                    {% if recurso.setor %}
-                        <span class="badge-soft badge-yellow">{{ recurso.setor.nome_exibicao }}</span>
-                    {% endif %}
-                </div>
-                <h3 class="h4 section-title mb-2">{{ recurso.titulo_exibicao }}</h3>
-                <p class="section-subtitle">{{ recurso.descricao_exibicao }}</p>
-                {% if recurso.url %}
-                    <a class="btn btn-outline-primary" href="{{ recurso.url }}" target="_blank" rel="noopener">
-                        {% if LANGUAGE_CODE == 'en' %}
-                            Open resource
-                        {% elif LANGUAGE_CODE == 'es' %}
-                            Abrir recurso
-                        {% else %}
-                            Abrir recurso
-                        {% endif %}
-                    </a>
-                {% endif %}
+            <article class="library-card">
+                <span class="library-badge">{{ recurso.tipo_recurso_exibicao }}</span>
+                <h2>{{ recurso.titulo_exibicao }}</h2>
+                <p>{{ recurso.descricao_exibicao }}</p>
+                {% if recurso.setor %}<small>{{ recurso.setor.nome_exibicao }}</small>{% endif %}
+                {% if recurso.url_publica %}<a class="btn btn-outline-primary btn-sm" href="{{ recurso.url_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Open resource{% elif LANGUAGE_CODE == 'es' %}Abrir recurso{% else %}Abrir recurso{% endif %}</a>{% endif %}
             </article>
-        </div>
+        {% empty %}
+            <div class="library-empty">
+                <h2>{% if LANGUAGE_CODE == 'en' %}No institutional resource is published yet{% elif LANGUAGE_CODE == 'es' %}Todav&iacute;a no hay recursos institucionales publicados{% else %}Ainda n&atilde;o h&aacute; recursos institucionais publicados{% endif %}</h2>
+                <p>{% if LANGUAGE_CODE == 'en' %}The current technical records have no publication or origin marker and are not presented as official content until technical curation is complete.{% elif LANGUAGE_CODE == 'es' %}Los registros t&eacute;cnicos actuales no tienen marcador de publicaci&oacute;n u origen y no se presentan como contenido oficial hasta completar la curadur&iacute;a t&eacute;cnica.{% else %}Os registros t&eacute;cnicos atuais n&atilde;o possuem marcador de publica&ccedil;&atilde;o ou origem e n&atilde;o s&atilde;o apresentados como conte&uacute;do oficial at&eacute; a conclus&atilde;o da curadoria t&eacute;cnica.{% endif %}</p>
+            </div>
         {% endfor %}
     </div>
-</section>
-{% else %}
-<section class="detail-layout-card">
-    <div class="section-kicker">
-        {% if LANGUAGE_CODE == 'en' %}
-            No published resources yet
-        {% elif LANGUAGE_CODE == 'es' %}
-            Sin recursos publicados todavía
-        {% else %}
-            Sem recursos publicados ainda
-        {% endif %}
-    </div>
-    <h2 class="section-title h4 mb-2">
-        {% if LANGUAGE_CODE == 'en' %}
-            Materials will be added after technical validation
-        {% elif LANGUAGE_CODE == 'es' %}
-            Los materiales serán incorporados después de validación técnica
-        {% else %}
-            Os materiais serão incorporados após validação técnica
-        {% endif %}
-    </h2>
-    <p class="section-subtitle mb-0">
-        {% if LANGUAGE_CODE == 'en' %}
-            This avoids presenting preliminary materials as official references before the specialized review process is complete.
-        {% elif LANGUAGE_CODE == 'es' %}
-            Esto evita presentar materiales preliminares como referencias oficiales antes de completar el proceso de revisión especializada.
-        {% else %}
-            Isso evita apresentar materiais preliminares como referências oficiais antes da conclusão do processo de revisão especializada.
-        {% endif %}
-    </p>
-</section>
-{% endif %}
+</div>
 {% endblock %}

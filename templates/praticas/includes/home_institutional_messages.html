@@ -1,0 +1,46 @@
+{% load static %}
+<section class="home-voices home-block-alt" id="testimonialsSection" aria-labelledby="home-voices-title">
+    <div class="home-section-wrap">
+    <div class="home-section-heading text-center">
+        <h2 class="home-section-title" id="home-voices-title">
+            {% if LANGUAGE_CODE == 'en' %}A message from COMTEMA and CGID{% elif LANGUAGE_CODE == 'es' %}Un mensaje de la COMTEMA y la CGID{% else %}Uma mensagem da COMTEMA e da CGID{% endif %}
+        </h2>
+    </div>
+
+    <div class="home-voices-grid">
+        <figure class="home-voice-card">
+            <img class="home-voice-photo" src="{% static 'praticas/img/camilo-benitez.jpg' %}" alt="Dr. Camilo Ben&iacute;tez" width="96" height="96" loading="lazy" decoding="async">
+            <blockquote class="home-voice-quote">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Climate justice requires placing human rights and equity at the center of public oversight; this platform was therefore born as a regional space to systematize good practices, exchange tools and strengthen the audit response to climate change.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La justicia clim&aacute;tica exige poner los derechos humanos y la equidad en el centro del control p&uacute;blico; por eso, esta plataforma nace como un espacio regional para sistematizar buenas pr&aacute;cticas, intercambiar herramientas y fortalecer la respuesta de la auditor&iacute;a ante el cambio clim&aacute;tico.
+                {% else %}
+                    A justi&ccedil;a clim&aacute;tica exige colocar os direitos humanos e a equidade no centro do controle p&uacute;blico; portanto, essa plataforma nasceu como um espa&ccedil;o regional para sistematizar boas pr&aacute;ticas, trocar ferramentas e fortalecer a resposta de auditoria &agrave;s mudan&ccedil;as clim&aacute;ticas.
+                {% endif %}
+            </blockquote>
+            <figcaption>
+                <span class="home-voice-name">Dr. Camilo Ben&iacute;tez</span>
+                <span class="home-voice-role">{% if LANGUAGE_CODE == 'en' %}President of COMTEMA{% elif LANGUAGE_CODE == 'es' %}Presidente de la COMTEMA{% else %}Presidente da COMTEMA{% endif %}</span>
+            </figcaption>
+        </figure>
+
+        <figure class="home-voice-card">
+            <img class="home-voice-photo" src="{% static 'praticas/img/pamela-calletti.jpg' %}" alt="Dra. Pamela Calletti" width="96" height="96" loading="lazy" decoding="async">
+            <blockquote class="home-voice-quote">
+                {% if LANGUAGE_CODE == 'en' %}
+                    For development to be truly sustainable, inclusive and human-rights centered, it is essential to incorporate the climate-justice perspective into government oversight.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    Para que el desarrollo sea verdaderamente sostenible, inclusivo y centrado en los derechos humanos, es esencial incorporar la perspectiva de la justicia clim&aacute;tica en el control gubernamental.
+                {% else %}
+                    Para que o desenvolvimento seja verdadeiramente sustent&aacute;vel, inclusivo e focado nos direitos humanos, &eacute; essencial incorporar a perspectiva da justi&ccedil;a clim&aacute;tica no controle governamental.
+                {% endif %}
+            </blockquote>
+            <figcaption>
+                <span class="home-voice-name">Dra. Pamela Calletti</span>
+                <span class="home-voice-role">{% if LANGUAGE_CODE == 'en' %}President of CGID{% elif LANGUAGE_CODE == 'es' %}Presidenta de la CGID{% else %}Presidenta da CGID{% endif %}</span>
+            </figcaption>
+        </figure>
+    </div>
+    </div>
+</section>

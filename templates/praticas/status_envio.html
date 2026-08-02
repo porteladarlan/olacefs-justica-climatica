@@ -1,122 +1,35 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %} | Plataforma Regional{% endblock %}
 
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/meu-espaco.css' %}">{% endblock %}
+
 {% block content %}
-<section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Track submission{% elif LANGUAGE_CODE == 'es' %}Seguimiento del env&iacute;o{% else %}Acompanhar envio{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Check the status of submitted good practices{% elif LANGUAGE_CODE == 'es' %}Consulte el estado de buenas pr&aacute;cticas enviadas{% else %}Consulte o status das boas pr&aacute;ticas enviadas{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Enter the institutional e-mail used in the submission form to view submissions, reviewer comments and editing options.{% elif LANGUAGE_CODE == 'es' %}Ingrese el correo institucional usado en el formulario para ver env&iacute;os, comentarios y opciones de edici&oacute;n.{% else %}Informe o e-mail institucional usado no formul&aacute;rio para visualizar envios, coment&aacute;rios e op&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}</p>
-</section>
+<div class="account-page account-page--narrow account-page--status">
+    <nav class="prototype-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Navega&ccedil;&atilde;o estrutural{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+    </nav>
 
+    <header class="account-heading">
+        <div class="eyebrow">{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}Review area{% elif LANGUAGE_CODE == 'es' %}&Aacute;rea de revisi&oacute;n{% else %}&Aacute;rea de revis&atilde;o{% endif %}{% elif LANGUAGE_CODE == 'en' %}Tracking{% elif LANGUAGE_CODE == 'es' %}Seguimiento{% else %}Acompanhamento{% endif %}</div>
+        <h1>{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}Platform submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os de la plataforma{% else %}Envios da plataforma{% endif %}{% elif LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado de los env&iacute;os{% else %}Status de envios{% endif %}</h1>
+        <p>{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}As a review team member, you can view all submissions and edit requests.{% elif LANGUAGE_CODE == 'es' %}Como integrante del equipo de revisi&oacute;n, puede ver todos los env&iacute;os y solicitudes de edici&oacute;n.{% else %}Como integrante da equipe de revis&atilde;o, voc&ecirc; visualiza todos os envios e solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}{% elif LANGUAGE_CODE == 'en' %}Track statuses and review comments for submissions linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Siga los estados y comentarios de revisi&oacute;n de los env&iacute;os vinculados a su cuenta autenticada.{% else %}Acompanhe os estados e coment&aacute;rios de revis&atilde;o dos envios vinculados &agrave; sua conta autenticada.{% endif %}</p>
+    </header>
 
-<section class="status-help-grid mb-4">
-    <div class="status-help-card">
-        <span class="status-pill status-enviado">🟡 {% if LANGUAGE_CODE == 'en' %}Awaiting technical review{% elif LANGUAGE_CODE == 'es' %}En espera de revisión técnica{% else %}Aguardando revisão técnica{% endif %}</span>
-        <p class="text-muted small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}The submission was received and is waiting for review.{% elif LANGUAGE_CODE == 'es' %}El envío fue recibido y espera revisión.{% else %}O envio foi recebido e aguarda revisão.{% endif %}</p>
+    <div class="account-cta-row">
+        <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Submit new practice{% elif LANGUAGE_CODE == 'es' %}Enviar nueva pr&aacute;ctica{% else %}Enviar nova pr&aacute;tica{% endif %}</a>
     </div>
-    <div class="status-help-card">
-        <span class="status-pill status-publicado">🟢 {% if LANGUAGE_CODE == 'en' %}Published on the platform{% elif LANGUAGE_CODE == 'es' %}Publicado en la plataforma{% else %}Publicado na plataforma{% endif %}</span>
-        <p class="text-muted small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}The good practice is publicly available.{% elif LANGUAGE_CODE == 'es' %}La buena práctica está disponible públicamente.{% else %}A boa prática está disponível publicamente.{% endif %}</p>
-    </div>
-    <div class="status-help-card">
-        <span class="status-pill status-rejeitado">🔴 {% if LANGUAGE_CODE == 'en' %}Needs adjustments{% elif LANGUAGE_CODE == 'es' %}Necesita ajustes{% else %}Necessita de ajustes{% endif %}</span>
-        <p class="text-muted small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Review comments indicate what should be corrected.{% elif LANGUAGE_CODE == 'es' %}Los comentarios indican qué debe corregirse.{% else %}Os comentários indicam o que deve ser corrigido.{% endif %}</p>
-    </div>
-</section>
 
-<form method="get" class="filter-panel row g-3 mb-4">
-    <div class="col-md-8">
-        <label class="form-label fw-semibold">{{ form.email_contato.label }}</label>
-        {{ form.email_contato }}
-        {% for error in form.email_contato.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-    </div>
-    <div class="col-md-4 d-grid align-self-end">
-        <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Check status{% elif LANGUAGE_CODE == 'es' %}Consultar estado{% else %}Consultar status{% endif %}</button>
-    </div>
-</form>
+    <section class="workspace-section" aria-labelledby="submission-status-list-title">
+        <h2 id="submission-status-list-title">{% if LANGUAGE_CODE == 'en' %}Submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os{% else %}Envios{% endif %}</h2>
+        {% include 'praticas/includes/lista_envios_conta.html' %}
+    </section>
 
-{% if consulta_realizada %}
-<section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os{% else %}Envios{% endif %}</div>
-    <div class="row g-3">
-        {% for experiencia in experiencias %}
-        <div class="col-lg-6">
-            <article class="catalog-card h-100">
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    {% if experiencia.status_publicacao == 'publicado' %}
-                        <span class="status-pill status-publicado">🟢 {% if LANGUAGE_CODE == 'en' %}Published on the platform{% elif LANGUAGE_CODE == 'es' %}Publicado en la plataforma{% else %}Publicado na plataforma{% endif %}</span>
-                    {% elif experiencia.status_publicacao == 'enviado' %}
-                        <span class="status-pill status-enviado">🟡 {% if LANGUAGE_CODE == 'en' %}Awaiting technical review{% elif LANGUAGE_CODE == 'es' %}En espera de revisión técnica{% else %}Aguardando revisão técnica{% endif %}</span>
-                    {% elif experiencia.status_publicacao == 'em_revisao' %}
-                        <span class="status-pill status-em_revisao">🔵 {% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</span>
-                    {% elif experiencia.status_publicacao == 'rejeitado' %}
-                        <span class="status-pill status-rejeitado">🔴 {% if LANGUAGE_CODE == 'en' %}Needs adjustments / corrections{% elif LANGUAGE_CODE == 'es' %}Necesita ajustes / correcciones{% else %}Necessita de ajustes / correções{% endif %}</span>
-                    {% elif experiencia.status_publicacao == 'rascunho' %}
-                        <span class="status-pill status-rascunho">⚪ {% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</span>
-                    {% else %}
-                        <span class="status-pill status-pendente">🟡 {{ experiencia.get_status_publicacao_display }}</span>
-                    {% endif %}
-                    <span class="badge-soft">{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
-                    <span class="badge-soft">{{ experiencia.ano_execucao }}</span>
-                </div>
-                <h2 class="h4 section-title">{{ experiencia.titulo_exibicao }}</h2>
-                <p class="section-subtitle">{{ experiencia.descricao_exibicao|truncatechars:260 }}</p>
-                {% if experiencia.comentario_revisor %}
-                    <div class="alert alert-light border small">
-                        <strong>{% if LANGUAGE_CODE == 'en' %}Reviewer comment{% elif LANGUAGE_CODE == 'es' %}Comentario de revisi&oacute;n{% else %}Coment&aacute;rio da revis&atilde;o{% endif %}:</strong>
-                        {{ experiencia.comentario_revisor }}
-                    </div>
-                {% endif %}
-
-                <div class="d-flex flex-wrap gap-2">
-                    {% if experiencia.status_publicacao == "publicado" %}
-                        <a class="btn btn-outline-primary btn-sm" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}?email={{ form.cleaned_data.email_contato }}">
-                            {% if LANGUAGE_CODE == 'en' %}Request edit{% elif LANGUAGE_CODE == 'es' %}Solicitar edici&oacute;n{% else %}Solicitar edi&ccedil;&atilde;o{% endif %}
-                        </a>
-                    {% else %}
-                        <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}?email={{ form.cleaned_data.email_contato }}">
-                            {% if LANGUAGE_CODE == 'en' %}Edit / resubmit{% elif LANGUAGE_CODE == 'es' %}Editar / reenviar{% else %}Editar / reenviar{% endif %}
-                        </a>
-                    {% endif %}
-                </div>
-            </article>
-        </div>
-        {% empty %}
-        <div class="col-12"><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submission found for this e-mail.{% elif LANGUAGE_CODE == 'es' %}No se encontraron env&iacute;os para este correo.{% else %}Nenhum envio encontrado para este e-mail.{% endif %}</p></div></div>
-        {% endfor %}
-    </div>
-</section>
-
-<section>
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Published edit requests{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n publicadas{% else %}Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o em publicados{% endif %}</div>
-    <div class="row g-3">
-        {% for proposta in propostas %}
-        <div class="col-lg-6">
-            <article class="catalog-card h-100">
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    {% if proposta.status == 'aprovada' or proposta.status == 'aprovado' %}
-                        <span class="status-pill status-aprovado">🟢 {{ proposta.get_status_display }}</span>
-                    {% elif proposta.status == 'rejeitada' or proposta.status == 'rejeitado' %}
-                        <span class="status-pill status-rejeitado">🔴 {{ proposta.get_status_display }}</span>
-                    {% else %}
-                        <span class="status-pill status-pendente">🟡 {{ proposta.get_status_display }}</span>
-                    {% endif %}
-                    <span class="badge-soft">{{ proposta.criado_em|date:"d/m/Y" }}</span>
-                </div>
-                <h2 class="h5 section-title">{{ proposta.experiencia.titulo_exibicao }}</h2>
-                {% if proposta.comentario_autor %}<p class="section-subtitle">{{ proposta.comentario_autor }}</p>{% endif %}
-                {% if proposta.comentario_revisor %}
-                    <div class="alert alert-light border small mb-0"><strong>Revisão:</strong> {{ proposta.comentario_revisor }}</div>
-                {% endif %}
-            </article>
-        </div>
-        {% empty %}
-        <div class="col-12"><p class="text-muted small mb-0">{% if LANGUAGE_CODE == 'en' %}No edit request found.{% elif LANGUAGE_CODE == 'es' %}No hay solicitudes de edici&oacute;n.{% else %}Nenhuma solicita&ccedil;&atilde;o de edi&ccedil;&atilde;o encontrada.{% endif %}</p></div>
-        {% endfor %}
-    </div>
-</section>
-{% endif %}
+    <section class="workspace-section" aria-labelledby="status-edit-request-list-title">
+        <h2 id="status-edit-request-list-title">{% if LANGUAGE_CODE == 'en' %}Edit requests for published content{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n de contenidos publicados{% else %}Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o de conte&uacute;dos publicados{% endif %}</h2>
+        {% include 'praticas/includes/lista_propostas_edicao_conta.html' %}
+    </section>
+</div>
 {% endblock %}

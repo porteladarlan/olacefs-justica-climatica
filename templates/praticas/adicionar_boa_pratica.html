@@ -1,39 +1,43 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Submit good practice{% elif LANGUAGE_CODE == 'es' %}Enviar buena pr&aacute;ctica{% else %}Enviar boa pr&aacute;tica{% endif %} | Plataforma Regional{% endblock %}
 
-{% block content %}
-<section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submission form{% elif LANGUAGE_CODE == 'es' %}Formulario de env&iacute;o{% else %}Formul&aacute;rio de envio{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Submit a good practice{% elif LANGUAGE_CODE == 'es' %}Enviar una buena pr&aacute;ctica{% else %}Enviar uma boa pr&aacute;tica{% endif %}</h1>
-    <p class="section-subtitle">{% if LANGUAGE_CODE == 'en' %}You can save a draft or submit the experience for review. Submitted content is not published automatically.{% elif LANGUAGE_CODE == 'es' %}Puede guardar un borrador o enviar la experiencia para revisi&oacute;n. El contenido enviado no se publica autom&aacute;ticamente.{% else %}Voc&ecirc; pode salvar um rascunho ou enviar a experi&ecirc;ncia para revis&atilde;o. O conte&uacute;do enviado n&atilde;o &eacute; publicado automaticamente.{% endif %}</p>
-</section>
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/envio-pratica.css' %}">{% endblock %}
 
-<form method="post" enctype="multipart/form-data" class="row g-4">
+{% block content %}
+<div class="submission-page">
+<nav class="prototype-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Navega&ccedil;&atilde;o estrutural{% endif %}">
+    <a href="{% url 'catalogo_experiencias' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Good practices{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas{% else %}Boas pr&aacute;ticas{% endif %}</a>
+</nav>
+
+<header class="submission-heading">
+    <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Contribute experience{% elif LANGUAGE_CODE == 'es' %}Aportar experiencia{% else %}Contribuir com experi&ecirc;ncia{% endif %}</div>
+    <h1>{% if LANGUAGE_CODE == 'en' %}Register a good practice{% elif LANGUAGE_CODE == 'es' %}Registrar una buena pr&aacute;ctica{% else %}Registrar uma boa pr&aacute;tica{% endif %}</h1>
+    <p>{% if LANGUAGE_CODE == 'en' %}You can save a draft or submit the experience for review. Only approved content is published.{% elif LANGUAGE_CODE == 'es' %}Puede guardar un borrador o enviar la experiencia para revisi&oacute;n. Solo se publica el contenido aprobado.{% else %}Voc&ecirc; pode salvar um rascunho ou enviar a experi&ecirc;ncia para revis&atilde;o. Somente conte&uacute;do aprovado &eacute; publicado.{% endif %}</p>
+</header>
+
+<div class="status-help-grid" aria-label="{% if LANGUAGE_CODE == 'en' %}Submission flow{% elif LANGUAGE_CODE == 'es' %}Flujo de env&iacute;o{% else %}Fluxo do envio{% endif %}">
+    <div class="status-help-card">
+        <strong>{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</strong>
+        <p>{% if LANGUAGE_CODE == 'en' %}Save partial information and continue later.{% elif LANGUAGE_CODE == 'es' %}Guarde la información parcial y continúe después.{% else %}Salve informações parciais e continue depois.{% endif %}</p>
+    </div>
+    <div class="status-help-card">
+        <strong>{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</strong>
+        <p>{% if LANGUAGE_CODE == 'en' %}Required fields are validated before editorial review.{% elif LANGUAGE_CODE == 'es' %}Los campos obligatorios se validan antes de la revisión editorial.{% else %}Os campos obrigatórios são validados antes da revisão editorial.{% endif %}</p>
+    </div>
+    <div class="status-help-card">
+        <strong>{% if LANGUAGE_CODE == 'en' %}Public content{% elif LANGUAGE_CODE == 'es' %}Contenido público{% else %}Conteúdo público{% endif %}</strong>
+        <p>{% if LANGUAGE_CODE == 'en' %}Only approved content is shown in the catalog.{% elif LANGUAGE_CODE == 'es' %}Solo el contenido aprobado se muestra en el catálogo.{% else %}Somente conteúdo aprovado aparece no catálogo.{% endif %}</p>
+    </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="submission-form">
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
-    <div class="col-12">
-        <div class="status-help-grid">
-            <div class="status-help-card">
-                <strong>{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</strong>
-                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Use this option to save partial information and continue later.{% elif LANGUAGE_CODE == 'es' %}Use esta opción para guardar información parcial y continuar después.{% else %}Use esta opção para salvar informações parciais e continuar depois.{% endif %}</p>
-            </div>
-            <div class="status-help-card">
-                <strong>{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</strong>
-                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Required fields are validated before the experience is sent to the editorial workflow.{% elif LANGUAGE_CODE == 'es' %}Los campos obligatorios se validan antes de enviar la experiencia al flujo editorial.{% else %}Os campos obrigatórios são validados antes de enviar a experiência ao fluxo editorial.{% endif %}</p>
-            </div>
-            <div class="status-help-card">
-                <strong>{% if LANGUAGE_CODE == 'en' %}Public content{% elif LANGUAGE_CODE == 'es' %}Contenido público{% else %}Conteúdo público{% endif %}</strong>
-                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Only approved content will become visible in the public catalog.{% elif LANGUAGE_CODE == 'es' %}Solo el contenido aprobado será visible en el catálogo público.{% else %}Somente o conteúdo aprovado ficará visível no catálogo público.{% endif %}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12">
-        <div class="alert alert-warning mb-0">
+    <div class="submission-guidance">
             <strong>{% if LANGUAGE_CODE == 'en' %}Before submitting:{% elif LANGUAGE_CODE == 'es' %}Antes de enviar:{% else %}Antes de enviar:{% endif %}</strong>
             {% if LANGUAGE_CODE == 'en' %}
                 submit only content related to audit, oversight or climate justice, authorized for public disclosure by the corresponding SAI. Do not include confidential information, offensive or discriminatory content, restricted copyrighted material, private advertising or experiences that cannot be verified by a SAI.
@@ -42,7 +46,6 @@
             {% else %}
                 envie somente conte&uacute;dos relacionados a auditoria, fiscaliza&ccedil;&atilde;o ou justi&ccedil;a clim&aacute;tica, autorizados para divulga&ccedil;&atilde;o p&uacute;blica pela EFS correspondente. N&atilde;o inclua informa&ccedil;&otilde;es confidenciais, conte&uacute;do ofensivo ou discriminat&oacute;rio, materiais com direitos autorais restritos, publicidade privada ou experi&ecirc;ncias que n&atilde;o possam ser verificadas por uma EFS.
             {% endif %}
-        </div>
     </div>
 
     <div class="col-12">
@@ -58,9 +61,9 @@
                 {% for field in form %}
                     {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
                     <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
-                        <label class="form-label fw-semibold">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
                             {{ field.label }}
-                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
                                 <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
                             {% endif %}
                             {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}
@@ -86,16 +89,20 @@
             </div>
             <div class="row g-3">
                 <div class="col-lg-6">
-                    <label class="form-label fw-semibold">{{ form.temas_transversais.label }}</label>
+                    <fieldset class="submission-fieldset">
+                    <legend>{{ form.temas_transversais.label }}</legend>
                     {{ form.temas_transversais }}
                     {% if form.temas_transversais.help_text %}<div class="form-text">{{ form.temas_transversais.help_text }}</div>{% endif %}
                     {% for error in form.temas_transversais.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </fieldset>
                 </div>
                 <div class="col-lg-6">
-                    <label class="form-label fw-semibold">{{ form.normas_internacionais.label }}</label>
+                    <fieldset class="submission-fieldset">
+                    <legend>{{ form.normas_internacionais.label }}</legend>
                     {{ form.normas_internacionais }}
                     {% if form.normas_internacionais.help_text %}<div class="form-text">{{ form.normas_internacionais.help_text }}</div>{% endif %}
                     {% for error in form.normas_internacionais.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </fieldset>
                 </div>
             </div>
         </div>
@@ -114,9 +121,9 @@
                 {% for field in form %}
                     {% if field.name in "objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade" %}
                     <div class="col-12">
-                        <label class="form-label fw-semibold">
+                        <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
                             {{ field.label }}
-                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                            {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
                                 <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
                             {% endif %}
                             {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}
@@ -140,12 +147,12 @@
                     <p>{% if LANGUAGE_CODE == 'en' %}Optional public files and external references.{% elif LANGUAGE_CODE == 'es' %}Archivos p&uacute;blicos opcionales y referencias externas.{% else %}Arquivos p&uacute;blicos opcionais e refer&ecirc;ncias externas.{% endif %}</p>
                 </div>
             </div>
-            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Up to three attachments are allowed. Accepted formats: PDF, Word and Excel, with a maximum of 10 MB each. You may also provide external links. Use self-explanatory titles, such as &ldquo;Audit report&rdquo;, &ldquo;Criteria matrix&rdquo; or &ldquo;Methodological report&rdquo;.{% elif LANGUAGE_CODE == 'es' %}Se permiten hasta tres anexos. Formatos aceptados: PDF, Word y Excel, con un m&aacute;ximo de 10 MB cada uno. Tambi&eacute;n puede informar enlaces externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditor&iacute;a&rdquo;, &ldquo;Matriz de criterios&rdquo; o &ldquo;Informe metodol&oacute;gico&rdquo;.{% else %}S&atilde;o permitidos at&eacute; tr&ecirc;s anexos. Formatos aceitos: PDF, Word e Excel, com m&aacute;ximo de 10 MB cada. Tamb&eacute;m &eacute; poss&iacute;vel informar links externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditoria&rdquo;, &ldquo;Matriz de crit&eacute;rios&rdquo; ou &ldquo;Relat&oacute;rio metodol&oacute;gico&rdquo;.{% endif %}</p>
+            <p class="attachment-help" id="attachment-help">{% if LANGUAGE_CODE == 'en' %}Up to three attachments are allowed. Accepted formats: PDF, JPG and PNG, with a maximum of 10 MB each. You may also provide external links. Use self-explanatory titles, such as &ldquo;Audit report&rdquo;, &ldquo;Criteria matrix&rdquo; or &ldquo;Methodological report&rdquo;.{% elif LANGUAGE_CODE == 'es' %}Se permiten hasta tres anexos. Formatos aceptados: PDF, JPG y PNG, con un m&aacute;ximo de 10 MB cada uno. Tambi&eacute;n puede informar enlaces externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditor&iacute;a&rdquo;, &ldquo;Matriz de criterios&rdquo; o &ldquo;Informe metodol&oacute;gico&rdquo;.{% else %}S&atilde;o permitidos at&eacute; tr&ecirc;s anexos. Formatos aceitos: PDF, JPG e PNG, com m&aacute;ximo de 10 MB cada. Tamb&eacute;m &eacute; poss&iacute;vel informar links externos. Use t&iacute;tulos autoexplicativos, como &ldquo;Informe de auditoria&rdquo;, &ldquo;Matriz de crit&eacute;rios&rdquo; ou &ldquo;Relat&oacute;rio metodol&oacute;gico&rdquo;.{% endif %}</p>
             {% for indice in "123" %}
-            <div class="row g-2 align-items-end mb-3">
-                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}Attachment title{% elif LANGUAGE_CODE == 'es' %}T&iacute;tulo del anexo{% else %}T&iacute;tulo do anexo{% endif %} {{ indice }}</label><input class="form-control" type="text" name="anexo_titulo_{{ indice }}"></div>
-                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}File{% elif LANGUAGE_CODE == 'es' %}Archivo{% else %}Arquivo{% endif %}</label><input class="form-control" type="file" name="anexo_arquivo_{{ indice }}" accept=".pdf,.doc,.docx,.xls,.xlsx"></div>
-                <div class="col-md-4"><label class="form-label small">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</label><input class="form-control" type="url" name="anexo_url_{{ indice }}"></div>
+            <div class="attachment-row">
+                <div><label for="id_anexo_titulo_{{ indice }}">{% if LANGUAGE_CODE == 'en' %}Attachment title{% elif LANGUAGE_CODE == 'es' %}T&iacute;tulo del anexo{% else %}T&iacute;tulo do anexo{% endif %} {{ indice }}</label><input class="form-control" id="id_anexo_titulo_{{ indice }}" type="text" name="anexo_titulo_{{ indice }}"></div>
+                <div><label for="id_anexo_arquivo_{{ indice }}">{% if LANGUAGE_CODE == 'en' %}File{% elif LANGUAGE_CODE == 'es' %}Archivo{% else %}Arquivo{% endif %}</label><input class="form-control" id="id_anexo_arquivo_{{ indice }}" type="file" name="anexo_arquivo_{{ indice }}" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" aria-describedby="attachment-help"></div>
+                <div><label for="id_anexo_url_{{ indice }}">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</label><input class="form-control" id="id_anexo_url_{{ indice }}" type="url" name="anexo_url_{{ indice }}"></div>
             </div>
             {% endfor %}
         </div>
@@ -163,7 +170,7 @@
             </div>
             <div class="row g-3">
                 <div class="col-12">
-                    <label class="form-label fw-semibold">
+                    <label class="form-label fw-semibold" for="{{ form.informacoes_adicionais.id_for_label }}">
                         {{ form.informacoes_adicionais.label }}
                         {% if form.informacoes_adicionais.help_text %}<span class="info-hint" title="{{ form.informacoes_adicionais.help_text }}">i</span>{% endif %}
                     </label>
@@ -175,10 +182,11 @@
         </div>
     </div>
 
-    <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
+    <div class="submission-actions">
         <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
         <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
         <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisi&oacute;n{% else %}Enviar para revis&atilde;o{% endif %}</button>
     </div>
 </form>
+</div>
 {% endblock %}

@@ -84,8 +84,7 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
         self.assertIn("TC", conteudo)
         self.assertIn("Brasil", conteudo)
         self.assertIn("2026", conteudo)
-        self.assertIn("E-mail", conteudo)
-        self.assertIn("contato@example.org", conteudo)
+        self.assertNotIn("contato@example.org", conteudo)
 
         # Validação dos novos blocos da retroalimentação sem fixar idioma.
         self.assertTrue(

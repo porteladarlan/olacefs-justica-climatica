@@ -72,6 +72,19 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.assertContains(resposta, "Boa prática para exclusão")
         self.assertContains(resposta, "confirmar_exclusao")
 
+    def test_cancelamento_descarta_next_com_esquema_inseguro(self):
+        experiencia = self.criar_experiencia()
+        self.client.login(username="admin_fase16i", password="SenhaForte123!")
+
+        resposta = self.client.get(
+            reverse("excluir_boa_pratica", args=[experiencia.pk]),
+            {"next": "javascript:alert(document.domain)"},
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertNotContains(resposta, "javascript:")
+        self.assertContains(resposta, reverse("catalogo_experiencias"))
+
     def test_staff_exclui_boa_pratica_por_post_confirmado(self):
         experiencia = self.criar_experiencia()
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
@@ -82,9 +95,9 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.assertEqual(resposta.status_code, 302)
         self.assertFalse(Experiencia.objects.filter(pk=experiencia.pk).exists())
 
-    def test_catalogo_exibe_acao_de_exclusao_para_staff(self):
+    def test_catalogo_publico_nao_exibe_acao_administrativa_extra(self):
         experiencia = self.criar_experiencia()
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
         resposta = self.client.get(reverse("catalogo_experiencias"))
         self.assertEqual(resposta.status_code, 200)
-        self.assertContains(resposta, reverse("excluir_boa_pratica", args=[experiencia.pk]))
+        self.assertNotContains(resposta, reverse("excluir_boa_pratica", args=[experiencia.pk]))

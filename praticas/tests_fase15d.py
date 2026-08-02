@@ -1,29 +1,25 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
 
 class RecursosTecnicosRetroalimentacaoTests(TestCase):
-    def test_recursos_tecnicos_exibe_conteudo_em_desenvolvimento(self):
+    def setUp(self):
+        translation.activate("pt-br")
+
+    def tearDown(self):
+        translation.deactivate_all()
+
+    def test_recursos_tecnicos_exibe_biblioteca_com_estado_vazio_honesto(self):
         response = self.client.get(reverse("banco_tecnico"))
 
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
 
-        self.assertTrue(
-            "Conte&uacute;do em desenvolvimento" in conteudo
-            or "Contenido en desarrollo" in conteudo
-            or "Content under development" in conteudo
-        )
-        self.assertTrue(
-            "consultoria auditora especializada" in conteudo
-            or "consultor&iacute;a auditora especializada" in conteudo
-            or "specialized audit consultancy" in conteudo
-        )
-        self.assertTrue(
-            "laborat&oacute;rio de justi&ccedil;a clim&aacute;tica" in conteudo
-            or "laboratorio de justicia clim&aacute;tica" in conteudo
-            or "climate justice laboratory" in conteudo
-        )
+        self.assertIn('class="norm-library"', conteudo)
+        self.assertIn('name="q"', conteudo)
+        self.assertEqual(response.context["total_resultados"], 0)
+        self.assertIn("Ainda n&atilde;o h&aacute; recursos institucionais publicados", conteudo)
 
     def test_recursos_tecnicos_nao_chama_conteudo_provisorio_de_final(self):
         response = self.client.get(reverse("banco_tecnico"))

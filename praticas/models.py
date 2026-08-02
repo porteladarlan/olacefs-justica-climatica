@@ -1,4 +1,8 @@
+import uuid
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import get_language
 
@@ -535,3 +539,650 @@ class BancoTecnico(models.Model):
     @property
     def tipo_recurso_exibicao(self):
         return texto_por_idioma(self.tipo_recurso, self.tipo_recurso_es, self.tipo_recurso_en)
+
+
+class LoteImportacaoConteudo(models.Model):
+    class Status(models.TextChoices):
+        PENDENTE = "pendente", "Pendente"
+        EM_EXECUCAO = "em_execucao", "Em execucao"
+        CONCLUIDO = "concluido", "Concluido"
+        COM_DIVERGENCIAS = "com_divergencias", "Com divergencias"
+        FALHOU = "falhou", "Falhou"
+        REVERTIDO = "revertido", "Revertido"
+        REVERSAO_PARCIAL = "reversao_parcial", "Reversao parcial"
+
+    identificador = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    fonte = models.CharField(max_length=500)
+    sha256 = models.CharField(
+        max_length=64,
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9a-fA-F]{64}$",
+                message="Informe um hash SHA-256 hexadecimal com 64 caracteres.",
+            )
+        ],
+    )
+    versao_fonte = models.CharField(max_length=100)
+    executado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="lotes_importacao_executados",
+    )
+    iniciado_em = models.DateTimeField(auto_now_add=True)
+    finalizado_em = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=30, choices=Status.choices, default=Status.PENDENTE)
+    contagens_esperadas = models.JSONField(default=dict)
+    contagens_realizadas = models.JSONField(default=dict)
+    relatorio_divergencias = models.JSONField(default=dict)
+    mensagem_sanitizada = models.TextField(blank=True)
+    revertido_em = models.DateTimeField(null=True, blank=True)
+    revertido_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="lotes_importacao_revertidos",
+    )
+    justificativa_reversao = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Lote de importacao de conteudo"
+        verbose_name_plural = "Lotes de importacao de conteudo"
+        ordering = ["-iniciado_em"]
+        indexes = [
+            models.Index(fields=["status", "-iniciado_em"]),
+            models.Index(fields=["sha256", "versao_fonte"]),
+            models.Index(fields=["executado_por", "-iniciado_em"]),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(sha256__regex=r"^[0-9a-fA-F]{64}$"),
+                name="lote_sha256_hex_64",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(finalizado_em__isnull=True)
+                    | models.Q(finalizado_em__gte=models.F("iniciado_em"))
+                ),
+                name="lote_final_ge_inicio",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(
+                        status__in=(
+                            "concluido",
+                            "com_divergencias",
+                            "falhou",
+                            "revertido",
+                            "reversao_parcial",
+                        )
+                    )
+                    | models.Q(finalizado_em__isnull=False)
+                ),
+                name="lote_status_final_com_data",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(status="falhou")
+                    | (
+                        ~models.Q(mensagem_sanitizada="")
+                        & ~models.Q(contagens_realizadas={})
+                    )
+                ),
+                name="lote_falha_detalhada",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(status__in=("revertido", "reversao_parcial"))
+                    | (
+                        models.Q(revertido_em__isnull=False)
+                        & models.Q(revertido_por__isnull=False)
+                        & ~models.Q(justificativa_reversao="")
+                    )
+                ),
+                name="lote_reversao_detalhada",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.identificador} - {self.get_status_display()}"
+
+    def clean(self):
+        super().clean()
+        erros = {}
+        status_finais = {
+            self.Status.CONCLUIDO,
+            self.Status.COM_DIVERGENCIAS,
+            self.Status.FALHOU,
+            self.Status.REVERTIDO,
+            self.Status.REVERSAO_PARCIAL,
+        }
+        if self.finalizado_em and self.iniciado_em and self.finalizado_em < self.iniciado_em:
+            erros["finalizado_em"] = "A finalizacao nao pode anteceder o inicio."
+        if self.status in status_finais and not self.finalizado_em:
+            erros["finalizado_em"] = "Um lote em estado final deve informar a finalizacao."
+        if self.status == self.Status.FALHOU:
+            if not self.mensagem_sanitizada.strip():
+                erros["mensagem_sanitizada"] = "Uma falha deve possuir mensagem sanitizada."
+            if not self.contagens_realizadas:
+                erros["contagens_realizadas"] = "Uma falha deve registrar as contagens realizadas."
+        if self.status in {self.Status.REVERTIDO, self.Status.REVERSAO_PARCIAL}:
+            if not self.revertido_em:
+                erros["revertido_em"] = "Uma reversao deve informar sua data."
+            if not self.revertido_por_id:
+                erros["revertido_por"] = "Uma reversao deve informar o responsavel."
+            if not self.justificativa_reversao.strip():
+                erros["justificativa_reversao"] = "Uma reversao deve possuir justificativa."
+        if erros:
+            raise ValidationError(erros)
+
+
+class ItemLoteImportacaoConteudo(models.Model):
+    class Entidade(models.TextChoices):
+        MARCO = "marco", "Marco"
+        FERRAMENTA = "ferramenta", "Ferramenta"
+        VERSAO_GUIA = "versao_guia", "Versao do guia"
+        EIXO = "eixo", "Eixo"
+        SUBEIXO = "subeixo", "Subeixo"
+        SUBAREA = "subarea", "Subarea"
+        PERGUNTA = "pergunta", "Pergunta"
+        REFERENCIA = "referencia", "Referencia"
+        EXPERIENCIA_PERGUNTA_GUIA = "experiencia_pergunta_guia", "Experiencia e pergunta do guia"
+        VINCULO_USUARIO_EFS = "vinculo_usuario_efs", "Vinculo usuario-EFS"
+        EPISODIO_VINCULO_USUARIO_EFS = "episodio_vinculo_usuario_efs", "Episodio de vinculo usuario-EFS"
+        ATRIBUICAO_PAPEL_VINCULO = "atribuicao_papel_vinculo", "Atribuicao de papel no vinculo"
+
+    class Operacao(models.TextChoices):
+        CRIADO = "criado", "Criado"
+        ATUALIZADO = "atualizado", "Atualizado"
+        IGNORADO = "ignorado", "Ignorado"
+        FALHOU = "falhou", "Falhou"
+
+    class StatusRollback(models.TextChoices):
+        NAO_APLICAVEL = "nao_aplicavel", "Nao aplicavel"
+        PENDENTE = "pendente", "Pendente"
+        REVERTIDO = "revertido", "Revertido"
+        BLOQUEADO = "bloqueado", "Bloqueado"
+
+    lote = models.ForeignKey(
+        LoteImportacaoConteudo,
+        on_delete=models.PROTECT,
+        related_name="itens",
+    )
+    entidade = models.CharField(max_length=50, choices=Entidade.choices)
+    codigo_origem = models.CharField(max_length=160)
+    objeto_pk = models.CharField(max_length=64, blank=True)
+    operacao = models.CharField(max_length=20, choices=Operacao.choices)
+    snapshot_anterior = models.JSONField(default=dict)
+    status_rollback = models.CharField(
+        max_length=20,
+        choices=StatusRollback.choices,
+        default=StatusRollback.NAO_APLICAVEL,
+    )
+    mensagem = models.TextField(blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Item de lote de importacao de conteudo"
+        verbose_name_plural = "Itens de lote de importacao de conteudo"
+        ordering = ["lote", "entidade", "codigo_origem"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["lote", "entidade", "codigo_origem"],
+                name="item_lote_origem_unico",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["lote", "operacao"]),
+            models.Index(fields=["entidade", "objeto_pk"]),
+        ]
+
+    def __str__(self):
+        return f"{self.lote.identificador} - {self.entidade}:{self.codigo_origem}"
+
+    def clean(self):
+        super().clean()
+        if not isinstance(self.snapshot_anterior, dict):
+            raise ValidationError({"snapshot_anterior": "O snapshot deve ser um objeto JSON."})
+
+        chaves_proibidas = {
+            "arquivo",
+            "authorization",
+            "conteudo_binario",
+            "cookie",
+            "email",
+            "ip",
+            "password",
+            "secret",
+            "segredo",
+            "senha",
+            "sessao",
+            "session",
+            "token",
+        }
+
+        def validar(valor):
+            if isinstance(valor, (bytes, bytearray, memoryview)):
+                raise ValidationError({"snapshot_anterior": "O snapshot nao pode armazenar conteudo binario."})
+            if isinstance(valor, dict):
+                for chave, item in valor.items():
+                    chave_normalizada = str(chave).casefold().replace("-", "_")
+                    partes = set(chave_normalizada.split("_"))
+                    if chave_normalizada in chaves_proibidas or partes & chaves_proibidas:
+                        raise ValidationError(
+                            {"snapshot_anterior": "O snapshot contem uma chave de dado sensivel nao permitida."}
+                        )
+                    validar(item)
+            elif isinstance(valor, (list, tuple)):
+                for item in valor:
+                    validar(item)
+
+        validar(self.snapshot_anterior)
+
+
+class PapelInstitucional(models.Model):
+    codigo = models.SlugField(max_length=50, unique=True)
+    nome = models.CharField(max_length=100)
+    nome_es = models.CharField(max_length=100)
+    nome_en = models.CharField(max_length=100)
+    descricao = models.TextField(blank=True)
+    descricao_es = models.TextField(blank=True)
+    descricao_en = models.TextField(blank=True)
+    ativo = models.BooleanField(default=True)
+    ordem = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Papel institucional"
+        verbose_name_plural = "Papeis institucionais"
+        ordering = ["ordem", "codigo"]
+        indexes = [models.Index(fields=["ativo", "ordem"])]
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+
+    def clean(self):
+        super().clean()
+        erros = {}
+        if self.ativo:
+            campos_traduzidos = {
+                "nome": self.nome,
+                "nome_es": self.nome_es,
+                "nome_en": self.nome_en,
+            }
+            for campo, valor in campos_traduzidos.items():
+                if not valor.strip():
+                    erros[campo] = "Um papel ativo deve possuir nome nos tres idiomas."
+        if self.pk and self.atribuicoes.exists():
+            codigo_original = type(self).objects.filter(pk=self.pk).values_list("codigo", flat=True).first()
+            if codigo_original and codigo_original != self.codigo:
+                erros["codigo"] = "O codigo nao pode mudar depois que o papel for utilizado."
+        if erros:
+            raise ValidationError(erros)
+
+
+class VinculoUsuarioEFS(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="vinculos_efs",
+    )
+    efs = models.ForeignKey(EFS, on_delete=models.PROTECT, related_name="vinculos_usuarios")
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Vinculo usuario-EFS"
+        verbose_name_plural = "Vinculos usuario-EFS"
+        ordering = ["efs__nome", "usuario__username"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["usuario", "efs"],
+                name="vinculo_usuario_efs_unico",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.usuario.get_username()} - {self.efs}"
+
+
+class EpisodioVinculoUsuarioEFS(models.Model):
+    class Status(models.TextChoices):
+        PENDENTE = "pendente", "Pendente"
+        ATIVO = "ativo", "Ativo"
+        SUSPENSO = "suspenso", "Suspenso"
+        ENCERRADO = "encerrado", "Encerrado"
+        REJEITADO = "rejeitado", "Rejeitado"
+
+    class Origem(models.TextChoices):
+        SOLICITACAO = "solicitacao", "Solicitacao"
+        ADMINISTRACAO = "administracao", "Administracao"
+        MIGRACAO = "migracao", "Migracao"
+
+    vinculo = models.ForeignKey(
+        VinculoUsuarioEFS,
+        on_delete=models.PROTECT,
+        related_name="episodios",
+    )
+    status = models.CharField(max_length=20, choices=Status.choices)
+    origem = models.CharField(max_length=20, choices=Origem.choices)
+    solicitado_em = models.DateTimeField(auto_now_add=True)
+    data_inicio = models.DateField(null=True, blank=True)
+    data_fim = models.DateField(null=True, blank=True)
+    decidido_em = models.DateTimeField(null=True, blank=True)
+    decidido_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="episodios_vinculo_decididos",
+    )
+    justificativa_decisao = models.TextField(blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Episodio de vinculo usuario-EFS"
+        verbose_name_plural = "Episodios de vinculo usuario-EFS"
+        ordering = ["-solicitado_em", "-pk"]
+        indexes = [
+            models.Index(fields=["vinculo", "status"]),
+            models.Index(fields=["status", "data_fim"]),
+            models.Index(fields=["decidido_por", "-decidido_em"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["vinculo"],
+                condition=models.Q(status__in=("pendente", "ativo", "suspenso")),
+                name="episodio_corrente_unico",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(data_fim__isnull=True)
+                    | (
+                        models.Q(data_inicio__isnull=False)
+                        & models.Q(data_fim__gte=models.F("data_inicio"))
+                    )
+                ),
+                name="episodio_fim_ge_inicio",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(status="ativo")
+                    | (
+                        models.Q(data_inicio__isnull=False)
+                        & models.Q(decidido_em__isnull=False)
+                        & models.Q(decidido_por__isnull=False)
+                    )
+                ),
+                name="episodio_ativo_decidido",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(status="suspenso")
+                    | models.Q(data_inicio__isnull=False)
+                ),
+                name="episodio_suspenso_com_inicio",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(status__in=("rejeitado", "suspenso", "encerrado"))
+                    | (
+                        models.Q(decidido_em__isnull=False)
+                        & models.Q(decidido_por__isnull=False)
+                        & ~models.Q(justificativa_decisao="")
+                    )
+                ),
+                name="episodio_decisao_detalhada",
+            ),
+            models.CheckConstraint(
+                condition=(~models.Q(status="encerrado") | models.Q(data_fim__isnull=False)),
+                name="episodio_encerrado_com_fim",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.vinculo} - {self.get_status_display()}"
+
+    def clean(self):
+        super().clean()
+        if self.decidido_por_id and self.vinculo_id:
+            usuario_id = (
+                VinculoUsuarioEFS.objects.filter(pk=self.vinculo_id)
+                .values_list("usuario_id", flat=True)
+                .first()
+            )
+            if self.decidido_por_id == usuario_id:
+                raise ValidationError({"decidido_por": "O usuario do vinculo nao pode decidir o proprio episodio."})
+
+
+class AtribuicaoPapelVinculo(models.Model):
+    episodio = models.ForeignKey(
+        EpisodioVinculoUsuarioEFS,
+        on_delete=models.PROTECT,
+        related_name="atribuicoes",
+    )
+    papel = models.ForeignKey(
+        PapelInstitucional,
+        on_delete=models.PROTECT,
+        related_name="atribuicoes",
+    )
+    atribuido_em = models.DateTimeField(auto_now_add=True)
+    atribuido_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="papeis_institucionais_atribuidos",
+    )
+    revogado_em = models.DateTimeField(null=True, blank=True)
+    revogado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="papeis_institucionais_revogados",
+    )
+    justificativa_revogacao = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Atribuicao de papel no vinculo"
+        verbose_name_plural = "Atribuicoes de papel no vinculo"
+        ordering = ["episodio", "papel", "-atribuido_em"]
+        indexes = [
+            models.Index(fields=["episodio", "revogado_em"]),
+            models.Index(fields=["papel", "revogado_em"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["episodio", "papel"],
+                condition=models.Q(revogado_em__isnull=True),
+                name="atribuicao_ativa_unica",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    (
+                        models.Q(revogado_em__isnull=True)
+                        & models.Q(revogado_por__isnull=True)
+                        & models.Q(justificativa_revogacao="")
+                    )
+                    | (
+                        models.Q(revogado_em__isnull=False)
+                        & models.Q(revogado_por__isnull=False)
+                        & ~models.Q(justificativa_revogacao="")
+                    )
+                ),
+                name="atribuicao_revogacao_completa",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.episodio} - {self.papel.codigo}"
+
+    def clean(self):
+        super().clean()
+        erros = {}
+        if (
+            not self.pk
+            and self.papel_id
+            and PapelInstitucional.objects.filter(pk=self.papel_id, ativo=False).exists()
+        ):
+            erros["papel"] = "Somente um papel ativo pode ser atribuido."
+        if self.episodio_id:
+            episodio = (
+                EpisodioVinculoUsuarioEFS.objects.filter(pk=self.episodio_id)
+                .values("origem", "vinculo__usuario_id")
+                .first()
+            )
+            if episodio:
+                origens_com_responsavel = {
+                    EpisodioVinculoUsuarioEFS.Origem.SOLICITACAO,
+                    EpisodioVinculoUsuarioEFS.Origem.ADMINISTRACAO,
+                }
+                if episodio["origem"] in origens_com_responsavel and not self.atribuido_por_id:
+                    erros["atribuido_por"] = "A origem do episodio exige o responsavel pela atribuicao."
+                usuario_id = episodio["vinculo__usuario_id"]
+                if self.atribuido_por_id == usuario_id:
+                    erros["atribuido_por"] = "O usuario do vinculo nao pode atribuir papel a si mesmo."
+                if self.revogado_por_id == usuario_id:
+                    erros["revogado_por"] = "O usuario do vinculo nao pode revogar o proprio papel."
+        dados_revogacao = (
+            bool(self.revogado_em),
+            bool(self.revogado_por_id),
+            bool(self.justificativa_revogacao.strip()),
+        )
+        if any(dados_revogacao) and not all(dados_revogacao):
+            erros["revogado_em"] = "A revogacao exige data, responsavel e justificativa."
+        if erros:
+            raise ValidationError(erros)
+
+
+class EventoVinculoUsuarioEFS(models.Model):
+    class Acao(models.TextChoices):
+        SOLICITADO = "solicitado", "Solicitado"
+        ATIVADO = "ativado", "Ativado"
+        REJEITADO = "rejeitado", "Rejeitado"
+        SUSPENSO = "suspenso", "Suspenso"
+        REATIVADO = "reativado", "Reativado"
+        ENCERRADO = "encerrado", "Encerrado"
+        PAPEL_ADICIONADO = "papel_adicionado", "Papel adicionado"
+        PAPEL_REVOGADO = "papel_revogado", "Papel revogado"
+
+    episodio = models.ForeignKey(
+        EpisodioVinculoUsuarioEFS,
+        on_delete=models.PROTECT,
+        related_name="eventos",
+    )
+    papel = models.ForeignKey(
+        PapelInstitucional,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="eventos_vinculo",
+    )
+    atribuicao_papel = models.ForeignKey(
+        AtribuicaoPapelVinculo,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="eventos",
+    )
+    lote_origem = models.ForeignKey(
+        LoteImportacaoConteudo,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="eventos_vinculo",
+    )
+    item_lote_origem = models.ForeignKey(
+        ItemLoteImportacaoConteudo,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="eventos_vinculo",
+    )
+    acao = models.CharField(max_length=30, choices=Acao.choices)
+    status_anterior = models.CharField(
+        max_length=20,
+        choices=EpisodioVinculoUsuarioEFS.Status.choices,
+        blank=True,
+    )
+    status_novo = models.CharField(
+        max_length=20,
+        choices=EpisodioVinculoUsuarioEFS.Status.choices,
+        blank=True,
+    )
+    responsavel = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="eventos_vinculo_efs",
+    )
+    justificativa = models.TextField(blank=True)
+    ocorrido_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Evento de vinculo usuario-EFS"
+        verbose_name_plural = "Eventos de vinculo usuario-EFS"
+        ordering = ["-ocorrido_em", "-pk"]
+        indexes = [
+            models.Index(fields=["episodio", "-ocorrido_em"]),
+            models.Index(fields=["papel", "-ocorrido_em"]),
+            models.Index(fields=["responsavel", "-ocorrido_em"]),
+            models.Index(fields=["lote_origem", "ocorrido_em"]),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    ~models.Q(acao__in=("papel_adicionado", "papel_revogado"))
+                    | models.Q(papel__isnull=False)
+                ),
+                name="evento_papel_exige_papel",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(item_lote_origem__isnull=True)
+                    | models.Q(lote_origem__isnull=False)
+                ),
+                name="evento_item_exige_lote",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.episodio} - {self.get_acao_display()}"
+
+    def clean(self):
+        super().clean()
+        erros = {}
+        if self.acao in {self.Acao.PAPEL_ADICIONADO, self.Acao.PAPEL_REVOGADO} and not self.papel_id:
+            erros["papel"] = "Uma acao de papel deve identificar o papel."
+        if self.atribuicao_papel_id:
+            atribuicao = (
+                AtribuicaoPapelVinculo.objects.filter(pk=self.atribuicao_papel_id)
+                .values("episodio_id", "papel_id")
+                .first()
+            )
+            if atribuicao and atribuicao["episodio_id"] != self.episodio_id:
+                erros["atribuicao_papel"] = "A atribuicao deve pertencer ao episodio do evento."
+            if atribuicao and self.papel_id and atribuicao["papel_id"] != self.papel_id:
+                erros["papel"] = "O papel deve corresponder ao papel da atribuicao."
+        if self.item_lote_origem_id:
+            if not self.lote_origem_id:
+                erros["lote_origem"] = "Um item de origem exige o lote correspondente."
+            elif not ItemLoteImportacaoConteudo.objects.filter(
+                pk=self.item_lote_origem_id,
+                lote_id=self.lote_origem_id,
+            ).exists():
+                erros["item_lote_origem"] = "O item deve pertencer ao lote informado."
+        if erros:
+            raise ValidationError(erros)
+
+    def save(self, *args, **kwargs):
+        if self.pk and type(self).objects.filter(pk=self.pk).exists():
+            raise ValidationError("Eventos de vinculo sao imutaveis.")
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Eventos de vinculo nao podem ser excluidos pelo fluxo normal.")

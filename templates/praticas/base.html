@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:'pt-br' }}">
@@ -6,9 +6,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Plataforma Regional | OLACEFS{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            "use strict";
+            try {
+                if (window.localStorage.getItem("pjc:ui:high-contrast:v1") === "true") {
+                    document.documentElement.classList.add("a11y-high-contrast");
+                }
+            } catch (error) {
+                // The shell remains usable when browser storage is unavailable.
+            }
+        })();
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -16,6 +25,7 @@
             --purple-700: #695173;
             --purple-300: #A999BF;
             --teal-700: #698D8B;
+            --teal-900: #4F706E;
             --teal-300: #A3BFBA;
             --ink: #151318;
             --muted: #66606b;
@@ -44,7 +54,7 @@
             margin: 0;
             color: var(--ink);
             background: var(--background);
-            font-family: "Poppins", Arial, "Helvetica Neue", Helvetica, sans-serif;
+            font-family: "Raleway", "Segoe UI", Arial, sans-serif;
             display: flex;
             flex-direction: column;
         }
@@ -65,9 +75,9 @@
         .btn:focus-visible,
         .nav-link:focus-visible,
         .dropdown-item:focus-visible {
-            outline: 3px solid rgba(242, 194, 48, 0.95);
-            outline-offset: 3px;
-            box-shadow: 0 0 0 0.2rem rgba(18, 106, 132, 0.12);
+            outline: 3px solid var(--purple-900) !important;
+            outline-offset: 3px !important;
+            box-shadow: none !important;
         }
 
         .skip-link {
@@ -489,13 +499,24 @@
         }
 
         .footer-institutional {
-            background: #fff;
+            padding: 2.5rem 0 2.1rem;
+            margin-top: 2.5rem;
+            background: var(--background);
             border-top: 1px solid var(--line);
         }
 
-        .footer-title {
-            color: var(--purple-900);
-            font-weight: 700;
+        .footer-wave {
+            height: 6px;
+            margin-bottom: 1.6rem;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--teal-700), var(--teal-300), var(--purple-300), var(--purple-900));
+        }
+
+        .footer-meta {
+            margin: 1rem 0 0;
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-align: center;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1014,16 +1035,13 @@
 
 
         .footer-logo-bar {
-            width: min(100%, 920px);
+            width: min(100%, 880px);
             height: auto;
             display: block;
             margin: 0 auto;
         }
 
         .footer-logo-wrap {
-            border-top: 1px solid var(--line);
-            padding-top: 1.25rem;
-            margin-top: 1rem;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1031,127 +1049,225 @@
 
 
         /* Fase 15A: nova home e navega&ccedil;&atilde;o simplificada */
-        .nav-search-form {
-            min-width: 150px;
-        }
-
-        .nav-search-input {
-            border-radius: 999px;
-            border-color: var(--line);
-            background: #fff;
-        }
-
         .jc-hero {
-            position: relative;
-            overflow: hidden;
             border-radius: 28px;
-            background:
-                linear-gradient(90deg, rgba(67, 32, 84, 0.94), rgba(105, 81, 115, 0.88)),
-                radial-gradient(circle at 85% 20%, rgba(163, 191, 186, 0.55), transparent 28rem);
-            color: #fff;
-            padding: clamp(2.3rem, 5vw, 4.5rem);
-            min-height: 360px;
-            display: flex;
+            border: 1px solid var(--line);
+            background: linear-gradient(135deg, #ffffff 0%, #faf9fb 58%, var(--soft-purple) 100%);
+            padding: clamp(2rem, 5vw, 4rem);
+        }
+
+        .jc-hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 0.95fr);
+            gap: clamp(2rem, 5vw, 4rem);
             align-items: center;
         }
 
-        .jc-hero::after {
-            content: "";
-            position: absolute;
-            right: -6rem;
-            bottom: -8rem;
-            width: 24rem;
-            height: 24rem;
-            border-radius: 50%;
-            background: rgba(163, 191, 186, 0.22);
-        }
-
         .jc-hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 860px;
+            max-width: 650px;
         }
 
         .jc-hero-kicker {
             display: inline-flex;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            padding: 0.48rem 0.78rem;
+            color: #4f706e;
             font-size: 0.78rem;
             font-weight: 800;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-bottom: 1rem;
+            margin-bottom: 1.1rem;
         }
 
         .jc-hero-title {
-            font-size: clamp(2.1rem, 5vw, 4rem);
-            line-height: 0.98;
-            letter-spacing: -0.055em;
+            max-width: 720px;
+            color: var(--purple-900);
+            font-size: clamp(2.25rem, 5vw, 3.8rem);
+            line-height: 1.05;
+            letter-spacing: -0.045em;
             font-weight: 800;
-            margin-bottom: 1rem;
-        }
-
-        .jc-hero-subtitle {
-            font-size: clamp(1.05rem, 2.2vw, 1.45rem);
-            font-weight: 600;
-            max-width: 760px;
-            margin-bottom: 1rem;
+            margin-bottom: 1.3rem;
         }
 
         .jc-hero-text {
-            color: rgba(255, 255, 255, 0.86);
-            max-width: 760px;
+            max-width: 62ch;
+            margin-bottom: 1.75rem;
+            color: var(--muted);
             font-size: 1rem;
-            line-height: 1.75;
+            line-height: 1.7;
         }
 
-        .home-primary-access-grid {
+        .jc-hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .jc-hero-art {
+            display: flex;
+            justify-content: center;
+        }
+
+        .jc-hero-art img {
+            display: block;
+            width: min(100%, 400px);
+            height: auto;
+        }
+
+        @media (max-width: 991.98px) {
+            .jc-hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .jc-hero-art img {
+                width: min(75%, 340px);
+            }
+        }
+
+        .home-section-heading {
+            margin-bottom: 1.5rem;
+        }
+
+        .home-voices {
+            padding: clamp(1.5rem, 4vw, 2.75rem);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--soft-purple);
+        }
+
+        .home-voices-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.25rem;
         }
 
-        .home-primary-access-card {
+        .home-voice-card {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            align-items: center;
             min-height: 100%;
-            padding: 1.25rem;
-            border: 1px solid var(--line);
-            border-top: 4px solid var(--teal-700);
-            border-radius: 20px;
-            background: #fff;
-            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
-        }
-
-        .home-primary-access-card:hover {
-            border-color: rgba(67, 32, 84, 0.25);
-            border-top-color: var(--purple-900);
-            box-shadow: 0 14px 30px rgba(67, 32, 84, 0.07);
-            transform: translateY(-2px);
-        }
-
-        .home-primary-access-card h3 {
             margin: 0;
+            padding: clamp(1.5rem, 3vw, 2.25rem);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fff;
+            text-align: center;
+            box-shadow: 0 12px 28px rgba(67, 32, 84, 0.06);
+        }
+
+        .home-voice-photo {
+            width: 96px;
+            height: 96px;
+            margin-bottom: 1.25rem;
+            border: 3px solid var(--purple-300);
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center 22%;
+        }
+
+        .home-voice-quote {
+            flex: 1;
+            max-width: 48ch;
+            margin: 0;
+            color: var(--ink);
+            font-size: 0.98rem;
+            font-style: italic;
+            line-height: 1.7;
+        }
+
+        .home-voice-quote::before {
+            content: "\201C";
+            color: var(--purple-300);
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 0;
+            vertical-align: -0.25rem;
+        }
+
+        .home-voice-card figcaption {
+            margin-top: 1.25rem;
+        }
+
+        .home-voice-name,
+        .home-voice-role {
+            display: block;
+        }
+
+        .home-voice-name {
             color: var(--purple-900);
-            font-size: 1.15rem;
             font-weight: 800;
         }
 
-        .home-primary-access-card p {
-            flex: 1;
-            margin: 0;
+        .home-voice-role {
+            margin-top: 0.15rem;
             color: var(--muted);
-            line-height: 1.65;
+            font-size: 0.84rem;
         }
 
-        .home-primary-access-number {
-            color: var(--teal-700);
-            font-size: 0.78rem;
-            font-weight: 900;
-            letter-spacing: 0.08em;
+        .home-map-future {
+            padding: clamp(1.5rem, 4vw, 3rem);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: linear-gradient(135deg, #fff 0%, var(--soft-teal) 100%);
+        }
+
+        .home-map-future-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+            gap: clamp(1.5rem, 4vw, 3rem);
+            align-items: center;
+        }
+
+        .home-map-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .home-map-status {
+            padding: 1.5rem;
+            border: 1px solid rgba(105, 141, 139, 0.35);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 12px 28px rgba(67, 32, 84, 0.06);
+        }
+
+        .home-map-status-badge {
+            display: inline-flex;
+            margin-bottom: 0.9rem;
+            padding: 0.38rem 0.7rem;
+            border-radius: 999px;
+            background: var(--soft-teal);
+            color: #466c6a;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .home-map-status h3 {
+            margin-bottom: 0.9rem;
+            color: var(--purple-900);
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .home-map-status ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 991.98px) {
+            .home-map-future-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .home-voices-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .info-tabs-card {
@@ -1635,18 +1751,641 @@
             }
         }
 
+        /* Integra&ccedil;&atilde;o do prot&oacute;tipo aprovado: cabe&ccedil;alho e p&aacute;gina inicial */
+        .navbar-institutional {
+            border-top: 0;
+            border-bottom: 1px solid var(--line);
+            box-shadow: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-institutional .container {
+            max-width: 1200px;
+            min-height: 66px;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .brand-lockup {
+            min-width: 260px;
+        }
+
+        .brand-name {
+            font-size: 0.91rem;
+        }
+
+        .brand-caption {
+            margin-top: 0.1rem;
+            font-size: 0.66rem;
+            letter-spacing: 0.02em;
+        }
+
+        .navbar-nav .nav-link {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9px;
+            color: var(--ink);
+            font-size: 0.84rem;
+            font-weight: 600;
+            padding: 0.55rem 0.8rem;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link:focus-visible {
+            color: var(--teal-900);
+            background: var(--soft-teal);
+        }
+
+        .navbar-nav .nav-link-pending {
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 0.05rem;
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        .nav-pending-status {
+            color: var(--teal-900);
+            font-size: 0.62rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .navbar-nav .nav-section-current,
+        .navbar-nav .nav-section-current:hover,
+        .navbar-nav .nav-section-current:focus-visible {
+            color: #fff;
+            background: var(--purple-900);
+            box-shadow: inset 0 -3px 0 var(--teal-300);
+            font-weight: 800;
+        }
+
+        .brand-lockup.nav-section-current .brand-name {
+            text-decoration: underline;
+            text-decoration-color: var(--teal-700);
+            text-decoration-thickness: 3px;
+            text-underline-offset: 0.28rem;
+        }
+
+        .navbar-institutional .dropdown-item[aria-current="page"] {
+            color: var(--purple-900);
+            background: var(--soft-purple);
+            box-shadow: inset 3px 0 0 var(--teal-900);
+            font-weight: 800;
+        }
+
+        .header-space-button {
+            gap: 0.45rem;
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .header-account-icon {
+            position: relative;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+        }
+
+        .header-account-icon::before,
+        .header-account-icon::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 1.5px solid currentColor;
+        }
+
+        .header-account-icon::before {
+            top: 0.18rem;
+            width: 0.28rem;
+            height: 0.28rem;
+            border-radius: 50%;
+        }
+
+        .header-account-icon::after {
+            bottom: 0.16rem;
+            width: 0.62rem;
+            height: 0.3rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            border-bottom: 0;
+        }
+
+        .navbar-institutional .dropdown-menu {
+            width: min(270px, calc(100vw - 2rem));
+            padding: 0.5rem;
+            border-radius: 14px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .header-space-item {
+            display: block;
+            padding: 0.72rem 0.8rem;
+        }
+
+        .header-space-item strong,
+        .header-space-item small {
+            display: block;
+        }
+
+        .header-space-item strong {
+            color: var(--purple-900);
+            font-size: 0.85rem;
+        }
+
+        .header-space-item small {
+            margin-top: 0.08rem;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 500;
+        }
+
+        .language-select {
+            min-width: 64px;
+            min-height: 44px;
+            border-radius: 10px;
+            padding-left: 0.75rem;
+            font-size: 0.82rem;
+        }
+
+        .header-a11y-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: var(--purple-900);
+            background: #fff;
+            font-size: 1.45rem;
+            line-height: 1;
+        }
+
+        .header-a11y-button:hover {
+            border-color: var(--teal-300);
+            background: var(--soft-teal);
+        }
+
+        .main-shell,
+        .footer-institutional .container {
+            max-width: 1200px;
+        }
+
+        body.home-page .main-shell {
+            width: 100%;
+            max-width: none;
+            padding: 0;
+        }
+
+        body.home-page .page-shell {
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        body.home-page .page-inner {
+            padding: 0;
+        }
+
+        .home-design {
+            overflow: hidden;
+        }
+
+        .home-block,
+        .home-section-wrap {
+            width: 100%;
+            max-width: 1200px;
+            margin-right: auto;
+            margin-left: auto;
+            padding-right: 2rem;
+            padding-left: 2rem;
+        }
+
+        .jc-hero {
+            padding-top: 4.4rem;
+            padding-bottom: 2.5rem;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .jc-hero-grid {
+            grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 0.95fr);
+            gap: 3.5rem;
+        }
+
+        .jc-hero-title {
+            max-width: 12ch;
+            margin-bottom: 1.25rem;
+            font-size: clamp(2.65rem, 5vw, 4rem);
+            line-height: 1.08;
+            letter-spacing: -0.035em;
+        }
+
+        .jc-hero-text {
+            max-width: 50ch;
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .jc-hero-actions {
+            margin-top: 1.85rem;
+        }
+
+        .home-design .btn {
+            min-height: 44px;
+            border-width: 1.5px;
+            border-radius: 11px;
+            padding: 0.7rem 1.35rem;
+            font-weight: 700;
+        }
+
+        .jc-hero-art img {
+            width: min(100%, 400px);
+            border-radius: 24px;
+        }
+
+        .home-block-alt {
+            background: var(--soft-purple);
+        }
+
+        .home-section-wrap,
+        .home-foundations,
+        .home-video {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+
+        .home-section-heading {
+            margin-bottom: 2.25rem;
+        }
+
+        .home-section-title {
+            margin: 0;
+            color: var(--purple-900);
+            font-size: clamp(1.8rem, 3vw, 2.25rem);
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .home-section-heading p {
+            max-width: 62ch;
+            margin: 0.8rem auto 0;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .home-voices {
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: var(--soft-purple);
+        }
+
+        .home-voices-grid {
+            gap: 1.6rem;
+        }
+
+        .home-voice-card {
+            min-height: 29rem;
+            padding: 2.6rem 2.3rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .home-voice-photo {
+            width: 88px;
+            height: 88px;
+            margin-bottom: 1.9rem;
+        }
+
+        .home-voice-quote {
+            display: flex;
+            align-items: center;
+            max-width: 40ch;
+            font-size: 0.97rem;
+            line-height: 1.75;
+        }
+
+        .home-voice-quote::after {
+            content: "\201D";
+            align-self: center;
+            color: var(--purple-300);
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .home-foundation-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.35rem;
+        }
+
+        .home-foundation-tab {
+            min-height: 52px;
+            padding: 0.75rem 1.15rem;
+            border: 1.5px solid var(--line);
+            border-radius: 11px;
+            color: var(--purple-900);
+            background: #fff;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .home-foundation-tab:hover {
+            border-color: var(--purple-300);
+            background: var(--soft-purple);
+        }
+
+        .home-foundation-tab.active {
+            border-color: var(--purple-900);
+            color: #fff;
+            background: var(--purple-900);
+        }
+
+        .home-foundation-panel {
+            padding: clamp(1.6rem, 4vw, 3.2rem);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .home-foundation-top {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem);
+            gap: 2.1rem;
+            align-items: start;
+        }
+
+        .home-foundation-panel h3 {
+            margin: 0 0 0.75rem;
+            color: var(--purple-900);
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .home-foundation-lead {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .home-foundation-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .home-foundation-photo img {
+            display: block;
+            width: 100%;
+            height: 17.5rem;
+            border-radius: 14px;
+            object-fit: cover;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .home-foundation-strategies {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-top: 1.4rem;
+        }
+
+        .home-foundation-strategy {
+            padding: 1rem 1.15rem;
+            border: 1px solid #e5ddea;
+            border-radius: 12px;
+            background: var(--soft-purple);
+        }
+
+        .home-foundation-strategy h4 {
+            margin: 0 0 0.25rem;
+            color: var(--purple-900);
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        .home-foundation-strategy p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .home-map-future {
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: var(--soft-purple);
+        }
+
+        .home-map-future-grid {
+            padding: clamp(1.6rem, 4vw, 3rem);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .home-video-frame {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 840px;
+            margin: 0 auto;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--soft-teal), #dce8e6 55%, var(--purple-300));
+            box-shadow: var(--shadow-soft);
+        }
+
+        .home-video-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            color: #4f706e;
+            background: rgba(255, 255, 255, 0.94);
+            font-size: 1.8rem;
+            box-shadow: 0 8px 26px rgba(67, 32, 84, 0.22);
+        }
+
+        .home-video-status {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            max-width: calc(100% - 2rem);
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            color: #fff;
+            background: rgba(42, 37, 48, 0.82);
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .home-examples-modal {
+            border: 1px solid var(--line);
+            border-radius: 20px;
+        }
+
+        html.a11y-high-contrast,
+        body.a11y-high-contrast {
+            --ink: #000;
+            --muted: #282828;
+            --line: #333;
+            --purple-900: #24102d;
+            --purple-700: #3e2748;
+            --soft-purple: #fff;
+            --soft-teal: #fff;
+            --background: #fff;
+        }
+
+        html.a11y-high-contrast body {
+            background: #fff;
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-institutional .container {
+                padding-top: 0.55rem;
+                padding-bottom: 0.55rem;
+            }
+
+            .navbar-collapse {
+                padding-top: 0.75rem;
+            }
+
+            .navbar-nav {
+                align-items: stretch;
+            }
+
+            .navbar-nav .nav-link,
+            .header-a11y-button,
+            .language-select {
+                width: 100%;
+            }
+
+            .jc-hero-grid,
+            .home-foundation-top {
+                grid-template-columns: 1fr;
+            }
+
+            .jc-hero-art img {
+                width: min(68%, 340px);
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .navbar-institutional .container,
+            .home-block,
+            .home-section-wrap {
+                padding-right: 1rem;
+                padding-left: 1rem;
+            }
+
+            body.home-page .main-shell,
+            body.home-page .page-inner {
+                padding: 0;
+            }
+
+            .jc-hero {
+                padding-top: 2.75rem;
+                padding-bottom: 2.75rem;
+                border-radius: 0;
+            }
+
+            .jc-hero-art img {
+                width: min(88%, 320px);
+            }
+
+            .home-section-wrap,
+            .home-foundations,
+            .home-video {
+                padding-top: 3rem;
+                padding-bottom: 3rem;
+            }
+
+            .home-voice-card {
+                min-height: 0;
+                padding: 2rem 1.3rem;
+            }
+
+            .home-foundation-tabs,
+            .home-foundation-strategies {
+                grid-template-columns: 1fr;
+            }
+
+            .home-foundation-tab {
+                width: 100%;
+            }
+
+            .home-foundation-panel {
+                padding: 1.2rem;
+            }
+
+            .home-foundation-photo img {
+                height: auto;
+                max-height: 20rem;
+            }
+        }
+
+        @media (max-width: 359.98px) {
+            .brand-lockup {
+                min-width: 0;
+                max-width: calc(100% - 54px);
+            }
+
+            .brand-name {
+                font-size: 0.82rem;
+            }
+
+            .brand-caption {
+                font-size: 0.61rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .home-design *,
+            .navbar-institutional * {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+
     </style>
+    <link rel="stylesheet" href="{% static 'praticas/css/design-system.css' %}">
+    <link rel="stylesheet" href="{% static 'praticas/css/shell.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if request.resolver_match.url_name == 'pagina_inicial' %}home-page{% endif %}">
 <a class="skip-link" href="#conteudo-principal">
     {% if LANGUAGE_CODE == 'en' %}Skip to main content{% elif LANGUAGE_CODE == 'es' %}Saltar al contenido principal{% else %}Pular para o conteúdo principal{% endif %}
 </a>
 
-<div class="brand-strip"></div>
-
+<div class="topline" aria-hidden="true"></div>
+{% with current_url=request.resolver_match.url_name|default:'' %}
 <nav class="navbar navbar-expand-lg navbar-light navbar-institutional sticky-top" aria-label="{% if LANGUAGE_CODE == 'en' %}Main navigation{% elif LANGUAGE_CODE == 'es' %}Navegaci&oacute;n principal{% else %}Navega&ccedil;&atilde;o principal{% endif %}">
     <div class="container">
-        <a class="brand-lockup" href="{% url 'pagina_inicial' %}" aria-label="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform{% elif LANGUAGE_CODE == 'es' %}Plataforma de Justicia Clim&aacute;tica{% else %}Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}">
+        <a class="brand-lockup{% if current_url == 'pagina_inicial' %} nav-section-current{% endif %}" href="{% url 'pagina_inicial' %}"{% if current_url == 'pagina_inicial' %} aria-current="page"{% endif %} aria-label="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform{% elif LANGUAGE_CODE == 'es' %}Plataforma de Justicia Clim&aacute;tica{% else %}Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}">
             <span class="brand-name">
                 {% if LANGUAGE_CODE == 'en' %}
                     Climate Justice Platform
@@ -1658,31 +2397,32 @@
             </span>
             <span class="brand-caption">
                 {% if LANGUAGE_CODE == 'en' %}
-                    Regional knowledge hub
+                    Living Guide &middot; CGID + COMTEMA
                 {% elif LANGUAGE_CODE == 'es' %}
-                    Auditor&iacute;as m&aacute;s equitativas, inclusivas y sostenibles
+                    Gu&iacute;a Viva &middot; CGID + COMTEMA
                 {% else %}
-                    Auditorias mais equitativas, inclusivas e sustent&aacute;veis
+                    Guia Viva &middot; CGID + COMTEMA
                 {% endif %}
             </span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="{% if LANGUAGE_CODE == 'en' %}Open navigation menu{% elif LANGUAGE_CODE == 'es' %}Abrir men&uacute; de navegaci&oacute;n{% else %}Abrir menu de navega&ccedil;&atilde;o{% endif %}">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" data-label-open="{% if LANGUAGE_CODE == 'en' %}Open navigation menu{% elif LANGUAGE_CODE == 'es' %}Abrir men&uacute; de navegaci&oacute;n{% else %}Abrir menu de navega&ccedil;&atilde;o{% endif %}" data-label-close="{% if LANGUAGE_CODE == 'en' %}Close navigation menu{% elif LANGUAGE_CODE == 'es' %}Cerrar men&uacute; de navegaci&oacute;n{% else %}Fechar menu de navega&ccedil;&atilde;o{% endif %}" aria-label="{% if LANGUAGE_CODE == 'en' %}Open navigation menu{% elif LANGUAGE_CODE == 'es' %}Abrir men&uacute; de navegaci&oacute;n{% else %}Abrir menu de navega&ccedil;&atilde;o{% endif %}">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="menuPrincipal">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-1 align-items-lg-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'pagina_inicial' %}">
-                        {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}
-                    </a>
-                </li>
+            <ul class="navbar-nav header-primary-nav mb-2 mb-lg-0 align-items-lg-center">
+                <li class="nav-item"><a class="nav-link{% if current_url == 'catalogo_experiencias' or current_url == 'detalhe_experiencia' or current_url == 'comparar_experiencias' or current_url == 'favoritos_experiencias' %} nav-section-current{% endif %}" href="{% url 'catalogo_experiencias' %}"{% if current_url == 'catalogo_experiencias' or current_url == 'detalhe_experiencia' or current_url == 'comparar_experiencias' or current_url == 'favoritos_experiencias' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Good Practices{% elif LANGUAGE_CODE == 'es' %}Buenas Pr&aacute;cticas{% else %}Boas Pr&aacute;ticas{% endif %}</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_url == 'normas_internacionais' %} nav-section-current{% endif %}" href="{% url 'normas_internacionais' %}"{% if current_url == 'normas_internacionais' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Normative Frameworks{% elif LANGUAGE_CODE == 'es' %}Marcos Normativos{% else %}Marcos Normativos{% endif %}</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_url == 'ferramentas' %} nav-section-current{% endif %}" href="{% url 'ferramentas' %}"{% if current_url == 'ferramentas' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</a></li>
+            </ul>
 
+            <ul class="navbar-nav header-tools-nav mb-2 mb-lg-0 align-items-lg-center">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle nav-secondary-action" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="nav-link dropdown-toggle nav-secondary-action header-space-button{% if current_url == 'login_usuario' or current_url == 'registrar_usuario' or current_url == 'meus_envios' or current_url == 'status_envio' or current_url == 'adicionar_boa_pratica' or current_url == 'editar_boa_pratica' or current_url == 'solicitar_edicao_publicada' or current_url == 'confirmacao_envio' or current_url == 'excluir_boa_pratica' or current_url == 'painel_revisao' or current_url == 'revisar_experiencia' or current_url == 'painel_revisao_edicoes' or current_url == 'revisar_edicao_publicada' %} nav-section-current{% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="header-account-icon" aria-hidden="true"></span>
                         {% if LANGUAGE_CODE == 'en' %}My space{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}
-                    </a>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         {% if request.user.is_authenticated %}
                             <li>
@@ -1692,13 +2432,15 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'meus_envios' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}
+                                <a class="dropdown-item header-space-item" href="{% url 'meus_envios' %}"{% if current_url == 'meus_envios' %} aria-current="page"{% endif %}>
+                                    <strong>{% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}</strong>
+                                    <small>{% if LANGUAGE_CODE == 'en' %}Manage your registered contributions{% elif LANGUAGE_CODE == 'es' %}Gestiona tus aportes registrados{% else %}Gerencie suas contribui&ccedil;&otilde;es registradas{% endif %}</small>
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'status_envio' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %}
+                                <a class="dropdown-item header-space-item" href="{% url 'status_envio' %}"{% if current_url == 'status_envio' %} aria-current="page"{% endif %}>
+                                    <strong>{% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado de env&iacute;os{% else %}Status dos envios{% endif %}</strong>
+                                    <small>{% if LANGUAGE_CODE == 'en' %}Track your registered contributions{% elif LANGUAGE_CODE == 'es' %}Sigue tus aportes registrados{% else %}Acompanhe suas contribui&ccedil;&otilde;es registradas{% endif %}</small>
                                 </a>
                             </li>
                             <li>
@@ -1707,6 +2449,12 @@
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
+                            {% if request.user.is_staff or request.user.is_superuser %}
+                                <li><a class="dropdown-item" href="{% url 'painel_revisao' %}"{% if current_url == 'painel_revisao' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n{% else %}Painel de revis&atilde;o{% endif %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'painel_revisao_edicoes' %}"{% if current_url == 'painel_revisao_edicoes' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Published edits{% elif LANGUAGE_CODE == 'es' %}Ediciones publicadas{% else %}Edi&ccedil;&otilde;es publicadas{% endif %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">{% if LANGUAGE_CODE == 'en' %}Django administration{% elif LANGUAGE_CODE == 'es' %}Administraci&oacute;n de Django{% else %}Administra&ccedil;&atilde;o do Django{% endif %}</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            {% endif %}
                             <li>
                                 <a class="dropdown-item" href="{% url 'logout_usuario' %}">
                                     {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
@@ -1714,52 +2462,26 @@
                             </li>
                         {% else %}
                             <li>
-                                <a class="dropdown-item" href="{% url 'login_usuario' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}
+                                <a class="dropdown-item header-space-item" href="{% url 'login_usuario' %}"{% if current_url == 'login_usuario' %} aria-current="page"{% endif %}>
+                                    <strong>{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</strong>
+                                    <small>{% if LANGUAGE_CODE == 'en' %}Access your account{% elif LANGUAGE_CODE == 'es' %}Accede a tu cuenta{% else %}Acesse sua conta{% endif %}</small>
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'registrar_usuario' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Registrarse{% else %}Cadastrar-se{% endif %}
+                                <a class="dropdown-item header-space-item" href="{% url 'registrar_usuario' %}"{% if current_url == 'registrar_usuario' %} aria-current="page"{% endif %}>
+                                    <strong>{% if LANGUAGE_CODE == 'en' %}Sign up{% elif LANGUAGE_CODE == 'es' %}Registrarse{% else %}Cadastrar-se{% endif %}</strong>
+                                    <small>{% if LANGUAGE_CODE == 'en' %}Create your platform account{% elif LANGUAGE_CODE == 'es' %}Crea tu cuenta en la plataforma{% else %}Crie sua conta na plataforma{% endif %}</small>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'status_envio' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado del env&iacute;o{% else %}Status do envio{% endif %}
+                                <a class="dropdown-item header-space-item" href="{% url 'status_envio' %}"{% if current_url == 'status_envio' %} aria-current="page"{% endif %}>
+                                    <strong>{% if LANGUAGE_CODE == 'en' %}Submission status{% elif LANGUAGE_CODE == 'es' %}Estado de env&iacute;os{% else %}Status dos envios{% endif %}</strong>
+                                    <small>{% if LANGUAGE_CODE == 'en' %}Track your registered contributions{% elif LANGUAGE_CODE == 'es' %}Sigue tus aportes registrados{% else %}Acompanhe suas contribui&ccedil;&otilde;es registradas{% endif %}</small>
                                 </a>
                             </li>
                         {% endif %}
                     </ul>
-                </li>
-
-                {% if request.user.is_staff or request.user.is_superuser %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle nav-secondary-action" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if LANGUAGE_CODE == 'en' %}Management{% elif LANGUAGE_CODE == 'es' %}Gesti&oacute;n{% else %}Gest&atilde;o{% endif %}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="{% url 'painel_revisao' %}">
-                                {% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n{% else %}Painel de revis&atilde;o{% endif %}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'painel_revisao_edicoes' %}">
-                                {% if LANGUAGE_CODE == 'en' %}Published edits{% elif LANGUAGE_CODE == 'es' %}Ediciones publicadas{% else %}Edi&ccedil;&otilde;es publicadas{% endif %}
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/admin/">Admin Django</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-
-                <li class="nav-item">
-                    <form method="get" action="{% url 'catalogo_experiencias' %}" class="nav-search-form" role="search">
-                        <label class="visually-hidden" for="buscaGlobal">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</label>
-                        <input id="buscaGlobal" class="form-control form-control-sm nav-search-input" type="search" name="q" placeholder="{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}">
-                    </form>
                 </li>
 
                 <li class="nav-item">
@@ -1771,10 +2493,14 @@
                         </select>
                     </div>
                 </li>
+                <li class="nav-item">
+                    <button class="header-a11y-button" id="highContrastToggle" type="button" aria-pressed="false" data-label-enable="{% if LANGUAGE_CODE == 'en' %}Enable high contrast{% elif LANGUAGE_CODE == 'es' %}Activar alto contraste{% else %}Ativar alto contraste{% endif %}" data-label-disable="{% if LANGUAGE_CODE == 'en' %}Disable high contrast{% elif LANGUAGE_CODE == 'es' %}Desactivar alto contraste{% else %}Desativar alto contraste{% endif %}" aria-label="{% if LANGUAGE_CODE == 'en' %}Enable high contrast{% elif LANGUAGE_CODE == 'es' %}Activar alto contraste{% else %}Ativar alto contraste{% endif %}" title="{% if LANGUAGE_CODE == 'en' %}Enable high contrast{% elif LANGUAGE_CODE == 'es' %}Activar alto contraste{% else %}Ativar alto contraste{% endif %}"><span aria-hidden="true">&#9680;</span></button>
+                </li>
             </ul>
         </div>
     </div>
 </nav>
+{% endwith %}
 
 <main class="container main-shell" id="conteudo-principal" tabindex="-1">
     <div class="page-shell">
@@ -1791,79 +2517,87 @@
     </div>
 </main>
 
-<footer class="footer-institutional py-4 mt-auto">
+<footer class="footer-institutional mt-auto">
     <div class="container">
-        <div class="d-flex flex-column gap-3 align-items-center text-center">
-            <div>
-                <div class="footer-title">
-                    {% if LANGUAGE_CODE == 'en' %}
-                        Regional Good Practices Platform
-                    {% elif LANGUAGE_CODE == 'es' %}
-                        Plataforma Regional de Buenas Pr&aacute;cticas
-                    {% else %}
-                        Plataforma Regional de Boas Pr&aacute;ticas
-                    {% endif %}
-                </div>
-                <div class="text-muted small">
-                    {% if LANGUAGE_CODE == 'en' %}
-                        The Guide provides orientation; the platform demonstrates.
-                    {% elif LANGUAGE_CODE == 'es' %}
-                        La Gu&iacute;a orienta; la plataforma demuestra.
-                    {% else %}
-                        A Guia orienta; a plataforma demonstra.
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
+        <div class="footer-wave" aria-hidden="true"></div>
         <div class="footer-logo-wrap">
             <img
-                src="/static/praticas/img/barra-logos-comtema-cgid.png"
+                src="{% static 'praticas/img/barra-de-logos.svg' %}"
                 alt="{% if LANGUAGE_CODE == 'en' %}German Cooperation, GIZ, AdaptaInfra, OLACEFS, COMTEMA and CGID{% elif LANGUAGE_CODE == 'es' %}Cooperaci&oacute;n Alemana, GIZ, AdaptaInfra, OLACEFS, COMTEMA y CGID{% else %}Coopera&ccedil;&atilde;o Alem&atilde;, GIZ, AdaptaInfra, OLACEFS, COMTEMA e CGID{% endif %}"
                 class="footer-logo-bar"
             >
         </div>
+        <p class="footer-meta">{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform &middot; OLACEFS &middot; German Cooperation (GIZ) &middot; BMZ{% elif LANGUAGE_CODE == 'es' %}Plataforma de Justicia Clim&aacute;tica &middot; OLACEFS &middot; Cooperaci&oacute;n Alemana (GIZ) &middot; BMZ{% else %}Plataforma de Justi&ccedil;a Clim&aacute;tica &middot; OLACEFS &middot; Coopera&ccedil;&atilde;o Alem&atilde; (GIZ) &middot; BMZ{% endif %}</p>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'praticas/js/shell-global.js' %}"></script>
+{% block extra_js %}{% endblock %}
 <script>
-    const languageSwitcher = document.getElementById("languageSwitcher");
-    if (languageSwitcher) {
-        languageSwitcher.addEventListener("change", function () {
-            const selectedLanguage = this.value;
-            let currentPath = window.location.pathname;
-            const queryString = window.location.search || "";
-            currentPath = currentPath.replace(/^\/(es|en)(\/|$)/, "/");
-            if (selectedLanguage === "es") {
-                currentPath = "/es" + currentPath;
-            } else if (selectedLanguage === "en") {
-                currentPath = "/en" + currentPath;
+    const foundationTablist = document.getElementById("homeFoundationTabs");
+    if (foundationTablist && typeof bootstrap !== "undefined" && !foundationTablist.dataset.initialized) {
+        foundationTablist.dataset.initialized = "true";
+        const foundationTabs = Array.from(foundationTablist.querySelectorAll('[role="tab"]'));
+
+        const updateFoundationTabStops = function (selectedTab) {
+            foundationTabs.forEach(function (item) {
+                item.tabIndex = item === selectedTab ? 0 : -1;
+            });
+        };
+
+        const focusFoundationPanel = function (tab) {
+            const panel = document.querySelector(tab.getAttribute("data-bs-target"));
+            if (panel) {
+                panel.focus();
             }
-            if (currentPath === "") {
-                currentPath = "/";
-            }
-            window.location.href = currentPath + queryString;
+        };
+
+        foundationTabs.forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                if (tab.getAttribute("aria-selected") === "true") {
+                    focusFoundationPanel(tab);
+                    return;
+                }
+
+                const handleShown = function () {
+                    updateFoundationTabStops(tab);
+                    focusFoundationPanel(tab);
+                };
+                tab.addEventListener("shown.bs.tab", handleShown, { once: true });
+                bootstrap.Tab.getOrCreateInstance(tab).show();
+            });
+
+            tab.addEventListener("keydown", function (event) {
+                if ((event.key === "Enter" || event.key === " ") && tab.getAttribute("aria-selected") === "true") {
+                    event.preventDefault();
+                    focusFoundationPanel(tab);
+                    return;
+                }
+
+                const currentIndex = foundationTabs.indexOf(this);
+                let nextIndex = null;
+
+                if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+                    nextIndex = (currentIndex + 1) % foundationTabs.length;
+                } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+                    nextIndex = (currentIndex - 1 + foundationTabs.length) % foundationTabs.length;
+                } else if (event.key === "Home") {
+                    nextIndex = 0;
+                } else if (event.key === "End") {
+                    nextIndex = foundationTabs.length - 1;
+                }
+
+                if (nextIndex !== null) {
+                    event.preventDefault();
+                    const nextTab = foundationTabs[nextIndex];
+                    updateFoundationTabStops(nextTab);
+                    bootstrap.Tab.getOrCreateInstance(nextTab).show();
+                    nextTab.focus();
+                }
+            });
         });
     }
-
-    document.querySelectorAll("[data-home-tab-target]").forEach(function (link) {
-        link.addEventListener("click", function (event) {
-            const tabTrigger = document.querySelector(this.dataset.homeTabTarget);
-            if (!tabTrigger || typeof bootstrap === "undefined") {
-                return;
-            }
-
-            event.preventDefault();
-            const panel = document.querySelector(tabTrigger.getAttribute("data-bs-target"));
-            tabTrigger.addEventListener("shown.bs.tab", function () {
-                if (panel) {
-                    panel.focus();
-                }
-            }, { once: true });
-            bootstrap.Tab.getOrCreateInstance(tabTrigger).show();
-        });
-    });
 </script>
 </body>
 </html>

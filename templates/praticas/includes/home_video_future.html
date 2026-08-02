@@ -1,0 +1,10 @@
+<section class="home-video home-block" id="videoSection" aria-labelledby="home-video-title">
+    <div class="home-section-heading text-center">
+        <h2 class="home-section-title" id="home-video-title">{% if LANGUAGE_CODE == 'en' %}A path toward climate justice in OLACEFS{% elif LANGUAGE_CODE == 'es' %}Un camino hacia la justicia clim&aacute;tica en la OLACEFS{% else %}Um caminho rumo &agrave; justi&ccedil;a clim&aacute;tica na OLACEFS{% endif %}</h2>
+        <p>{% if LANGUAGE_CODE == 'en' %}A guided tour of the regional map, normative frameworks, tools and good practices is planned for a future stage.{% elif LANGUAGE_CODE == 'es' %}Se prev&eacute; para una etapa futura un recorrido guiado por el mapa regional, los marcos normativos, las herramientas y las buenas pr&aacute;cticas.{% else %}Est&aacute; previsto para uma etapa futura um percurso guiado pelo mapa regional, marcos normativos, ferramentas e boas pr&aacute;ticas.{% endif %}</p>
+    </div>
+    <div class="home-video-frame" role="status">
+        <span class="home-video-mark" aria-hidden="true">&#9654;</span>
+        <span class="home-video-status">{% if LANGUAGE_CODE == 'en' %}Audiovisual content in preparation{% elif LANGUAGE_CODE == 'es' %}Contenido audiovisual en preparaci&oacute;n{% else %}Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o{% endif %}</span>
+    </div>
+</section>

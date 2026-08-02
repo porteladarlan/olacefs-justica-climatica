@@ -1,30 +1,47 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %} | Plataforma Regional{% endblock %}
 
-{% block content %}
-<section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Restricted submission area{% elif LANGUAGE_CODE == 'es' %}Área de envío restringida{% else %}Área de envio restrita{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Use your account to submit practices, save drafts and track your submissions.{% elif LANGUAGE_CODE == 'es' %}Use su cuenta para enviar prácticas, guardar borradores y consultar sus envíos.{% else %}Use sua conta para enviar práticas, salvar rascunhos e acompanhar seus envios.{% endif %}</p>
-</section>
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/meu-espaco.css' %}">{% endblock %}
 
-<form method="post" class="form-section mx-auto" style="max-width: 560px;">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}">
-    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-    {% for field in form %}
-        <div class="mb-3">
-            <label class="form-label fw-semibold">{{ field.label }}</label>
-            {{ field }}
-            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+{% block content %}
+<div class="account-page account-page--narrow">
+    <nav class="prototype-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Navega&ccedil;&atilde;o estrutural{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+    </nav>
+
+    <header class="account-heading">
+        <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Account access{% elif LANGUAGE_CODE == 'es' %}Acceso a la cuenta{% else %}Acesso &agrave; conta{% endif %}</div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' %}Use your account to submit practices, save drafts and track your submissions.{% elif LANGUAGE_CODE == 'es' %}Use su cuenta para enviar pr&aacute;cticas, guardar borradores y consultar sus env&iacute;os.{% else %}Use sua conta para enviar pr&aacute;ticas, salvar rascunhos e acompanhar seus envios.{% endif %}</p>
+    </header>
+
+    <form method="post" class="account-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {% if form.errors %}
+            <div class="form-error-summary" role="alert" tabindex="-1">
+                <strong>{% if LANGUAGE_CODE == 'en' %}Check the information provided.{% elif LANGUAGE_CODE == 'es' %}Revise la informaci&oacute;n ingresada.{% else %}Revise as informa&ccedil;&otilde;es preenchidas.{% endif %}</strong>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="account-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="field-help" id="{{ field.id_for_label }}_help">{{ field.help_text }}</div>{% endif %}
+                {% for error in field.errors %}<div class="field-error" id="{{ field.id_for_label }}_error">{{ error }}</div>{% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="account-actions">
+            <a href="{% url 'registrar_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="linklike">{% if LANGUAGE_CODE == 'en' %}Create an account &rarr;{% elif LANGUAGE_CODE == 'es' %}Crear una cuenta &rarr;{% else %}Criar uma conta &rarr;{% endif %}</a>
+            <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</button>
         </div>
-    {% endfor %}
-    <div class="d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'registrar_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</a>
-        <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</button>
-    </div>
-</form>
+    </form>
+</div>
 {% endblock %}
