@@ -1,5 +1,5 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}
@@ -10,6 +10,10 @@
     {% else %}
         In&iacute;cio | Plataforma de Justi&ccedil;a Clim&aacute;tica
     {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'praticas/css/home.css' %}">
 {% endblock %}
 
 {% block content %}

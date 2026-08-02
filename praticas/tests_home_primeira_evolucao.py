@@ -32,7 +32,8 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertContains(response, "Boas Pr&aacute;ticas", html=False)
         self.assertContains(response, "Marcos Normativos")
         self.assertContains(response, "Ferramentas")
-        self.assertContains(response, 'class="nav-link nav-link-pending" role="link" aria-disabled="true"', html=False)
+        self.assertContains(response, f'href="{reverse("ferramentas")}"')
+        self.assertIsNone(re.search(r'class="[^"]*\bnav-link-pending\b', html))
         self.assertContains(response, f'href="{reverse("login_usuario")}"')
         self.assertContains(response, f'href="{reverse("registrar_usuario")}"')
         self.assertContains(response, f'href="{reverse("status_envio")}"')
@@ -116,14 +117,13 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertIsNone(re.search(r"<h(?:1|5|6)\b", fundamentos))
         self.assertIsNone(re.search(r"<h[2-4][^>]*>\s*</h[2-4]>", fundamentos))
 
-    def test_estilos_de_foco_e_contraste_usam_cores_aprovadas(self):
+    def test_home_carrega_estilo_proprio_e_preserva_foco_das_abas(self):
         response = self.client.get(reverse("pagina_inicial"))
 
-        self.assertContains(response, "outline: 3px solid var(--purple-900) !important;")
-        self.assertContains(response, "outline-offset: 3px !important;")
-        self.assertContains(response, "box-shadow: none !important;")
-        self.assertContains(response, "color: #4f706e;")
-        self.assertNotContains(response, "#F2C230")
+        self.assertContains(response, f'href="{static("praticas/css/home.css")}"')
+        self.assertContains(response, 'role="tablist"')
+        self.assertContains(response, 'aria-selected="true"')
+        self.assertContains(response, 'id="concepto-pane" role="tabpanel" aria-labelledby="concepto-tab" tabindex="-1"', html=False)
         self.assertContains(response, 'tab.addEventListener("shown.bs.tab", handleShown, { once: true });', count=1)
         self.assertContains(response, "bootstrap.Tab.getOrCreateInstance(tab).show();", count=1)
         self.assertContains(response, 'event.key === "Enter" || event.key === " "')

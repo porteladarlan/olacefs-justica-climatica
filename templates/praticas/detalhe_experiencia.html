@@ -1,10 +1,15 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{{ experiencia.titulo_exibicao }} | Plataforma Regional{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'praticas/css/content.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="content-prototype">
 <a href="{% url 'catalogo_experiencias' %}" class="btn btn-link ps-0 text-decoration-none mb-3">
     &larr; {% if LANGUAGE_CODE == 'en' %}Back to good practices{% elif LANGUAGE_CODE == 'es' %}Volver a buenas pr&aacute;cticas{% else %}Voltar para boas pr&aacute;ticas{% endif %}
 </a>
@@ -32,10 +37,6 @@
     <div class="metadata-item">
         <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Responsible person{% elif LANGUAGE_CODE == 'es' %}Persona responsable{% else %}Pessoa respons&aacute;vel{% endif %}</div>
         <div class="metadata-value">{{ experiencia.pessoa_responsavel|default:"-" }}</div>
-    </div>
-    <div class="metadata-item">
-        <div class="metadata-label">E-mail</div>
-        <div class="metadata-value">{{ experiencia.email_contato|default:"-" }}</div>
     </div>
 </section>
 
@@ -225,10 +226,10 @@
                             <div class="compact-summary-card mb-2">
                                 <strong>{{ anexo.titulo_exibicao }}</strong><br>
                                 {% if anexo.arquivo %}
-                                    <a href="{{ anexo.arquivo.url }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}Download file{% elif LANGUAGE_CODE == 'es' %}Descargar archivo{% else %}Baixar arquivo{% endif %}</a>
+                                    <a href="{{ anexo.arquivo.url }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Download file{% elif LANGUAGE_CODE == 'es' %}Descargar archivo{% else %}Baixar arquivo{% endif %}</a>
                                 {% endif %}
                                 {% if anexo.url_externa %}
-                                    <br><a href="{{ anexo.url_externa }}" target="_blank">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>
+                                    <br><a href="{{ anexo.url_externa }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}External link{% elif LANGUAGE_CODE == 'es' %}Enlace externo{% else %}Link externo{% endif %}</a>
                                 {% endif %}
                             </div>
                         {% empty %}
@@ -268,5 +269,6 @@
             </button>
         </form>
     </aside>
+</div>
 </div>
 {% endblock %}

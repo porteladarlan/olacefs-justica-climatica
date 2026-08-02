@@ -9,7 +9,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Q
+from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -63,6 +63,60 @@ def experiencias_publicas():
     return Experiencia.objects.filter(
         status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
     )
+
+
+def _objetos_selecionados(request, parametro, queryset):
+    """Retorna objetos existentes, preservando a ordem dos valores GET válidos."""
+    identificadores = []
+    vistos = set()
+    for valor in request.GET.getlist(parametro):
+        try:
+            identificador = int(valor)
+        except (TypeError, ValueError):
+            continue
+        if identificador > 0 and identificador not in vistos:
+            vistos.add(identificador)
+            identificadores.append(identificador)
+
+    objetos_por_id = {
+        objeto.pk: objeto for objeto in queryset.filter(pk__in=identificadores)
+    }
+    return [
+        objetos_por_id[identificador]
+        for identificador in identificadores
+        if identificador in objetos_por_id
+    ]
+
+
+def _url_sem_valor_filtro(request, parametro, valor=None):
+    parametros = request.GET.copy()
+    if valor is None:
+        parametros.pop(parametro, None)
+    else:
+        valores = [
+            item for item in parametros.getlist(parametro) if item != str(valor)
+        ]
+        if valores:
+            parametros.setlist(parametro, valores)
+        else:
+            parametros.pop(parametro, None)
+    consulta = parametros.urlencode()
+    return f"{request.path}?{consulta}" if consulta else request.path
+
+
+def _url_http_segura(valor):
+    if not valor:
+        return ""
+    try:
+        URLValidator(schemes=["http", "https"])(valor)
+    except ValidationError:
+        return ""
+    return valor
+
+
+def ferramentas_catalogadas():
+    """Não publica registros sem origem e aprovação institucional verificáveis."""
+    return BancoTecnico.objects.none()
 
 
 STATUS_VISIVEIS_REVISAO = [
@@ -358,8 +412,9 @@ def pagina_inicial(request):
 
 
 def catalogo_experiencias(request):
+    experiencias_base = experiencias_publicas()
     experiencias = (
-        experiencias_publicas()
+        experiencias_base
         .select_related("efs", "pais", "tipo_experiencia", "setor")
         .prefetch_related(
             "temas_transversais",
@@ -370,36 +425,105 @@ def catalogo_experiencias(request):
         .distinct()
     )
 
-    pais_id = request.GET.get("pais")
-    efs_id = request.GET.get("efs")
-    tipo_id = request.GET.get("tipo")
-    setor_id = request.GET.get("setor")
-    tema_id = request.GET.get("tema")
-    norma_id = request.GET.get("norma")
-    dimensao_id = request.GET.get("dimensao")
-    grupo_id = request.GET.get("grupo")
-    ano = request.GET.get("ano")
-    termo = request.GET.get("q")
+    paises = Pais.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    efs_lista = EFS.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).select_related("pais").distinct()
+    tipos = TipoExperiencia.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    setores = Setor.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    temas = TemaTransversal.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    normas = NormaInternacional.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    dimensoes = DimensaoJusticaClimatica.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    grupos = GrupoVulneravel.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    ).distinct()
+    anos = list(
+        experiencias_base.values_list("ano_execucao", flat=True)
+        .distinct()
+        .order_by("-ano_execucao")
+    )
+    idioma = getattr(request, "LANGUAGE_CODE", "pt-br")
+    ferramentas_opcoes = []
+    ferramentas_por_valor = {}
+    for valor_pt, valor_es, valor_en in experiencias_base.values_list(
+        "ferramentas_utilizadas",
+        "ferramentas_utilizadas_es",
+        "ferramentas_utilizadas_en",
+    ):
+        valor = (valor_pt or valor_es or valor_en or "").strip()
+        if not valor or len(valor) > 200 or valor in ferramentas_por_valor:
+            continue
+        if idioma == "en":
+            rotulo = (valor_en or valor_pt or valor_es or valor).strip()
+        elif idioma == "es":
+            rotulo = (valor_es or valor_pt or valor_en or valor).strip()
+        else:
+            rotulo = (valor_pt or valor_es or valor_en or valor).strip()
+        opcao = {"valor": valor, "rotulo": rotulo}
+        ferramentas_por_valor[valor] = opcao
+        ferramentas_opcoes.append(opcao)
+    ferramentas_opcoes.sort(key=lambda opcao: opcao["rotulo"].casefold())
+    ferramentas_selecionadas = []
+    for valor in request.GET.getlist("ferramenta"):
+        if valor in ferramentas_por_valor and valor not in ferramentas_selecionadas:
+            ferramentas_selecionadas.append(valor)
 
-    if pais_id:
-        experiencias = experiencias.filter(pais_id=pais_id)
-    if efs_id:
-        experiencias = experiencias.filter(efs_id=efs_id)
-    if tipo_id:
-        experiencias = experiencias.filter(tipo_experiencia_id=tipo_id)
-    if setor_id:
-        experiencias = experiencias.filter(setor_id=setor_id)
-    if tema_id:
-        experiencias = experiencias.filter(temas_transversais__id=tema_id)
-    if norma_id:
-        experiencias = experiencias.filter(normas_internacionais__id=norma_id)
-    if dimensao_id:
-        experiencias = experiencias.filter(dimensoes_consideradas__id=dimensao_id)
-    if grupo_id:
-        experiencias = experiencias.filter(grupos_vulneraveis__id=grupo_id)
-    if ano:
-        experiencias = experiencias.filter(ano_execucao=ano)
+    selecoes = {
+        "pais": _objetos_selecionados(request, "pais", paises),
+        "efs": _objetos_selecionados(request, "efs", efs_lista),
+        "tipo": _objetos_selecionados(request, "tipo", tipos),
+        "setor": _objetos_selecionados(request, "setor", setores),
+        "tema": _objetos_selecionados(request, "tema", temas),
+        "norma": _objetos_selecionados(request, "norma", normas),
+        "dimensao": _objetos_selecionados(request, "dimensao", dimensoes),
+        "grupo": _objetos_selecionados(request, "grupo", grupos),
+    }
+    anos_selecionados = []
+    for valor in request.GET.getlist("ano"):
+        try:
+            ano = int(valor)
+        except (TypeError, ValueError):
+            continue
+        if ano in anos and ano not in anos_selecionados:
+            anos_selecionados.append(ano)
 
+    campos_filtro = {
+        "pais": "pais_id__in",
+        "efs": "efs_id__in",
+        "tipo": "tipo_experiencia_id__in",
+        "setor": "setor_id__in",
+        "tema": "temas_transversais__id__in",
+        "norma": "normas_internacionais__id__in",
+        "dimensao": "dimensoes_consideradas__id__in",
+        "grupo": "grupos_vulneraveis__id__in",
+    }
+    for chave, campo in campos_filtro.items():
+        if selecoes[chave]:
+            experiencias = experiencias.filter(
+                **{campo: [objeto.pk for objeto in selecoes[chave]]}
+            )
+    if anos_selecionados:
+        experiencias = experiencias.filter(ano_execucao__in=anos_selecionados)
+    if ferramentas_selecionadas:
+        experiencias = experiencias.filter(
+            Q(ferramentas_utilizadas__in=ferramentas_selecionadas)
+            | Q(ferramentas_utilizadas_es__in=ferramentas_selecionadas)
+            | Q(ferramentas_utilizadas_en__in=ferramentas_selecionadas)
+        )
+
+    termo = (request.GET.get("q") or "").strip()[:200]
     if termo:
         experiencias = experiencias.filter(
             Q(titulo__icontains=termo)
@@ -436,23 +560,69 @@ def catalogo_experiencias(request):
             | Q(efs__nome_es__icontains=termo)
             | Q(efs__nome_en__icontains=termo)
             | Q(efs__sigla__icontains=termo)
-        ).distinct()
+        )
+
+    experiencias = experiencias.distinct()
+    chips = []
+    if termo:
+        chips.append(
+            {
+                "chave": "q",
+                "rotulo": termo,
+                "url_remover": _url_sem_valor_filtro(request, "q"),
+            }
+        )
+    for chave, objetos in selecoes.items():
+        for objeto in objetos:
+            chips.append(
+                {
+                    "chave": chave,
+                    "rotulo": objeto.nome_exibicao,
+                    "url_remover": _url_sem_valor_filtro(
+                        request, chave, objeto.pk
+                    ),
+                }
+            )
+    for ano in anos_selecionados:
+        chips.append(
+            {
+                "chave": "ano",
+                "rotulo": str(ano),
+                "url_remover": _url_sem_valor_filtro(request, "ano", ano),
+            }
+        )
+    for valor in ferramentas_selecionadas:
+        chips.append(
+            {
+                "chave": "ferramenta",
+                "rotulo": ferramentas_por_valor[valor]["rotulo"],
+                "url_remover": _url_sem_valor_filtro(
+                    request, "ferramenta", valor
+                ),
+            }
+        )
 
     contexto = {
         "experiencias": experiencias,
-        "paises": Pais.objects.all(),
-        "efs_lista": EFS.objects.select_related("pais").all(),
-        "tipos": TipoExperiencia.objects.all(),
-        "setores": Setor.objects.all(),
-        "temas": TemaTransversal.objects.all(),
-        "normas": NormaInternacional.objects.all(),
-        "dimensoes": DimensaoJusticaClimatica.objects.all(),
-        "grupos": GrupoVulneravel.objects.all(),
-        "anos": (
-            Experiencia.objects.values_list("ano_execucao", flat=True)
-            .distinct()
-            .order_by("-ano_execucao")
-        ),
+        "paises": paises,
+        "efs_lista": efs_lista,
+        "tipos": tipos,
+        "setores": setores,
+        "temas": temas,
+        "normas": normas,
+        "dimensoes": dimensoes,
+        "grupos": grupos,
+        "anos": anos,
+        "filtros_ids": {
+            chave: [objeto.pk for objeto in objetos]
+            for chave, objetos in selecoes.items()
+        },
+        "anos_selecionados": anos_selecionados,
+        "ferramentas_opcoes": ferramentas_opcoes,
+        "ferramentas_selecionadas": ferramentas_selecionadas,
+        "termo_busca": termo,
+        "chips_filtros": chips,
+        "total_resultados": experiencias.count(),
         "favoritos_ids": favoritos_ids(request),
     }
     return render(request, "praticas/catalogo_experiencias.html", contexto)
@@ -511,8 +681,115 @@ def detalhe_experiencia(request, pk):
 
 
 def normas_internacionais(request):
-    normas = NormaInternacional.objects.all()
-    return render(request, "praticas/normas_internacionais.html", {"normas": normas})
+    termo = (request.GET.get("q") or "").strip()[:200]
+    experiencias_relacionadas = experiencias_publicas().select_related(
+        "pais", "setor"
+    )
+    paises = Pais.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+        experiencias__normas_internacionais__isnull=False,
+    ).distinct()
+    setores = Setor.objects.filter(
+        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+        experiencias__normas_internacionais__isnull=False,
+    ).distinct()
+    paises_selecionados = _objetos_selecionados(request, "pais", paises)
+    setores_selecionados = _objetos_selecionados(request, "setor", setores)
+
+    normas = NormaInternacional.objects.annotate(
+        total_experiencias_publicas=Count(
+            "experiencias",
+            filter=Q(
+                experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+            ),
+            distinct=True,
+        )
+    ).prefetch_related(
+        Prefetch(
+            "experiencias",
+            queryset=experiencias_relacionadas,
+            to_attr="experiencias_publicas_catalogo",
+        )
+    )
+    if termo:
+        normas = normas.filter(
+            Q(nome__icontains=termo)
+            | Q(nome_es__icontains=termo)
+            | Q(nome_en__icontains=termo)
+            | Q(resumo__icontains=termo)
+            | Q(resumo_es__icontains=termo)
+            | Q(resumo_en__icontains=termo)
+        )
+
+    filtros_relacionados = Q()
+    if paises_selecionados:
+        filtros_relacionados &= Q(
+            experiencias__pais_id__in=[pais.pk for pais in paises_selecionados]
+        )
+    if setores_selecionados:
+        filtros_relacionados &= Q(
+            experiencias__setor_id__in=[setor.pk for setor in setores_selecionados]
+        )
+    if filtros_relacionados:
+        normas = normas.filter(
+            filtros_relacionados,
+            experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+        )
+
+    normas = list(normas.distinct())
+    for norma in normas:
+        norma.url_publica = _url_http_segura(norma.url_referencia)
+        norma.paises_publicos = sorted(
+            {
+                experiencia.pais.nome_exibicao
+                for experiencia in norma.experiencias_publicas_catalogo
+            },
+            key=str.casefold,
+        )
+        norma.setores_publicos = sorted(
+            {
+                experiencia.setor.nome_exibicao
+                for experiencia in norma.experiencias_publicas_catalogo
+            },
+            key=str.casefold,
+        )
+
+    chips = []
+    if termo:
+        chips.append(
+            {
+                "rotulo": termo,
+                "url_remover": _url_sem_valor_filtro(request, "q"),
+            }
+        )
+    for chave, objetos in (
+        ("pais", paises_selecionados),
+        ("setor", setores_selecionados),
+    ):
+        for objeto in objetos:
+            chips.append(
+                {
+                    "rotulo": objeto.nome_exibicao,
+                    "url_remover": _url_sem_valor_filtro(
+                        request, chave, objeto.pk
+                    ),
+                }
+            )
+
+    return render(
+        request,
+        "praticas/normas_internacionais.html",
+        {
+            "normas": normas,
+            "paises": paises,
+            "setores": setores,
+            "paises_selecionados": [item.pk for item in paises_selecionados],
+            "setores_selecionados": [item.pk for item in setores_selecionados],
+            "chips_filtros": chips,
+            "termo_busca": termo,
+            "total_resultados": len(normas),
+        },
+    )
 
 
 def salvar_anexos_submissao(experiencia, anexos):
@@ -1088,16 +1365,91 @@ def excluir_boa_pratica(request, pk):
         "praticas/excluir_boa_pratica.html",
         {
             "experiencia": experiencia,
+            "destino_cancelamento": proximo,
         },
     )
 
 def banco_tecnico(request):
+    termo = (request.GET.get("q") or "").strip()[:200]
     recursos = (
-        BancoTecnico.objects.select_related("setor")
+        BancoTecnico.objects.none().select_related("setor")
         .prefetch_related("dimensoes")
         .all()
     )
-    return render(request, "praticas/banco_tecnico.html", {"recursos": recursos})
+    if termo:
+        recursos = recursos.filter(
+            Q(titulo__icontains=termo)
+            | Q(titulo_es__icontains=termo)
+            | Q(titulo_en__icontains=termo)
+            | Q(descricao__icontains=termo)
+            | Q(descricao_es__icontains=termo)
+            | Q(descricao_en__icontains=termo)
+            | Q(tipo_recurso__icontains=termo)
+            | Q(tipo_recurso_es__icontains=termo)
+            | Q(tipo_recurso_en__icontains=termo)
+            | Q(setor__nome__icontains=termo)
+            | Q(setor__nome_es__icontains=termo)
+            | Q(setor__nome_en__icontains=termo)
+        )
+    recursos = list(recursos.distinct())
+    for recurso in recursos:
+        recurso.url_publica = _url_http_segura(recurso.url)
+    return render(
+        request,
+        "praticas/banco_tecnico.html",
+        {
+            "recursos": recursos,
+            "termo_busca": termo,
+            "total_resultados": len(recursos),
+        },
+    )
+
+
+def ferramentas(request):
+    termo = (request.GET.get("q") or "").strip()[:200]
+    recursos_base = ferramentas_catalogadas()
+    setores = Setor.objects.filter(
+        recursos_tecnicos__in=recursos_base
+    ).distinct()
+    setor_selecionado = _objetos_selecionados(
+        request, "setor", setores
+    )
+    setor_selecionado = setor_selecionado[0] if setor_selecionado else None
+
+    recursos = recursos_base.select_related("setor").prefetch_related("dimensoes")
+    if setor_selecionado:
+        recursos = recursos.filter(setor=setor_selecionado)
+    if termo:
+        recursos = recursos.filter(
+            Q(titulo__icontains=termo)
+            | Q(titulo_es__icontains=termo)
+            | Q(titulo_en__icontains=termo)
+            | Q(descricao__icontains=termo)
+            | Q(descricao_es__icontains=termo)
+            | Q(descricao_en__icontains=termo)
+            | Q(tipo_recurso__icontains=termo)
+            | Q(tipo_recurso_es__icontains=termo)
+            | Q(tipo_recurso_en__icontains=termo)
+            | Q(setor__nome__icontains=termo)
+            | Q(setor__nome_es__icontains=termo)
+            | Q(setor__nome_en__icontains=termo)
+        )
+
+    recursos = list(recursos.distinct())
+    for recurso in recursos:
+        recurso.url_publica = _url_http_segura(recurso.url)
+
+    return render(
+        request,
+        "praticas/ferramentas.html",
+        {
+            "recursos": recursos,
+            "setores": setores,
+            "setor_selecionado": setor_selecionado,
+            "termo_busca": termo,
+            "total_resultados": len(recursos),
+        },
+    )
 
 
 def sobre_plataforma(request):

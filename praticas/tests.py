@@ -302,11 +302,12 @@ class RotasPublicasTests(TestCase):
         self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
         self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
 
-    def test_catalogo_exibe_popup_boa_pratica_e_oculta_comparador(self):
+    def test_catalogo_preserva_apenas_acoes_previstas_no_prototipo(self):
         response = self.client.get(reverse("catalogo_experiencias"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "modalBoaPratica")
-        self.assertContains(response, "What is a good practice")
+        self.assertNotContains(response, "modalBoaPratica")
+        self.assertNotContains(response, "What is a good practice")
+        self.assertNotContains(response, ">Favoritar<")
         self.assertNotContains(response, "catalog-compare-checkbox")
         self.assertNotContains(response, "catalogoCompararSelecionadas")
         self.assertNotContains(response, "Open comparison page")

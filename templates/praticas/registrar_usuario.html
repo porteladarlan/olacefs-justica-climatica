@@ -1,45 +1,60 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %} | Plataforma Regional{% endblock %}
 
-{% block content %}
-<section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Submitter registration{% elif LANGUAGE_CODE == 'es' %}Registro de usuario remitente{% else %}Cadastro de usuário remetente{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{% if LANGUAGE_CODE == 'en' %}Create an account to submit practices{% elif LANGUAGE_CODE == 'es' %}Cree una cuenta para enviar buenas prácticas{% else %}Crie uma conta para enviar boas práticas{% endif %}</h1>
-    <p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}Public content remains open, but submissions require registration with an institutional e-mail.{% elif LANGUAGE_CODE == 'es' %}El contenido público permanece abierto, pero los envíos requieren registro con correo institucional.{% else %}O conteúdo público permanece aberto, mas os envios exigem cadastro com e-mail institucional.{% endif %}</p>
-</section>
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/meu-espaco.css' %}">{% endblock %}
 
-<form method="post" class="form-section mx-auto" style="max-width: 720px;">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}">
-    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label fw-semibold">{% if LANGUAGE_CODE == 'en' %}First name{% elif LANGUAGE_CODE == 'es' %}Nombre{% else %}Nome{% endif %}</label>
-            <input type="text" name="first_name" class="form-control" value="{{ request.POST.first_name }}" required>
+{% block content %}
+<div class="account-page account-page--narrow">
+    <nav class="prototype-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Navega&ccedil;&atilde;o estrutural{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+    </nav>
+
+    <header class="account-heading">
+        <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}New account{% elif LANGUAGE_CODE == 'es' %}Nueva cuenta{% else %}Nova conta{% endif %}</div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' %}Create an account to submit good practices and track your contributions. Published content remains open.{% elif LANGUAGE_CODE == 'es' %}Cree una cuenta para enviar buenas pr&aacute;cticas y hacer seguimiento de sus contribuciones. El contenido publicado permanece abierto.{% else %}Crie uma conta para enviar boas pr&aacute;ticas e acompanhar suas contribui&ccedil;&otilde;es. O conte&uacute;do publicado permanece aberto.{% endif %}</p>
+    </header>
+
+    <form method="post" class="account-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {% if form.errors %}
+            <div class="form-error-summary" role="alert" tabindex="-1">
+                <strong>{% if LANGUAGE_CODE == 'en' %}Check the information provided.{% elif LANGUAGE_CODE == 'es' %}Revise la informaci&oacute;n ingresada.{% else %}Revise as informa&ccedil;&otilde;es preenchidas.{% endif %}</strong>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="account-field">
+            <label for="id_first_name">{% if LANGUAGE_CODE == 'en' %}First name{% elif LANGUAGE_CODE == 'es' %}Nombre{% else %}Nome{% endif %}</label>
+            <input type="text" id="id_first_name" name="first_name" class="form-control" value="{{ request.POST.first_name }}" autocomplete="given-name" required>
         </div>
-        <div class="col-md-6">
-            <label class="form-label fw-semibold">{% if LANGUAGE_CODE == 'en' %}Last name{% elif LANGUAGE_CODE == 'es' %}Apellido{% else %}Sobrenome{% endif %}</label>
-            <input type="text" name="last_name" class="form-control" value="{{ request.POST.last_name }}">
+        <div class="account-field">
+            <label for="id_last_name">{% if LANGUAGE_CODE == 'en' %}Last name{% elif LANGUAGE_CODE == 'es' %}Apellido{% else %}Sobrenome{% endif %}</label>
+            <input type="text" id="id_last_name" name="last_name" class="form-control" value="{{ request.POST.last_name }}" autocomplete="family-name">
         </div>
-        <div class="col-12">
-            <label class="form-label fw-semibold">{% if LANGUAGE_CODE == 'en' %}Institutional e-mail{% elif LANGUAGE_CODE == 'es' %}Correo institucional{% else %}E-mail institucional{% endif %}</label>
-            <input type="email" name="email" class="form-control" value="{{ request.POST.email }}" placeholder="nome@efs.gob" required>
+        <div class="account-field">
+            <label for="id_email">{% if LANGUAGE_CODE == 'en' %}Institutional e-mail{% elif LANGUAGE_CODE == 'es' %}Correo institucional{% else %}E-mail institucional{% endif %}</label>
+            <input type="email" id="id_email" name="email" class="form-control" value="{{ request.POST.email }}" placeholder="nome@efs.gob" autocomplete="email" required>
         </div>
+
         {% for field in form %}
-            <div class="col-12">
-                <label class="form-label fw-semibold">{{ field.label }}</label>
+            <div class="account-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-                {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                {% if field.help_text %}<div class="field-help" id="{{ field.id_for_label }}_help">{{ field.help_text }}</div>{% endif %}
+                {% for error in field.errors %}<div class="field-error" id="{{ field.id_for_label }}_error">{{ error }}</div>{% endfor %}
             </div>
         {% endfor %}
-    </div>
-    <div class="d-flex flex-column flex-md-row gap-2 justify-content-end mt-4">
-        <a href="{% url 'login_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}I already have an account{% elif LANGUAGE_CODE == 'es' %}Ya tengo cuenta{% else %}Já tenho conta{% endif %}</a>
-        <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</button>
-    </div>
-</form>
+
+        <div class="account-actions">
+            <a href="{% url 'login_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="linklike">&larr; {% if LANGUAGE_CODE == 'en' %}I already have an account{% elif LANGUAGE_CODE == 'es' %}Ya tengo cuenta{% else %}J&aacute; tenho conta{% endif %}</a>
+            <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

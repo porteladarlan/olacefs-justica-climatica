@@ -1,0 +1,37 @@
+<ul class="submission-list submission-list--secondary">
+    {% for proposta in propostas %}
+        <li>
+            <article class="submission-item">
+                <div class="submission-item-main">
+                    <div class="submission-item-meta">
+                        <span class="status-badge status-{{ proposta.status }}">
+                            <span class="status-dot" aria-hidden="true"></span>
+                            {% if proposta.status == 'aprovada' %}
+                                {% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobada{% else %}Aprovada{% endif %}
+                            {% elif proposta.status == 'rejeitada' %}
+                                {% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazada{% else %}Rejeitada{% endif %}
+                            {% elif proposta.status == 'em_revisao' %}
+                                {% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisi&oacute;n{% else %}Em revis&atilde;o{% endif %}
+                            {% else %}
+                                {% if LANGUAGE_CODE == 'en' %}Pending{% elif LANGUAGE_CODE == 'es' %}Pendiente{% else %}Pendente{% endif %}
+                            {% endif %}
+                        </span>
+                        <span>{{ proposta.criado_em|date:"d/m/Y" }}</span>
+                    </div>
+                    <h3>{{ proposta.experiencia.titulo_exibicao }}</h3>
+                    {% if proposta.comentario_autor %}<p>{{ proposta.comentario_autor }}</p>{% endif %}
+                    {% if proposta.comentario_revisor %}
+                        <div class="review-comment">
+                            <strong>{% if LANGUAGE_CODE == 'en' %}Review:{% elif LANGUAGE_CODE == 'es' %}Revisi&oacute;n:{% else %}Revis&atilde;o:{% endif %}</strong>
+                            {{ proposta.comentario_revisor }}
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        </li>
+    {% empty %}
+        <li class="account-empty account-empty--compact">
+            {% if LANGUAGE_CODE == 'en' %}No edit requests yet.{% elif LANGUAGE_CODE == 'es' %}A&uacute;n no hay solicitudes de edici&oacute;n.{% else %}Ainda n&atilde;o h&aacute; solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}
+        </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,57 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %} | Plataforma Regional{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/ferramentas-publicas.css' %}">{% endblock %}
+
+{% block content %}
+<div class="tools-library">
+    <nav class="tools-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</span>
+    </nav>
+
+    <header class="tools-heading">
+        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Toolbox{% elif LANGUAGE_CODE == 'es' %}Caja de herramientas{% else %}Caixa de ferramentas{% endif %}</div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Tools for climate justice audits{% elif LANGUAGE_CODE == 'es' %}Herramientas para auditor&iacute;as de justicia clim&aacute;tica{% else %}Ferramentas para auditorias de justi&ccedil;a clim&aacute;tica{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' %}Search the institutional methodologies and tools made available after technical curation.{% elif LANGUAGE_CODE == 'es' %}Busque metodolog&iacute;as y herramientas institucionales publicadas despu&eacute;s de la curadur&iacute;a t&eacute;cnica.{% else %}Busque metodologias e ferramentas institucionais disponibilizadas ap&oacute;s a curadoria t&eacute;cnica.{% endif %}</p>
+    </header>
+
+    <form method="get" class="tools-toolbar" role="search">
+        <label class="tools-search">
+            <span class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Search tools{% elif LANGUAGE_CODE == 'es' %}Buscar herramientas{% else %}Buscar ferramentas{% endif %}</span>
+            <input type="search" name="q" maxlength="200" value="{{ termo_busca }}" placeholder="{% if LANGUAGE_CODE == 'en' %}Search tools and methodologies{% elif LANGUAGE_CODE == 'es' %}Buscar herramientas y metodolog&iacute;as{% else %}Buscar ferramentas e metodologias{% endif %}">
+        </label>
+        <div class="tools-sector-group">
+            <span>{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</span>
+            <a class="tools-pill{% if not setor_selecionado %} active{% endif %}" href="{% url 'ferramentas' %}{% if termo_busca %}?q={{ termo_busca|urlencode }}{% endif %}">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</a>
+            {% for setor in setores %}<button class="tools-pill{% if setor_selecionado.pk == setor.pk %} active{% endif %}" type="submit" name="setor" value="{{ setor.pk }}">{{ setor.nome_exibicao }}</button>{% endfor %}
+        </div>
+        <button class="btn btn-primary btn-sm" type="submit">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</button>
+    </form>
+
+    <p class="tools-counter" aria-live="polite"><strong>{{ total_resultados }}</strong> {% if LANGUAGE_CODE == 'en' %}tools available{% elif LANGUAGE_CODE == 'es' %}herramientas disponibles{% else %}ferramentas dispon&iacute;veis{% endif %}</p>
+
+    <div class="tools-list">
+        {% for recurso in recursos %}
+            <article class="tools-row">
+                <span class="tools-type">{{ recurso.tipo_recurso_exibicao }}</span>
+                <div>
+                    <h2>{{ recurso.titulo_exibicao }}</h2>
+                    <p>{{ recurso.descricao_exibicao }}</p>
+                </div>
+                <div class="tools-meta">{% if recurso.setor %}{{ recurso.setor.nome_exibicao }}{% endif %}</div>
+                <div>{% if recurso.url_publica %}<a class="tools-link" href="{{ recurso.url_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}View{% elif LANGUAGE_CODE == 'es' %}Ver{% else %}Ver{% endif %}</a>{% endif %}</div>
+            </article>
+        {% empty %}
+            <div class="tools-empty">
+                <h2>{% if LANGUAGE_CODE == 'en' %}No institutional tool is published yet{% elif LANGUAGE_CODE == 'es' %}Todav&iacute;a no hay herramientas institucionales publicadas{% else %}Ainda n&atilde;o h&aacute; ferramentas institucionais publicadas{% endif %}</h2>
+                <p>{% if LANGUAGE_CODE == 'en' %}The current technical records have no publication or origin marker and therefore are not presented as official content. Their curation is planned for Phase 2C.{% elif LANGUAGE_CODE == 'es' %}Los registros t&eacute;cnicos actuales no tienen marcador de publicaci&oacute;n u origen y, por eso, no se presentan como contenido oficial. Su curadur&iacute;a est&aacute; prevista para la Fase 2C.{% else %}Os registros t&eacute;cnicos atuais n&atilde;o possuem marcador de publica&ccedil;&atilde;o ou origem e, por isso, n&atilde;o s&atilde;o apresentados como conte&uacute;do oficial. A curadoria est&aacute; prevista para a Fase 2C.{% endif %}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

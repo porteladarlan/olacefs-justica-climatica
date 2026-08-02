@@ -15,8 +15,8 @@
 - mensagens da COMTEMA e da CGID compostas com textos e fotografias locais fornecidos no protótipo;
 - fundamentos apresentados nas três abas do protótipo, com ARIA, navegação por teclado, painéis focalizáveis e fotografias locais;
 - seções semanticamente preparadas para o futuro mapa regional e conteúdo audiovisual, sem D3, TopoJSON, dados ou interações simuladas;
-- cabeçalho com acessos diretos a Boas Práticas e Marcos Normativos, indicação acessível da futura rota de Ferramentas, rotas reais de conta, idiomas e alto contraste;
-- rodapé e tipografia alinhados ao protótipo, usando assets e fallbacks locais;
+- cabeçalho com acessos diretos a Boas Práticas, Marcos Normativos e Ferramentas, além das rotas reais de conta, idiomas e alto contraste;
+- rodapé e tipografia alinhados ao protótipo, com Raleway distribuída localmente e fallbacks de sistema;
 - implementação somente em templates, CSS e JavaScript existente, sem alteração do modelo de dados.
 
 ## Implementado na fase de segurança crítica
@@ -37,6 +37,17 @@
 - duas migrations estruturais sem carga de dados e administração somente para inspeção;
 - autorização atual preservada: os novos models não são consultados por views, forms ou serviços de permissão;
 - `db.sqlite3` não foi migrado nesta execução; upgrade, rollback e re-upgrade foram ensaiados em banco temporário limpo.
+
+## Implementado no Lote 1 de fidelidade — interface pública e Meu Espaço
+
+- cabeçalho, tipografia e componentes comuns implementados com os tokens e a largura extraídos do protótipo; cabeçalho e geometria das páginas de Boas Práticas e Marcos Normativos foram homologados em navegador;
+- estados atuais derivados das rotas Django reais para Home, Boas Práticas, Marcos Normativos, Ferramentas e Meu Espaço;
+- catálogos públicos usam filtros e contadores reais no servidor; Boas Práticas publica somente experiências com estado `publicado`, reproduz a sidebar pesquisável do protótipo e não inclui ações extras, enquanto Marcos Normativos apresenta os registros atuais em cards e drawer acessível, sem simular natureza jurídica ou compêndio ainda inexistentes;
+- Ferramentas possui rota real e pesquisa funcional, mas retorna estado vazio enquanto os registros existentes não tiverem proveniência e situação editorial confirmadas para publicação;
+- login, cadastro, envios, status, detalhe e submissão foram recompostos sem remover campos ou alterar os contratos de autorização, CSRF e upload;
+- menus anônimo, autenticado e staff preservam as regras existentes e não prometem vínculo institucional ainda não implementado;
+- seletor trilíngue preserva caminho, query string e fragmento, e alto contraste persiste apenas uma preferência booleana local;
+- cobertura específica para shell, home, catálogos públicos e Meu Espaço, sem alteração de forms, models, migrations, banco ou autorização.
 
 ## Protótipo
 

@@ -8,9 +8,9 @@ class ConteudoInstitucionalNormasTests(TestCase):
         conteudo = response.content.decode('utf-8')
 
         self.assertIn('Technical and normative resources', conteudo)
-        self.assertIn('Content under technical curation', conteudo)
-        self.assertIn('The area is ready, but the final collection is not closed', conteudo)
-        self.assertIn('Relationship with the catalog', conteudo)
+        self.assertIn('No institutional resource is published yet', conteudo)
+        self.assertIn('no publication or origin marker', conteudo)
+        self.assertEqual(response.context['total_resultados'], 0)
         self.assertNotIn('MVP', conteudo)
 
     def test_banco_tecnico_em_espanhol_reforca_area_em_preparacao(self):
@@ -18,19 +18,22 @@ class ConteudoInstitucionalNormasTests(TestCase):
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode('utf-8')
 
-        self.assertIn('Recursos técnicos y normativos', conteudo)
-        self.assertIn('Contenido en curaduría técnica', conteudo)
-        self.assertIn('En preparación', conteudo)
+        self.assertIn('Recursos t&eacute;cnicos y normativos', conteudo)
+        self.assertIn('Todav&iacute;a no hay recursos institucionales publicados', conteudo)
+        self.assertIn('no tienen marcador de publicaci&oacute;n u origen', conteudo)
+        self.assertEqual(response.context['total_resultados'], 0)
         self.assertNotIn('MVP', conteudo)
 
-    def test_normas_internacionais_em_ingles_nao_parece_repositorio_juridico(self):
+    def test_normas_internacionais_em_ingles_usa_biblioteca_e_contador_real(self):
         response = self.client.get('/en/normas-internacionais/')
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode('utf-8')
 
-        self.assertIn('Normative references as anchors for good practices', conteudo)
-        self.assertIn('The platform is not a legal repository', conteudo)
-        self.assertIn('No frameworks registered yet', conteudo)
+        self.assertIn('Normative library', conteudo)
+        self.assertIn('Normative frameworks for climate justice audits', conteudo)
+        self.assertIn('No normative framework found', conteudo)
+        self.assertEqual(response.context['total_resultados'], 0)
+        self.assertNotIn('34 results', conteudo)
 
     def test_sobre_reforca_relacao_guia_e_plataforma(self):
         response = self.client.get('/sobre/')

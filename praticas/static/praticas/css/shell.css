@@ -1,0 +1,407 @@
+/* Shell global fiel ao protótipo, aplicado sobre a estrutura Django existente. */
+.topline {
+    display: none;
+}
+
+.navbar-institutional {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.navbar-institutional > .container {
+    width: 100%;
+    max-width: var(--maxw);
+    min-height: 0;
+    margin: 0 auto;
+    padding: 14px 32px;
+    gap: 18px;
+}
+
+.brand-lockup {
+    min-width: 0;
+    flex: 0 0 auto;
+    gap: 0;
+    padding: 0;
+    color: var(--text);
+    line-height: 1.16;
+}
+
+.brand-name {
+    color: var(--purple);
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.16;
+}
+
+.brand-caption {
+    margin-top: 1px;
+    color: var(--text-soft);
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.16;
+}
+
+.brand-lockup.nav-section-current .brand-name {
+    text-decoration: none;
+}
+
+.navbar-institutional .navbar-collapse {
+    min-width: 0;
+}
+
+.navbar-institutional .navbar-nav {
+    gap: 6px;
+    align-items: center;
+}
+
+.navbar-institutional .navbar-nav .nav-link {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9px;
+    padding: 9px 13px;
+    color: var(--text);
+    background: transparent;
+    box-shadow: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.navbar-institutional .navbar-nav .nav-link:hover,
+.navbar-institutional .navbar-nav .nav-link:focus-visible {
+    color: var(--green-dark);
+    background: var(--green-pale);
+}
+
+.navbar-institutional .navbar-nav .nav-section-current,
+.navbar-institutional .navbar-nav .nav-section-current:hover,
+.navbar-institutional .navbar-nav .nav-section-current:focus-visible {
+    color: #ffffff;
+    background: var(--purple);
+    box-shadow: none;
+    font-weight: 600;
+    outline: 0.666667px solid #e59700 !important;
+    outline-offset: 0 !important;
+}
+
+.navbar-institutional .navbar-nav .nav-link-pending {
+    color: var(--text-soft);
+    cursor: not-allowed;
+}
+
+.nav-pending-status {
+    color: var(--green-dark);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.header-space-button {
+    gap: 6px;
+    border: 1px solid var(--border) !important;
+    color: var(--purple) !important;
+    background: var(--surface) !important;
+}
+
+.header-space-button:hover,
+.header-space-button:focus-visible {
+    border-color: var(--green-soft) !important;
+    color: var(--green-dark) !important;
+    background: var(--green-pale) !important;
+}
+
+.header-space-button.nav-section-current,
+.header-space-button.nav-section-current:hover,
+.header-space-button.nav-section-current:focus-visible {
+    border-color: var(--purple) !important;
+    color: #ffffff !important;
+    background: var(--purple) !important;
+}
+
+.header-account-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.navbar-institutional .dropdown-menu {
+    width: min(270px, calc(100vw - 32px));
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+}
+
+.navbar-institutional .dropdown-item {
+    min-height: 44px;
+    border-radius: 10px;
+    color: var(--text);
+    white-space: normal;
+}
+
+.navbar-institutional .dropdown-item:hover,
+.navbar-institutional .dropdown-item:focus-visible {
+    color: var(--green-dark);
+    background: var(--green-pale);
+}
+
+.navbar-institutional .dropdown-item[aria-current="page"] {
+    color: var(--purple);
+    background: var(--lilac-pale);
+    box-shadow: inset 3px 0 0 var(--green-dark);
+    font-weight: 800;
+}
+
+.header-space-item {
+    padding: 12px;
+}
+
+.header-space-item strong {
+    color: var(--purple);
+    font-size: 13.5px;
+    font-weight: 800;
+}
+
+.header-space-item small {
+    margin-top: 1px;
+    color: var(--text-soft);
+    font-size: 11.5px;
+    font-weight: 400;
+}
+
+.language-select {
+    width: auto;
+    min-width: 64px;
+    min-height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 28px 8px 10px;
+    color: var(--purple);
+    background-color: var(--surface);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.header-a11y-button {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0;
+    color: var(--purple);
+    background: var(--surface);
+    font-size: 16px;
+    line-height: 1;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.header-a11y-button:hover,
+.header-a11y-button:focus-visible {
+    border-color: var(--green-soft);
+    color: var(--green-dark);
+    background: var(--green-pale);
+}
+
+.navbar-toggler {
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+
+.main-shell,
+.footer-institutional > .container {
+    width: 100%;
+    max-width: var(--maxw);
+}
+
+.footer-institutional {
+    margin-top: 40px !important;
+    padding: 40px 0 34px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.footer-institutional > .container {
+    padding-right: 32px;
+    padding-left: 32px;
+}
+
+.footer-wave {
+    height: 6px;
+    margin-bottom: 26px;
+    border-radius: 6px;
+    background: linear-gradient(
+        90deg,
+        var(--green),
+        var(--green-soft),
+        var(--purple-soft),
+        var(--purple)
+    );
+}
+
+.footer-logo-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo-bar {
+    display: block;
+    width: auto;
+    max-width: min(880px, 100%);
+    height: auto;
+    margin: 0 auto;
+    background: transparent;
+}
+
+.footer-meta {
+    margin: 16px 0 0;
+    color: var(--text-soft);
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.55;
+    text-align: center;
+}
+
+@media (min-width: 992px) {
+    .navbar-institutional > .container {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+
+    .brand-lockup {
+        grid-column: 1;
+        justify-self: start;
+    }
+
+    .navbar-institutional .navbar-collapse {
+        display: contents !important;
+    }
+
+    .header-primary-nav {
+        grid-column: 2;
+        justify-self: center;
+    }
+
+    .header-tools-nav {
+        grid-column: 3;
+        justify-self: end;
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-institutional > .container {
+        padding-top: 9px;
+        padding-bottom: 9px;
+    }
+
+    .navbar-institutional .navbar-collapse {
+        width: 100%;
+        padding-top: 10px;
+    }
+
+    .navbar-institutional .navbar-nav {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .header-tools-nav {
+        margin-top: 6px;
+    }
+
+    .navbar-institutional .navbar-nav .nav-link,
+    .language-select,
+    .header-a11y-button {
+        width: 100%;
+        min-height: 44px;
+        justify-content: flex-start;
+    }
+
+    .header-a11y-button {
+        justify-content: center;
+    }
+
+    .navbar-institutional .dropdown-menu {
+        width: 100%;
+        margin-top: 6px;
+        box-shadow: var(--shadow);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .navbar-institutional > .container,
+    .footer-institutional > .container {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .brand-lockup {
+        max-width: calc(100% - 62px);
+    }
+
+    .brand-name {
+        font-size: 14px;
+    }
+
+    .brand-caption {
+        font-size: 10px;
+    }
+
+    .footer-institutional {
+        padding-top: 32px;
+        padding-bottom: 28px;
+    }
+
+    .footer-wave {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 359.98px) {
+    .brand-name {
+        font-size: 13px;
+    }
+
+    .brand-caption {
+        font-size: 9.5px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar-institutional *,
+    .navbar-institutional *::before,
+    .navbar-institutional *::after,
+    .footer-institutional *,
+    .footer-institutional *::before,
+    .footer-institutional *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

@@ -49,11 +49,11 @@
     <form method="post" class="d-flex flex-column flex-sm-row gap-2">
         {% csrf_token %}
         <input type="hidden" name="confirmar_exclusao" value="sim">
-        <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+        <input type="hidden" name="next" value="{{ destino_cancelamento|default:'' }}">
         <button type="submit" class="btn btn-danger">
             {% if LANGUAGE_CODE == 'en' %}Yes, delete permanently{% elif LANGUAGE_CODE == 'es' %}Sí, eliminar definitivamente{% else %}Sim, excluir definitivamente{% endif %}
         </button>
-        <a href="{{ request.GET.next|default:'javascript:history.back()' }}" class="btn btn-outline-secondary">
+        <a href="{% if destino_cancelamento %}{{ destino_cancelamento }}{% else %}{% url 'catalogo_experiencias' %}{% endif %}" class="btn btn-outline-secondary">
             {% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}
         </a>
     </form>

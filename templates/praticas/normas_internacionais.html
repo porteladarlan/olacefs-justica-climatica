@@ -1,74 +1,110 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}International frameworks{% elif LANGUAGE_CODE == 'es' %}Marcos internacionales{% else %}Marcos internacionais{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Normative frameworks{% elif LANGUAGE_CODE == 'es' %}Marcos normativos{% else %}Marcos normativos{% endif %} | Plataforma Regional{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/marcos-publicos.css' %}">{% endblock %}
 
 {% block content %}
-<section class="page-hero mb-4">
-    <span class="hero-eyebrow">
-        {% if LANGUAGE_CODE == 'en' %}Standards, rights and climate frameworks{% elif LANGUAGE_CODE == 'es' %}Normas, derechos y marcos climáticos{% else %}Normas, direitos e marcos climáticos{% endif %}
-    </span>
-    <h1 class="hero-title">
-        {% if LANGUAGE_CODE == 'en' %}Normative references as anchors for good practices.{% elif LANGUAGE_CODE == 'es' %}Referencias normativas como anclajes para buenas prácticas.{% else %}Referências normativas como âncoras para boas práticas.{% endif %}
-    </h1>
-    <p class="hero-subtitle">
-        {% if LANGUAGE_CODE == 'en' %}
-            International frameworks help explain why a practice is relevant, which rights or commitments it relates to and how it can support audit criteria.
-        {% elif LANGUAGE_CODE == 'es' %}
-            Los marcos internacionales ayudan a explicar por qué una práctica es relevante, con qué derechos o compromisos se relaciona y cómo puede apoyar criterios de auditoría.
-        {% else %}
-            Os marcos internacionais ajudam a explicar por que uma prática é relevante, com quais direitos ou compromissos ela se relaciona e como pode apoiar critérios de auditoria.
-        {% endif %}
-    </p>
-</section>
+<div class="norm-library">
+    <nav class="library-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{% if LANGUAGE_CODE == 'en' %}Normative frameworks{% elif LANGUAGE_CODE == 'es' %}Marcos normativos{% else %}Marcos normativos{% endif %}</span>
+    </nav>
 
-<section class="detail-layout-card mb-4">
-    <div class="section-kicker">
-        {% if LANGUAGE_CODE == 'en' %}How this area should be read{% elif LANGUAGE_CODE == 'es' %}Cómo leer esta área{% else %}Como ler esta área{% endif %}
-    </div>
-    <h2 class="section-title h3 mb-2">
-        {% if LANGUAGE_CODE == 'en' %}The platform is not a legal repository{% elif LANGUAGE_CODE == 'es' %}La plataforma no es un repositorio jurídico{% else %}A plataforma não é um repositório jurídico{% endif %}
-    </h2>
-    <p class="section-subtitle mb-0">
-        {% if LANGUAGE_CODE == 'en' %}
-            This section organizes frameworks as references connected to the experiences. The complete legal and methodological curation will be refined in the specialized technical stage.
-        {% elif LANGUAGE_CODE == 'es' %}
-            Esta sección organiza marcos como referencias conectadas a las experiencias. La curaduría jurídica y metodológica completa será refinada en la etapa técnica especializada.
-        {% else %}
-            Esta seção organiza marcos como referências conectadas às experiências. A curadoria jurídica e metodológica completa será refinada na etapa técnica especializada.
-        {% endif %}
-    </p>
-</section>
-
-<div class="row g-4">
-    {% for norma in normas %}
-    <div class="col-lg-6">
-        <article class="resource-card h-100">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}International framework{% elif LANGUAGE_CODE == 'es' %}Marco internacional{% else %}Marco internacional{% endif %}</div>
-            <h2 class="h4 section-title">{{ norma.nome_exibicao }}</h2>
-            <p class="section-subtitle">{{ norma.resumo_exibicao|truncatechars:420 }}</p>
-            <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-primary" href="{% url 'catalogo_experiencias' %}?norma={{ norma.id }}">{% if LANGUAGE_CODE == 'en' %}See related experiences{% elif LANGUAGE_CODE == 'es' %}Ver experiencias relacionadas{% else %}Ver experiências relacionadas{% endif %}</a>
-                {% if norma.url_referencia %}<a class="btn btn-outline-secondary" href="{{ norma.url_referencia }}" target="_blank" rel="noopener">{% if LANGUAGE_CODE == 'en' %}External reference{% elif LANGUAGE_CODE == 'es' %}Referencia externa{% else %}Referência externa{% endif %}</a>{% endif %}
+    <section class="library-section" aria-labelledby="library-title">
+        <header class="library-heading">
+            <div>
+                <div class="library-eyebrow">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15"><path d="M12 3v17M5 6h14M7 6l-4 7h8L7 6Zm10 0-4 7h8l-4-7ZM6 21h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>{% if LANGUAGE_CODE == 'en' %}Normative library{% elif LANGUAGE_CODE == 'es' %}Biblioteca normativa{% else %}Biblioteca normativa{% endif %}</span>
+                </div>
+                <h1 id="library-title">{% if LANGUAGE_CODE == 'en' %}Normative frameworks for climate justice audits{% elif LANGUAGE_CODE == 'es' %}Marcos normativos para auditor&iacute;as de justicia clim&aacute;tica{% else %}Marcos normativos para auditorias de justi&ccedil;a clim&aacute;tica{% endif %}</h1>
+                <p>{% if LANGUAGE_CODE == 'en' %}Normative frameworks allow SAIs to connect oversight with international commitments and standards, incorporating them as practical criteria in audit matrices.{% elif LANGUAGE_CODE == 'es' %}Los marcos normativos permiten a las EFS vincular su fiscalizaci&oacute;n con los compromisos y est&aacute;ndares internacionales, incorpor&aacute;ndolos como criterios pr&aacute;cticos en sus matrices de auditor&iacute;a.{% else %}Os marcos normativos permitem que as EFS vinculem a fiscaliza&ccedil;&atilde;o a compromissos e padr&otilde;es internacionais, incorporando-os como crit&eacute;rios pr&aacute;ticos nas matrizes de auditoria.{% endif %}</p>
             </div>
-        </article>
-    </div>
-    {% empty %}
-    <div class="col-12">
-        <div class="feature-card">
-            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}No frameworks registered yet{% elif LANGUAGE_CODE == 'es' %}Sin marcos registrados todavía{% else %}Sem marcos cadastrados ainda{% endif %}</div>
-            <p class="mb-0 text-muted">
-                {% if LANGUAGE_CODE == 'en' %}
-                    The normative list will be completed after the technical curation process.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    La lista normativa será completada después del proceso de curaduría técnica.
-                {% else %}
-                    A lista normativa será completada após o processo de curadoria técnica.
-                {% endif %}
-            </p>
+            <button class="library-compendium" type="button" disabled aria-describedby="compendium-help">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 17v3h14v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>{% if LANGUAGE_CODE == 'en' %}Download PDF compendium{% elif LANGUAGE_CODE == 'es' %}Descargar compendio en PDF{% else %}Baixar comp&ecirc;ndio em PDF{% endif %}</span>
+            </button>
+            <span class="visually-hidden" id="compendium-help">{% if LANGUAGE_CODE == 'en' %}The institutional compendium has not yet been published.{% elif LANGUAGE_CODE == 'es' %}El compendio institucional a&uacute;n no fue publicado.{% else %}O comp&ecirc;ndio institucional ainda n&atilde;o foi publicado.{% endif %}</span>
+        </header>
+
+        <form method="get" class="library-toolbar" role="search" aria-label="{% if LANGUAGE_CODE == 'en' %}Normative framework filters{% elif LANGUAGE_CODE == 'es' %}Filtros de marcos normativos{% else %}Filtros de marcos normativos{% endif %}">
+            <label class="library-search">
+                <span class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Search normative frameworks{% elif LANGUAGE_CODE == 'es' %}Buscar marcos normativos{% else %}Buscar marcos normativos{% endif %}</span>
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <input type="search" name="q" maxlength="200" value="{{ termo_busca }}" placeholder="{% if LANGUAGE_CODE == 'en' %}Search by name, topic or year&hellip;{% elif LANGUAGE_CODE == 'es' %}Buscar por nombre, tema o a&ntilde;o&hellip;{% else %}Buscar por nome, tema ou ano&hellip;{% endif %}">
+            </label>
+
+            <select data-add-filter="pais" aria-label="{% if LANGUAGE_CODE == 'en' %}Add country filter{% elif LANGUAGE_CODE == 'es' %}A&ntilde;adir filtro de pa&iacute;s{% else %}Adicionar filtro de pa&iacute;s{% endif %}"{% if not paises %} disabled{% endif %}>
+                <option value="">{% if LANGUAGE_CODE == 'en' %}Add country&hellip;{% elif LANGUAGE_CODE == 'es' %}A&ntilde;adir pa&iacute;s&hellip;{% else %}Adicionar pa&iacute;s&hellip;{% endif %}</option>
+                {% for pais in paises %}{% if pais.pk not in paises_selecionados %}<option value="{{ pais.pk }}">{{ pais.nome_exibicao }}</option>{% endif %}{% endfor %}
+            </select>
+
+            <select name="setor" data-auto-submit aria-label="{% if LANGUAGE_CODE == 'en' %}Filter by sector{% elif LANGUAGE_CODE == 'es' %}Filtrar por sector{% else %}Filtrar por setor{% endif %}"{% if not setores %} disabled{% endif %}>
+                <option value="">{% if LANGUAGE_CODE == 'en' %}All sectors{% elif LANGUAGE_CODE == 'es' %}Todos los sectores{% else %}Todos os setores{% endif %}</option>
+                {% for setor in setores %}<option value="{{ setor.pk }}"{% if setor.pk in setores_selecionados %} selected{% endif %}>{{ setor.nome_exibicao }}</option>{% endfor %}
+            </select>
+
+            <select disabled aria-describedby="legal-nature-help" aria-label="{% if LANGUAGE_CODE == 'en' %}Legal nature{% elif LANGUAGE_CODE == 'es' %}Naturaleza jur&iacute;dica{% else %}Natureza jur&iacute;dica{% endif %}">
+                <option>{% if LANGUAGE_CODE == 'en' %}All legal natures{% elif LANGUAGE_CODE == 'es' %}Toda naturaleza jur&iacute;dica{% else %}Toda natureza jur&iacute;dica{% endif %}</option>
+            </select>
+            <span class="visually-hidden" id="legal-nature-help">{% if LANGUAGE_CODE == 'en' %}Legal nature is not available in the current data structure.{% elif LANGUAGE_CODE == 'es' %}La naturaleza jur&iacute;dica no est&aacute; disponible en la estructura de datos actual.{% else %}A natureza jur&iacute;dica n&atilde;o est&aacute; dispon&iacute;vel na estrutura de dados atual.{% endif %}</span>
+
+            <a class="library-clear" href="{% url 'normas_internacionais' %}">{% if LANGUAGE_CODE == 'en' %}Clear filters{% elif LANGUAGE_CODE == 'es' %}Limpiar filtros{% else %}Limpar filtros{% endif %}</a>
+            <noscript><button class="library-noscript-submit" type="submit">{% if LANGUAGE_CODE == 'en' %}Apply filters{% elif LANGUAGE_CODE == 'es' %}Aplicar filtros{% else %}Aplicar filtros{% endif %}</button></noscript>
+        </form>
+
+        {% if chips_filtros %}
+            <div class="library-chips" aria-label="{% if LANGUAGE_CODE == 'en' %}Active filters{% elif LANGUAGE_CODE == 'es' %}Filtros activos{% else %}Filtros ativos{% endif %}">
+                {% for chip in chips_filtros %}<span>{{ chip.rotulo }}<a href="{{ chip.url_remover }}" aria-label="{% if LANGUAGE_CODE == 'en' %}Remove filter{% elif LANGUAGE_CODE == 'es' %}Quitar filtro{% else %}Remover filtro{% endif %} {{ chip.rotulo }}">&times;</a></span>{% endfor %}
+            </div>
+        {% endif %}
+
+        <p class="library-counter" aria-live="polite"><strong>{{ total_resultados }}</strong> {% if LANGUAGE_CODE == 'en' %}result{% if total_resultados != 1 %}s{% endif %}{% elif LANGUAGE_CODE == 'es' %}resultado{% if total_resultados != 1 %}s{% endif %}{% else %}resultado{% if total_resultados != 1 %}s{% endif %}{% endif %}</p>
+
+        <div class="library-grid">
+            {% for norma in normas %}
+                <article class="library-card">
+                    <div class="library-card-top">
+                        <span class="library-badge">{% if LANGUAGE_CODE == 'en' %}Normative framework{% elif LANGUAGE_CODE == 'es' %}Marco normativo{% else %}Marco normativo{% endif %}</span>
+                    </div>
+                    <h2>{{ norma.nome_exibicao }}</h2>
+                    <p>{{ norma.resumo_exibicao|truncatechars:300 }}</p>
+                    {% if norma.setores_publicos %}<div class="library-sectors">{% for setor in norma.setores_publicos|slice:':3' %}<span>{{ setor }}</span>{% endfor %}</div>{% endif %}
+                    <div class="library-card-footer">
+                        <span class="library-applies">{% if LANGUAGE_CODE == 'en' %}Applies to:{% elif LANGUAGE_CODE == 'es' %}Aplica a:{% else %}Aplica-se a:{% endif %} {% if norma.paises_publicos %}{{ norma.paises_publicos|join:', ' }}{% elif LANGUAGE_CODE == 'en' %}not informed{% elif LANGUAGE_CODE == 'es' %}no informado{% else %}n&atilde;o informado{% endif %}</span>
+                    </div>
+                    <button class="library-detail" type="button" data-dialog-target="norma-{{ norma.pk }}">{% if LANGUAGE_CODE == 'en' %}View details{% elif LANGUAGE_CODE == 'es' %}Ver detalle{% else %}Ver detalhes{% endif %} <span aria-hidden="true">&rarr;</span></button>
+                </article>
+
+                <dialog class="norm-dialog" id="norma-{{ norma.pk }}" aria-labelledby="norma-title-{{ norma.pk }}">
+                    <div class="norm-dialog-content">
+                        <button class="norm-dialog-close" type="button" data-dialog-close aria-label="{% if LANGUAGE_CODE == 'en' %}Close details{% elif LANGUAGE_CODE == 'es' %}Cerrar detalle{% else %}Fechar detalhes{% endif %}">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        </button>
+                        <div class="library-eyebrow">{% if LANGUAGE_CODE == 'en' %}Normative framework{% elif LANGUAGE_CODE == 'es' %}Marco normativo{% else %}Marco normativo{% endif %}</div>
+                        <h2 id="norma-title-{{ norma.pk }}">{{ norma.nome_exibicao }}</h2>
+                        <p>{{ norma.resumo_exibicao }}</p>
+                        {% if norma.setores_publicos %}<div class="library-sectors">{% for setor in norma.setores_publicos %}<span>{{ setor }}</span>{% endfor %}</div>{% endif %}
+                        <p class="norm-dialog-meta"><strong>{% if LANGUAGE_CODE == 'en' %}Countries linked to public practices:{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;ses vinculados a pr&aacute;cticas p&uacute;blicas:{% else %}Pa&iacute;ses vinculados a pr&aacute;ticas p&uacute;blicas:{% endif %}</strong> {% if norma.paises_publicos %}{{ norma.paises_publicos|join:', ' }}{% elif LANGUAGE_CODE == 'en' %}not informed{% elif LANGUAGE_CODE == 'es' %}no informado{% else %}n&atilde;o informado{% endif %}</p>
+                        <div class="norm-dialog-actions">
+                            <a class="norm-primary-action" href="{% url 'catalogo_experiencias' %}?norma={{ norma.pk }}">{% if LANGUAGE_CODE == 'en' %}Related practices{% elif LANGUAGE_CODE == 'es' %}Pr&aacute;cticas relacionadas{% else %}Pr&aacute;ticas relacionadas{% endif %}</a>
+                            {% if norma.url_publica %}<a class="norm-secondary-action" href="{{ norma.url_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Official source{% elif LANGUAGE_CODE == 'es' %}Fuente oficial{% else %}Fonte oficial{% endif %}</a>{% endif %}
+                        </div>
+                    </div>
+                </dialog>
+            {% empty %}
+                <div class="library-empty">
+                    <h2>{% if LANGUAGE_CODE == 'en' %}No normative framework found{% elif LANGUAGE_CODE == 'es' %}No se encontr&oacute; ning&uacute;n marco normativo{% else %}Nenhum marco normativo encontrado{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Try another search term or clear the current filters.{% elif LANGUAGE_CODE == 'es' %}Pruebe otro t&eacute;rmino o limpie los filtros actuales.{% else %}Tente outro termo ou limpe os filtros atuais.{% endif %}</p>
+                </div>
+            {% endfor %}
         </div>
-    </div>
-    {% endfor %}
+    </section>
 </div>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'praticas/js/filtros-publicos.js' %}" defer></script><script src="{% static 'praticas/js/marcos-drawer.js' %}" defer></script>{% endblock %}

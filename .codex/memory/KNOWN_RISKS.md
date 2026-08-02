@@ -13,7 +13,13 @@
 - a primeira evolução da home foi verificada nos breakpoints documentados, mas auditoria completa com tecnologia assistiva e zoom de 200% permanece como validação manual.
 - a autorização definitiva de reprodução das ilustrações, fotografias e barra de logos recebidas no protótipo de referência deve permanecer rastreável antes da publicação;
 - os textos institucionais e as identificações de nomes e cargos reproduzidos do protótipo ainda dependem de validação institucional final;
-- a fonte Raleway não foi adicionada ao repositório nem carregada por CDN; sua disponibilização institucional permanece pendente e a interface utiliza `Segoe UI` e Arial como fallbacks.
-- Ferramentas ainda não possui rota própria; o cabeçalho informa essa indisponibilidade de forma acessível, sem criar destino ou comportamento fictício.
+- a fonte Raleway foi incorporada localmente nos pesos variáveis normal 300–800 e itálico 400, sob OFL; eventual substituição por arquivos institucionais oficiais deve preservar licença, métricas e fallbacks.
+- Ferramentas possui rota pública funcional, mas os registros atuais permanecem ocultos porque o model ainda não distingue conteúdo demonstrativo de conteúdo aprovado; publicação depende da situação editorial prevista para a Fase 2C.
 - a fundação técnica da afiliação usuário–EFS existe, mas nomes/poderes dos papéis, aprovadores, retenção e autorização por objeto continuam pendentes; até decisões e fase específica, vínculo, episódio e papel não concedem acesso e objetos sem `autor` permanecem restritos a staff;
 - o limite de três anexos foi alinhado à interface atual; eventual alteração quantitativa depende de confirmação negocial e deve preservar os controles de segurança implementados.
+- o Bootstrap 5.3.3 continua carregado por `cdn.jsdelivr.net` como exceção temporária do Lote 1; localização, integridade e política offline permanecem hardening P1 posterior;
+- o logout autenticado continua aceitando GET por decisão explícita de escopo do Lote 1; a migração para POST com CSRF permanece pendência P1;
+- a validação automatizada cobre os contratos do shell, mas zoom de 200%, tecnologia assistiva, storage bloqueado e interações reais de teclado exigem evidência manual complementar em navegador.
+- Boas Práticas e Marcos Normativos foram comparados em navegador com o protótipo em 1440 × 900 e verificados sem rolagem horizontal em 320/768/1024/1440 px; as demais páginas ainda exigem homologação visual própria e a auditoria com tecnologia assistiva permanece pendente;
+- Marcos Normativos ainda não possui no schema natureza jurídica, ano próprio ou publicação de compêndio; esses elementos permanecem indisponíveis na interface para evitar dados ou downloads simulados até a Fase 2B;
+- o comando legado `carregar_dados_ficticios` grava experiências demonstrativas com estado `publicado` e normas sem marcador de proveniência; até a Fase 2B/2C introduzir situação editorial e origem, esse comando não deve ser executado em ambiente institucional nem seus dados tratados como conteúdo homologado.
