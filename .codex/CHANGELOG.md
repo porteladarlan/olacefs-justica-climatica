@@ -2,6 +2,7 @@
 
 ## Não lançado — 2026-08-01
 
+- Documentado o levantamento controlado da Fase 2D.0 do Guia de Justiça Climática, confirmando no protótipo oficial 407 perguntas, 224 ocorrências de referências e a ausência de tela ou interação funcional do módulo; foram registrados o inventário estrutural, as lacunas de idioma, o modelo conceitual candidato, as decisões pendentes e as subfases futuras, sem alteração de código ou banco.
 - Refinado o shell global trilíngue com os tokens extraídos do protótipo: Raleway local, navegação com estado atual, menus por perfil, idioma preservando rota/filtros/fragmento, contraste persistente e menu móvel acessível; cabeçalho e geometria foram homologados em navegador nas páginas de Boas Práticas e Marcos Normativos.
 - Recompostos e homologados visualmente os catálogos públicos de Boas Práticas e Marcos Normativos em 1440 × 900, com hierarquia, espaçamentos, sidebar, toolbar, grids, cards e drawer equivalentes ao protótipo. Filtros e contadores usam QuerySets reais, ícones são SVGs sem ligaturas visíveis e Boas Práticas não exibe ações adicionais ausentes do desenho oficial. Marcos mantém indisponíveis, sem simulação, o compêndio e a natureza jurídica ainda não suportados pelo schema. Criada também a rota funcional de Ferramentas com estado vazio honesto enquanto não existe situação editorial para os registros da Fase 2C.
 - Alinhadas ao protótipo as páginas de login, cadastro, envios, status e formulário de submissão, preservando campos, CSRF, uploads, autoria e autorização existentes.
