@@ -44,8 +44,8 @@
             </article>
         {% empty %}
             <div class="library-empty">
-                <h2>{% if LANGUAGE_CODE == 'en' %}No institutional resource is published yet{% elif LANGUAGE_CODE == 'es' %}Todav&iacute;a no hay recursos institucionales publicados{% else %}Ainda n&atilde;o h&aacute; recursos institucionais publicados{% endif %}</h2>
-                <p>{% if LANGUAGE_CODE == 'en' %}The current technical records have no publication or origin marker and are not presented as official content until technical curation is complete.{% elif LANGUAGE_CODE == 'es' %}Los registros t&eacute;cnicos actuales no tienen marcador de publicaci&oacute;n u origen y no se presentan como contenido oficial hasta completar la curadur&iacute;a t&eacute;cnica.{% else %}Os registros t&eacute;cnicos atuais n&atilde;o possuem marcador de publica&ccedil;&atilde;o ou origem e n&atilde;o s&atilde;o apresentados como conte&uacute;do oficial at&eacute; a conclus&atilde;o da curadoria t&eacute;cnica.{% endif %}</p>
+                <h2>{% if LANGUAGE_CODE == 'en' %}The Technical Bank is being prepared.{% elif LANGUAGE_CODE == 'es' %}El Banco T&eacute;cnico est&aacute; en preparaci&oacute;n.{% else %}O Banco T&eacute;cnico est&aacute; em prepara&ccedil;&atilde;o.{% endif %}</h2>
+                <p>{% if LANGUAGE_CODE == 'en' %}Documents and references will be published after institutional curation is complete.{% elif LANGUAGE_CODE == 'es' %}Los documentos y referencias se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.{% else %}Documentos e refer&ecirc;ncias ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.{% endif %}</p>
             </div>
         {% endfor %}
     </div>

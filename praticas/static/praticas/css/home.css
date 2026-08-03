@@ -15,11 +15,18 @@
 
 .home-design {
     color: var(--text);
+    overflow: visible;
 }
 
 .home-design .home-block,
 .home-design .home-block-alt {
-    padding: 64px max(32px, calc((100vw - 1200px) / 2 + 32px));
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    padding: 64px max(
+        var(--layout-gutter),
+        calc((100% - var(--maxw)) / 2 + var(--layout-gutter))
+    );
 }
 
 .home-design .home-block-alt {
@@ -376,7 +383,7 @@
 @media (max-width: 820px) {
     .home-design .home-block,
     .home-design .home-block-alt {
-        padding: 48px 24px;
+        padding: 48px var(--layout-gutter);
     }
 
     .home-design .jc-hero-grid,
@@ -412,7 +419,7 @@
 @media (max-width: 480px) {
     .home-design .home-block,
     .home-design .home-block-alt {
-        padding-inline: 20px;
+        padding-inline: var(--layout-gutter);
     }
 
     .home-design .jc-hero-title {

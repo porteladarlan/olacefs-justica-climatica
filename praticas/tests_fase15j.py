@@ -2,14 +2,15 @@ from django.test import TestCase
 
 
 class ConteudoInstitucionalNormasTests(TestCase):
-    def test_banco_tecnico_em_ingles_reforca_curadoria_tecnica(self):
+    def test_banco_tecnico_em_ingles_informa_preparacao_institucional(self):
         response = self.client.get('/en/banco-tecnico/')
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode('utf-8')
 
         self.assertIn('Technical and normative resources', conteudo)
-        self.assertIn('No institutional resource is published yet', conteudo)
-        self.assertIn('no publication or origin marker', conteudo)
+        self.assertIn('The Technical Bank is being prepared.', conteudo)
+        self.assertIn('Documents and references will be published after institutional curation is complete.', conteudo)
+        self.assertNotIn('publication or origin marker', conteudo)
         self.assertEqual(response.context['total_resultados'], 0)
         self.assertNotIn('MVP', conteudo)
 
@@ -19,8 +20,9 @@ class ConteudoInstitucionalNormasTests(TestCase):
         conteudo = response.content.decode('utf-8')
 
         self.assertIn('Recursos t&eacute;cnicos y normativos', conteudo)
-        self.assertIn('Todav&iacute;a no hay recursos institucionales publicados', conteudo)
-        self.assertIn('no tienen marcador de publicaci&oacute;n u origen', conteudo)
+        self.assertIn('El Banco T&eacute;cnico est&aacute; en preparaci&oacute;n.', conteudo)
+        self.assertIn('Los documentos y referencias se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.', conteudo)
+        self.assertNotIn('marcador de publicaci&oacute;n u origen', conteudo)
         self.assertEqual(response.context['total_resultados'], 0)
         self.assertNotIn('MVP', conteudo)
 

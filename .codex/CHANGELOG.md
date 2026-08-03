@@ -9,6 +9,7 @@
 - Criada a fundação de dados da Fase 2A.1 para vínculo usuário–EFS, com catálogo vazio de papéis, vínculo canônico, episódios históricos, atribuições temporais, eventos imutáveis e ledger de importação.
 - Adicionadas as migrations `0010_fase2a1_lote_importacao` e `0011_fase2a1_vinculo_efs`, sem `RunPython`, papéis, vínculos ou qualquer carga inicial.
 - Mantida integralmente a autorização vigente por `Experiencia.autor` ou staff; e-mail, domínio, vínculo, episódio e papel institucional ainda não concedem permissão.
+- Implementado o catálogo funcional da Fase 2C com model próprio `Ferramenta`, situação editorial, setor, ordenação, traduções institucionais opcionais com fallback para o espanhol e administração de curadoria. A migration `0012_fase2c_ferramenta` é somente estrutural; o comando `importar_ferramentas_fase2c` valida o SHA-256 oficial, usa códigos canônicos independentes da ordem, cria rascunhos por padrão, exige `--publicar` e `--atualizar` para ações explícitas, bloqueia a publicação de registro divergente sem reconciliação, oferece dry-run com contagens e reversão segura de lotes concluídos ou com divergências e registra ferramentas e setores em ledger auditável. A rota pública oferece busca progressiva, filtro por setor, contador real, links externos seguros e estados distintos para catálogo sem publicação e filtro sem resultados.
 
 ## Não lançado — 2026-07-31
 

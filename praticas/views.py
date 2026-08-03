@@ -26,6 +26,7 @@ from .models import (
     DimensaoJusticaClimatica,
     EFS,
     Experiencia,
+    Ferramenta,
     GrupoVulneravel,
     NormaInternacional,
     Pais,
@@ -115,8 +116,7 @@ def _url_http_segura(valor):
 
 
 def ferramentas_catalogadas():
-    """Não publica registros sem origem e aprovação institucional verificáveis."""
-    return BancoTecnico.objects.none()
+    return Ferramenta.objects.filter(situacao=Ferramenta.Situacao.PUBLICADA)
 
 
 STATUS_VISIVEIS_REVISAO = [
@@ -1408,15 +1408,16 @@ def banco_tecnico(request):
 def ferramentas(request):
     termo = (request.GET.get("q") or "").strip()[:200]
     recursos_base = ferramentas_catalogadas()
+    total_publicadas = recursos_base.count()
     setores = Setor.objects.filter(
-        recursos_tecnicos__in=recursos_base
-    ).distinct()
+        ferramentas__situacao=Ferramenta.Situacao.PUBLICADA
+    ).distinct().order_by("nome_es", "nome")
     setor_selecionado = _objetos_selecionados(
         request, "setor", setores
     )
     setor_selecionado = setor_selecionado[0] if setor_selecionado else None
 
-    recursos = recursos_base.select_related("setor").prefetch_related("dimensoes")
+    recursos = recursos_base.select_related("setor")
     if setor_selecionado:
         recursos = recursos.filter(setor=setor_selecionado)
     if termo:
@@ -1427,9 +1428,8 @@ def ferramentas(request):
             | Q(descricao__icontains=termo)
             | Q(descricao_es__icontains=termo)
             | Q(descricao_en__icontains=termo)
-            | Q(tipo_recurso__icontains=termo)
-            | Q(tipo_recurso_es__icontains=termo)
-            | Q(tipo_recurso_en__icontains=termo)
+            | Q(responsavel__icontains=termo)
+            | Q(periodo__icontains=termo)
             | Q(setor__nome__icontains=termo)
             | Q(setor__nome_es__icontains=termo)
             | Q(setor__nome_en__icontains=termo)
@@ -1448,6 +1448,7 @@ def ferramentas(request):
             "setor_selecionado": setor_selecionado,
             "termo_busca": termo,
             "total_resultados": len(recursos),
+            "total_publicadas": total_publicadas,
         },
     )
 

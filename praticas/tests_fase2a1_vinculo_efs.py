@@ -508,6 +508,7 @@ class Fase2A1VinculoEFSTests(TestCase):
             {
                 "marco",
                 "ferramenta",
+                "setor",
                 "versao_guia",
                 "eixo",
                 "subeixo",

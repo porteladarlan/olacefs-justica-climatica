@@ -260,6 +260,66 @@ class FidelidadeCatalogosPublicosTests(TestCase):
                 self.assertNotContains(response, "15 ferramentas")
                 self.assertNotContains(response, 'href="#"')
 
+    def test_estados_indisponiveis_sao_publicos_e_trilingues(self):
+        casos = (
+            (
+                "/ferramentas/",
+                "O cat&aacute;logo de ferramentas est&aacute; em prepara&ccedil;&atilde;o.",
+                "Os conte&uacute;dos ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.",
+            ),
+            (
+                "/es/ferramentas/",
+                "El cat&aacute;logo de herramientas est&aacute; en preparaci&oacute;n.",
+                "Los contenidos se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.",
+            ),
+            (
+                "/en/ferramentas/",
+                "The tools catalog is being prepared.",
+                "Content will be published after institutional curation is complete.",
+            ),
+            (
+                "/banco-tecnico/",
+                "O Banco T&eacute;cnico est&aacute; em prepara&ccedil;&atilde;o.",
+                "Documentos e refer&ecirc;ncias ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.",
+            ),
+            (
+                "/es/banco-tecnico/",
+                "El Banco T&eacute;cnico est&aacute; en preparaci&oacute;n.",
+                "Los documentos y referencias se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.",
+            ),
+            (
+                "/en/banco-tecnico/",
+                "The Technical Bank is being prepared.",
+                "Documents and references will be published after institutional curation is complete.",
+            ),
+        )
+        for caminho, titulo, texto in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, titulo, html=False)
+                self.assertContains(response, texto, html=False)
+                self.assertNotContains(response, "Fase 2C")
+                self.assertNotContains(response, "Phase 2C")
+                self.assertNotContains(response, "publication or origin marker")
+
+    def test_compendio_indisponivel_tem_ajuda_visivel_trilingue(self):
+        casos = (
+            ("/normas-internacionais/", "Comp&ecirc;ndio institucional em prepara&ccedil;&atilde;o."),
+            ("/es/normas-internacionais/", "Compendio institucional en preparaci&oacute;n."),
+            ("/en/normas-internacionais/", "Institutional compendium in preparation."),
+        )
+        for caminho, texto in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'class="library-compendium"')
+                self.assertContains(response, "disabled")
+                self.assertContains(response, 'aria-describedby="compendium-help"')
+                self.assertContains(response, 'class="library-compendium-help"')
+                self.assertContains(response, texto, html=False)
+                self.assertNotContains(response, "download=")
+
     def test_assets_progressivos_dos_catalogos_existem(self):
         for asset in (
             "praticas/css/catalogo-publico.css",

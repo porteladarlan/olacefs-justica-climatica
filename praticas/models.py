@@ -20,6 +20,15 @@ def texto_por_idioma(texto_pt, texto_es="", texto_en=""):
     return texto_pt
 
 
+def texto_por_idioma_com_fallback_es(texto_es, texto_pt="", texto_en=""):
+    idioma = idioma_atual()
+    if idioma.startswith("en") and texto_en:
+        return texto_en
+    if idioma.startswith("pt") and texto_pt:
+        return texto_pt
+    return texto_es
+
+
 class Pais(models.Model):
     nome = models.CharField(max_length=100)
     nome_es = models.CharField(max_length=100, blank=True)
@@ -541,6 +550,84 @@ class BancoTecnico(models.Model):
         return texto_por_idioma(self.tipo_recurso, self.tipo_recurso_es, self.tipo_recurso_en)
 
 
+class Ferramenta(models.Model):
+    class Situacao(models.TextChoices):
+        RASCUNHO = "rascunho", "Rascunho"
+        PUBLICADA = "publicada", "Publicada"
+        ARQUIVADA = "arquivada", "Arquivada"
+
+    codigo = models.SlugField(max_length=160, unique=True)
+    titulo = models.CharField(max_length=220, blank=True)
+    titulo_es = models.CharField(max_length=220)
+    titulo_en = models.CharField(max_length=220, blank=True)
+    descricao = models.TextField(blank=True)
+    descricao_es = models.TextField()
+    descricao_en = models.TextField(blank=True)
+    responsavel = models.CharField(max_length=255)
+    periodo = models.CharField(max_length=30)
+    setor = models.ForeignKey(
+        Setor,
+        on_delete=models.PROTECT,
+        related_name="ferramentas",
+    )
+    url = models.URLField(max_length=500)
+    situacao = models.CharField(
+        max_length=20,
+        choices=Situacao.choices,
+        default=Situacao.RASCUNHO,
+    )
+    ordem = models.PositiveSmallIntegerField()
+    lote_origem = models.ForeignKey(
+        "LoteImportacaoConteudo",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="ferramentas_importadas",
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Ferramenta"
+        verbose_name_plural = "Ferramentas"
+        ordering = ["ordem", "titulo_es"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ordem"],
+                name="ferramenta_ordem_unica",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["situacao", "ordem"],
+                name="ferramenta_status_ordem",
+            ),
+            models.Index(
+                fields=["setor", "situacao"],
+                name="ferramenta_setor_status",
+            ),
+        ]
+
+    def __str__(self):
+        return self.titulo_exibicao
+
+    @property
+    def titulo_exibicao(self):
+        return texto_por_idioma_com_fallback_es(
+            self.titulo_es,
+            self.titulo,
+            self.titulo_en,
+        )
+
+    @property
+    def descricao_exibicao(self):
+        return texto_por_idioma_com_fallback_es(
+            self.descricao_es,
+            self.descricao,
+            self.descricao_en,
+        )
+
+
 class LoteImportacaoConteudo(models.Model):
     class Status(models.TextChoices):
         PENDENTE = "pendente", "Pendente"
@@ -681,6 +768,7 @@ class ItemLoteImportacaoConteudo(models.Model):
     class Entidade(models.TextChoices):
         MARCO = "marco", "Marco"
         FERRAMENTA = "ferramenta", "Ferramenta"
+        SETOR = "setor", "Setor"
         VERSAO_GUIA = "versao_guia", "Versao do guia"
         EIXO = "eixo", "Eixo"
         SUBEIXO = "subeixo", "Subeixo"
@@ -713,7 +801,7 @@ class ItemLoteImportacaoConteudo(models.Model):
     codigo_origem = models.CharField(max_length=160)
     objeto_pk = models.CharField(max_length=64, blank=True)
     operacao = models.CharField(max_length=20, choices=Operacao.choices)
-    snapshot_anterior = models.JSONField(default=dict)
+    snapshot_anterior = models.JSONField(default=dict, blank=True)
     status_rollback = models.CharField(
         max_length=20,
         choices=StatusRollback.choices,

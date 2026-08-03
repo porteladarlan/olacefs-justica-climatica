@@ -1,3 +1,18 @@
+.main-shell {
+    width: 100%;
+    max-width: var(--maxw);
+    padding: 0 var(--layout-gutter) 40px;
+}
+
+.page-shell,
+.page-inner {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
 .content-prototype {
     width: min(100%, 820px);
     margin-inline: auto;

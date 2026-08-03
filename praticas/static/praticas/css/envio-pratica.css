@@ -2,7 +2,7 @@
 .main-shell {
     width: 100%;
     max-width: var(--maxw);
-    padding: 0 32px 40px;
+    padding: 0 var(--layout-gutter) 40px;
 }
 
 .page-shell {
@@ -263,11 +263,6 @@
 }
 
 @media (max-width: 820px) {
-    .main-shell {
-        padding-right: 32px;
-        padding-left: 32px;
-    }
-
     .attachment-row {
         grid-template-columns: 1fr;
         align-items: stretch;
@@ -276,11 +271,6 @@
 }
 
 @media (max-width: 540px) {
-    .main-shell {
-        padding-right: 20px;
-        padding-left: 20px;
-    }
-
     .submission-actions {
         align-items: stretch;
         flex-direction: column;

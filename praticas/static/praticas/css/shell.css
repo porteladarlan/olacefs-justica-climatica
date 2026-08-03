@@ -21,7 +21,7 @@
     max-width: var(--maxw);
     min-height: 0;
     margin: 0 auto;
-    padding: 14px 32px;
+    padding: 14px var(--layout-gutter);
     gap: 18px;
 }
 
@@ -95,8 +95,6 @@
     background: var(--purple);
     box-shadow: none;
     font-weight: 600;
-    outline: 0.666667px solid #e59700 !important;
-    outline-offset: 0 !important;
 }
 
 .navbar-institutional .navbar-nav .nav-link-pending {
@@ -238,6 +236,16 @@
     max-width: var(--maxw);
 }
 
+.main-shell {
+    padding-right: var(--layout-gutter);
+    padding-left: var(--layout-gutter);
+}
+
+.page-shell,
+.page-inner {
+    overflow: visible;
+}
+
 .footer-institutional {
     margin-top: 40px !important;
     padding: 40px 0 34px;
@@ -246,8 +254,8 @@
 }
 
 .footer-institutional > .container {
-    padding-right: 32px;
-    padding-left: 32px;
+    padding-right: var(--layout-gutter);
+    padding-left: var(--layout-gutter);
 }
 
 .footer-wave {
@@ -355,12 +363,6 @@
 }
 
 @media (max-width: 767.98px) {
-    .navbar-institutional > .container,
-    .footer-institutional > .container {
-        padding-right: 16px;
-        padding-left: 16px;
-    }
-
     .brand-lockup {
         max-width: calc(100% - 62px);
     }
