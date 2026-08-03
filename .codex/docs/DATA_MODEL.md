@@ -9,7 +9,7 @@ O schema real vem do código.
 - **PracticeAttachment:** arquivo, nome de exibição, MIME, tamanho, visibilidade e autor.
 - **Sector, Theme, AuditType, PracticeType:** classificações traduzíveis.
 - **NormativeFramework:** título, descrição, natureza, ano, âmbito, texto/link, países e setores.
-- **Tool:** nome, descrição, tipo, arquivo/link, setores, países, idioma e versão.
+- **Tool/Ferramenta:** código, título e descrição canônicos em espanhol, traduções PT/EN opcionais, responsável, período, setor, URL externa, situação editorial, ordem e lote de origem; o setor é o badge canônico e não existe campo de tipo duplicado.
 - **AuditQuestion:** texto, eixo, setor, tipo de auditoria, normas, ordem e traduções.
 - **TechnicalResource:** documentos não cobertos pelas entidades anteriores.
 - **ModerationEvent:** objeto, estado anterior/novo, responsável, comentário e data.

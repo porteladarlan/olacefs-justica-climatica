@@ -9,6 +9,7 @@ from .models import (
     EpisodioVinculoUsuarioEFS,
     EventoVinculoUsuarioEFS,
     Experiencia,
+    Ferramenta,
     GrupoVulneravel,
     ItemLoteImportacaoConteudo,
     LoteImportacaoConteudo,
@@ -171,6 +172,36 @@ class BancoTecnicoAdmin(admin.ModelAdmin):
     search_fields = ("titulo", "titulo_es", "titulo_en", "descricao", "descricao_es", "descricao_en", "tipo_recurso", "tipo_recurso_es", "tipo_recurso_en", "setor__nome")
     autocomplete_fields = ("setor",)
     filter_horizontal = ("dimensoes",)
+    list_per_page = 20
+
+
+@admin.register(Ferramenta)
+class FerramentaAdmin(admin.ModelAdmin):
+    list_display = (
+        "ordem",
+        "titulo_es",
+        "setor",
+        "responsavel",
+        "periodo",
+        "situacao",
+    )
+    list_filter = ("situacao", "setor")
+    search_fields = (
+        "codigo",
+        "titulo",
+        "titulo_es",
+        "titulo_en",
+        "descricao",
+        "descricao_es",
+        "descricao_en",
+        "responsavel",
+        "setor__nome",
+        "setor__nome_es",
+        "setor__nome_en",
+    )
+    autocomplete_fields = ("setor",)
+    readonly_fields = ("lote_origem", "criado_em", "atualizado_em")
+    ordering = ("ordem",)
     list_per_page = 20
 
 

@@ -8,50 +8,80 @@
 
 {% block content %}
 <div class="tools-library">
-    <nav class="tools-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
-        <a href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}In&iacute;cio{% endif %}</a>
+    <nav class="tools-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegación{% else %}Trilha de navegação{% endif %}">
+        <a href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}Início{% endif %}</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</span>
     </nav>
 
     <header class="tools-heading">
-        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Toolbox{% elif LANGUAGE_CODE == 'es' %}Caja de herramientas{% else %}Caixa de ferramentas{% endif %}</div>
-        <h1>{% if LANGUAGE_CODE == 'en' %}Tools for climate justice audits{% elif LANGUAGE_CODE == 'es' %}Herramientas para auditor&iacute;as de justicia clim&aacute;tica{% else %}Ferramentas para auditorias de justi&ccedil;a clim&aacute;tica{% endif %}</h1>
-        <p>{% if LANGUAGE_CODE == 'en' %}Search the institutional methodologies and tools made available after technical curation.{% elif LANGUAGE_CODE == 'es' %}Busque metodolog&iacute;as y herramientas institucionales publicadas despu&eacute;s de la curadur&iacute;a t&eacute;cnica.{% else %}Busque metodologias e ferramentas institucionais disponibilizadas ap&oacute;s a curadoria t&eacute;cnica.{% endif %}</p>
+        <div class="section-kicker">
+            <svg class="tools-kicker-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4l-3 3-3-3 3-3Z"/>
+            </svg>
+            {% if LANGUAGE_CODE == 'en' %}Toolbox{% elif LANGUAGE_CODE == 'es' %}Caja de herramientas{% else %}Caixa de ferramentas{% endif %}
+        </div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Tools for climate-justice audits{% elif LANGUAGE_CODE == 'es' %}Herramientas para auditorías de justicia climática{% else %}Ferramentas para auditorias de justiça climática{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' %}Audit guides and good practices with a climate justice perspective, organized by sector.{% elif LANGUAGE_CODE == 'es' %}Guías y buenas prácticas de auditoría con perspectiva de justicia climática en la región, organizadas por sector.{% else %}Guias e boas práticas de auditoria com perspectiva de justiça climática na região, organizadas por setor.{% endif %}</p>
     </header>
 
-    <form method="get" class="tools-toolbar" role="search">
-        <label class="tools-search">
-            <span class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Search tools{% elif LANGUAGE_CODE == 'es' %}Buscar herramientas{% else %}Buscar ferramentas{% endif %}</span>
-            <input type="search" name="q" maxlength="200" value="{{ termo_busca }}" placeholder="{% if LANGUAGE_CODE == 'en' %}Search tools and methodologies{% elif LANGUAGE_CODE == 'es' %}Buscar herramientas y metodolog&iacute;as{% else %}Buscar ferramentas e metodologias{% endif %}">
-        </label>
-        <div class="tools-sector-group">
-            <span>{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</span>
-            <a class="tools-pill{% if not setor_selecionado %} active{% endif %}" href="{% url 'ferramentas' %}{% if termo_busca %}?q={{ termo_busca|urlencode }}{% endif %}">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todos{% endif %}</a>
-            {% for setor in setores %}<button class="tools-pill{% if setor_selecionado.pk == setor.pk %} active{% endif %}" type="submit" name="setor" value="{{ setor.pk }}">{{ setor.nome_exibicao }}</button>{% endfor %}
-        </div>
-        <button class="btn btn-primary btn-sm" type="submit">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</button>
-    </form>
+    {% if total_publicadas %}
+        <form method="get" class="tools-toolbar" role="search" data-tools-filter-form>
+            <label class="tools-search">
+                <span class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Search tool{% elif LANGUAGE_CODE == 'es' %}Buscar herramienta{% else %}Buscar ferramenta{% endif %}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6.5"/>
+                    <path d="m16 16 4 4"/>
+                </svg>
+                <input type="search" name="q" maxlength="200" value="{{ termo_busca }}" data-tools-progressive-search autocomplete="off" placeholder="{% if LANGUAGE_CODE == 'en' %}Search tool…{% elif LANGUAGE_CODE == 'es' %}Buscar herramienta…{% else %}Buscar ferramenta…{% endif %}">
+            </label>
+            {% if setor_selecionado %}<input type="hidden" name="setor" value="{{ setor_selecionado.pk }}">{% endif %}
+            <div class="tools-sector-group" aria-label="{% if LANGUAGE_CODE == 'en' %}Filter by sector{% elif LANGUAGE_CODE == 'es' %}Filtrar por sector{% else %}Filtrar por setor{% endif %}">
+                <span>{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</span>
+                <a class="tools-pill{% if not setor_selecionado %} active{% endif %}"{% if not setor_selecionado %} aria-current="true"{% endif %} href="{% url 'ferramentas' %}{% if termo_busca %}?q={{ termo_busca|urlencode }}{% endif %}">{% if LANGUAGE_CODE == 'en' %}All{% elif LANGUAGE_CODE == 'es' %}Todos{% else %}Todas{% endif %}</a>
+                {% for setor in setores %}
+                    <a class="tools-pill{% if setor_selecionado.pk == setor.pk %} active{% endif %}"{% if setor_selecionado.pk == setor.pk %} aria-current="true"{% endif %} href="{% url 'ferramentas' %}?setor={{ setor.pk }}{% if termo_busca %}&amp;q={{ termo_busca|urlencode }}{% endif %}">{{ setor.nome_exibicao }}</a>
+                {% endfor %}
+            </div>
+        </form>
 
-    <p class="tools-counter" aria-live="polite"><strong>{{ total_resultados }}</strong> {% if LANGUAGE_CODE == 'en' %}tools available{% elif LANGUAGE_CODE == 'es' %}herramientas disponibles{% else %}ferramentas dispon&iacute;veis{% endif %}</p>
+        <p class="tools-counter" aria-live="polite"><strong>{{ total_resultados }}</strong> {% if total_resultados == 1 %}{% if LANGUAGE_CODE == 'en' %}tool found{% elif LANGUAGE_CODE == 'es' %}herramienta encontrada{% else %}ferramenta encontrada{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}tools found{% elif LANGUAGE_CODE == 'es' %}herramientas encontradas{% else %}ferramentas encontradas{% endif %}{% endif %}</p>
+    {% endif %}
 
-    <div class="tools-list">
-        {% for recurso in recursos %}
-            <article class="tools-row">
-                <span class="tools-type">{{ recurso.tipo_recurso_exibicao }}</span>
-                <div>
-                    <h2>{{ recurso.titulo_exibicao }}</h2>
-                    <p>{{ recurso.descricao_exibicao }}</p>
-                </div>
-                <div class="tools-meta">{% if recurso.setor %}{{ recurso.setor.nome_exibicao }}{% endif %}</div>
-                <div>{% if recurso.url_publica %}<a class="tools-link" href="{{ recurso.url_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}View{% elif LANGUAGE_CODE == 'es' %}Ver{% else %}Ver{% endif %}</a>{% endif %}</div>
-            </article>
-        {% empty %}
+    <div class="tools-list{% if not total_publicadas or not recursos %} tools-list-empty{% endif %}">
+        {% if not total_publicadas %}
             <div class="tools-empty">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4l-3 3-3-3 3-3Z"/></svg>
                 <h2>{% if LANGUAGE_CODE == 'en' %}The tools catalog is being prepared.{% elif LANGUAGE_CODE == 'es' %}El cat&aacute;logo de herramientas est&aacute; en preparaci&oacute;n.{% else %}O cat&aacute;logo de ferramentas est&aacute; em prepara&ccedil;&atilde;o.{% endif %}</h2>
                 <p>{% if LANGUAGE_CODE == 'en' %}Content will be published after institutional curation is complete.{% elif LANGUAGE_CODE == 'es' %}Los contenidos se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.{% else %}Os conte&uacute;dos ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.{% endif %}</p>
             </div>
-        {% endfor %}
+        {% elif recursos %}
+            {% for recurso in recursos %}
+                <article class="tools-row">
+                    <span class="tools-type">{{ recurso.setor.nome_exibicao }}</span>
+                    <div class="tools-main">
+                        <h2>{{ recurso.titulo_exibicao }}</h2>
+                        <p>{{ recurso.descricao_exibicao }}</p>
+                    </div>
+                    <div class="tools-meta"><strong>{{ recurso.responsavel }}</strong><br>{{ recurso.periodo }}</div>
+                    <div class="tools-action">
+                        {% if recurso.url_publica %}
+                            <a class="tools-link" href="{{ recurso.url_publica }}" target="_blank" rel="noopener noreferrer">
+                                {% if LANGUAGE_CODE == 'en' %}View{% elif LANGUAGE_CODE == 'es' %}Ver{% else %}Ver{% endif %}
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7M9 7h8v8"/></svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="tools-empty tools-no-results">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5M8.5 8.5l4 4m0-4-4 4"/></svg>
+                <p>{% if LANGUAGE_CODE == 'en' %}No results found. Try broadening your search or clearing the filters.{% elif LANGUAGE_CODE == 'es' %}No se encontraron resultados. Prueba ampliar la búsqueda o limpiar los filtros.{% else %}Nenhum resultado encontrado. Tente ampliar a busca ou limpar os filtros.{% endif %}</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'praticas/js/ferramentas-publicas.js' %}" defer></script>{% endblock %}
