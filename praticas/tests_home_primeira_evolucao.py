@@ -143,19 +143,21 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertContains(response, beneficio, html=False)
                 self.assertContains(response, genero, html=False)
 
-    def test_mapa_e_video_assumem_estado_futuro_sem_dados_falsos(self):
+    def test_mapa_funcional_e_video_honesto_sem_dados_falsos(self):
         casos = [
-            ("/", "Mapa regional das EFS", "Etapa futura", "Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o"),
-            ("/es/", "Mapa regional de las EFS", "Etapa futura", "Contenido audiovisual en preparaci&oacute;n"),
-            ("/en/", "Regional map of SAIs", "Future stage", "Audiovisual content in preparation"),
+            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o"),
+            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Contenido audiovisual en preparaci&oacute;n"),
+            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Audiovisual content in preparation"),
         ]
 
-        for caminho, mapa, estado, video in casos:
+        for caminho, mapa, estado_funcional, video in casos:
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
-                self.assertContains(response, mapa)
-                self.assertContains(response, estado)
+                self.assertContains(response, mapa, html=False)
+                self.assertContains(response, estado_funcional)
                 self.assertContains(response, video, html=False)
-                self.assertContains(response, f'href="{reverse("catalogo_experiencias")}"')
-                self.assertContains(response, f'href="{reverse("normas_internacionais")}"')
+                self.assertNotContains(response, "Etapa futura")
+                self.assertNotContains(response, "Future stage")
+                self.assertContains(response, f'formaction="{reverse("catalogo_experiencias")}"')
+                self.assertContains(response, f'formaction="{reverse("normas_internacionais")}"')

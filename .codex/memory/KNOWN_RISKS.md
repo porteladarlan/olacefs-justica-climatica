@@ -6,7 +6,7 @@
 - produção sem homologação;
 - migrations sem backup;
 - i18n apenas no cliente;
-- mapa inacessível;
+- o mapa regional possui teclado, foco, estado acessível e alternativa textual completa, mas a homologação com leitores de tela por pessoas usuárias permanece pendente;
 - anexos passam por allowlist e assinatura básica, mas antivírus, quarentena e análise avançada de arquivos permanecem pendentes de infraestrutura;
 - workflow indefinido;
 - servidor sem operação definida.
