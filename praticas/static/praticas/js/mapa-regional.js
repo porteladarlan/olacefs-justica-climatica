@@ -320,7 +320,7 @@
         }
     });
 
-    clearButton.addEventListener("click", function () {
+    form.addEventListener("reset", function () {
         selectedIds.clear();
         renderSelection();
     });

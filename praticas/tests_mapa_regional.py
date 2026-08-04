@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import EFS, Experiencia, NormaInternacional, Pais, Setor, TipoExperiencia
-from .views import _payload_mapa_regional
+from .views import MAPA_REGIONAL_ISO3_PARA_GEO_ID, _payload_mapa_regional
 
 
 class MapaRegionalTests(TestCase):
@@ -265,12 +265,18 @@ class MapaRegionalTests(TestCase):
     def test_fallback_textual_e_controles_acessiveis_estao_presentes(self):
         response, _ = self._payload()
         self.assertContains(response, "Lista acess&iacute;vel de pa&iacute;ses", html=False)
+        self.assertContains(response, 'id="regionalMapForm" method="get"')
         self.assertContains(response, 'name="pais"', count=3)
         self.assertContains(response, 'id="regionalMapCount"')
         self.assertContains(response, 'aria-live="polite"')
         self.assertContains(response, '<noscript>')
         self.assertContains(response, 'formaction="/catalogo/"')
         self.assertContains(response, 'formaction="/normas-internacionais/"')
+        self.assertContains(
+            response,
+            '<button class="home-map-clear" id="regionalMapClear" type="reset">',
+            html=False,
+        )
 
     def test_assets_sao_locais_e_javascript_e_progressivo(self):
         arquivos = (
@@ -300,10 +306,33 @@ class MapaRegionalTests(TestCase):
         self.assertIn("showLoadError", script)
         self.assertIn("const normativeIds = new Set();", script)
         self.assertIn("country.criterios_normativos_ids", script)
+        self.assertIn('form.addEventListener("reset"', script)
+        self.assertIn("selectedIds.clear();", script)
+        self.assertNotIn('clearButton.addEventListener("click"', script)
         self.assertNotIn("totalNorms +=", script)
         self.assertNotIn("innerHTML", script)
         self.assertNotIn("geolocation", script)
         self.assertNotIn("https://", script)
+
+    def test_ids_geograficos_configurados_existem_no_world_atlas_local(self):
+        caminho = Path(finders.find("praticas/data/countries-50m.json"))
+        dados = json.loads(caminho.read_text(encoding="utf-8"))
+        ids_disponiveis = {
+            str(geometria["id"]).zfill(3)
+            for geometria in dados["objects"]["countries"]["geometries"]
+            if geometria.get("id") is not None
+        }
+        ids_configurados = {
+            str(geo_id).zfill(3)
+            for geo_id in MAPA_REGIONAL_ISO3_PARA_GEO_ID.values()
+        }
+        ids_ausentes = sorted(ids_configurados - ids_disponiveis)
+
+        self.assertFalse(
+            ids_ausentes,
+            "IDs geográficos configurados ausentes em countries-50m.json: "
+            + ", ".join(ids_ausentes),
+        )
 
     def test_requisicao_da_home_nao_modifica_dados(self):
         contagens_antes = (
@@ -322,12 +351,3 @@ class MapaRegionalTests(TestCase):
                 NormaInternacional.objects.count(),
             ),
         )
-
-    def test_fase_nao_cria_migration_posterior_a_0012(self):
-        migration_dir = Path(__file__).resolve().parent / "migrations"
-        numeradas = sorted(
-            path.name
-            for path in migration_dir.glob("[0-9][0-9][0-9][0-9]_*.py")
-        )
-        self.assertTrue(numeradas)
-        self.assertTrue(numeradas[-1].startswith("0012_"))

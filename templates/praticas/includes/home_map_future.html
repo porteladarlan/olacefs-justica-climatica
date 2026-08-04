@@ -124,7 +124,7 @@
                         <button class="btn btn-outline-primary" type="submit" formaction="{% url 'normas_internacionais' %}">
                             {% if LANGUAGE_CODE == 'en' %}Applicable normative criteria{% elif LANGUAGE_CODE == 'es' %}Criterios normativos aplicables{% else %}Crit&eacute;rios normativos aplic&aacute;veis{% endif %}
                         </button>
-                        <button class="home-map-clear" id="regionalMapClear" type="button">
+                        <button class="home-map-clear" id="regionalMapClear" type="reset">
                             {% if LANGUAGE_CODE == 'en' %}Clear selection{% elif LANGUAGE_CODE == 'es' %}Limpiar selecci&oacute;n{% else %}Limpar sele&ccedil;&atilde;o{% endif %}
                         </button>
                     </div>
