@@ -10,14 +10,22 @@
 
 ## Implementado nesta evolução
 
-- página inicial institucional reconstruída na ordem aprovada: hero, mensagens, fundamentos, área futura do mapa, conteúdo audiovisual futuro e rodapé;
+- página inicial institucional reconstruída na ordem aprovada: hero, mensagens, fundamentos, mapa regional funcional, conteúdo audiovisual futuro e rodapé;
 - hero aberto em duas colunas, sem contêiner externo arredondado, com CTAs reais para marcos normativos e para a área do mapa;
 - mensagens da COMTEMA e da CGID compostas com textos e fotografias locais fornecidos no protótipo;
 - fundamentos apresentados nas três abas do protótipo, com ARIA, navegação por teclado, painéis focalizáveis e fotografias locais;
-- seções semanticamente preparadas para o futuro mapa regional e conteúdo audiovisual, sem D3, TopoJSON, dados ou interações simuladas;
+- mapa regional integrado aos cadastros reais de país, EFS, experiências publicadas e normas relacionadas, com seleção múltipla, filtros reais e alternativa textual; conteúdo audiovisual permanece em estado futuro honesto;
 - cabeçalho com acessos diretos a Boas Práticas, Marcos Normativos e Ferramentas, além das rotas reais de conta, idiomas e alto contraste;
 - rodapé e tipografia alinhados ao protótipo, com Raleway distribuída localmente e fallbacks de sistema;
-- implementação somente em templates, CSS e JavaScript existente, sem alteração do modelo de dados.
+- implementação em views, templates, CSS, JavaScript e assets locais, sem alteração do modelo de dados.
+
+## Implementado na Fase 2E — mapa regional
+
+- geometrias regionais do `world-atlas` 2.0.2, D3 7.9.0 e TopoJSON Client 3.1.0 distribuídos localmente, com versões, licenças e hashes registrados;
+- payload público mínimo sem dados pessoais, rascunhos ou campos internos, montado em três consultas agregadas: uma para países, experiências e contagens; uma de prefetch para EFS; e uma distinta para os pares país–norma, sem consulta individual por país;
+- seleção por mouse, teclado ou lista textual, com múltiplos países, chips removíveis, estado anunciado, EFS associadas, contagens reais e ações GET que preservam parâmetros `pais` repetidos;
+- catálogos de Boas Práticas e Marcos Normativos reconhecem países existentes sem publicações e retornam zero resultados, em vez de ignorar silenciosamente o filtro;
+- nenhuma migration, carga, alteração de banco ou interface do Guia de Perguntas foi criada.
 
 ## Implementado na fase de segurança crítica
 

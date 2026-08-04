@@ -1,5 +1,6 @@
 ﻿import json
 from pathlib import Path
+from urllib.parse import urlencode
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -11,6 +12,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
@@ -49,6 +51,44 @@ ANEXO_MIME_POR_EXTENSAO = {
 }
 ANEXO_CONTENT_TYPES_PERMITIDOS = set(ANEXO_MIME_POR_EXTENSAO.values())
 
+# ISO 3166-1 alfa-3 usado no cadastro -> identificador numérico do world-atlas.
+# A lista regional segue a referência visual oficial e permite desenhar também
+# territórios sem correspondência institucional no banco.
+MAPA_REGIONAL_ISO3_PARA_GEO_ID = {
+    "ABW": "533",
+    "ARG": "032",
+    "BHS": "044",
+    "BLZ": "084",
+    "BOL": "068",
+    "BRA": "076",
+    "CHL": "152",
+    "COL": "170",
+    "CRI": "188",
+    "CUB": "192",
+    "CUW": "531",
+    "DOM": "214",
+    "ECU": "218",
+    "FLK": "238",
+    "GTM": "320",
+    "GUY": "328",
+    "HTI": "332",
+    "HND": "340",
+    "JAM": "388",
+    "MEX": "484",
+    "NIC": "558",
+    "PAN": "591",
+    "PRY": "600",
+    "PER": "604",
+    "PRI": "630",
+    "SLV": "222",
+    "SUR": "740",
+    "TTO": "780",
+    "URY": "858",
+    "VEN": "862",
+}
+MAPA_REGIONAL_GEO_IDS = tuple(MAPA_REGIONAL_ISO3_PARA_GEO_ID.values())
+
+
 def obter_destino_seguro(request, padrao="meus_envios"):
     destino = request.POST.get("next") or request.GET.get("next")
     if destino and url_has_allowed_host_and_scheme(
@@ -64,6 +104,92 @@ def experiencias_publicas():
     return Experiencia.objects.filter(
         status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
     )
+
+
+def _url_com_paises(nome_rota, paises_ids):
+    base = reverse(nome_rota)
+    consulta = urlencode([("pais", pais_id) for pais_id in paises_ids])
+    return f"{base}?{consulta}" if consulta else base
+
+
+def _payload_mapa_regional():
+    efs_mapa = EFS.objects.only(
+        "id",
+        "nome",
+        "nome_es",
+        "nome_en",
+        "sigla",
+        "pais_id",
+    ).order_by("nome")
+    paises = (
+        Pais.objects.filter(
+            sigla__in=MAPA_REGIONAL_ISO3_PARA_GEO_ID,
+            efs__isnull=False,
+        )
+        .annotate(
+            experiencias_publicadas=Count(
+                "experiencias",
+                filter=Q(
+                    experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+                ),
+                distinct=True,
+            ),
+            criterios_normativos=Count(
+                "experiencias__normas_internacionais",
+                filter=Q(
+                    experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+                ),
+                distinct=True,
+            ),
+        )
+        .prefetch_related(Prefetch("efs", queryset=efs_mapa, to_attr="efs_mapa"))
+        .distinct()
+        .order_by("nome")
+    )
+
+    paises = list(paises)
+    criterios_ids_por_pais = {pais.pk: [] for pais in paises}
+    pares_criterios = (
+        Experiencia.objects.filter(
+            status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+            pais_id__in=criterios_ids_por_pais.keys(),
+            normas_internacionais__isnull=False,
+        )
+        .values_list("pais_id", "normas_internacionais__id")
+        .distinct()
+        .order_by("pais_id", "normas_internacionais__id")
+    )
+    for pais_id, norma_id in pares_criterios:
+        criterios_ids_por_pais[pais_id].append(norma_id)
+
+    paises_publicos = []
+    for pais in paises:
+        paises_publicos.append(
+            {
+                "id": pais.pk,
+                "sigla": pais.sigla,
+                "nome": pais.nome_exibicao,
+                "geo_id": MAPA_REGIONAL_ISO3_PARA_GEO_ID[pais.sigla],
+                "efs": [
+                    {"nome": efs.nome_exibicao, "sigla": efs.sigla}
+                    for efs in pais.efs_mapa
+                ],
+                "experiencias_publicadas": pais.experiencias_publicadas,
+                "criterios_normativos": pais.criterios_normativos,
+                "criterios_normativos_ids": criterios_ids_por_pais[pais.pk],
+                "url_boas_praticas": _url_com_paises(
+                    "catalogo_experiencias", [pais.pk]
+                ),
+                "url_marcos_normativos": _url_com_paises(
+                    "normas_internacionais", [pais.pk]
+                ),
+            }
+        )
+
+    return {
+        "paises": paises_publicos,
+        "geo_ids_regiao": MAPA_REGIONAL_GEO_IDS,
+    }
 
 
 def _objetos_selecionados(request, parametro, queryset):
@@ -406,7 +532,10 @@ def pagina_inicial(request):
         "total_paises": Pais.objects.count(),
         "total_normas": NormaInternacional.objects.count(),
         "ultimas_experiencias": experiencias[:3],
-        "experiencias_destacadas": experiencias.filter(Q(destacado=True) | Q(relevante=True))[:3],
+        "experiencias_destacadas": experiencias.filter(
+            Q(destacado=True) | Q(relevante=True)
+        )[:3],
+        "mapa_regional": _payload_mapa_regional(),
     }
     return render(request, "praticas/pagina_inicial.html", contexto)
 
@@ -481,7 +610,7 @@ def catalogo_experiencias(request):
             ferramentas_selecionadas.append(valor)
 
     selecoes = {
-        "pais": _objetos_selecionados(request, "pais", paises),
+        "pais": _objetos_selecionados(request, "pais", Pais.objects.all()),
         "efs": _objetos_selecionados(request, "efs", efs_lista),
         "tipo": _objetos_selecionados(request, "tipo", tipos),
         "setor": _objetos_selecionados(request, "setor", setores),
@@ -693,7 +822,9 @@ def normas_internacionais(request):
         experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
         experiencias__normas_internacionais__isnull=False,
     ).distinct()
-    paises_selecionados = _objetos_selecionados(request, "pais", paises)
+    paises_selecionados = _objetos_selecionados(
+        request, "pais", Pais.objects.all()
+    )
     setores_selecionados = _objetos_selecionados(request, "setor", setores)
 
     normas = NormaInternacional.objects.annotate(

@@ -12,6 +12,12 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'praticas/vendor/d3/d3-7.9.0.min.js' %}"></script>
+<script src="{% static 'praticas/vendor/topojson/topojson-client-3.1.0.min.js' %}"></script>
+<script src="{% static 'praticas/js/mapa-regional.js' %}"></script>
+{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'praticas/css/home.css' %}">
 {% endblock %}
