@@ -69,7 +69,6 @@ MAPA_REGIONAL_ISO3_PARA_GEO_ID = {
     "DOM": "214",
     "ECU": "218",
     "FLK": "238",
-    "GLP": "312",
     "GTM": "320",
     "GUY": "328",
     "HTI": "332",
