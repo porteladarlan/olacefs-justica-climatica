@@ -27,6 +27,12 @@
 - catálogos de Boas Práticas e Marcos Normativos reconhecem países existentes sem publicações e retornam zero resultados, em vez de ignorar silenciosamente o filtro;
 - nenhuma migration, carga, alteração de banco ou interface do Guia de Perguntas foi criada.
 
+## Planejado na Fase 2D.1A — fundação do Guia
+
+- decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 formalizadas em `FASE2D1_DECISOES_FUNDACAO_GUIA.md`;
+- futura fundação limitada a versão, hierarquia própria, perguntas, referências por subárea e proveniência, sem implementar código nesta etapa;
+- importação permanece bloqueada até a fonte institucional incorporar códigos estáveis; publicação automática, traduções inventadas e relações pergunta–referência continuam vedadas.
+
 ## Implementado na fase de segurança crítica
 
 - edição de boa prática, solicitação de edição publicada e status restritos a usuário autenticado;

@@ -415,7 +415,7 @@ O modelo abaixo é deliberadamente mínimo. “Confirmado” significa que a inf
 
 **Riscos:** atualizar conteúdo sem versão tornaria impossível reproduzir as 407 perguntas auditadas.
 
-**Decisão pendente:** política de versionamento, vigência, imutabilidade e coexistência de versões.
+**Decisão registrada:** GUIA-02 aprovou rascunho editável, versão publicada imutável, coexistência histórica, vigência única e publicação explícita com data, hash e lote, sem publicação automática pela importação.
 
 ### 10.2 `EixoGuia`
 
@@ -443,9 +443,9 @@ O modelo abaixo é deliberadamente mínimo. “Confirmado” significa que a inf
 
 **Riscos:** a fonte contém grafias que precisam de validação negocial antes de qualquer saneamento.
 
-**Decisão pendente:** política de códigos e correção editorial da fonte.
+**Decisão registrada:** GUIA-03 aprovou códigos estáveis fornecidos por fonte institucional controlada. Correções editoriais permanecem pendentes em GUIA-06.
 
-### 10.4 `SetorGuia` ou vínculo controlado com `Setor`
+### 10.4 `SetorGuia`
 
 **Finalidade:** representar os nove agrupamentos setoriais do Guia.
 
@@ -457,7 +457,7 @@ O modelo abaixo é deliberadamente mínimo. “Confirmado” significa que a inf
 
 **Riscos:** reutilizar `Setor` sem mapeamento pode renomear ou ampliar indevidamente taxonomias compartilhadas por outros módulos; criar outra entidade pode duplicar conceitos.
 
-**Decisão pendente:** tabela própria versus mapeamento explícito e versionado para `Setor`.
+**Decisão registrada:** GUIA-04 aprovou taxonomia própria `SetorGuia`, sem reutilização ou sincronização automática com `Setor`; eventual mapeamento será explícito, opcional, versionado e decidido em fase separada.
 
 ### 10.5 `SubareaGuia`
 
@@ -485,7 +485,7 @@ O modelo abaixo é deliberadamente mínimo. “Confirmado” significa que a inf
 
 **Riscos:** não há identidade estável entre revisões; hash ou texto não bastam para decidir continuidade sem curadoria.
 
-**Decisão pendente:** estratégia de identidade editorial entre versões e exigência de traduções para publicação.
+**Decisão registrada:** GUIA-03 definiu identidade por código institucional + versão. A exigência de traduções para publicação permanece pendente em GUIA-05.
 
 ### 10.7 `ReferenciaGuia`
 
@@ -513,7 +513,7 @@ O modelo abaixo é deliberadamente mínimo. “Confirmado” significa que a inf
 
 **Riscos:** criar diretamente `PerguntaReferenciaGuia` atribuiria uma precisão que a fonte não possui.
 
-**Decisão pendente:** se o negocial fornecer mapeamento por pergunta, uma entidade adicional poderá ser criada em fase posterior.
+**Decisão registrada:** GUIA-07 mantém a relação no nível de subárea e veda `PerguntaReferenciaGuia`; eventual relação por pergunta exige fonte institucional explícita e nova decisão de schema.
 
 ### 10.9 Infraestrutura reutilizável
 
@@ -530,17 +530,17 @@ Não estão confirmados pelo protótipo e não devem entrar na fundação sem de
 - exportação, impressão ou geração de relatório;
 - busca, filtros e seleção persistida.
 
-## 11. Decisões pendentes
+## 11. Decisões e pendências
 
 | ID | Decisão necessária | Motivo | Bloqueia |
 |---|---|---|---|
 | GUIA-01 | Confirmar se a consulta será pública e se alguma função futura exigirá autenticação. | O protótipo não tem tela nem autorização do Guia. | Rota e política de acesso. |
-| GUIA-02 | Aprovar versionamento, vigência e imutabilidade de versões publicadas. | A fonte não possui versão ou histórico. | Schema e importação. |
-| GUIA-03 | Aprovar códigos estáveis para eixos, subeixos, setores, subáreas, perguntas e referências. | A fonte só possui ordem posicional. | Importador idempotente e reconciliação. |
-| GUIA-04 | Decidir se os nove setores reutilizam `Setor` mediante mapeamento ou usam taxonomia própria. | Não há compatibilidade comprovada com os catálogos atuais. | Schema de setor/subárea. |
+| GUIA-02 | **Aprovada:** rascunhos são editáveis; versões publicadas são imutáveis; somente uma versão pode estar vigente; publicação registra data, hash e lote e nunca ocorre automaticamente na importação. | A fonte não possui versão ou histórico. | Resolvido para a fundação estrutural; detalhes em `FASE2D1_DECISOES_FUNDACAO_GUIA.md`. |
+| GUIA-03 | **Aprovada:** eixos, subeixos, setores, subáreas, perguntas e referências terão códigos estáveis fornecidos por fonte institucional controlada e reconciliados por código + versão. | A fonte atual só possui ordem posicional e ainda não fornece os códigos. | Schema resolvido; importação permanece bloqueada até a fonte codificada. |
+| GUIA-04 | **Aprovada:** criar `SetorGuia`, sem reutilização ou sincronização automática com `Setor`; eventual mapeamento será explícito, opcional e aprovado separadamente. | Não há compatibilidade comprovada com os catálogos atuais. | Resolvido para o schema de setor/subárea. |
 | GUIA-05 | Definir política PT/EN para hierarquia, perguntas e referências. | Somente a interface está traduzida. | Publicação trilíngue. |
 | GUIA-06 | Validar correções editoriais do espanhol, sem saneamento silencioso. | Há anomalias literais na fonte. | Carga institucional final. |
-| GUIA-07 | Confirmar que referências permanecem no nível de subárea ou fornecer mapeamento por pergunta. | A fonte não contém relação pergunta–referência. | Cardinalidade das referências. |
+| GUIA-07 | **Aprovada:** referências permanecem no nível de subárea por ocorrência ordenada; não criar relação pergunta–referência nem inferir vínculos. | A fonte não contém relação pergunta–referência. | Resolvido para a fundação estrutural; nova relação exige fonte e decisão próprias. |
 | GUIA-08 | Definir critérios de deduplicação e reconciliação com `NormaInternacional`. | 224 ocorrências, 223 textos únicos e títulos semelhantes sem IDs. | Normalização normativa. |
 | GUIA-09 | Fornecer/validar URLs oficiais e metadados das referências, se necessários. | Nenhuma referência possui URL estruturada. | Links públicos e verificação. |
 | GUIA-10 | Homologar a UX do Guia. | Não existe página visual oficial executável para transportar. | Templates, interações e fidelidade visual. |
@@ -565,7 +565,7 @@ Não estão confirmados pelo protótipo e não devem entrar na fundação sem de
 
 | Subfase | Objetivo | Arquivos prováveis | Migration | Risco/dependências | Testes necessários | Critério de aceite |
 |---|---|---|---|---|---|---|
-| 2D.1 — fundação de dados | Criar versão, hierarquia, perguntas e referências no nível confirmado. | `praticas/models.py`, `praticas/admin.py`, nova migration, testes de models e documentação. | Sim, somente estrutural. | Depende de GUIA-02, 03, 04 e 07; risco de cardinalidade errada. | Constraints, unicidade contextual, exclusão, publicação, imutabilidade e SQLite limpo. | Schema representa 3/8/9/47 e dois tipos sem dados embutidos na migration. |
+| 2D.1 — fundação de dados | Criar versão, hierarquia, perguntas e referências no nível confirmado. | `praticas/models.py`, `praticas/admin.py`, nova migration, testes de models e documentação. | Sim, somente estrutural. | GUIA-02, 03, 04 e 07 registradas em `FASE2D1_DECISOES_FUNDACAO_GUIA.md`; permanece o risco de cardinalidade errada. | Constraints, unicidade contextual, exclusão, publicação, imutabilidade e SQLite limpo. | Schema representa 3/8/9/47 e dois tipos sem dados embutidos na migration. |
 | 2D.2 — importação controlada | Importar o conteúdo espanhol com códigos aprovados, hash, lote, itens, dry-run e reversão. | Novo management command, arquivo-fonte institucional controlado, testes do importador e documentação. | Não, salvo ajuste previamente aprovado do ledger. | Depende de GUIA-03, 06 e hash/fonte homologados; risco de divergência posicional. | Dry-run, idempotência, contagens 407/224, falha/rollback, divergência, segunda reversão, preservação de traduções. | Uma versão rascunho reproduz exatamente as contagens e cada item tem proveniência. |
 | 2D.3 — catálogo público | Criar rota pública de consulta e estado editorial honesto. | `praticas/views.py`, `praticas/urls.py`, template, CSS, testes de view/i18n. | Não prevista. | Depende de GUIA-01, 05 e 10; sem visual oficial completo. | Acesso público, somente versão publicada, PT/ES/EN com fallback aprovado, estados vazio/indisponível. | Conteúdo não publicado não vaza; a página comunica claramente idioma e versão. |
 | 2D.4 — detalhe e navegação | Navegar por eixos, subeixos, setores, subáreas e tipo de auditoria. | Views/URLs, includes, CSS, JavaScript progressivo e testes. | Não prevista. | Depende de GUIA-10 e desenho acessível; listas longas. | Teclado, foco, ARIA, URL/estado, 320–1440 px, zoom 200%, ausência de rolagem horizontal. | Toda pergunta é alcançável e o estado é compreensível sem JavaScript quando aplicável. |
@@ -580,9 +580,9 @@ As fases 2D.6 e 2D.7 não são compromissos de escopo. Elas existem para isolar 
 
 Antes de 2D.1:
 
-1. registrar as decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07;
+1. **Atendido:** decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 registradas em `FASE2D1_DECISOES_FUNDACAO_GUIA.md`;
 2. aprovar a fonte e seu hash, sem correção silenciosa;
-3. definir a política de publicação e versão;
+3. **Atendido:** política de publicação e versão definida em GUIA-02;
 4. demonstrar que o schema não reutiliza models incompatíveis;
 5. preservar o ledger existente e planejar rollback em SQLite e PostgreSQL.
 
