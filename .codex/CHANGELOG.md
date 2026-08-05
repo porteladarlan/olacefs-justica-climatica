@@ -2,6 +2,7 @@
 
 ## Não lançado — 2026-08-01
 
+- Registradas as decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 para a futura fundação estrutural do Guia, sem código, migration ou carga de dados.
 - Implementado o mapa regional funcional da Fase 2E com D3 7.9.0, TopoJSON Client 3.1.0 e `world-atlas` 2.0.2 servidos localmente, seleção múltipla acessível, alternativa textual sem JavaScript, EFS e contagens derivadas somente de experiências publicadas e URLs reais para Boas Práticas e Marcos Normativos; nenhuma alteração de model, migration ou banco foi realizada.
 - Documentado o levantamento controlado da Fase 2D.0 do Guia de Justiça Climática, confirmando no protótipo oficial 407 perguntas, 224 ocorrências de referências e a ausência de tela ou interação funcional do módulo; foram registrados o inventário estrutural, as lacunas de idioma, o modelo conceitual candidato, as decisões pendentes e as subfases futuras, sem alteração de código ou banco.
 - Refinado o shell global trilíngue com os tokens extraídos do protótipo: Raleway local, navegação com estado atual, menus por perfil, idioma preservando rota/filtros/fragmento, contraste persistente e menu móvel acessível; cabeçalho e geometria foram homologados em navegador nas páginas de Boas Práticas e Marcos Normativos.
