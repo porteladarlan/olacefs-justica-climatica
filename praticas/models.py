@@ -769,12 +769,14 @@ class ItemLoteImportacaoConteudo(models.Model):
         MARCO = "marco", "Marco"
         FERRAMENTA = "ferramenta", "Ferramenta"
         SETOR = "setor", "Setor"
+        SETOR_GUIA = "setor_guia", "Setor do guia"
         VERSAO_GUIA = "versao_guia", "Versao do guia"
         EIXO = "eixo", "Eixo"
         SUBEIXO = "subeixo", "Subeixo"
         SUBAREA = "subarea", "Subarea"
         PERGUNTA = "pergunta", "Pergunta"
         REFERENCIA = "referencia", "Referencia"
+        SUBAREA_REFERENCIA_GUIA = "subarea_referencia_guia", "Ocorrencia de referencia em subarea"
         EXPERIENCIA_PERGUNTA_GUIA = "experiencia_pergunta_guia", "Experiencia e pergunta do guia"
         VINCULO_USUARIO_EFS = "vinculo_usuario_efs", "Vinculo usuario-EFS"
         EPISODIO_VINCULO_USUARIO_EFS = "episodio_vinculo_usuario_efs", "Episodio de vinculo usuario-EFS"
@@ -1274,3 +1276,481 @@ class EventoVinculoUsuarioEFS(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Eventos de vinculo nao podem ser excluidos pelo fluxo normal.")
+
+
+class VersaoGuia(models.Model):
+    class Situacao(models.TextChoices):
+        RASCUNHO = "rascunho", "Rascunho"
+        PUBLICADA = "publicada", "Publicada"
+
+    codigo = models.SlugField(max_length=100, unique=True)
+    fonte = models.CharField(max_length=500)
+    sha256_fonte = models.CharField(
+        max_length=64,
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9a-fA-F]{64}$",
+                message="Informe um hash SHA-256 hexadecimal com 64 caracteres.",
+            )
+        ],
+    )
+    idioma_canonico = models.CharField(max_length=5, default="es", editable=False)
+    situacao = models.CharField(
+        max_length=20,
+        choices=Situacao.choices,
+        default=Situacao.RASCUNHO,
+    )
+    vigente = models.BooleanField(default=False)
+    publicado_em = models.DateTimeField(null=True, blank=True)
+    lote_origem = models.ForeignKey(
+        LoteImportacaoConteudo,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="versoes_guia",
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Versao do guia"
+        verbose_name_plural = "Versoes do guia"
+        ordering = ["-vigente", "-publicado_em", "-criado_em"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["vigente"],
+                condition=models.Q(vigente=True),
+                name="guia_versao_vigente_unica",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        situacao="rascunho",
+                        vigente=False,
+                        publicado_em__isnull=True,
+                    )
+                    | models.Q(
+                        situacao="publicada",
+                        publicado_em__isnull=False,
+                        lote_origem__isnull=False,
+                    )
+                ),
+                name="guia_versao_estado_coerente",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(sha256_fonte__regex=r"^[0-9a-fA-F]{64}$"),
+                name="guia_versao_sha256_valido",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["situacao", "vigente"], name="guia_versao_status_vig"),
+            models.Index(fields=["sha256_fonte"], name="guia_versao_sha256"),
+        ]
+
+    def __str__(self):
+        marcador = " vigente" if self.vigente else ""
+        return f"{self.codigo} - {self.get_situacao_display()}{marcador}"
+
+    def clean(self):
+        super().clean()
+        erros = {}
+        if self.idioma_canonico != "es":
+            erros["idioma_canonico"] = "O idioma canonico desta fundacao deve permanecer espanhol."
+        if self.situacao == self.Situacao.RASCUNHO:
+            if self.vigente:
+                erros["vigente"] = "Uma versao em rascunho nao pode estar vigente."
+            if self.publicado_em:
+                erros["publicado_em"] = "Uma versao em rascunho nao pode ter data de publicacao."
+        elif self.situacao == self.Situacao.PUBLICADA:
+            if not self.publicado_em:
+                erros["publicado_em"] = "Uma versao publicada deve informar a data de publicacao."
+            if not self.lote_origem_id:
+                erros["lote_origem"] = "Uma versao publicada deve registrar o lote de origem."
+        if erros:
+            raise ValidationError(erros)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            original = type(self).objects.filter(pk=self.pk).first()
+            if original and original.situacao == self.Situacao.PUBLICADA:
+                campos_imutaveis = (
+                    "codigo",
+                    "fonte",
+                    "sha256_fonte",
+                    "idioma_canonico",
+                    "situacao",
+                    "publicado_em",
+                    "lote_origem_id",
+                )
+                alterados = [
+                    campo
+                    for campo in campos_imutaveis
+                    if getattr(original, campo) != getattr(self, campo)
+                ]
+                if alterados:
+                    raise ValidationError(
+                        "Uma versao publicada e imutavel; somente sua vigencia pode ser alterada."
+                    )
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.situacao == self.Situacao.PUBLICADA:
+            raise ValidationError("Uma versao publicada nao pode ser excluida.")
+        return super().delete(*args, **kwargs)
+
+
+class ConteudoGuiaProtegido(models.Model):
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def versao_guia(self):
+        raise NotImplementedError
+
+    def _validar_versao_editavel(self):
+        versao = self.versao_guia
+        if versao and versao.situacao == VersaoGuia.Situacao.PUBLICADA:
+            raise ValidationError("O conteudo de uma versao publicada e imutavel.")
+
+    def save(self, *args, **kwargs):
+        self._validar_versao_editavel()
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self._validar_versao_editavel()
+        return super().delete(*args, **kwargs)
+
+
+class EixoGuia(ConteudoGuiaProtegido):
+    versao = models.ForeignKey(
+        VersaoGuia,
+        on_delete=models.PROTECT,
+        related_name="eixos",
+    )
+    codigo = models.SlugField(max_length=160)
+    nome_es = models.CharField(max_length=220)
+    ordem = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "Eixo do guia"
+        verbose_name_plural = "Eixos do guia"
+        ordering = ["versao", "ordem", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["versao", "codigo"],
+                name="guia_eixo_codigo_versao_unico",
+            ),
+            models.UniqueConstraint(
+                fields=["versao", "ordem"],
+                name="guia_eixo_ordem_versao_unica",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        return self.versao
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome_es}"
+
+
+class SubeixoGuia(ConteudoGuiaProtegido):
+    versao = models.ForeignKey(
+        VersaoGuia,
+        on_delete=models.PROTECT,
+        related_name="subeixos",
+    )
+    eixo = models.ForeignKey(
+        EixoGuia,
+        on_delete=models.PROTECT,
+        related_name="subeixos",
+    )
+    codigo = models.SlugField(max_length=160)
+    nome_es = models.CharField(max_length=220)
+    ordem = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "Subeixo do guia"
+        verbose_name_plural = "Subeixos do guia"
+        ordering = ["versao", "eixo__ordem", "ordem", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["versao", "codigo"],
+                name="guia_subeixo_codigo_versao_unico",
+            ),
+            models.UniqueConstraint(
+                fields=["eixo", "ordem"],
+                name="guia_subeixo_ordem_eixo_unica",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        return self.versao
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome_es}"
+
+    def clean(self):
+        super().clean()
+        if self.versao_id and self.eixo_id and self.eixo.versao_id != self.versao_id:
+            raise ValidationError({"eixo": "O eixo deve pertencer a mesma versao do subeixo."})
+
+
+class SetorGuia(ConteudoGuiaProtegido):
+    versao = models.ForeignKey(
+        VersaoGuia,
+        on_delete=models.PROTECT,
+        related_name="setores",
+    )
+    codigo = models.SlugField(max_length=160)
+    nome_es = models.CharField(max_length=220)
+    ordem = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "Setor do guia"
+        verbose_name_plural = "Setores do guia"
+        ordering = ["versao", "ordem", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["versao", "codigo"],
+                name="guia_setor_codigo_versao_unico",
+            ),
+            models.UniqueConstraint(
+                fields=["versao", "ordem"],
+                name="guia_setor_ordem_versao_unica",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        return self.versao
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome_es}"
+
+
+class SubareaGuia(ConteudoGuiaProtegido):
+    versao = models.ForeignKey(
+        VersaoGuia,
+        on_delete=models.PROTECT,
+        related_name="subareas",
+    )
+    setor = models.ForeignKey(
+        SetorGuia,
+        on_delete=models.PROTECT,
+        related_name="subareas",
+    )
+    codigo = models.SlugField(max_length=160)
+    nome_es = models.CharField(max_length=220)
+    ordem = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "Subarea do guia"
+        verbose_name_plural = "Subareas do guia"
+        ordering = ["versao", "setor__ordem", "ordem", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["versao", "codigo"],
+                name="guia_subarea_codigo_versao_unico",
+            ),
+            models.UniqueConstraint(
+                fields=["setor", "ordem"],
+                name="guia_subarea_ordem_setor_unica",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        return self.versao
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome_es}"
+
+    def clean(self):
+        super().clean()
+        if self.versao_id and self.setor_id and self.setor.versao_id != self.versao_id:
+            raise ValidationError({"setor": "O setor deve pertencer a mesma versao da subarea."})
+
+
+class PerguntaGuia(ConteudoGuiaProtegido):
+    class TipoAuditoria(models.TextChoices):
+        CUMPLIMIENTO = "cumplimiento", "Conformidade"
+        GESTION = "gestion", "Gestao"
+
+    versao = models.ForeignKey(
+        VersaoGuia,
+        on_delete=models.PROTECT,
+        related_name="perguntas",
+    )
+    codigo = models.SlugField(max_length=160)
+    texto_es = models.TextField()
+    tipo_auditoria = models.CharField(max_length=20, choices=TipoAuditoria.choices)
+    ordem = models.PositiveSmallIntegerField()
+    eixo = models.ForeignKey(
+        EixoGuia,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="perguntas_diretas",
+    )
+    subeixo = models.ForeignKey(
+        SubeixoGuia,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="perguntas",
+    )
+    subarea = models.ForeignKey(
+        SubareaGuia,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="perguntas",
+    )
+
+    class Meta:
+        verbose_name = "Pergunta do guia"
+        verbose_name_plural = "Perguntas do guia"
+        ordering = ["versao", "tipo_auditoria", "ordem", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["versao", "codigo"],
+                name="guia_pergunta_codigo_versao_unico",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(eixo__isnull=False, subeixo__isnull=True, subarea__isnull=True)
+                    | models.Q(eixo__isnull=True, subeixo__isnull=False, subarea__isnull=True)
+                    | models.Q(eixo__isnull=True, subeixo__isnull=True, subarea__isnull=False)
+                ),
+                name="guia_pergunta_um_escopo",
+            ),
+            models.UniqueConstraint(
+                fields=["eixo", "tipo_auditoria", "ordem"],
+                condition=models.Q(eixo__isnull=False),
+                name="guia_pergunta_ordem_eixo_unica",
+            ),
+            models.UniqueConstraint(
+                fields=["subeixo", "tipo_auditoria", "ordem"],
+                condition=models.Q(subeixo__isnull=False),
+                name="guia_pergunta_ordem_subeixo_unica",
+            ),
+            models.UniqueConstraint(
+                fields=["subarea", "tipo_auditoria", "ordem"],
+                condition=models.Q(subarea__isnull=False),
+                name="guia_pergunta_ordem_subarea_unica",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["versao", "tipo_auditoria"],
+                name="guia_pergunta_versao_tipo",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        return self.versao
+
+    def __str__(self):
+        return f"{self.codigo} - {self.get_tipo_auditoria_display()}"
+
+    def clean(self):
+        super().clean()
+        escopos = [self.eixo_id, self.subeixo_id, self.subarea_id]
+        if sum(valor is not None for valor in escopos) != 1:
+            raise ValidationError("A pergunta deve possuir exatamente um escopo hierarquico.")
+        erros = {}
+        if self.eixo_id and self.eixo.versao_id != self.versao_id:
+            erros["eixo"] = "O eixo deve pertencer a mesma versao da pergunta."
+        if self.subeixo_id and self.subeixo.versao_id != self.versao_id:
+            erros["subeixo"] = "O subeixo deve pertencer a mesma versao da pergunta."
+        if self.subarea_id and self.subarea.versao_id != self.versao_id:
+            erros["subarea"] = "A subarea deve pertencer a mesma versao da pergunta."
+        if erros:
+            raise ValidationError(erros)
+
+
+class ReferenciaGuia(ConteudoGuiaProtegido):
+    versao = models.ForeignKey(
+        VersaoGuia,
+        on_delete=models.PROTECT,
+        related_name="referencias",
+    )
+    codigo = models.SlugField(max_length=160)
+    citacao_es = models.TextField()
+
+    class Meta:
+        verbose_name = "Referencia do guia"
+        verbose_name_plural = "Referencias do guia"
+        ordering = ["versao", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["versao", "codigo"],
+                name="guia_referencia_codigo_versao_unico",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        return self.versao
+
+    def __str__(self):
+        return f"{self.codigo} - {self.citacao_es[:80]}"
+
+
+class SubareaReferenciaGuia(ConteudoGuiaProtegido):
+    subarea = models.ForeignKey(
+        SubareaGuia,
+        on_delete=models.PROTECT,
+        related_name="ocorrencias_referencias",
+    )
+    referencia = models.ForeignKey(
+        ReferenciaGuia,
+        on_delete=models.PROTECT,
+        related_name="ocorrencias_subareas",
+    )
+    ordem = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = "Ocorrencia de referencia do guia"
+        verbose_name_plural = "Ocorrencias de referencias do guia"
+        ordering = ["subarea", "ordem", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["subarea", "ordem"],
+                name="guia_ref_ordem_subarea_unica",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["referencia", "subarea"],
+                name="guia_ref_subarea_lookup",
+            ),
+        ]
+
+    @property
+    def versao_guia(self):
+        if not self.subarea_id:
+            return None
+        return self.subarea.versao
+
+    def __str__(self):
+        return f"{self.subarea} - {self.ordem}: {self.referencia.codigo}"
+
+    def clean(self):
+        super().clean()
+        if (
+            self.subarea_id
+            and self.referencia_id
+            and self.subarea.versao_id != self.referencia.versao_id
+        ):
+            raise ValidationError(
+                {"referencia": "A referencia deve pertencer a mesma versao da subarea."}
+            )
