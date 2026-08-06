@@ -27,11 +27,17 @@
 - catálogos de Boas Práticas e Marcos Normativos reconhecem países existentes sem publicações e retornam zero resultados, em vez de ignorar silenciosamente o filtro;
 - nenhuma migration, carga, alteração de banco ou interface do Guia de Perguntas foi criada.
 
-## Planejado na Fase 2D.1A — fundação do Guia
+## Implementado na Fase 2D.1 — fundação estrutural do Guia
 
-- decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 formalizadas em `FASE2D1_DECISOES_FUNDACAO_GUIA.md`;
-- futura fundação limitada a versão, hierarquia própria, perguntas, referências por subárea e proveniência, sem implementar código nesta etapa;
-- importação permanece bloqueada até a fonte institucional incorporar códigos estáveis; publicação automática, traduções inventadas e relações pergunta–referência continuam vedadas.
+- decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 formalizadas e transportadas para a fundação estrutural do módulo;
+- criados os models `VersaoGuia`, `EixoGuia`, `SubeixoGuia`, `SetorGuia`, `SubareaGuia`, `PerguntaGuia`, `ReferenciaGuia` e `SubareaReferenciaGuia`;
+- `SetorGuia` permanece independente do catálogo compartilhado `Setor`; perguntas possuem um único escopo hierárquico e referências permanecem como ocorrências ordenadas no nível da subárea;
+- versões em rascunho são editáveis; versões publicadas e seus conteúdos são protegidos contra alteração e exclusão, permanecendo somente o campo `vigente` administrável na versão publicada;
+- entidades próprias do Guia foram registradas no ledger de importação e os oito models foram disponibilizados no Django Admin para curadoria;
+- criada a migration estrutural `0013_fase2d1_fundacao_guia`, sem `RunPython`, `RunSQL`, carga automática, 407 perguntas ou 224 ocorrências de referências;
+- aprovados 21 testes direcionados da fundação e do Admin e 278 testes na regressão completa;
+- validado em 6 de agosto de 2026, sobre SQLite temporário, o ciclo `0012 → 0013 → 0012 → 0013`; o banco temporário foi removido e o SHA-256 do `db.sqlite3` real permaneceu inalterado;
+- importação continua bloqueada até existir fonte institucional controlada com códigos estáveis; interface pública, traduções, correções editoriais e reconciliação normativa dependem das decisões GUIA-01, GUIA-05, GUIA-06, GUIA-08, GUIA-09 e GUIA-10.
 
 ## Implementado na fase de segurança crítica
 

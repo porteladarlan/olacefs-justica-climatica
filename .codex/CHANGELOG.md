@@ -2,6 +2,8 @@
 
 ## Não lançado — 2026-08-01
 
+- Implementada e encerrada a Fase 2D.1 com oito models próprios e versionados do Guia, proteção de versões publicadas, administração de curadoria, ledger ampliado e migration estrutural `0013_fase2d1_fundacao_guia`, sem carga das 407 perguntas ou das 224 ocorrências de referências; foram aprovados 21 testes direcionados, 278 testes na regressão completa e o ciclo `0012 → 0013 → 0012 → 0013` em SQLite temporário, preservando integralmente o banco real.
+
 - Registradas as decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 para a futura fundação estrutural do Guia, sem código, migration ou carga de dados.
 - Implementado o mapa regional funcional da Fase 2E com D3 7.9.0, TopoJSON Client 3.1.0 e `world-atlas` 2.0.2 servidos localmente, seleção múltipla acessível, alternativa textual sem JavaScript, EFS e contagens derivadas somente de experiências publicadas e URLs reais para Boas Práticas e Marcos Normativos; nenhuma alteração de model, migration ou banco foi realizada.
 - Documentado o levantamento controlado da Fase 2D.0 do Guia de Justiça Climática, confirmando no protótipo oficial 407 perguntas, 224 ocorrências de referências e a ausência de tela ou interação funcional do módulo; foram registrados o inventário estrutural, as lacunas de idioma, o modelo conceitual candidato, as decisões pendentes e as subfases futuras, sem alteração de código ou banco.
