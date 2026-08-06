@@ -10,6 +10,14 @@ from .models import (
     EventoVinculoUsuarioEFS,
     Experiencia,
     Ferramenta,
+    EixoGuia,
+    PerguntaGuia,
+    ReferenciaGuia,
+    SetorGuia,
+    SubareaGuia,
+    SubareaReferenciaGuia,
+    SubeixoGuia,
+    VersaoGuia,
     GrupoVulneravel,
     ItemLoteImportacaoConteudo,
     LoteImportacaoConteudo,
@@ -366,3 +374,218 @@ class EventoVinculoUsuarioEFSAdmin(InspecaoSeguraAdmin):
     @admin.display(ordering="episodio__vinculo__efs__nome", description="EFS")
     def efs(self, obj):
         return obj.episodio.vinculo.efs
+
+
+class GuiaPublicacaoProtegidaAdmin(admin.ModelAdmin):
+    actions = None
+    list_per_page = 25
+
+    def _versao_publicada(self, obj):
+        if obj is None:
+            return False
+        versao = obj if isinstance(obj, VersaoGuia) else obj.versao_guia
+        return (
+            versao is not None
+            and versao.situacao == VersaoGuia.Situacao.PUBLICADA
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        campos = list(super().get_readonly_fields(request, obj))
+        if self._versao_publicada(obj):
+            campos.extend(campo.name for campo in self.model._meta.fields)
+        return tuple(dict.fromkeys(campos))
+
+    def has_delete_permission(self, request, obj=None):
+        if self._versao_publicada(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+
+
+@admin.register(VersaoGuia)
+class VersaoGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = (
+        "codigo",
+        "situacao",
+        "vigente",
+        "idioma_canonico",
+        "publicado_em",
+        "lote_origem",
+        "atualizado_em",
+    )
+    list_filter = ("situacao", "vigente", "idioma_canonico")
+    search_fields = (
+        "codigo",
+        "fonte",
+        "sha256_fonte",
+        "lote_origem__identificador",
+        "lote_origem__versao_fonte",
+    )
+    list_select_related = ("lote_origem",)
+    readonly_fields = ("idioma_canonico", "criado_em", "atualizado_em")
+    date_hierarchy = "criado_em"
+    ordering = ("-vigente", "-publicado_em", "-criado_em")
+
+    def get_readonly_fields(self, request, obj=None):
+        campos = list(
+            admin.ModelAdmin.get_readonly_fields(self, request, obj)
+        )
+        campos.extend(("idioma_canonico", "criado_em", "atualizado_em"))
+        if obj and obj.situacao == VersaoGuia.Situacao.PUBLICADA:
+            campos.extend(
+                campo.name
+                for campo in self.model._meta.fields
+                if campo.name != "vigente"
+            )
+        return tuple(dict.fromkeys(campos))
+
+
+@admin.register(EixoGuia)
+class EixoGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = ("codigo", "nome_es", "versao", "ordem", "atualizado_em")
+    list_filter = ("versao__situacao", "versao__vigente", "versao")
+    search_fields = ("codigo", "nome_es", "versao__codigo")
+    autocomplete_fields = ("versao",)
+    list_select_related = ("versao",)
+    ordering = ("versao", "ordem", "codigo")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+
+@admin.register(SubeixoGuia)
+class SubeixoGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = (
+        "codigo",
+        "nome_es",
+        "eixo",
+        "versao",
+        "ordem",
+        "atualizado_em",
+    )
+    list_filter = ("versao__situacao", "versao__vigente", "versao", "eixo")
+    search_fields = (
+        "codigo",
+        "nome_es",
+        "versao__codigo",
+        "eixo__codigo",
+        "eixo__nome_es",
+    )
+    autocomplete_fields = ("versao", "eixo")
+    list_select_related = ("versao", "eixo")
+    ordering = ("versao", "eixo__ordem", "ordem", "codigo")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+
+@admin.register(SetorGuia)
+class SetorGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = ("codigo", "nome_es", "versao", "ordem", "atualizado_em")
+    list_filter = ("versao__situacao", "versao__vigente", "versao")
+    search_fields = ("codigo", "nome_es", "versao__codigo")
+    autocomplete_fields = ("versao",)
+    list_select_related = ("versao",)
+    ordering = ("versao", "ordem", "codigo")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+
+@admin.register(SubareaGuia)
+class SubareaGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = (
+        "codigo",
+        "nome_es",
+        "setor",
+        "versao",
+        "ordem",
+        "atualizado_em",
+    )
+    list_filter = ("versao__situacao", "versao__vigente", "versao", "setor")
+    search_fields = (
+        "codigo",
+        "nome_es",
+        "versao__codigo",
+        "setor__codigo",
+        "setor__nome_es",
+    )
+    autocomplete_fields = ("versao", "setor")
+    list_select_related = ("versao", "setor")
+    ordering = ("versao", "setor__ordem", "ordem", "codigo")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+
+@admin.register(PerguntaGuia)
+class PerguntaGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = (
+        "codigo",
+        "tipo_auditoria",
+        "escopo",
+        "versao",
+        "ordem",
+        "atualizado_em",
+    )
+    list_filter = (
+        "tipo_auditoria",
+        "versao__situacao",
+        "versao__vigente",
+        "versao",
+    )
+    search_fields = (
+        "codigo",
+        "texto_es",
+        "versao__codigo",
+        "eixo__codigo",
+        "subeixo__codigo",
+        "subarea__codigo",
+    )
+    autocomplete_fields = ("versao", "eixo", "subeixo", "subarea")
+    list_select_related = ("versao", "eixo", "subeixo", "subarea")
+    ordering = ("versao", "tipo_auditoria", "ordem", "codigo")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+    @admin.display(description="Escopo")
+    def escopo(self, obj):
+        return obj.eixo or obj.subeixo or obj.subarea
+
+
+@admin.register(ReferenciaGuia)
+class ReferenciaGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = ("codigo", "versao", "citacao_resumida", "atualizado_em")
+    list_filter = ("versao__situacao", "versao__vigente", "versao")
+    search_fields = ("codigo", "citacao_es", "versao__codigo")
+    autocomplete_fields = ("versao",)
+    list_select_related = ("versao",)
+    ordering = ("versao", "codigo")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+    @admin.display(description="Citacao")
+    def citacao_resumida(self, obj):
+        return obj.citacao_es[:100]
+
+
+@admin.register(SubareaReferenciaGuia)
+class SubareaReferenciaGuiaAdmin(GuiaPublicacaoProtegidaAdmin):
+    list_display = ("subarea", "referencia", "ordem", "versao")
+    list_filter = (
+        "subarea__versao__situacao",
+        "subarea__versao__vigente",
+        "subarea__versao",
+        "subarea__setor",
+    )
+    search_fields = (
+        "subarea__codigo",
+        "subarea__nome_es",
+        "referencia__codigo",
+        "referencia__citacao_es",
+    )
+    autocomplete_fields = ("subarea", "referencia")
+    list_select_related = (
+        "subarea",
+        "subarea__versao",
+        "subarea__setor",
+        "referencia",
+    )
+    ordering = ("subarea", "ordem", "pk")
+    readonly_fields = ("criado_em", "atualizado_em")
+
+    @admin.display(
+        ordering="subarea__versao__codigo",
+        description="Versao",
+    )
+    def versao(self, obj):
+        return obj.subarea.versao
