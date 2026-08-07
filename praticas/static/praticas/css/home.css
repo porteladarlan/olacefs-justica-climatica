@@ -791,3 +791,108 @@ html.a11y-high-contrast .home-design .home-map-country.is-member:focus {
     stroke: #ffd800;
     stroke-width: 4px;
 }
+
+/* Ajustes negociais homologados em 2026-08-06 */
+
+.home-design .jc-hero-title-line {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .home-design .jc-hero-title-nowrap {
+        white-space: nowrap;
+    }
+}
+
+.home-design .home-voices .home-section-heading {
+    margin-bottom: 28px;
+}
+
+.home-design .home-voice-photo {
+    width: 112px;
+    height: 112px;
+    margin-bottom: 18px;
+}
+
+.home-design .home-foundations {
+    margin-block: 40px;
+}
+
+/* Botões do mapa dentro da identidade visual aprovada. */
+.home-design .home-map-actions .btn-primary {
+    border-color: #432054;
+    background: #432054;
+    color: #ffffff;
+}
+
+.home-design .home-map-actions .btn-primary:hover,
+.home-design .home-map-actions .btn-primary:focus-visible {
+    border-color: #695173;
+    background: #695173;
+    color: #ffffff;
+}
+
+.home-design .home-map-actions .btn-outline-primary {
+    border-color: #432054;
+    background: #ffffff;
+    color: #432054;
+}
+
+.home-design .home-map-actions .btn-outline-primary:hover,
+.home-design .home-map-actions .btn-outline-primary:focus-visible {
+    border-color: #432054;
+    background: #432054;
+    color: #ffffff;
+}
+
+/* Seleção do mapa sem o amarelo usado anteriormente. */
+.home-design .home-map-country.is-selected {
+    fill: #698D8B;
+    stroke: #432054;
+    stroke-width: 2px;
+}
+
+.home-design .home-map-country.is-member:focus {
+    outline: none;
+    stroke: #432054;
+    stroke-width: 3px;
+}
+
+.home-design .home-map-dot.is-selected {
+    background: #698D8B;
+}
+
+/* Desktop: hero mais horizontal e mapa com maior área útil. */
+@media (min-width: 992px) {
+    .home-design .home-block,
+    .home-design .home-block-alt {
+        padding-top: 48px;
+        padding-bottom: 48px;
+    }
+
+    .home-design .jc-hero-grid {
+        grid-template-columns:
+            minmax(0, 1.25fr)
+            minmax(300px, .75fr);
+        gap: 40px;
+    }
+
+    .home-design .jc-hero-text {
+        max-width: 68ch;
+    }
+
+    .home-design .home-map-layout {
+        grid-template-columns:
+            minmax(0, 1.65fr)
+            minmax(280px, .65fr);
+        gap: 20px;
+    }
+
+    .home-design .home-map-stage {
+        min-height: 500px;
+    }
+
+    .home-design .home-map-stage svg {
+        max-height: 580px;
+    }
+}
