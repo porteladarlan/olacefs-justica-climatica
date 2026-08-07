@@ -74,7 +74,9 @@ class Command(BaseCommand):
                 f"{resumo['perguntas']} perguntas, "
                 f"{resumo['referencias_ocorrencias']} ocorrências de referências. "
                 f"SHA-256 do JSON: {sha256_arquivo}. "
-                "Validação somente estrutural; nenhuma escrita foi realizada."
+                "Equivalência canônica confirmada: "
+                f"{resumo['sha256_guia_canonico']}. "
+                "Nenhuma escrita foi realizada."
             )
         )
 
@@ -184,10 +186,21 @@ class Command(BaseCommand):
                     f"esperado {esperado}, encontrado {realizado}."
                 )
 
-        return {
+        sha256_guia_canonico = (
+            self._validar_equivalencia_canonica(
+                documento
+            )
+        )
+
+        resumo = {
             chave: estado[chave]
             for chave in self.CONTAGENS_ESPERADAS
         }
+        resumo["sha256_guia_canonico"] = (
+            sha256_guia_canonico
+        )
+
+        return resumo
 
     def _validar_fonte_origem(self, fonte):
         contexto = "raiz.fonte_origem"
@@ -699,6 +712,172 @@ class Command(BaseCommand):
                 f"{contexto} deve possuir ordens únicas e "
                 f"contíguas de 1 a {len(itens)}."
             )
+
+    def _ordenar_por_ordem(self, itens):
+        return sorted(
+            itens,
+            key=lambda item: item["ordem"],
+        )
+
+    def _textos_perguntas_ordenados(
+        self,
+        bloco,
+        tipo,
+    ):
+        return [
+            pergunta["texto_es"]
+            for pergunta in self._ordenar_por_ordem(
+                bloco[tipo]
+            )
+        ]
+
+    def _reconstruir_guia_canonico(
+        self,
+        documento,
+    ):
+        transversales = []
+
+        for eixo in self._ordenar_por_ordem(
+            documento["eixos"]
+        ):
+            subejes = []
+
+            for subeixo in self._ordenar_por_ordem(
+                eixo["subeixos"]
+            ):
+                subejes.append(
+                    {
+                        "nombre": subeixo["nome_es"],
+                        "cumplimiento": (
+                            self._textos_perguntas_ordenados(
+                                subeixo["perguntas"],
+                                "cumplimiento",
+                            )
+                        ),
+                        "gestion": (
+                            self._textos_perguntas_ordenados(
+                                subeixo["perguntas"],
+                                "gestion",
+                            )
+                        ),
+                    }
+                )
+
+            transversales.append(
+                {
+                    "nombre": eixo["nome_es"],
+                    "pregCumpl": (
+                        self._textos_perguntas_ordenados(
+                            eixo["perguntas"],
+                            "cumplimiento",
+                        )
+                    ),
+                    "pregGest": (
+                        self._textos_perguntas_ordenados(
+                            eixo["perguntas"],
+                            "gestion",
+                        )
+                    ),
+                    "subejes": subejes,
+                }
+            )
+
+        sectores = []
+
+        for setor in self._ordenar_por_ordem(
+            documento["setores"]
+        ):
+            subareas = []
+
+            for subarea in self._ordenar_por_ordem(
+                setor["subareas"]
+            ):
+                referencias = [
+                    referencia["citacao_es"]
+                    for referencia
+                    in self._ordenar_por_ordem(
+                        subarea["referencias"]
+                    )
+                ]
+
+                subareas.append(
+                    {
+                        "nombre": subarea["nome_es"],
+                        "cumplimiento": (
+                            self._textos_perguntas_ordenados(
+                                subarea["perguntas"],
+                                "cumplimiento",
+                            )
+                        ),
+                        "gestion": (
+                            self._textos_perguntas_ordenados(
+                                subarea["perguntas"],
+                                "gestion",
+                            )
+                        ),
+                        "referencias": referencias,
+                    }
+                )
+
+            sectores.append(
+                {
+                    "sector": setor["nome_es"],
+                    "subareas": subareas,
+                }
+            )
+
+        return {
+            "transversales": transversales,
+            "sectores": sectores,
+        }
+
+    def _serializar_guia_canonico(self, guia):
+        return json.dumps(
+            guia,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+
+    def _calcular_sha256_guia_canonico(
+        self,
+        documento,
+    ):
+        guia = self._reconstruir_guia_canonico(
+            documento
+        )
+
+        serializado = (
+            self._serializar_guia_canonico(
+                guia
+            )
+        )
+
+        return hashlib.sha256(
+            serializado.encode("utf-8")
+        ).hexdigest()
+
+    def _validar_equivalencia_canonica(
+        self,
+        documento,
+    ):
+        calculado = (
+            self._calcular_sha256_guia_canonico(
+                documento
+            )
+        )
+
+        esperado = self.SHA256_GUIA_ORIGEM
+
+        if calculado != esperado:
+            raise CommandError(
+                "O conteúdo espanhol codificado não é "
+                "canonicamente equivalente ao "
+                "PJC_DATA.guia auditado. "
+                f"SHA-256 esperado: {esperado}; "
+                f"SHA-256 reconstruído: {calculado}."
+            )
+
+        return calculado
 
     def _validar_sha256(self, valor, contexto):
         if (

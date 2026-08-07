@@ -2,10 +2,15 @@ import io
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import SimpleTestCase
+
+from praticas.management.commands.validar_fonte_guia_fase2d2 import (
+    Command as ValidadorGuiaCommand,
+)
 
 
 class ValidadorFonteGuiaFase2D2Tests(SimpleTestCase):
@@ -238,7 +243,27 @@ class ValidadorFonteGuiaFase2D2Tests(SimpleTestCase):
             "setores": setores,
         }
 
-    def _executar(self, documento):
+    def _preparar_hash_sintetico(self, documento):
+        validador = ValidadorGuiaCommand()
+
+        hash_sintetico = (
+            validador._calcular_sha256_guia_canonico(
+                documento
+            )
+        )
+
+        documento["fonte_origem"]["sha256_guia"] = (
+            hash_sintetico
+        )
+
+        return hash_sintetico
+
+    def _executar(
+        self,
+        documento,
+        *,
+        sha_guia_esperado=None,
+    ):
         with TemporaryDirectory() as pasta:
             caminho = Path(pasta) / "guia.json"
 
@@ -252,18 +277,38 @@ class ValidadorFonteGuiaFase2D2Tests(SimpleTestCase):
 
             saida = io.StringIO()
 
-            call_command(
-                "validar_fonte_guia_fase2d2",
-                "--arquivo",
-                str(caminho),
-                stdout=saida,
-            )
+            def executar():
+                call_command(
+                    "validar_fonte_guia_fase2d2",
+                    "--arquivo",
+                    str(caminho),
+                    stdout=saida,
+                )
+
+            if sha_guia_esperado is None:
+                executar()
+            else:
+                with patch.object(
+                    ValidadorGuiaCommand,
+                    "SHA256_GUIA_ORIGEM",
+                    sha_guia_esperado,
+                ):
+                    executar()
 
             return saida.getvalue()
 
     def test_fonte_codificada_valida_eh_aceita(self):
+        documento = self._documento_valido()
+
+        hash_sintetico = (
+            self._preparar_hash_sintetico(
+                documento
+            )
+        )
+
         saida = self._executar(
-            self._documento_valido()
+            documento,
+            sha_guia_esperado=hash_sintetico,
         )
 
         self.assertIn(
@@ -276,6 +321,14 @@ class ValidadorFonteGuiaFase2D2Tests(SimpleTestCase):
         )
         self.assertIn(
             "224 ocorrências de referências",
+            saida,
+        )
+        self.assertIn(
+            "Equivalência canônica confirmada",
+            saida,
+        )
+        self.assertIn(
+            hash_sintetico,
             saida,
         )
 
@@ -338,6 +391,168 @@ class ValidadorFonteGuiaFase2D2Tests(SimpleTestCase):
             "com citação diferente",
         ):
             self._executar(documento)
+
+    def test_serializacao_canonica_preserva_ordem_e_utf8(self):
+        guia = {
+            "transversales": [
+                {
+                    "nombre": "Água",
+                    "pregCumpl": [],
+                    "pregGest": [],
+                    "subejes": [],
+                }
+            ],
+            "sectores": [],
+        }
+
+        serializado = (
+            ValidadorGuiaCommand()
+            ._serializar_guia_canonico(guia)
+        )
+
+        self.assertEqual(
+            serializado,
+            (
+                '{"transversales":[{"nombre":"Água",'
+                '"pregCumpl":[],"pregGest":[],'
+                '"subejes":[]}],"sectores":[]}'
+            ),
+        )
+
+    def test_mesmas_contagens_sem_equivalencia_sao_bloqueadas(self):
+        documento = self._documento_valido()
+
+        with self.assertRaisesRegex(
+            CommandError,
+            "canonicamente equivalente",
+        ):
+            self._executar(documento)
+
+    def test_texto_alterado_com_mesmas_contagens_eh_bloqueado(self):
+        documento = self._documento_valido()
+
+        hash_original = (
+            self._preparar_hash_sintetico(
+                documento
+            )
+        )
+
+        pergunta = documento[
+            "eixos"
+        ][0]["subeixos"][0][
+            "perguntas"
+        ]["cumplimiento"][0]
+
+        pergunta["texto_es"] += " alterada"
+
+        with self.assertRaisesRegex(
+            CommandError,
+            "canonicamente equivalente",
+        ):
+            self._executar(
+                documento,
+                sha_guia_esperado=hash_original,
+            )
+
+    def test_ordem_semantica_alterada_eh_bloqueada(self):
+        documento = self._documento_valido()
+
+        hash_original = (
+            self._preparar_hash_sintetico(
+                documento
+            )
+        )
+
+        perguntas = documento[
+            "eixos"
+        ][0]["subeixos"][0][
+            "perguntas"
+        ]["cumplimiento"]
+
+        self.assertGreaterEqual(
+            len(perguntas),
+            2,
+        )
+
+        perguntas[0]["ordem"], perguntas[1]["ordem"] = (
+            perguntas[1]["ordem"],
+            perguntas[0]["ordem"],
+        )
+
+        with self.assertRaisesRegex(
+            CommandError,
+            "canonicamente equivalente",
+        ):
+            self._executar(
+                documento,
+                sha_guia_esperado=hash_original,
+            )
+
+    def test_troca_de_tipo_com_mesmas_contagens_eh_bloqueada(self):
+        documento = self._documento_valido()
+
+        hash_original = (
+            self._preparar_hash_sintetico(
+                documento
+            )
+        )
+
+        bloco = documento[
+            "eixos"
+        ][0]["subeixos"][0]["perguntas"]
+
+        cumprimento = bloco["cumplimiento"][0]
+        gestao = bloco["gestion"][0]
+
+        (
+            cumprimento["texto_es"],
+            gestao["texto_es"],
+        ) = (
+            gestao["texto_es"],
+            cumprimento["texto_es"],
+        )
+
+        with self.assertRaisesRegex(
+            CommandError,
+            "canonicamente equivalente",
+        ):
+            self._executar(
+                documento,
+                sha_guia_esperado=hash_original,
+            )
+
+    def test_referencia_alterada_com_mesmas_contagens_eh_bloqueada(self):
+        documento = self._documento_valido()
+
+        hash_original = (
+            self._preparar_hash_sintetico(
+                documento
+            )
+        )
+
+        referencias = documento[
+            "setores"
+        ][0]["subareas"][0][
+            "referencias"
+        ]
+
+        self.assertGreaterEqual(
+            len(referencias),
+            2,
+        )
+
+        referencias[1]["citacao_es"] += (
+            " alterada"
+        )
+
+        with self.assertRaisesRegex(
+            CommandError,
+            "canonicamente equivalente",
+        ):
+            self._executar(
+                documento,
+                sha_guia_esperado=hash_original,
+            )
 
     def test_html_legado_nao_eh_aceito_como_fonte_codificada(self):
         with TemporaryDirectory() as pasta:

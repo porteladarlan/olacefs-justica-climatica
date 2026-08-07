@@ -14,7 +14,7 @@ A fonte codificada deve declarar como origem o material auditado na Fase 2D.0:
 - SHA-256 determinístico do objeto original `PJC_DATA.guia`: `8d56bed6eb08a32ef496f251d11cb423463544ecb43ba41ba804fc12c19ded3d`;
 - idioma canônico: `es`.
 
-A declaração desses hashes registra proveniência. A equivalência textual integral entre o JSON codificado e o conteúdo auditado será verificada antes da importação efetiva.
+A declaração desses hashes registra proveniência. A equivalência textual integral entre o JSON codificado e o conteúdo auditado é verificada pela subfase 2D.2B antes de qualquer importação efetiva.
 
 ## Formato
 
@@ -105,6 +105,6 @@ Validação:
 
 `python manage.py validar_fonte_guia_fase2d2 --arquivo <fonte.json>`
 
-A aprovação desse comando significa somente que o contrato estrutural foi atendido.
+A aprovação desse comando significa que o contrato estrutural e a equivalência canônica da subfase 2D.2B foram atendidos.
 
 Ela não autoriza publicação e, isoladamente, ainda não autoriza a importação efetiva.
