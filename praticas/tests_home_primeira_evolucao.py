@@ -54,10 +54,17 @@ class HomePrimeiraEvolucaoTests(TestCase):
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
+
+                html = response.content.decode("utf-8")
+                hero = html.split(
+                    '<section class="jc-hero home-block"',
+                    1,
+                )[1].split("</section>", 1)[0]
+
                 self.assertContains(response, proposito, html=False)
                 self.assertContains(response, "COMTEMA")
                 self.assertContains(response, "CGID")
-                self.assertContains(response, "GIZ")
+                self.assertNotIn("GIZ", hero)
                 self.assertContains(response, cta_marcos, html=False)
                 self.assertContains(response, cta_mapa, html=False)
                 self.assertContains(response, f'href="{reverse("normas_internacionais")}"')
@@ -84,7 +91,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
         response = self.client.get(reverse("pagina_inicial"))
         html = response.content.decode("utf-8")
 
-        self.assertContains(response, "Uma mensagem da COMTEMA e da CGID")
+        self.assertContains(response, "Palavras das Presid&ecirc;ncias da COMTEMA e da CGID")
         self.assertContains(response, "Dr. Camilo Ben&iacute;tez", html=False)
         self.assertContains(response, "Dra. Pamela Calletti")
         self.assertContains(response, f'src="{static("praticas/img/camilo-benitez.jpg")}"')
