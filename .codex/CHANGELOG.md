@@ -31,3 +31,9 @@
 ## 1.0.0 — 2026-07-31
 
 Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI, Skills, playbooks e regras para redução de tokens.
+# 2026-08-09 — Fase 2D.2: motor de importação controlada do Guia
+
+- Implementados validação e dry-run da fonte institucional codificada, sem carga real.
+- Implementados importação atômica em rascunho, idempotência, divergências, lote e ledger.
+- Implementadas reversão conservadora por lote e publicação/versionamento em operação separada.
+- Adicionada cobertura direcionada com fixture sintética; nenhuma migration foi necessária.

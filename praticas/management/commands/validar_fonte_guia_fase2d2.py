@@ -1,895 +1,321 @@
 import hashlib
 import json
-import re
 from pathlib import Path
 
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
+from django.core.validators import validate_slug
+
+
+HASH_CANONICO_GUIA = "8d56bed6eb08a32ef496f251d11cb423463544ecb43ba41ba804fc12c19ded3d"
+HASH_FONTE_OFICIAL = "cd78b9beca799aa9c6976af825c314e57e4a1903bfa832ecec2fbc3d86b61c67"
+CONTAGENS_OFICIAIS = {
+    "eixos": 3,
+    "subeixos": 8,
+    "setores": 9,
+    "subareas": 47,
+    "perguntas": 407,
+    "ocorrencias_referencias": 224,
+    "referencias": 223,
+}
+CONTRATO = "guia-fase2d2-v1"
+
+
+class ErroFonteGuia(ValueError):
+    pass
+
+
+def _objeto(objeto, obrigatorias, permitidas, contexto):
+    if not isinstance(objeto, dict):
+        raise ErroFonteGuia(f"{contexto}: deve ser um objeto.")
+    chaves = set(objeto)
+    ausentes = sorted(set(obrigatorias) - chaves)
+    if ausentes:
+        raise ErroFonteGuia(
+            f"{contexto}: campos obrigatorios ausentes: {', '.join(ausentes)}."
+        )
+    desconhecidas = sorted(chaves - set(permitidas))
+    if desconhecidas:
+        raise ErroFonteGuia(
+            f"{contexto}: campos desconhecidos: {', '.join(desconhecidas)}."
+        )
+
+
+def _texto(objeto, campo, contexto, limite=None):
+    valor = objeto.get(campo)
+    if not isinstance(valor, str) or not valor.strip():
+        raise ErroFonteGuia(f"{contexto}: campo {campo} ausente ou invalido.")
+    if limite is not None and len(valor) > limite:
+        raise ErroFonteGuia(f"{contexto}: campo {campo} excede {limite} caracteres.")
+    return valor
+
+
+def _codigo(objeto, contexto, limite=160):
+    codigo = _texto(objeto, "codigo", contexto)
+    try:
+        validate_slug(codigo)
+    except ValidationError:
+        raise ErroFonteGuia(f"{contexto}: codigo institucional invalido.") from None
+    if len(codigo) > limite:
+        raise ErroFonteGuia(f"{contexto}: codigo institucional invalido.")
+    return codigo
+
+
+def _lista(objeto, campo, contexto):
+    valor = objeto.get(campo)
+    if not isinstance(valor, list):
+        raise ErroFonteGuia(f"{contexto}: campo {campo} deve ser uma lista.")
+    return valor
+
+
+def _validar_ordem(itens, contexto):
+    if any(not isinstance(item, dict) for item in itens):
+        raise ErroFonteGuia(f"{contexto}: todos os itens devem ser objetos.")
+    ordens = [item.get("ordem") for item in itens]
+    if any(
+        isinstance(ordem, bool)
+        or not isinstance(ordem, int)
+        or not 1 <= ordem <= 32767
+        for ordem in ordens
+    ) or sorted(ordens) != list(range(1, len(itens) + 1)):
+        raise ErroFonteGuia(
+            f"{contexto}: ordens devem ser inteiros contiguos de 1 a {len(itens)}."
+        )
+
+
+def validar_estrutura_2d2a(documento):
+    campos_raiz = {
+        "contrato",
+        "idioma_canonico",
+        "versao",
+        "guia",
+        "sha256_guia",
+        "contagens",
+    }
+    _objeto(documento, campos_raiz, campos_raiz, "raiz")
+    if documento["contrato"] != CONTRATO:
+        raise ErroFonteGuia(f"Contrato invalido; esperado {CONTRATO}.")
+    if documento["idioma_canonico"] != "es":
+        raise ErroFonteGuia("raiz: idioma_canonico deve permanecer es.")
+    versao = documento["versao"]
+    campos_versao = {"codigo", "fonte", "sha256_fonte"}
+    _objeto(versao, campos_versao, campos_versao, "versao")
+    _codigo(versao, "versao", limite=100)
+    # O prefixo operacional usado no lote tambem deve caber em fonte (500).
+    _texto(versao, "fonte", "versao", limite=500 - len("guia-fase2d2/"))
+    sha_fonte = _texto(versao, "sha256_fonte", "versao").lower()
+    if len(sha_fonte) != 64 or any(c not in "0123456789abcdef" for c in sha_fonte):
+        raise ErroFonteGuia("versao: sha256_fonte invalido.")
+    if sha_fonte != HASH_FONTE_OFICIAL:
+        raise ErroFonteGuia("Hash de proveniencia da fonte divergente.")
+    guia = documento["guia"]
+    campos_guia = {"eixos", "setores", "referencias"}
+    _objeto(guia, campos_guia, campos_guia, "guia")
+    hash_calculado = hashlib.sha256(
+        json.dumps(guia, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    if documento.get("sha256_guia") != hash_calculado:
+        raise ErroFonteGuia("Hash canonico declarado do Guia divergente.")
+
+    codigos = {nome: set() for nome in ("eixos", "subeixos", "setores", "subareas", "perguntas", "referencias")}
+    totais = {nome: 0 for nome in (*codigos, "ocorrencias_referencias")}
+    referencias_usadas = []
+
+    def registrar(tipo, item, contexto):
+        codigo = _codigo(item, contexto)
+        if codigo in codigos[tipo]:
+            raise ErroFonteGuia(f"{contexto}: codigo duplicado {codigo}.")
+        codigos[tipo].add(codigo)
+        totais[tipo] += 1
+
+    def perguntas(itens, contexto):
+        for item in itens:
+            campos = {"codigo", "texto_es", "tipo_auditoria", "ordem"}
+            _objeto(item, campos, campos, contexto)
+            registrar("perguntas", item, contexto)
+            _texto(item, "texto_es", contexto)
+            if item.get("tipo_auditoria") not in ("cumplimiento", "gestion"):
+                raise ErroFonteGuia(f"{contexto}: tipo_auditoria invalido.")
+        for tipo in ("cumplimiento", "gestion"):
+            _validar_ordem(
+                [item for item in itens if item["tipo_auditoria"] == tipo],
+                f"{contexto} ({tipo})",
+            )
+
+    eixos = _lista(guia, "eixos", "guia")
+    _validar_ordem(eixos, "eixos")
+    for eixo in eixos:
+        campos = {"codigo", "nome_es", "ordem", "perguntas", "subeixos"}
+        _objeto(eixo, campos, campos, "eixo")
+        registrar("eixos", eixo, "eixo")
+        _texto(eixo, "nome_es", "eixo", limite=220)
+        perguntas(_lista(eixo, "perguntas", "eixo"), "perguntas de eixo")
+        subeixos = _lista(eixo, "subeixos", "eixo")
+        _validar_ordem(subeixos, "subeixos")
+        for subeixo in subeixos:
+            campos = {"codigo", "nome_es", "ordem", "perguntas"}
+            _objeto(subeixo, campos, campos, "subeixo")
+            registrar("subeixos", subeixo, "subeixo")
+            _texto(subeixo, "nome_es", "subeixo", limite=220)
+            perguntas(_lista(subeixo, "perguntas", "subeixo"), "perguntas de subeixo")
+
+    setores = _lista(guia, "setores", "guia")
+    _validar_ordem(setores, "setores")
+    for setor in setores:
+        campos = {"codigo", "nome_es", "ordem", "subareas"}
+        _objeto(setor, campos, campos, "setor")
+        registrar("setores", setor, "setor")
+        _texto(setor, "nome_es", "setor", limite=220)
+        subareas = _lista(setor, "subareas", "setor")
+        _validar_ordem(subareas, "subareas")
+        for subarea in subareas:
+            campos = {"codigo", "nome_es", "ordem", "perguntas", "referencias"}
+            _objeto(subarea, campos, campos, "subarea")
+            registrar("subareas", subarea, "subarea")
+            _texto(subarea, "nome_es", "subarea", limite=220)
+            perguntas(_lista(subarea, "perguntas", "subarea"), "perguntas de subarea")
+            ocorrencias = _lista(subarea, "referencias", "subarea")
+            _validar_ordem(ocorrencias, "referencias da subarea")
+            for ocorrencia in ocorrencias:
+                campos = {"codigo_referencia", "ordem"}
+                _objeto(ocorrencia, campos, campos, "ocorrencia")
+                referencias_usadas.append(_texto(ocorrencia, "codigo_referencia", "ocorrencia"))
+                totais["ocorrencias_referencias"] += 1
+
+    referencias = _lista(guia, "referencias", "guia")
+    for referencia in referencias:
+        campos = {"codigo", "citacao_es"}
+        _objeto(referencia, campos, campos, "referencia")
+        registrar("referencias", referencia, "referencia")
+        _texto(referencia, "citacao_es", "referencia")
+    inexistentes = sorted(set(referencias_usadas) - codigos["referencias"])
+    if inexistentes:
+        raise ErroFonteGuia(f"Ocorrencia referencia codigo inexistente: {inexistentes[0]}.")
+    contagens = documento["contagens"]
+    _objeto(contagens, totais, totais, "contagens")
+    if any(
+        isinstance(valor, bool) or not isinstance(valor, int) or valor < 0
+        for valor in contagens.values()
+    ):
+        raise ErroFonteGuia("Contagens devem ser inteiros nao negativos.")
+    if contagens != totais:
+        raise ErroFonteGuia("Contagens declaradas ou realizadas divergentes.")
+    return {"documento": documento, "guia": guia, "versao": versao, "contagens": totais, "sha256_guia": hash_calculado}
+
+
+def _ordenar_por_ordem(itens):
+    return sorted(itens, key=lambda item: item["ordem"])
+
+
+def _textos_por_tipo(perguntas, tipo):
+    return [
+        pergunta["texto_es"]
+        for pergunta in _ordenar_por_ordem(
+            [item for item in perguntas if item["tipo_auditoria"] == tipo]
+        )
+    ]
+
+
+def _reconstruir_guia_canonico(guia):
+    referencias = {
+        referencia["codigo"]: referencia["citacao_es"]
+        for referencia in guia["referencias"]
+    }
+    transversales = []
+    for eixo in _ordenar_por_ordem(guia["eixos"]):
+        subejes = []
+        for subeixo in _ordenar_por_ordem(eixo["subeixos"]):
+            subejes.append(
+                {
+                    "nombre": subeixo["nome_es"],
+                    "cumplimiento": _textos_por_tipo(
+                        subeixo["perguntas"], "cumplimiento"
+                    ),
+                    "gestion": _textos_por_tipo(subeixo["perguntas"], "gestion"),
+                }
+            )
+        transversales.append(
+            {
+                "nombre": eixo["nome_es"],
+                "pregCumpl": _textos_por_tipo(
+                    eixo["perguntas"], "cumplimiento"
+                ),
+                "pregGest": _textos_por_tipo(eixo["perguntas"], "gestion"),
+                "subejes": subejes,
+            }
+        )
+
+    sectores = []
+    for setor in _ordenar_por_ordem(guia["setores"]):
+        subareas = []
+        for subarea in _ordenar_por_ordem(setor["subareas"]):
+            subareas.append(
+                {
+                    "nombre": subarea["nome_es"],
+                    "cumplimiento": _textos_por_tipo(
+                        subarea["perguntas"], "cumplimiento"
+                    ),
+                    "gestion": _textos_por_tipo(
+                        subarea["perguntas"], "gestion"
+                    ),
+                    "referencias": [
+                        referencias[ocorrencia["codigo_referencia"]]
+                        for ocorrencia in _ordenar_por_ordem(
+                            subarea["referencias"]
+                        )
+                    ],
+                }
+            )
+        sectores.append({"sector": setor["nome_es"], "subareas": subareas})
+    return {"transversales": transversales, "sectores": sectores}
+
+
+def _calcular_sha256_guia_canonico(guia):
+    serializado = json.dumps(
+        _reconstruir_guia_canonico(guia),
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(serializado.encode("utf-8")).hexdigest()
+
+
+def validar_equivalencia_2d2b(resultado):
+    """Reconstrói e confirma o conteúdo espanhol institucional auditado."""
+    hash_canonico = _calcular_sha256_guia_canonico(resultado["guia"])
+    if hash_canonico != HASH_CANONICO_GUIA:
+        raise ErroFonteGuia("Hash canonico do Guia divergente.")
+    if resultado["contagens"] != CONTAGENS_OFICIAIS:
+        raise ErroFonteGuia("Contagens declaradas ou realizadas divergentes.")
+    return {**resultado, "sha256_guia_canonico": hash_canonico}
+
+
+def validar_documento(documento):
+    """Executa, em ordem, o contrato 2D.2A e a equivalência canônica 2D.2B."""
+    return validar_equivalencia_2d2b(validar_estrutura_2d2a(documento))
+
+
+def ler_e_validar(caminho):
+    caminho = Path(caminho).expanduser().resolve()
+    if not caminho.is_file():
+        raise ErroFonteGuia("Arquivo de fonte inexistente ou nao regular.")
+    if caminho.stat().st_size > 20 * 1024 * 1024:
+        raise ErroFonteGuia("Arquivo de fonte excede o limite operacional de 20 MiB.")
+    try:
+        documento = json.loads(caminho.read_text(encoding="utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ErroFonteGuia("Arquivo deve conter JSON UTF-8 valido.") from exc
+    return validar_documento(documento)
 
 
 class Command(BaseCommand):
-    help = (
-        "Valida o contrato institucional codificado do Guia da Fase 2D.2 "
-        "sem escrever no banco."
-    )
-
-    FORMATO = "guia-justica-climatica-fase2d2-v1"
-
-    SHA256_ARQUIVO_ORIGEM = (
-        "cd78b9beca799aa9c6976af825c314e57e4a1903bfa832ecec2fbc3d86b61c67"
-    )
-    SHA256_GUIA_ORIGEM = (
-        "8d56bed6eb08a32ef496f251d11cb423463544ecb43ba41ba804fc12c19ded3d"
-    )
-
-    CONTAGENS_ESPERADAS = {
-        "eixos": 3,
-        "subeixos": 8,
-        "setores": 9,
-        "subareas": 47,
-        "perguntas_eixo": 6,
-        "perguntas_subeixo": 54,
-        "perguntas_subarea": 347,
-        "perguntas": 407,
-        "cumplimiento": 224,
-        "gestion": 183,
-        "referencias_ocorrencias": 224,
-        "referencias_textuais_unicas": 223,
-        "perguntas_textuais_unicas": 407,
-    }
-
-    PADRAO_CODIGO = re.compile(r"^[A-Za-z0-9_-]+$")
+    help = "Valida a fonte institucional codificada da Fase 2D.2 sem escrever no banco."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--arquivo",
-            required=True,
-            help="Caminho do JSON institucional codificado do Guia.",
-        )
+        parser.add_argument("--arquivo", required=True)
 
     def handle(self, *args, **options):
-        caminho = Path(options["arquivo"]).expanduser().resolve()
-
-        if not caminho.is_file():
-            raise CommandError(f"Arquivo não encontrado: {caminho}")
-
-        dados_brutos = caminho.read_bytes()
-        sha256_arquivo = hashlib.sha256(dados_brutos).hexdigest()
-
         try:
-            documento = json.loads(dados_brutos.decode("utf-8-sig"))
-        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise CommandError(
-                "A fonte codificada do Guia deve ser um JSON UTF-8 válido."
-            ) from exc
-
-        resumo = self._validar_documento(documento)
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                "FONTE 2D.2 VÁLIDA: "
-                f"{resumo['eixos']} eixos, "
-                f"{resumo['subeixos']} subeixos, "
-                f"{resumo['setores']} setores, "
-                f"{resumo['subareas']} subáreas, "
-                f"{resumo['perguntas']} perguntas, "
-                f"{resumo['referencias_ocorrencias']} ocorrências de referências. "
-                f"SHA-256 do JSON: {sha256_arquivo}. "
-                "Equivalência canônica confirmada: "
-                f"{resumo['sha256_guia_canonico']}. "
-                "Nenhuma escrita foi realizada."
-            )
-        )
-
-    def _validar_documento(self, documento):
-        self._validar_objeto(
-            documento,
-            obrigatorias={
-                "formato",
-                "idioma_canonico",
-                "fonte_origem",
-                "versao",
-                "eixos",
-                "setores",
-            },
-            permitidas={
-                "formato",
-                "idioma_canonico",
-                "fonte_origem",
-                "versao",
-                "eixos",
-                "setores",
-            },
-            contexto="raiz",
-        )
-
-        if documento["formato"] != self.FORMATO:
-            raise CommandError(
-                f"raiz.formato deve ser exatamente {self.FORMATO!r}."
-            )
-
-        if documento["idioma_canonico"] != "es":
-            raise CommandError(
-                "raiz.idioma_canonico deve permanecer exatamente 'es'."
-            )
-
-        self._validar_fonte_origem(documento["fonte_origem"])
-        self._validar_versao(documento["versao"])
-
-        eixos = documento["eixos"]
-        setores = documento["setores"]
-
-        self._validar_lista(eixos, "raiz.eixos")
-        self._validar_lista(setores, "raiz.setores")
-
-        if len(eixos) != self.CONTAGENS_ESPERADAS["eixos"]:
-            raise CommandError(
-                "A fonte deve conter exatamente 3 eixos."
-            )
-
-        if len(setores) != self.CONTAGENS_ESPERADAS["setores"]:
-            raise CommandError(
-                "A fonte deve conter exatamente 9 setores."
-            )
-
-        estado = {
-            "eixos": len(eixos),
-            "subeixos": 0,
-            "setores": len(setores),
-            "subareas": 0,
-            "perguntas_eixo": 0,
-            "perguntas_subeixo": 0,
-            "perguntas_subarea": 0,
-            "perguntas": 0,
-            "cumplimiento": 0,
-            "gestion": 0,
-            "referencias_ocorrencias": 0,
-            "codigos_eixos": set(),
-            "codigos_subeixos": set(),
-            "codigos_setores": set(),
-            "codigos_subareas": set(),
-            "codigos_perguntas": set(),
-            "referencias_por_codigo": {},
-            "textos_perguntas": set(),
-            "textos_referencias": set(),
-        }
-
-        for indice, eixo in enumerate(eixos, start=1):
-            contexto = f"raiz.eixos[{indice}]"
-            self._validar_eixo(eixo, contexto, estado)
-
-        self._validar_ordens_contiguas(
-            eixos,
-            "raiz.eixos",
-        )
-
-        for indice, setor in enumerate(setores, start=1):
-            contexto = f"raiz.setores[{indice}]"
-            self._validar_setor(setor, contexto, estado)
-
-        self._validar_ordens_contiguas(
-            setores,
-            "raiz.setores",
-        )
-
-        estado["perguntas_textuais_unicas"] = len(
-            estado["textos_perguntas"]
-        )
-        estado["referencias_textuais_unicas"] = len(
-            estado["textos_referencias"]
-        )
-
-        for chave, esperado in self.CONTAGENS_ESPERADAS.items():
-            realizado = estado[chave]
-            if realizado != esperado:
-                raise CommandError(
-                    f"Contagem inválida para {chave}: "
-                    f"esperado {esperado}, encontrado {realizado}."
-                )
-
-        sha256_guia_canonico = (
-            self._validar_equivalencia_canonica(
-                documento
-            )
-        )
-
-        resumo = {
-            chave: estado[chave]
-            for chave in self.CONTAGENS_ESPERADAS
-        }
-        resumo["sha256_guia_canonico"] = (
-            sha256_guia_canonico
-        )
-
-        return resumo
-
-    def _validar_fonte_origem(self, fonte):
-        contexto = "raiz.fonte_origem"
-
-        self._validar_objeto(
-            fonte,
-            obrigatorias={
-                "arquivo",
-                "sha256_arquivo",
-                "sha256_guia",
-            },
-            permitidas={
-                "arquivo",
-                "sha256_arquivo",
-                "sha256_guia",
-            },
-            contexto=contexto,
-        )
-
-        self._validar_texto(
-            fonte["arquivo"],
-            f"{contexto}.arquivo",
-        )
-
-        sha_arquivo = self._validar_sha256(
-            fonte["sha256_arquivo"],
-            f"{contexto}.sha256_arquivo",
-        )
-        sha_guia = self._validar_sha256(
-            fonte["sha256_guia"],
-            f"{contexto}.sha256_guia",
-        )
-
-        if sha_arquivo != self.SHA256_ARQUIVO_ORIGEM:
-            raise CommandError(
-                "O SHA-256 do arquivo de origem não corresponde "
-                "à fonte auditada na Fase 2D.0."
-            )
-
-        if sha_guia != self.SHA256_GUIA_ORIGEM:
-            raise CommandError(
-                "O SHA-256 do objeto original PJC_DATA.guia não corresponde "
-                "à fonte auditada na Fase 2D.0."
-            )
-
-    def _validar_versao(self, versao):
-        contexto = "raiz.versao"
-
-        self._validar_objeto(
-            versao,
-            obrigatorias={"codigo", "fonte"},
-            permitidas={"codigo", "fonte"},
-            contexto=contexto,
-        )
-
-        self._validar_codigo(
-            versao["codigo"],
-            f"{contexto}.codigo",
-            tamanho_maximo=100,
-        )
-        self._validar_texto(
-            versao["fonte"],
-            f"{contexto}.fonte",
-        )
-
-    def _validar_eixo(self, eixo, contexto, estado):
-        self._validar_objeto(
-            eixo,
-            obrigatorias={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "perguntas",
-                "subeixos",
-            },
-            permitidas={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "perguntas",
-                "subeixos",
-            },
-            contexto=contexto,
-        )
-
-        self._validar_codigo_unico(
-            eixo["codigo"],
-            f"{contexto}.codigo",
-            estado["codigos_eixos"],
-        )
-        self._validar_texto(
-            eixo["nome_es"],
-            f"{contexto}.nome_es",
-        )
-        self._validar_ordem(
-            eixo["ordem"],
-            f"{contexto}.ordem",
-        )
-
-        self._validar_perguntas(
-            eixo["perguntas"],
-            f"{contexto}.perguntas",
-            estado,
-            "perguntas_eixo",
-        )
-
-        subeixos = eixo["subeixos"]
-        self._validar_lista(
-            subeixos,
-            f"{contexto}.subeixos",
-        )
-
-        for indice, subeixo in enumerate(subeixos, start=1):
-            self._validar_subeixo(
-                subeixo,
-                f"{contexto}.subeixos[{indice}]",
-                estado,
-            )
-
-        self._validar_ordens_contiguas(
-            subeixos,
-            f"{contexto}.subeixos",
-        )
-
-    def _validar_subeixo(self, subeixo, contexto, estado):
-        self._validar_objeto(
-            subeixo,
-            obrigatorias={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "perguntas",
-            },
-            permitidas={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "perguntas",
-            },
-            contexto=contexto,
-        )
-
-        self._validar_codigo_unico(
-            subeixo["codigo"],
-            f"{contexto}.codigo",
-            estado["codigos_subeixos"],
-        )
-        self._validar_texto(
-            subeixo["nome_es"],
-            f"{contexto}.nome_es",
-        )
-        self._validar_ordem(
-            subeixo["ordem"],
-            f"{contexto}.ordem",
-        )
-
-        estado["subeixos"] += 1
-
-        self._validar_perguntas(
-            subeixo["perguntas"],
-            f"{contexto}.perguntas",
-            estado,
-            "perguntas_subeixo",
-        )
-
-    def _validar_setor(self, setor, contexto, estado):
-        self._validar_objeto(
-            setor,
-            obrigatorias={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "subareas",
-            },
-            permitidas={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "subareas",
-            },
-            contexto=contexto,
-        )
-
-        self._validar_codigo_unico(
-            setor["codigo"],
-            f"{contexto}.codigo",
-            estado["codigos_setores"],
-        )
-        self._validar_texto(
-            setor["nome_es"],
-            f"{contexto}.nome_es",
-        )
-        self._validar_ordem(
-            setor["ordem"],
-            f"{contexto}.ordem",
-        )
-
-        subareas = setor["subareas"]
-        self._validar_lista(
-            subareas,
-            f"{contexto}.subareas",
-        )
-
-        for indice, subarea in enumerate(subareas, start=1):
-            self._validar_subarea(
-                subarea,
-                f"{contexto}.subareas[{indice}]",
-                estado,
-            )
-
-        self._validar_ordens_contiguas(
-            subareas,
-            f"{contexto}.subareas",
-        )
-
-    def _validar_subarea(self, subarea, contexto, estado):
-        self._validar_objeto(
-            subarea,
-            obrigatorias={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "perguntas",
-                "referencias",
-            },
-            permitidas={
-                "codigo",
-                "nome_es",
-                "ordem",
-                "perguntas",
-                "referencias",
-            },
-            contexto=contexto,
-        )
-
-        self._validar_codigo_unico(
-            subarea["codigo"],
-            f"{contexto}.codigo",
-            estado["codigos_subareas"],
-        )
-        self._validar_texto(
-            subarea["nome_es"],
-            f"{contexto}.nome_es",
-        )
-        self._validar_ordem(
-            subarea["ordem"],
-            f"{contexto}.ordem",
-        )
-
-        estado["subareas"] += 1
-
-        self._validar_perguntas(
-            subarea["perguntas"],
-            f"{contexto}.perguntas",
-            estado,
-            "perguntas_subarea",
-        )
-
-        referencias = subarea["referencias"]
-        self._validar_lista(
-            referencias,
-            f"{contexto}.referencias",
-        )
-
-        for indice, referencia in enumerate(referencias, start=1):
-            ref_contexto = f"{contexto}.referencias[{indice}]"
-
-            self._validar_objeto(
-                referencia,
-                obrigatorias={
-                    "codigo",
-                    "citacao_es",
-                    "ordem",
-                },
-                permitidas={
-                    "codigo",
-                    "citacao_es",
-                    "ordem",
-                },
-                contexto=ref_contexto,
-            )
-
-            codigo = self._validar_codigo(
-                referencia["codigo"],
-                f"{ref_contexto}.codigo",
-            )
-            citacao = self._validar_texto(
-                referencia["citacao_es"],
-                f"{ref_contexto}.citacao_es",
-            )
-            self._validar_ordem(
-                referencia["ordem"],
-                f"{ref_contexto}.ordem",
-            )
-
-            citacao_anterior = estado["referencias_por_codigo"].get(
-                codigo
-            )
-            if (
-                citacao_anterior is not None
-                and citacao_anterior != citacao
-            ):
-                raise CommandError(
-                    f"{ref_contexto}.codigo reutiliza {codigo!r} "
-                    "com citação diferente."
-                )
-
-            estado["referencias_por_codigo"][codigo] = citacao
-            estado["textos_referencias"].add(citacao)
-            estado["referencias_ocorrencias"] += 1
-
-        self._validar_ordens_contiguas(
-            referencias,
-            f"{contexto}.referencias",
-        )
-
-    def _validar_perguntas(
-        self,
-        bloco,
-        contexto,
-        estado,
-        contador_escopo,
-    ):
-        self._validar_objeto(
-            bloco,
-            obrigatorias={"cumplimiento", "gestion"},
-            permitidas={"cumplimiento", "gestion"},
-            contexto=contexto,
-        )
-
-        for tipo in ("cumplimiento", "gestion"):
-            perguntas = bloco[tipo]
-
-            self._validar_lista(
-                perguntas,
-                f"{contexto}.{tipo}",
-            )
-
-            for indice, pergunta in enumerate(perguntas, start=1):
-                pergunta_contexto = (
-                    f"{contexto}.{tipo}[{indice}]"
-                )
-
-                self._validar_objeto(
-                    pergunta,
-                    obrigatorias={
-                        "codigo",
-                        "texto_es",
-                        "ordem",
-                    },
-                    permitidas={
-                        "codigo",
-                        "texto_es",
-                        "ordem",
-                    },
-                    contexto=pergunta_contexto,
-                )
-
-                self._validar_codigo_unico(
-                    pergunta["codigo"],
-                    f"{pergunta_contexto}.codigo",
-                    estado["codigos_perguntas"],
-                )
-                texto = self._validar_texto(
-                    pergunta["texto_es"],
-                    f"{pergunta_contexto}.texto_es",
-                )
-                self._validar_ordem(
-                    pergunta["ordem"],
-                    f"{pergunta_contexto}.ordem",
-                )
-
-                estado["textos_perguntas"].add(texto)
-                estado[tipo] += 1
-                estado[contador_escopo] += 1
-                estado["perguntas"] += 1
-
-            self._validar_ordens_contiguas(
-                perguntas,
-                f"{contexto}.{tipo}",
-            )
-
-    def _validar_objeto(
-        self,
-        valor,
-        obrigatorias,
-        permitidas,
-        contexto,
-    ):
-        if not isinstance(valor, dict):
-            raise CommandError(
-                f"{contexto} deve ser um objeto JSON."
-            )
-
-        faltantes = obrigatorias - set(valor)
-        if faltantes:
-            raise CommandError(
-                f"{contexto} não possui campos obrigatórios: "
-                f"{', '.join(sorted(faltantes))}."
-            )
-
-        desconhecidas = set(valor) - permitidas
-        if desconhecidas:
-            raise CommandError(
-                f"{contexto} possui campos não homologados: "
-                f"{', '.join(sorted(desconhecidas))}."
-            )
-
-    def _validar_lista(self, valor, contexto):
-        if not isinstance(valor, list):
-            raise CommandError(
-                f"{contexto} deve ser uma lista JSON."
-            )
-
-    def _validar_codigo_unico(
-        self,
-        valor,
-        contexto,
-        conjunto,
-    ):
-        codigo = self._validar_codigo(
-            valor,
-            contexto,
-        )
-
-        if codigo in conjunto:
-            raise CommandError(
-                f"{contexto} repete o código {codigo!r}."
-            )
-
-        conjunto.add(codigo)
-        return codigo
-
-    def _validar_codigo(
-        self,
-        valor,
-        contexto,
-        tamanho_maximo=160,
-    ):
-        if not isinstance(valor, str) or not valor:
-            raise CommandError(
-                f"{contexto} deve ser um código não vazio."
-            )
-
-        if valor != valor.strip():
-            raise CommandError(
-                f"{contexto} não pode possuir espaços externos."
-            )
-
-        if len(valor) > tamanho_maximo:
-            raise CommandError(
-                f"{contexto} excede {tamanho_maximo} caracteres."
-            )
-
-        if not self.PADRAO_CODIGO.fullmatch(valor):
-            raise CommandError(
-                f"{contexto} deve usar somente letras ASCII, "
-                "números, hífen ou sublinhado."
-            )
-
-        return valor
-
-    def _validar_texto(self, valor, contexto):
-        if not isinstance(valor, str):
-            raise CommandError(
-                f"{contexto} deve ser texto."
-            )
-
-        if not valor.strip():
-            raise CommandError(
-                f"{contexto} não pode ser vazio."
-            )
-
-        if "\x00" in valor:
-            raise CommandError(
-                f"{contexto} contém caractere NUL inválido."
-            )
-
-        return valor
-
-    def _validar_ordem(self, valor, contexto):
-        if (
-            isinstance(valor, bool)
-            or not isinstance(valor, int)
-            or valor < 1
-        ):
-            raise CommandError(
-                f"{contexto} deve ser inteiro positivo."
-            )
-
-        return valor
-
-    def _validar_ordens_contiguas(
-        self,
-        itens,
-        contexto,
-    ):
-        ordens = [item["ordem"] for item in itens]
-
-        esperado = list(
-            range(
-                1,
-                len(itens) + 1,
-            )
-        )
-
-        if sorted(ordens) != esperado:
-            raise CommandError(
-                f"{contexto} deve possuir ordens únicas e "
-                f"contíguas de 1 a {len(itens)}."
-            )
-
-    def _ordenar_por_ordem(self, itens):
-        return sorted(
-            itens,
-            key=lambda item: item["ordem"],
-        )
-
-    def _textos_perguntas_ordenados(
-        self,
-        bloco,
-        tipo,
-    ):
-        return [
-            pergunta["texto_es"]
-            for pergunta in self._ordenar_por_ordem(
-                bloco[tipo]
-            )
-        ]
-
-    def _reconstruir_guia_canonico(
-        self,
-        documento,
-    ):
-        transversales = []
-
-        for eixo in self._ordenar_por_ordem(
-            documento["eixos"]
-        ):
-            subejes = []
-
-            for subeixo in self._ordenar_por_ordem(
-                eixo["subeixos"]
-            ):
-                subejes.append(
-                    {
-                        "nombre": subeixo["nome_es"],
-                        "cumplimiento": (
-                            self._textos_perguntas_ordenados(
-                                subeixo["perguntas"],
-                                "cumplimiento",
-                            )
-                        ),
-                        "gestion": (
-                            self._textos_perguntas_ordenados(
-                                subeixo["perguntas"],
-                                "gestion",
-                            )
-                        ),
-                    }
-                )
-
-            transversales.append(
-                {
-                    "nombre": eixo["nome_es"],
-                    "pregCumpl": (
-                        self._textos_perguntas_ordenados(
-                            eixo["perguntas"],
-                            "cumplimiento",
-                        )
-                    ),
-                    "pregGest": (
-                        self._textos_perguntas_ordenados(
-                            eixo["perguntas"],
-                            "gestion",
-                        )
-                    ),
-                    "subejes": subejes,
-                }
-            )
-
-        sectores = []
-
-        for setor in self._ordenar_por_ordem(
-            documento["setores"]
-        ):
-            subareas = []
-
-            for subarea in self._ordenar_por_ordem(
-                setor["subareas"]
-            ):
-                referencias = [
-                    referencia["citacao_es"]
-                    for referencia
-                    in self._ordenar_por_ordem(
-                        subarea["referencias"]
-                    )
-                ]
-
-                subareas.append(
-                    {
-                        "nombre": subarea["nome_es"],
-                        "cumplimiento": (
-                            self._textos_perguntas_ordenados(
-                                subarea["perguntas"],
-                                "cumplimiento",
-                            )
-                        ),
-                        "gestion": (
-                            self._textos_perguntas_ordenados(
-                                subarea["perguntas"],
-                                "gestion",
-                            )
-                        ),
-                        "referencias": referencias,
-                    }
-                )
-
-            sectores.append(
-                {
-                    "sector": setor["nome_es"],
-                    "subareas": subareas,
-                }
-            )
-
-        return {
-            "transversales": transversales,
-            "sectores": sectores,
-        }
-
-    def _serializar_guia_canonico(self, guia):
-        return json.dumps(
-            guia,
-            ensure_ascii=False,
-            separators=(",", ":"),
-        )
-
-    def _calcular_sha256_guia_canonico(
-        self,
-        documento,
-    ):
-        guia = self._reconstruir_guia_canonico(
-            documento
-        )
-
-        serializado = (
-            self._serializar_guia_canonico(
-                guia
-            )
-        )
-
-        return hashlib.sha256(
-            serializado.encode("utf-8")
-        ).hexdigest()
-
-    def _validar_equivalencia_canonica(
-        self,
-        documento,
-    ):
-        calculado = (
-            self._calcular_sha256_guia_canonico(
-                documento
-            )
-        )
-
-        esperado = self.SHA256_GUIA_ORIGEM
-
-        if calculado != esperado:
-            raise CommandError(
-                "O conteúdo espanhol codificado não é "
-                "canonicamente equivalente ao "
-                "PJC_DATA.guia auditado. "
-                f"SHA-256 esperado: {esperado}; "
-                f"SHA-256 reconstruído: {calculado}."
-            )
-
-        return calculado
-
-    def _validar_sha256(self, valor, contexto):
-        if (
-            not isinstance(valor, str)
-            or not re.fullmatch(
-                r"[0-9a-fA-F]{64}",
-                valor,
-            )
-        ):
-            raise CommandError(
-                f"{contexto} deve ser SHA-256 hexadecimal "
-                "com 64 caracteres."
-            )
-
-        return valor.lower()
+            resultado = ler_e_validar(options["arquivo"])
+        except ErroFonteGuia as exc:
+            raise CommandError(str(exc)) from exc
+        self.stdout.write(self.style.SUCCESS(f"FONTE VALIDA: {resultado['contagens']['perguntas']} perguntas; SHA-256 {resultado['sha256_guia']}."))

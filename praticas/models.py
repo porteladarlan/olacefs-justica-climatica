@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import get_language
 
 
@@ -1411,19 +1411,23 @@ class ConteudoGuiaProtegido(models.Model):
     def versao_guia(self):
         raise NotImplementedError
 
-    def _validar_versao_editavel(self):
+    def _validar_versao_editavel(self, *, bloquear=False):
         versao = self.versao_guia
+        if bloquear and versao and versao.pk:
+            versao = VersaoGuia.objects.select_for_update().get(pk=versao.pk)
         if versao and versao.situacao == VersaoGuia.Situacao.PUBLICADA:
             raise ValidationError("O conteudo de uma versao publicada e imutavel.")
 
     def save(self, *args, **kwargs):
-        self._validar_versao_editavel()
-        self.full_clean()
-        return super().save(*args, **kwargs)
+        with transaction.atomic():
+            self._validar_versao_editavel(bloquear=True)
+            self.full_clean()
+            return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self._validar_versao_editavel()
-        return super().delete(*args, **kwargs)
+        with transaction.atomic():
+            self._validar_versao_editavel(bloquear=True)
+            return super().delete(*args, **kwargs)
 
 
 class EixoGuia(ConteudoGuiaProtegido):
