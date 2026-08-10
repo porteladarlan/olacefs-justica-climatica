@@ -1,4 +1,6 @@
-# Deploy no Render — Plataforma OLACEFS Justiça Climática
+# Deploy legado/teste no Render — Plataforma OLACEFS Justiça Climática
+
+O Render permanece documentado apenas como ambiente legado/teste. Esta configuração não define a infraestrutura institucional futura.
 
 ## Arquivos deste pacote
 
@@ -48,7 +50,7 @@ Web Service:
 ```text
 Runtime: Python
 Build Command: bash build.sh
-Start Command: python manage.py migrate && python manage.py aplicar_retroalimentacao_formulario && python manage.py criar_usuarios_teste --confirmar --resetar-senha && gunicorn config.wsgi:application
+Start Command: gunicorn config.wsgi:application
 ```
 
 Variáveis:
@@ -56,6 +58,8 @@ Variáveis:
 ```text
 SECRET_KEY = gerar automaticamente ou colar uma chave Django
 DEBUG = False
+DJANGO_ENV = staging
+TRUST_X_FORWARDED_PROTO = True
 ALLOWED_HOSTS = .onrender.com,127.0.0.1,localhost
 CSRF_TRUSTED_ORIGINS = https://*.onrender.com
 DATABASE_URL = Internal Database URL do PostgreSQL
@@ -68,6 +72,8 @@ Banco:
 PostgreSQL
 Name: olacefs-justica-db
 ```
+
+O `build.sh` executa somente instalação de dependências, coleta de arquivos estáticos e migrations. O deploy não carrega dados demonstrativos, não aplica retroalimentação e não cria administradores ou usuários. Cargas e criação de usuários são operações manuais, conscientes e autorizadas; os comandos de gestão continuam disponíveis para esse uso controlado.
 
 ## Observação importante sobre anexos
 

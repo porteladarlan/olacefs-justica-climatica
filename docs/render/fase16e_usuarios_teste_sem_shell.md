@@ -34,17 +34,13 @@ python manage.py criar_usuarios_teste --confirmar --resetar-senha
 
 ## Execução no Render sem Shell
 
-Como o plano gratuito pode não permitir Shell/SSH, use o Start Command temporariamente.
+Não inclua criação de usuários no Build Command nem no Start Command, mesmo temporariamente. Use somente um mecanismo de execução manual e controlada disponibilizado pelo provedor. Se o ambiente não oferecer esse mecanismo, a criação deve ser coordenada com a operação responsável antes do teste.
 
-### 1. Start Command temporário
-
-No serviço do Render, altere temporariamente o Start Command para algo semelhante a:
+### 1. Comando manual
 
 ```bash
-python manage.py migrate && python manage.py criar_usuarios_teste --confirmar --resetar-senha && gunicorn config.wsgi:application
+python manage.py criar_usuarios_teste --confirmar --resetar-senha
 ```
-
-Depois faça redeploy.
 
 ### 2. Confirmar nos logs
 
@@ -56,17 +52,7 @@ OK  revisor_teste
 OK  usuario_teste
 ```
 
-### 3. Reverter Start Command
-
-Depois que os usuários forem criados, volte o Start Command ao padrão do projeto, por exemplo:
-
-```bash
-gunicorn config.wsgi:application
-```
-
-ou ao comando que já estava configurado no Render.
-
-### 4. Desativar variável de criação
+### 3. Desativar variável de criação
 
 Depois da criação, remova ou altere:
 

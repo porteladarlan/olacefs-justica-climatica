@@ -251,9 +251,9 @@ Comandos executados no build atual:
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py migrate
-python manage.py carregar_dados_ficticios
-python manage.py criar_admin_render
 ```
+
+O deploy não carrega dados demonstrativos, não aplica retroalimentação e não cria administrador. Essas operações permanecem disponíveis somente para execução manual, consciente e autorizada. O Render é mantido como ambiente legado/teste, sem definir a infraestrutura institucional futura. Ambientes de staging e produção usam PostgreSQL e as variáveis explícitas descritas na Fase 2F.
 
 Para ambiente de teste externo, recomenda-se revisar `docs/render/checklist_render_teste_externo.md`.
 

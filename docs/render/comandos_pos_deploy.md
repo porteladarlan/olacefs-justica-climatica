@@ -1,5 +1,7 @@
 # Comandos pós-deploy para o ambiente de teste
 
+Este documento é um catálogo de operações manuais. O pipeline padrão já executa migrations e `collectstatic`; ele não carrega dados demonstrativos, não aplica retroalimentação e não cria usuários. Os comandos que alteram dados ou acessos exigem decisão consciente e autorização antes da execução.
+
 ## 1. Rodar migrações
 
 ```bash
@@ -14,12 +16,16 @@ python manage.py collectstatic --noinput
 
 ## 3. Carregar dados demonstrativos
 
+Executar somente quando houver aprovação explícita para preparar ou alterar uma base de teste:
+
 ```bash
 python manage.py carregar_dados_ficticios
 python manage.py aplicar_retroalimentacao_formulario
 ```
 
 ## 4. Criar superusuário ou usuário staff
+
+Executar manualmente, com credenciais administradas fora do repositório:
 
 ```bash
 python manage.py createsuperuser

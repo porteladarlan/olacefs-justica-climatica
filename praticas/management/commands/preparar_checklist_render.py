@@ -24,10 +24,16 @@ class Command(BaseCommand):
         "python manage.py validar_entrega_final",
     ]
 
-    COMANDOS_RENDER = [
+    COMANDOS_BUILD = [
+        "pip install -r requirements.txt",
+        "python manage.py collectstatic --no-input",
         "python manage.py migrate",
-        "python manage.py collectstatic --noinput",
+    ]
+
+    OPERACOES_MANUAIS = [
         "python manage.py carregar_dados_ficticios --limpar-demo",
+        "python manage.py aplicar_retroalimentacao_formulario",
+        "python manage.py criar_admin_render",
     ]
 
     def add_arguments(self, parser):
@@ -59,12 +65,21 @@ class Command(BaseCommand):
             self.stdout.write(f"  - {comando}")
 
         self.stdout.write("")
-        self.stdout.write(self.style.MIGRATE_LABEL("3. Comandos pós-deploy no Render"))
-        for comando in self.COMANDOS_RENDER:
+        self.stdout.write(self.style.MIGRATE_LABEL("3. Operações técnicas automáticas do build"))
+        for comando in self.COMANDOS_BUILD:
             self.stdout.write(f"  - {comando}")
 
         self.stdout.write("")
-        self.stdout.write(self.style.MIGRATE_LABEL("4. Checklist manual mínimo"))
+        self.stdout.write(
+            self.style.MIGRATE_LABEL(
+                "4. Operações manuais, somente com decisão consciente e autorização"
+            )
+        )
+        for comando in self.OPERACOES_MANUAIS:
+            self.stdout.write(f"  - {comando}")
+
+        self.stdout.write("")
+        self.stdout.write(self.style.MIGRATE_LABEL("5. Checklist manual mínimo"))
         itens = [
             "Validar URL pública em PT/EN/ES.",
             "Confirmar dados demonstrativos no catálogo.",

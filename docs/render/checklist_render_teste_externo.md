@@ -32,23 +32,26 @@ Conferir no painel do Render:
 
 - [ ] `SECRET_KEY`
 - [ ] `DEBUG=False`
+- [ ] `DJANGO_ENV=staging`
+- [ ] `TRUST_X_FORWARDED_PROTO=True`
 - [ ] `ALLOWED_HOSTS`
 - [ ] `CSRF_TRUSTED_ORIGINS`
-- [ ] configuração de banco, se houver
+- [ ] `DATABASE_URL` apontando para PostgreSQL
 - [ ] configuração de arquivos/anexos, se houver
 - [ ] comando de build
 - [ ] comando de start
 
 ## Comandos esperados no ambiente
 
-Após deploy:
+Executados automaticamente pelo build:
 
 ```bash
+pip install -r requirements.txt
+python manage.py collectstatic --no-input
 python manage.py migrate
-python manage.py collectstatic --noinput
-python manage.py carregar_dados_ficticios
-python manage.py aplicar_retroalimentacao_formulario
 ```
+
+O deploy não carrega dados demonstrativos, não aplica retroalimentação e não cria administrador. Qualquer carga ou criação de usuário deve ser uma operação manual, consciente e autorizada.
 
 ## Validação manual da URL pública
 
