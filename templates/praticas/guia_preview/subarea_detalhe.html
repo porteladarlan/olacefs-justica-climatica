@@ -1,0 +1,42 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{{ subarea.nome_es }} | {% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/guia-preview.css' %}">{% endblock %}
+
+{% block content %}
+<div class="guia-preview">
+    <nav class="guia-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
+        <ol>
+            <li><a href="{% url 'guia_preview_inicio' %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
+            <li><a href="{% url 'guia_preview_setores' %}">{% if LANGUAGE_CODE == 'en' %}Sectors{% elif LANGUAGE_CODE == 'es' %}Sectores{% else %}Setores{% endif %}</a></li>
+            <li lang="es"><a href="{% url 'guia_preview_setor' setor_codigo=setor.codigo %}">{{ setor.nome_es }}</a></li>
+            <li lang="es" aria-current="page">{{ subarea.nome_es }}</li>
+        </ol>
+    </nav>
+
+    {% include 'praticas/guia_preview/_cabecalho.html' with titulo=subarea.nome_es titulo_institucional=True %}
+
+    <section class="guia-section" aria-labelledby="perguntas-subarea">
+        <div class="guia-section-heading"><h2 id="perguntas-subarea">{% if LANGUAGE_CODE == 'en' %}Questions{% elif LANGUAGE_CODE == 'es' %}Preguntas{% else %}Perguntas{% endif %}</h2></div>
+        <div class="guia-question-groups">
+            {% include 'praticas/guia_preview/_perguntas.html' with perguntas=perguntas_cumplimiento tipo='cumplimiento' %}
+            {% include 'praticas/guia_preview/_perguntas.html' with perguntas=perguntas_gestion tipo='gestion' %}
+        </div>
+    </section>
+
+    <section class="guia-section" aria-labelledby="referencias-subarea">
+        <div class="guia-section-heading"><h2 id="referencias-subarea">{% if LANGUAGE_CODE == 'en' %}References{% elif LANGUAGE_CODE == 'es' %}Referencias{% else %}Refer&ecirc;ncias{% endif %}</h2></div>
+        {% if ocorrencias_referencias %}
+            <ol class="guia-reference-list">
+                {% for ocorrencia in ocorrencias_referencias %}
+                    <li><p lang="es">{{ ocorrencia.referencia.citacao_es }}</p></li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="guia-empty"><p>{% if LANGUAGE_CODE == 'en' %}No references are available for this subarea.{% elif LANGUAGE_CODE == 'es' %}No hay referencias disponibles para esta sub&aacute;rea.{% else %}N&atilde;o h&aacute; refer&ecirc;ncias dispon&iacute;veis para esta sub&aacute;rea.{% endif %}</p></div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

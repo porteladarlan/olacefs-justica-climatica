@@ -1,0 +1,55 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Sectors{% elif LANGUAGE_CODE == 'es' %}Sectores{% else %}Setores{% endif %} | {% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/guia-preview.css' %}">{% endblock %}
+
+{% block content %}
+<div class="guia-preview">
+    <nav class="guia-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
+        <ol>
+            <li><a href="{% url 'guia_preview_inicio' %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
+            <li aria-current="page">{% if LANGUAGE_CODE == 'en' %}Sectors{% elif LANGUAGE_CODE == 'es' %}Sectores{% else %}Setores{% endif %}</li>
+        </ol>
+    </nav>
+
+    {% if versao %}
+    {% if LANGUAGE_CODE == 'en' %}
+        {% include 'praticas/guia_preview/_cabecalho.html' with titulo='Sectors' subtitulo='Browse sectors and their institutional subareas.' %}
+    {% elif LANGUAGE_CODE == 'es' %}
+        {% include 'praticas/guia_preview/_cabecalho.html' with titulo='Sectores' subtitulo='Consulte los sectores y sus subáreas institucionales.' %}
+    {% else %}
+        {% include 'praticas/guia_preview/_cabecalho.html' with titulo='Setores' subtitulo='Consulte os setores e suas subáreas institucionais.' %}
+    {% endif %}
+
+    <section class="guia-section" aria-labelledby="lista-setores">
+        <div class="guia-section-heading"><h2 id="lista-setores">{% if LANGUAGE_CODE == 'en' %}Available sectors{% elif LANGUAGE_CODE == 'es' %}Sectores disponibles{% else %}Setores dispon&iacute;veis{% endif %}</h2></div>
+        {% if setores %}
+            <ol class="guia-grid">
+                {% for setor in setores %}
+                    <li>
+                        <article class="guia-card">
+                            <span class="guia-card-order">{% if LANGUAGE_CODE == 'en' %}Position{% elif LANGUAGE_CODE == 'es' %}Posici&oacute;n{% else %}Posi&ccedil;&atilde;o{% endif %} {{ setor.ordem }}</span>
+                            <h3 lang="es"><a class="guia-card-link" href="{% url 'guia_preview_setor' setor_codigo=setor.codigo %}">{{ setor.nome_es }}</a></h3>
+                            <div class="guia-card-meta">
+                                <span>{{ setor.total_subareas }} {% if setor.total_subareas == 1 %}{% if LANGUAGE_CODE == 'en' %}subarea{% elif LANGUAGE_CODE == 'es' %}sub&aacute;rea{% else %}sub&aacute;rea{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}subareas{% elif LANGUAGE_CODE == 'es' %}sub&aacute;reas{% else %}sub&aacute;reas{% endif %}{% endif %}</span>
+                            </div>
+                        </article>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="guia-empty"><p>{% if LANGUAGE_CODE == 'en' %}No sectors are available in this version.{% elif LANGUAGE_CODE == 'es' %}No hay sectores disponibles en esta versi&oacute;n.{% else %}N&atilde;o h&aacute; setores dispon&iacute;veis nesta vers&atilde;o.{% endif %}</p></div>
+        {% endif %}
+    </section>
+    {% else %}
+        <section class="guia-section" aria-labelledby="guia-indisponivel">
+            <div class="guia-empty">
+                <h1 id="guia-indisponivel">{% if LANGUAGE_CODE == 'en' %}Preview unavailable{% elif LANGUAGE_CODE == 'es' %}Vista previa no disponible{% else %}Pr&eacute;via indispon&iacute;vel{% endif %}</h1>
+                <p>{% if LANGUAGE_CODE == 'en' %}There is no current published version available.{% elif LANGUAGE_CODE == 'es' %}No hay una versi&oacute;n publicada vigente disponible.{% else %}N&atilde;o existe vers&atilde;o publicada vigente dispon&iacute;vel.{% endif %}</p>
+            </div>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

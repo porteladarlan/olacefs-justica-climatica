@@ -37,3 +37,10 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 - Implementados importação atômica em rascunho, idempotência, divergências, lote e ledger.
 - Implementadas reversão conservadora por lote e publicação/versionamento em operação separada.
 - Adicionada cobertura direcionada com fixture sintética; nenhuma migration foi necessária.
+# 2026-08-09 — Fase 2D.3: preview interna do Guia
+
+- Criada preview interna somente leitura, restrita a staff/revisor.
+- Implementada navegação por eixos, subeixos, setores, subáreas, perguntas e referências da versão publicada vigente.
+- Preservado o conteúdo institucional em espanhol, sem tradução ou fallback definitivo.
+- Adicionados isolamento por versão, validação hierárquica, estados vazios e testes sintéticos, sem migration.
+- Permanecem pendentes GUIA-01, GUIA-05, GUIA-06 e GUIA-08 a GUIA-13.
