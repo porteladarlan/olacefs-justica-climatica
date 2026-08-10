@@ -23,7 +23,7 @@
         <section class="guia-section" aria-labelledby="titulo-eixos">
             <div class="guia-section-heading">
                 <h2 id="titulo-eixos">{% if LANGUAGE_CODE == 'en' %}Cross-cutting axes{% elif LANGUAGE_CODE == 'es' %}Ejes transversales{% else %}Eixos transversais{% endif %}</h2>
-                <a href="{% url 'guia_preview_eixos' %}">{% if LANGUAGE_CODE == 'en' %}View all{% elif LANGUAGE_CODE == 'es' %}Ver todos{% else %}Ver todos{% endif %}</a>
+                <a href="{% url guia_rota_eixos %}">{% if LANGUAGE_CODE == 'en' %}View all{% elif LANGUAGE_CODE == 'es' %}Ver todos{% else %}Ver todos{% endif %}</a>
             </div>
             {% if eixos %}
                 <ol class="guia-grid">
@@ -31,7 +31,7 @@
                         <li>
                             <article class="guia-card">
                                 <span class="guia-card-order">{% if LANGUAGE_CODE == 'en' %}Axis{% elif LANGUAGE_CODE == 'es' %}Eje{% else %}Eixo{% endif %} {{ eixo.ordem }}</span>
-                                <h3 lang="es"><a class="guia-card-link" href="{% url 'guia_preview_eixo' eixo_codigo=eixo.codigo %}">{{ eixo.nome_es }}</a></h3>
+                                <h3 lang="es"><a class="guia-card-link" href="{% url guia_rota_eixo eixo_codigo=eixo.codigo %}">{{ eixo.nome_es }}</a></h3>
                             </article>
                         </li>
                     {% endfor %}
@@ -44,7 +44,7 @@
         <section class="guia-section" aria-labelledby="titulo-setores">
             <div class="guia-section-heading">
                 <h2 id="titulo-setores">{% if LANGUAGE_CODE == 'en' %}Sectors{% elif LANGUAGE_CODE == 'es' %}Sectores{% else %}Setores{% endif %}</h2>
-                <a href="{% url 'guia_preview_setores' %}">{% if LANGUAGE_CODE == 'en' %}View all{% elif LANGUAGE_CODE == 'es' %}Ver todos{% else %}Ver todos{% endif %}</a>
+                <a href="{% url guia_rota_setores %}">{% if LANGUAGE_CODE == 'en' %}View all{% elif LANGUAGE_CODE == 'es' %}Ver todos{% else %}Ver todos{% endif %}</a>
             </div>
             {% if setores %}
                 <ol class="guia-grid">
@@ -52,7 +52,7 @@
                         <li>
                             <article class="guia-card">
                                 <span class="guia-card-order">{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %} {{ setor.ordem }}</span>
-                                <h3 lang="es"><a class="guia-card-link" href="{% url 'guia_preview_setor' setor_codigo=setor.codigo %}">{{ setor.nome_es }}</a></h3>
+                                <h3 lang="es"><a class="guia-card-link" href="{% url guia_rota_setor setor_codigo=setor.codigo %}">{{ setor.nome_es }}</a></h3>
                             </article>
                         </li>
                     {% endfor %}
@@ -64,13 +64,13 @@
     {% else %}
         <div class="guia-header">
             <div class="guia-header-copy">
-                <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Internal preview{% elif LANGUAGE_CODE == 'es' %}Vista previa interna{% else %}Pr&eacute;via interna{% endif %}</div>
+                {% if guia_preview_interna %}<div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Internal preview{% elif LANGUAGE_CODE == 'es' %}Vista previa interna{% else %}Pr&eacute;via interna{% endif %}</div>{% endif %}
                 <h1>{% if LANGUAGE_CODE == 'en' %}Climate Justice Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a de Justicia Clim&aacute;tica{% else %}Guia de Justi&ccedil;a Clim&aacute;tica{% endif %}</h1>
             </div>
         </div>
         <section class="guia-section" aria-labelledby="guia-indisponivel">
             <div class="guia-empty">
-                <h2 id="guia-indisponivel">{% if LANGUAGE_CODE == 'en' %}Preview unavailable{% elif LANGUAGE_CODE == 'es' %}Vista previa no disponible{% else %}Pr&eacute;via indispon&iacute;vel{% endif %}</h2>
+                <h2 id="guia-indisponivel">{% if guia_preview_interna %}{% if LANGUAGE_CODE == 'en' %}Preview unavailable{% elif LANGUAGE_CODE == 'es' %}Vista previa no disponible{% else %}Pr&eacute;via indispon&iacute;vel{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Guide unavailable{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a no disponible{% else %}Guia indispon&iacute;vel{% endif %}{% endif %}</h2>
                 <p>{% if LANGUAGE_CODE == 'en' %}There is no current published version available.{% elif LANGUAGE_CODE == 'es' %}No hay una versi&oacute;n publicada vigente disponible.{% else %}N&atilde;o existe vers&atilde;o publicada vigente dispon&iacute;vel.{% endif %}</p>
             </div>
         </section>

@@ -9,7 +9,7 @@
 <div class="guia-preview">
     <nav class="guia-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
         <ol>
-            <li><a href="{% url 'guia_preview_inicio' %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
+            <li><a href="{% url guia_rota_inicio %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
             <li aria-current="page">{% if LANGUAGE_CODE == 'en' %}Axes{% elif LANGUAGE_CODE == 'es' %}Ejes{% else %}Eixos{% endif %}</li>
         </ol>
     </nav>
@@ -31,7 +31,7 @@
                     <li>
                         <article class="guia-card">
                             <span class="guia-card-order">{% if LANGUAGE_CODE == 'en' %}Position{% elif LANGUAGE_CODE == 'es' %}Posici&oacute;n{% else %}Posi&ccedil;&atilde;o{% endif %} {{ eixo.ordem }}</span>
-                            <h3 lang="es"><a class="guia-card-link" href="{% url 'guia_preview_eixo' eixo_codigo=eixo.codigo %}">{{ eixo.nome_es }}</a></h3>
+                            <h3 lang="es"><a class="guia-card-link" href="{% url guia_rota_eixo eixo_codigo=eixo.codigo %}">{{ eixo.nome_es }}</a></h3>
                             <div class="guia-card-meta">
                                 <span>{{ eixo.total_subeixos }} {% if eixo.total_subeixos == 1 %}{% if LANGUAGE_CODE == 'en' %}sub-axis{% elif LANGUAGE_CODE == 'es' %}subeje{% else %}subeixo{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}sub-axes{% elif LANGUAGE_CODE == 'es' %}subejes{% else %}subeixos{% endif %}{% endif %}</span>
                                 <span>{{ eixo.total_perguntas }} {% if eixo.total_perguntas == 1 %}{% if LANGUAGE_CODE == 'en' %}question{% elif LANGUAGE_CODE == 'es' %}pregunta{% else %}pergunta{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}questions{% elif LANGUAGE_CODE == 'es' %}preguntas{% else %}perguntas{% endif %}{% endif %}</span>
@@ -47,7 +47,7 @@
     {% else %}
         <section class="guia-section" aria-labelledby="guia-indisponivel">
             <div class="guia-empty">
-                <h1 id="guia-indisponivel">{% if LANGUAGE_CODE == 'en' %}Preview unavailable{% elif LANGUAGE_CODE == 'es' %}Vista previa no disponible{% else %}Pr&eacute;via indispon&iacute;vel{% endif %}</h1>
+                <h1 id="guia-indisponivel">{% if guia_preview_interna %}{% if LANGUAGE_CODE == 'en' %}Preview unavailable{% elif LANGUAGE_CODE == 'es' %}Vista previa no disponible{% else %}Pr&eacute;via indispon&iacute;vel{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Guide unavailable{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a no disponible{% else %}Guia indispon&iacute;vel{% endif %}{% endif %}</h1>
                 <p>{% if LANGUAGE_CODE == 'en' %}There is no current published version available.{% elif LANGUAGE_CODE == 'es' %}No hay una versi&oacute;n publicada vigente disponible.{% else %}N&atilde;o existe vers&atilde;o publicada vigente dispon&iacute;vel.{% endif %}</p>
             </div>
         </section>

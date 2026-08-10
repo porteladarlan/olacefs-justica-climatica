@@ -48,3 +48,7 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 # 2026-08-09 — Fase 2D.4: hardening técnico do Guia
 
 - Reforçado o isolamento explícito por versão nos relacionamentos da preview e restringidas suas views a GET/HEAD, com cobertura para métodos rejeitados, versão e hierarquia, sem migration.
+
+# 2026-08-10 — Fase 2D.5: Guia público MVP
+
+- Publicada a navegação somente leitura do Guia por eixos, subeixos, setores e subáreas, reutilizando seletores e interface da preview, com conteúdo institucional preservado em espanhol e sem migration.

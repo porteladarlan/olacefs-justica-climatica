@@ -1,6 +1,6 @@
 <header class="guia-header">
     <div class="guia-header-copy">
-        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Internal preview{% elif LANGUAGE_CODE == 'es' %}Vista previa interna{% else %}Pr&eacute;via interna{% endif %}</div>
+        {% if guia_preview_interna %}<div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Internal preview{% elif LANGUAGE_CODE == 'es' %}Vista previa interna{% else %}Pr&eacute;via interna{% endif %}</div>{% endif %}
         <h1 lang="{% if titulo_institucional %}es{% else %}{{ LANGUAGE_CODE }}{% endif %}">{{ titulo }}</h1>
         {% if subtitulo %}<p>{{ subtitulo }}</p>{% endif %}
     </div>
