@@ -56,3 +56,7 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 # 2026-08-10 — Fase 2F: preparação técnica para homologação
 
 - Tornada explícita e fail-closed a configuração de staging/produção para segredos, hosts, CSRF, banco, cookies e proxy HTTPS, preservando desenvolvimento local com SQLite e sem definir infraestrutura institucional.
+
+# 2026-08-10 — Fase 2G: hardening do pipeline de deploy
+
+- Restrito o build automático a dependências, arquivos estáticos e migrations; cargas, retroalimentação e criação de administradores permanecem somente como operações manuais controladas.
