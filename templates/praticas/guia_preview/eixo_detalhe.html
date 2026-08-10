@@ -1,0 +1,46 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{{ eixo.nome_es }} | {% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/guia-preview.css' %}">{% endblock %}
+
+{% block content %}
+<div class="guia-preview">
+    <nav class="guia-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
+        <ol>
+            <li><a href="{% url 'guia_preview_inicio' %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
+            <li><a href="{% url 'guia_preview_eixos' %}">{% if LANGUAGE_CODE == 'en' %}Axes{% elif LANGUAGE_CODE == 'es' %}Ejes{% else %}Eixos{% endif %}</a></li>
+            <li lang="es" aria-current="page">{{ eixo.nome_es }}</li>
+        </ol>
+    </nav>
+
+    {% include 'praticas/guia_preview/_cabecalho.html' with titulo=eixo.nome_es titulo_institucional=True %}
+
+    <section class="guia-section" aria-labelledby="lista-subeixos">
+        <div class="guia-section-heading"><h2 id="lista-subeixos">{% if LANGUAGE_CODE == 'en' %}Sub-axes{% elif LANGUAGE_CODE == 'es' %}Subejes{% else %}Subeixos{% endif %}</h2></div>
+        {% if subeixos %}
+            <ol class="guia-grid">
+                {% for subeixo in subeixos %}
+                    <li>
+                        <article class="guia-card">
+                            <span class="guia-card-order">{% if LANGUAGE_CODE == 'en' %}Position{% elif LANGUAGE_CODE == 'es' %}Posici&oacute;n{% else %}Posi&ccedil;&atilde;o{% endif %} {{ subeixo.ordem }}</span>
+                            <h3 lang="es"><a class="guia-card-link" href="{% url 'guia_preview_subeixo' eixo_codigo=eixo.codigo subeixo_codigo=subeixo.codigo %}">{{ subeixo.nome_es }}</a></h3>
+                        </article>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="guia-empty"><p>{% if LANGUAGE_CODE == 'en' %}No sub-axes are available for this axis.{% elif LANGUAGE_CODE == 'es' %}No hay subejes disponibles para este eje.{% else %}N&atilde;o h&aacute; subeixos dispon&iacute;veis para este eixo.{% endif %}</p></div>
+        {% endif %}
+    </section>
+
+    <section class="guia-section" aria-labelledby="perguntas-diretas">
+        <div class="guia-section-heading"><h2 id="perguntas-diretas">{% if LANGUAGE_CODE == 'en' %}Questions directly associated with the axis{% elif LANGUAGE_CODE == 'es' %}Preguntas asociadas directamente al eje{% else %}Perguntas associadas diretamente ao eixo{% endif %}</h2></div>
+        <div class="guia-question-groups">
+            {% include 'praticas/guia_preview/_perguntas.html' with perguntas=perguntas_cumplimiento tipo='cumplimiento' %}
+            {% include 'praticas/guia_preview/_perguntas.html' with perguntas=perguntas_gestion tipo='gestion' %}
+        </div>
+    </section>
+</div>
+{% endblock %}

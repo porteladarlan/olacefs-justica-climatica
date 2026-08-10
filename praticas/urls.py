@@ -27,4 +27,27 @@ urlpatterns = [
     path("banco-tecnico/", views.banco_tecnico, name="banco_tecnico"),
     path("ferramentas/", views.ferramentas, name="ferramentas"),
     path("sobre/", views.sobre_plataforma, name="sobre_plataforma"),
+    path("guia/preview/", views.guia_preview_inicio, name="guia_preview_inicio"),
+    path("guia/preview/eixos/", views.guia_preview_eixos, name="guia_preview_eixos"),
+    path(
+        "guia/preview/eixos/<slug:eixo_codigo>/",
+        views.guia_preview_eixo,
+        name="guia_preview_eixo",
+    ),
+    path(
+        "guia/preview/eixos/<slug:eixo_codigo>/subeixos/<slug:subeixo_codigo>/",
+        views.guia_preview_subeixo,
+        name="guia_preview_subeixo",
+    ),
+    path("guia/preview/setores/", views.guia_preview_setores, name="guia_preview_setores"),
+    path(
+        "guia/preview/setores/<slug:setor_codigo>/",
+        views.guia_preview_setor,
+        name="guia_preview_setor",
+    ),
+    path(
+        "guia/preview/setores/<slug:setor_codigo>/subareas/<slug:subarea_codigo>/",
+        views.guia_preview_subarea,
+        name="guia_preview_subarea",
+    ),
 ]

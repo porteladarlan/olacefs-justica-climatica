@@ -1,0 +1,20 @@
+<section class="guia-question-group" aria-labelledby="perguntas-{{ tipo }}">
+    <h3 id="perguntas-{{ tipo }}">
+        {% if tipo == 'cumplimiento' %}
+            {% if LANGUAGE_CODE == 'en' %}Compliance{% elif LANGUAGE_CODE == 'es' %}Cumplimiento{% else %}Conformidade{% endif %}
+        {% else %}
+            {% if LANGUAGE_CODE == 'en' %}Management{% elif LANGUAGE_CODE == 'es' %}Gesti&oacute;n{% else %}Gest&atilde;o{% endif %}
+        {% endif %}
+    </h3>
+    {% if perguntas %}
+        <ol class="guia-question-list">
+            {% for pergunta in perguntas %}
+                <li><p lang="es">{{ pergunta.texto_es }}</p></li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p class="guia-inline-empty">
+            {% if LANGUAGE_CODE == 'en' %}No questions in this group.{% elif LANGUAGE_CODE == 'es' %}No hay preguntas en este grupo.{% else %}N&atilde;o h&aacute; perguntas neste grupo.{% endif %}
+        </p>
+    {% endif %}
+</section>

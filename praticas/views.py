@@ -37,6 +37,16 @@ from .models import (
     TemaTransversal,
     TipoExperiencia,
 )
+from .seletores_guia_preview import (
+    listar_eixos,
+    listar_setores,
+    obter_versao_publicada_vigente,
+    queryset_eixo_detalhado,
+    queryset_setor_detalhado,
+    queryset_subarea_detalhada,
+    queryset_subeixo_detalhado,
+    separar_perguntas_por_tipo,
+)
 
 # Configurações padrão para anexos.
 # Mantém compatibilidade com as três posições disponíveis nos formulários.
@@ -243,6 +253,14 @@ def _url_http_segura(valor):
 
 def ferramentas_catalogadas():
     return Ferramenta.objects.filter(situacao=Ferramenta.Situacao.PUBLICADA)
+
+
+def _contexto_perguntas(perguntas):
+    cumplimiento, gestion = separar_perguntas_por_tipo(perguntas)
+    return {
+        "perguntas_cumplimiento": cumplimiento,
+        "perguntas_gestion": gestion,
+    }
 
 
 STATUS_VISIVEIS_REVISAO = [
@@ -1586,3 +1604,110 @@ def ferramentas(request):
 
 def sobre_plataforma(request):
     return render(request, "praticas/sobre_plataforma.html")
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_inicio(request):
+    versao = obter_versao_publicada_vigente()
+    return render(
+        request,
+        "praticas/guia_preview/inicio.html",
+        {
+            "versao": versao,
+            "eixos": listar_eixos(versao) if versao else (),
+            "setores": listar_setores(versao) if versao else (),
+        },
+    )
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_eixos(request):
+    versao = obter_versao_publicada_vigente()
+    return render(
+        request,
+        "praticas/guia_preview/eixos.html",
+        {
+            "versao": versao,
+            "eixos": listar_eixos(versao) if versao else (),
+        },
+    )
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_eixo(request, eixo_codigo):
+    versao = obter_versao_publicada_vigente()
+    eixo = get_object_or_404(
+        queryset_eixo_detalhado(versao),
+        codigo=eixo_codigo,
+    )
+    contexto = {
+        "versao": versao,
+        "eixo": eixo,
+        "subeixos": eixo.subeixos_preview,
+    }
+    contexto.update(_contexto_perguntas(eixo.perguntas_preview))
+    return render(request, "praticas/guia_preview/eixo_detalhe.html", contexto)
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_subeixo(request, eixo_codigo, subeixo_codigo):
+    versao = obter_versao_publicada_vigente()
+    subeixo = get_object_or_404(
+        queryset_subeixo_detalhado(versao, eixo_codigo),
+        codigo=subeixo_codigo,
+    )
+    contexto = {
+        "versao": versao,
+        "eixo": subeixo.eixo,
+        "subeixo": subeixo,
+    }
+    contexto.update(_contexto_perguntas(subeixo.perguntas_preview))
+    return render(request, "praticas/guia_preview/subeixo_detalhe.html", contexto)
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_setores(request):
+    versao = obter_versao_publicada_vigente()
+    return render(
+        request,
+        "praticas/guia_preview/setores.html",
+        {
+            "versao": versao,
+            "setores": listar_setores(versao) if versao else (),
+        },
+    )
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_setor(request, setor_codigo):
+    versao = obter_versao_publicada_vigente()
+    setor = get_object_or_404(
+        queryset_setor_detalhado(versao),
+        codigo=setor_codigo,
+    )
+    return render(
+        request,
+        "praticas/guia_preview/setor_detalhe.html",
+        {
+            "versao": versao,
+            "setor": setor,
+            "subareas": setor.subareas_preview,
+        },
+    )
+
+
+@staff_member_required(login_url="login_usuario")
+def guia_preview_subarea(request, setor_codigo, subarea_codigo):
+    versao = obter_versao_publicada_vigente()
+    subarea = get_object_or_404(
+        queryset_subarea_detalhada(versao, setor_codigo),
+        codigo=subarea_codigo,
+    )
+    contexto = {
+        "versao": versao,
+        "setor": subarea.setor,
+        "subarea": subarea,
+        "ocorrencias_referencias": subarea.ocorrencias_referencias_preview,
+    }
+    contexto.update(_contexto_perguntas(subarea.perguntas_preview))
+    return render(request, "praticas/guia_preview/subarea_detalhe.html", contexto)

@@ -1,0 +1,14 @@
+<header class="guia-header">
+    <div class="guia-header-copy">
+        <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Internal preview{% elif LANGUAGE_CODE == 'es' %}Vista previa interna{% else %}Pr&eacute;via interna{% endif %}</div>
+        <h1 lang="{% if titulo_institucional %}es{% else %}{{ LANGUAGE_CODE }}{% endif %}">{{ titulo }}</h1>
+        {% if subtitulo %}<p>{{ subtitulo }}</p>{% endif %}
+    </div>
+    {% if versao %}
+        <div class="guia-version">
+            <span>{% if LANGUAGE_CODE == 'en' %}Institutional version{% elif LANGUAGE_CODE == 'es' %}Versi&oacute;n institucional{% else %}Vers&atilde;o institucional{% endif %}</span>
+            <strong>{{ versao.codigo }}</strong>
+            <span>{% if LANGUAGE_CODE == 'en' %}Institutional content in Spanish{% elif LANGUAGE_CODE == 'es' %}Contenido institucional en espa&ntilde;ol{% else %}Conte&uacute;do institucional em espanhol{% endif %}</span>
+        </div>
+    {% endif %}
+</header>
