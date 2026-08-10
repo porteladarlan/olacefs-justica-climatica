@@ -9,6 +9,10 @@ services:
         value: 3.12.7
       - key: DEBUG
         value: "False"
+      - key: DJANGO_ENV
+        value: staging
+      - key: TRUST_X_FORWARDED_PROTO
+        value: "True"
       - key: ALLOWED_HOSTS
         value: ".onrender.com,127.0.0.1,localhost"
       - key: CSRF_TRUSTED_ORIGINS
