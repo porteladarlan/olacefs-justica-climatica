@@ -9,8 +9,8 @@
 <div class="guia-preview">
     <nav class="guia-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegaci&oacute;n{% else %}Trilha de navega&ccedil;&atilde;o{% endif %}">
         <ol>
-            <li><a href="{% url 'guia_preview_inicio' %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
-            <li><a href="{% url 'guia_preview_setores' %}">{% if LANGUAGE_CODE == 'en' %}Sectors{% elif LANGUAGE_CODE == 'es' %}Sectores{% else %}Setores{% endif %}</a></li>
+            <li><a href="{% url guia_rota_inicio %}">{% if LANGUAGE_CODE == 'en' %}Guide{% elif LANGUAGE_CODE == 'es' %}Gu&iacute;a{% else %}Guia{% endif %}</a></li>
+            <li><a href="{% url guia_rota_setores %}">{% if LANGUAGE_CODE == 'en' %}Sectors{% elif LANGUAGE_CODE == 'es' %}Sectores{% else %}Setores{% endif %}</a></li>
             <li lang="es" aria-current="page">{{ setor.nome_es }}</li>
         </ol>
     </nav>
@@ -25,7 +25,7 @@
                     <li>
                         <article class="guia-card">
                             <span class="guia-card-order">{% if LANGUAGE_CODE == 'en' %}Position{% elif LANGUAGE_CODE == 'es' %}Posici&oacute;n{% else %}Posi&ccedil;&atilde;o{% endif %} {{ subarea.ordem }}</span>
-                            <h3 lang="es"><a class="guia-card-link" href="{% url 'guia_preview_subarea' setor_codigo=setor.codigo subarea_codigo=subarea.codigo %}">{{ subarea.nome_es }}</a></h3>
+                            <h3 lang="es"><a class="guia-card-link" href="{% url guia_rota_subarea setor_codigo=setor.codigo subarea_codigo=subarea.codigo %}">{{ subarea.nome_es }}</a></h3>
                         </article>
                     </li>
                 {% endfor %}

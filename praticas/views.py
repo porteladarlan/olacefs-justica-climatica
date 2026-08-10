@@ -1606,38 +1606,62 @@ def sobre_plataforma(request):
     return render(request, "praticas/sobre_plataforma.html")
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_inicio(request):
+GUIA_ROTAS_PUBLICAS = {
+    "guia_rota_inicio": "guia_inicio",
+    "guia_rota_eixos": "guia_eixos",
+    "guia_rota_eixo": "guia_eixo",
+    "guia_rota_subeixo": "guia_subeixo",
+    "guia_rota_setores": "guia_setores",
+    "guia_rota_setor": "guia_setor",
+    "guia_rota_subarea": "guia_subarea",
+}
+
+GUIA_ROTAS_PREVIEW = {
+    "guia_rota_inicio": "guia_preview_inicio",
+    "guia_rota_eixos": "guia_preview_eixos",
+    "guia_rota_eixo": "guia_preview_eixo",
+    "guia_rota_subeixo": "guia_preview_subeixo",
+    "guia_rota_setores": "guia_preview_setores",
+    "guia_rota_setor": "guia_preview_setor",
+    "guia_rota_subarea": "guia_preview_subarea",
+}
+
+
+def _contexto_navegacao_guia(*, preview_interna):
+    rotas = GUIA_ROTAS_PREVIEW if preview_interna else GUIA_ROTAS_PUBLICAS
+    return {"guia_preview_interna": preview_interna, **rotas}
+
+
+def _render_guia_inicio(request, *, preview_interna):
     versao = obter_versao_publicada_vigente()
+    contexto = {
+        "versao": versao,
+        "eixos": listar_eixos(versao) if versao else (),
+        "setores": listar_setores(versao) if versao else (),
+    }
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(
         request,
         "praticas/guia_preview/inicio.html",
-        {
-            "versao": versao,
-            "eixos": listar_eixos(versao) if versao else (),
-            "setores": listar_setores(versao) if versao else (),
-        },
+        contexto,
     )
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_eixos(request):
+def _render_guia_eixos(request, *, preview_interna):
     versao = obter_versao_publicada_vigente()
+    contexto = {
+        "versao": versao,
+        "eixos": listar_eixos(versao) if versao else (),
+    }
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(
         request,
         "praticas/guia_preview/eixos.html",
-        {
-            "versao": versao,
-            "eixos": listar_eixos(versao) if versao else (),
-        },
+        contexto,
     )
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_eixo(request, eixo_codigo):
+def _render_guia_eixo(request, eixo_codigo, *, preview_interna):
     versao = obter_versao_publicada_vigente()
     eixo = get_object_or_404(
         queryset_eixo_detalhado(versao),
@@ -1649,12 +1673,13 @@ def guia_preview_eixo(request, eixo_codigo):
         "subeixos": eixo.subeixos_preview,
     }
     contexto.update(_contexto_perguntas(eixo.perguntas_preview))
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(request, "praticas/guia_preview/eixo_detalhe.html", contexto)
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_subeixo(request, eixo_codigo, subeixo_codigo):
+def _render_guia_subeixo(
+    request, eixo_codigo, subeixo_codigo, *, preview_interna
+):
     versao = obter_versao_publicada_vigente()
     subeixo = get_object_or_404(
         queryset_subeixo_detalhado(versao, eixo_codigo),
@@ -1666,45 +1691,46 @@ def guia_preview_subeixo(request, eixo_codigo, subeixo_codigo):
         "subeixo": subeixo,
     }
     contexto.update(_contexto_perguntas(subeixo.perguntas_preview))
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(request, "praticas/guia_preview/subeixo_detalhe.html", contexto)
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_setores(request):
+def _render_guia_setores(request, *, preview_interna):
     versao = obter_versao_publicada_vigente()
+    contexto = {
+        "versao": versao,
+        "setores": listar_setores(versao) if versao else (),
+    }
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(
         request,
         "praticas/guia_preview/setores.html",
-        {
-            "versao": versao,
-            "setores": listar_setores(versao) if versao else (),
-        },
+        contexto,
     )
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_setor(request, setor_codigo):
+def _render_guia_setor(request, setor_codigo, *, preview_interna):
     versao = obter_versao_publicada_vigente()
     setor = get_object_or_404(
         queryset_setor_detalhado(versao),
         codigo=setor_codigo,
     )
+    contexto = {
+        "versao": versao,
+        "setor": setor,
+        "subareas": setor.subareas_preview,
+    }
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(
         request,
         "praticas/guia_preview/setor_detalhe.html",
-        {
-            "versao": versao,
-            "setor": setor,
-            "subareas": setor.subareas_preview,
-        },
+        contexto,
     )
 
 
-@staff_member_required(login_url="login_usuario")
-@require_safe
-def guia_preview_subarea(request, setor_codigo, subarea_codigo):
+def _render_guia_subarea(
+    request, setor_codigo, subarea_codigo, *, preview_interna
+):
     versao = obter_versao_publicada_vigente()
     subarea = get_object_or_404(
         queryset_subarea_detalhada(versao, setor_codigo),
@@ -1717,4 +1743,102 @@ def guia_preview_subarea(request, setor_codigo, subarea_codigo):
         "ocorrencias_referencias": subarea.ocorrencias_referencias_preview,
     }
     contexto.update(_contexto_perguntas(subarea.perguntas_preview))
+    contexto.update(_contexto_navegacao_guia(preview_interna=preview_interna))
     return render(request, "praticas/guia_preview/subarea_detalhe.html", contexto)
+
+
+@require_safe
+def guia_inicio(request):
+    return _render_guia_inicio(request, preview_interna=False)
+
+
+@require_safe
+def guia_eixos(request):
+    return _render_guia_eixos(request, preview_interna=False)
+
+
+@require_safe
+def guia_eixo(request, eixo_codigo):
+    return _render_guia_eixo(request, eixo_codigo, preview_interna=False)
+
+
+@require_safe
+def guia_subeixo(request, eixo_codigo, subeixo_codigo):
+    return _render_guia_subeixo(
+        request,
+        eixo_codigo,
+        subeixo_codigo,
+        preview_interna=False,
+    )
+
+
+@require_safe
+def guia_setores(request):
+    return _render_guia_setores(request, preview_interna=False)
+
+
+@require_safe
+def guia_setor(request, setor_codigo):
+    return _render_guia_setor(request, setor_codigo, preview_interna=False)
+
+
+@require_safe
+def guia_subarea(request, setor_codigo, subarea_codigo):
+    return _render_guia_subarea(
+        request,
+        setor_codigo,
+        subarea_codigo,
+        preview_interna=False,
+    )
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_inicio(request):
+    return _render_guia_inicio(request, preview_interna=True)
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_eixos(request):
+    return _render_guia_eixos(request, preview_interna=True)
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_eixo(request, eixo_codigo):
+    return _render_guia_eixo(request, eixo_codigo, preview_interna=True)
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_subeixo(request, eixo_codigo, subeixo_codigo):
+    return _render_guia_subeixo(
+        request,
+        eixo_codigo,
+        subeixo_codigo,
+        preview_interna=True,
+    )
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_setores(request):
+    return _render_guia_setores(request, preview_interna=True)
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_setor(request, setor_codigo):
+    return _render_guia_setor(request, setor_codigo, preview_interna=True)
+
+
+@staff_member_required(login_url="login_usuario")
+@require_safe
+def guia_preview_subarea(request, setor_codigo, subarea_codigo):
+    return _render_guia_subarea(
+        request,
+        setor_codigo,
+        subarea_codigo,
+        preview_interna=True,
+    )

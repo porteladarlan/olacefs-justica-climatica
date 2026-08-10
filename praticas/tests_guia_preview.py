@@ -249,32 +249,35 @@ class GuiaPreviewTests(TestCase):
     def setUp(self):
         self.client.force_login(self.staff)
 
-    def test_acesso_exige_staff(self):
-        rotas = (
-            reverse("guia_preview_inicio"),
-            reverse("guia_preview_eixos"),
+    def _rotas_guia(self, prefixo):
+        return (
+            reverse(f"{prefixo}_inicio"),
+            reverse(f"{prefixo}_eixos"),
             reverse(
-                "guia_preview_eixo", kwargs={"eixo_codigo": self.eixo_um.codigo}
+                f"{prefixo}_eixo", kwargs={"eixo_codigo": self.eixo_um.codigo}
             ),
             reverse(
-                "guia_preview_subeixo",
+                f"{prefixo}_subeixo",
                 kwargs={
                     "eixo_codigo": self.eixo_um.codigo,
                     "subeixo_codigo": self.subeixo_um.codigo,
                 },
             ),
-            reverse("guia_preview_setores"),
+            reverse(f"{prefixo}_setores"),
             reverse(
-                "guia_preview_setor", kwargs={"setor_codigo": self.setor_um.codigo}
+                f"{prefixo}_setor", kwargs={"setor_codigo": self.setor_um.codigo}
             ),
             reverse(
-                "guia_preview_subarea",
+                f"{prefixo}_subarea",
                 kwargs={
                     "setor_codigo": self.setor_um.codigo,
                     "subarea_codigo": self.subarea_um.codigo,
                 },
             ),
         )
+
+    def test_acesso_exige_staff(self):
+        rotas = self._rotas_guia("guia_preview")
 
         self.client.logout()
         for rota in rotas:
@@ -300,37 +303,106 @@ class GuiaPreviewTests(TestCase):
                 self.assertEqual(self.client.get(rota).status_code, 200)
 
     def test_views_rejeitam_metodos_de_escrita(self):
-        rotas = (
-            reverse("guia_preview_inicio"),
-            reverse("guia_preview_eixos"),
-            reverse(
-                "guia_preview_eixo", kwargs={"eixo_codigo": self.eixo_um.codigo}
-            ),
-            reverse(
-                "guia_preview_subeixo",
-                kwargs={
-                    "eixo_codigo": self.eixo_um.codigo,
-                    "subeixo_codigo": self.subeixo_um.codigo,
-                },
-            ),
-            reverse("guia_preview_setores"),
-            reverse(
-                "guia_preview_setor", kwargs={"setor_codigo": self.setor_um.codigo}
-            ),
-            reverse(
-                "guia_preview_subarea",
-                kwargs={
-                    "setor_codigo": self.setor_um.codigo,
-                    "subarea_codigo": self.subarea_um.codigo,
-                },
-            ),
-        )
+        rotas = self._rotas_guia("guia_preview")
 
         for metodo in ("post", "put", "patch", "delete"):
             for rota in rotas:
                 with self.subTest(metodo=metodo.upper(), rota=rota):
                     resposta = getattr(self.client, metodo)(rota)
                     self.assertEqual(resposta.status_code, 405)
+
+    def test_guia_publico_permite_acesso_anonimo_e_usuario_comum(self):
+        self.client.logout()
+        for rota in self._rotas_guia("guia"):
+            with self.subTest(perfil="anonimo", rota=rota):
+                self.assertEqual(self.client.get(rota).status_code, 200)
+
+        self.client.force_login(self.comum)
+        for rota in self._rotas_guia("guia"):
+            with self.subTest(perfil="comum", rota=rota):
+                self.assertEqual(self.client.get(rota).status_code, 200)
+
+    def test_guia_publico_permite_get_head_e_rejeita_metodos_de_escrita(self):
+        self.client.logout()
+        for rota in self._rotas_guia("guia"):
+            for metodo in ("get", "head"):
+                with self.subTest(metodo=metodo.upper(), rota=rota):
+                    self.assertEqual(getattr(self.client, metodo)(rota).status_code, 200)
+            for metodo in ("post", "put", "patch", "delete"):
+                with self.subTest(metodo=metodo.upper(), rota=rota):
+                    self.assertEqual(getattr(self.client, metodo)(rota).status_code, 405)
+
+    def test_guia_publico_mantem_interface_trilingue_e_conteudo_em_espanhol(self):
+        self.client.logout()
+        for idioma, titulo, rotulo_preview in (
+            ("pt-br", "Guia de Justiça Climática", "Prévia interna"),
+            ("es", "Guía de Justicia Climática", "Vista previa interna"),
+            ("en", "Climate Justice Guide", "Internal preview"),
+        ):
+            with self.subTest(idioma=idioma), translation.override(idioma):
+                resposta_inicio = self.client.get(reverse("guia_inicio"))
+                resposta_subarea = self.client.get(
+                    reverse(
+                        "guia_subarea",
+                        kwargs={
+                            "setor_codigo": self.setor_um.codigo,
+                            "subarea_codigo": self.subarea_um.codigo,
+                        },
+                    )
+                )
+
+                self.assertContains(resposta_inicio, titulo)
+                self.assertContains(resposta_inicio, "Eje primero vigente")
+                self.assertContains(resposta_inicio, '<h3 lang="es">', html=False)
+                self.assertNotContains(resposta_inicio, rotulo_preview)
+                self.assertContains(
+                    resposta_subarea,
+                    '<p lang="es">¿Cumplimiento primero de la subárea?</p>',
+                    html=False,
+                )
+                self.assertContains(
+                    resposta_subarea,
+                    '<p lang="es">Primera cita institucional sintética.</p>',
+                    html=False,
+                )
+
+    def test_guia_publico_expoe_somente_publicada_vigente(self):
+        self.client.logout()
+        resposta = self.client.get(reverse("guia_inicio"))
+
+        self.assertEqual(resposta.context["versao"], self.vigente)
+        self.assertContains(resposta, "Eje primero vigente")
+        self.assertNotContains(resposta, "Eje de una versión anterior")
+        self.assertNotContains(resposta, "Eje que no puede exponerse")
+
+        for rota in (
+            reverse("guia_eixo", kwargs={"eixo_codigo": "inexistente"}),
+            reverse("guia_eixo", kwargs={"eixo_codigo": "eixo-antiga"}),
+            reverse("guia_eixo", kwargs={"eixo_codigo": "eixo-rascunho"}),
+            reverse("guia_setor", kwargs={"setor_codigo": "setor-antiga"}),
+        ):
+            with self.subTest(rota=rota):
+                self.assertEqual(self.client.get(rota).status_code, 404)
+
+    def test_navegacao_publica_permanece_publica_e_preview_permanece_interna(self):
+        self.client.logout()
+        resposta_publica = self.client.get(reverse("guia_inicio"))
+        self.assertContains(resposta_publica, reverse("guia_eixos"))
+        self.assertContains(
+            resposta_publica,
+            reverse("guia_eixo", kwargs={"eixo_codigo": self.eixo_um.codigo}),
+        )
+        self.assertContains(resposta_publica, reverse("guia_setores"))
+        self.assertContains(
+            resposta_publica,
+            reverse("guia_setor", kwargs={"setor_codigo": self.setor_um.codigo}),
+        )
+        self.assertNotContains(resposta_publica, reverse("guia_preview_inicio"))
+
+        self.client.force_login(self.staff)
+        resposta_preview = self.client.get(reverse("guia_preview_inicio"))
+        self.assertContains(resposta_preview, reverse("guia_preview_eixos"))
+        self.assertContains(resposta_preview, "Pr&eacute;via interna", html=False)
 
     def test_rotulos_seguem_idioma_da_interface_e_conteudo_permanece_es(self):
         for idioma, titulo in (
@@ -479,7 +551,7 @@ class GuiaPreviewTests(TestCase):
             with self.subTest(rota=rota):
                 self.assertEqual(self.client.get(rota).status_code, 404)
 
-    def test_relacionamentos_da_preview_sao_isolados_por_versao(self):
+    def test_relacionamentos_do_guia_sao_isolados_por_versao(self):
         eixo_rascunho = EixoGuia.objects.get(
             versao=self.rascunho, codigo="eixo-rascunho"
         )
@@ -579,6 +651,38 @@ class GuiaPreviewTests(TestCase):
             ],
         )
 
+        resposta_eixo = self.client.get(
+            reverse("guia_eixo", kwargs={"eixo_codigo": self.eixo_um.codigo})
+        )
+        resposta_subeixo = self.client.get(
+            reverse(
+                "guia_subeixo",
+                kwargs={
+                    "eixo_codigo": self.eixo_um.codigo,
+                    "subeixo_codigo": self.subeixo_um.codigo,
+                },
+            )
+        )
+        resposta_setor = self.client.get(
+            reverse("guia_setor", kwargs={"setor_codigo": self.setor_um.codigo})
+        )
+        resposta_subarea = self.client.get(
+            reverse(
+                "guia_subarea",
+                kwargs={
+                    "setor_codigo": self.setor_um.codigo,
+                    "subarea_codigo": self.subarea_um.codigo,
+                },
+            )
+        )
+        for resposta in (
+            resposta_eixo,
+            resposta_subeixo,
+            resposta_setor,
+            resposta_subarea,
+        ):
+            self.assertNotContains(resposta, "isolamento")
+
     def test_hierarquia_incorreta_nao_permite_acesso_cruzado(self):
         for rota in (
             reverse(
@@ -597,6 +701,34 @@ class GuiaPreviewTests(TestCase):
             ),
             reverse(
                 "guia_preview_subarea",
+                kwargs={
+                    "setor_codigo": "setor-um",
+                    "subarea_codigo": "subarea-antiga",
+                },
+            ),
+        ):
+            with self.subTest(rota=rota):
+                self.assertEqual(self.client.get(rota).status_code, 404)
+
+    def test_guia_publico_rejeita_hierarquia_cruzada(self):
+        self.client.logout()
+        for rota in (
+            reverse(
+                "guia_subeixo",
+                kwargs={
+                    "eixo_codigo": "eixo-dois",
+                    "subeixo_codigo": "subeixo-um",
+                },
+            ),
+            reverse(
+                "guia_subarea",
+                kwargs={
+                    "setor_codigo": "setor-dois",
+                    "subarea_codigo": "subarea-um",
+                },
+            ),
+            reverse(
+                "guia_subarea",
                 kwargs={
                     "setor_codigo": "setor-um",
                     "subarea_codigo": "subarea-antiga",
