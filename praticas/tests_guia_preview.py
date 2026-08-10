@@ -299,6 +299,39 @@ class GuiaPreviewTests(TestCase):
             with self.subTest(perfil="staff", rota=rota):
                 self.assertEqual(self.client.get(rota).status_code, 200)
 
+    def test_views_rejeitam_metodos_de_escrita(self):
+        rotas = (
+            reverse("guia_preview_inicio"),
+            reverse("guia_preview_eixos"),
+            reverse(
+                "guia_preview_eixo", kwargs={"eixo_codigo": self.eixo_um.codigo}
+            ),
+            reverse(
+                "guia_preview_subeixo",
+                kwargs={
+                    "eixo_codigo": self.eixo_um.codigo,
+                    "subeixo_codigo": self.subeixo_um.codigo,
+                },
+            ),
+            reverse("guia_preview_setores"),
+            reverse(
+                "guia_preview_setor", kwargs={"setor_codigo": self.setor_um.codigo}
+            ),
+            reverse(
+                "guia_preview_subarea",
+                kwargs={
+                    "setor_codigo": self.setor_um.codigo,
+                    "subarea_codigo": self.subarea_um.codigo,
+                },
+            ),
+        )
+
+        for metodo in ("post", "put", "patch", "delete"):
+            for rota in rotas:
+                with self.subTest(metodo=metodo.upper(), rota=rota):
+                    resposta = getattr(self.client, metodo)(rota)
+                    self.assertEqual(resposta.status_code, 405)
+
     def test_rotulos_seguem_idioma_da_interface_e_conteudo_permanece_es(self):
         for idioma, titulo in (
             ("pt-br", "Guia de Justiça Climática"),
@@ -446,18 +479,132 @@ class GuiaPreviewTests(TestCase):
             with self.subTest(rota=rota):
                 self.assertEqual(self.client.get(rota).status_code, 404)
 
-    def test_hierarquia_incorreta_nao_permite_acesso_cruzado(self):
-        rota_subeixo = reverse(
-            "guia_preview_subeixo",
-            kwargs={"eixo_codigo": "eixo-dois", "subeixo_codigo": "subeixo-um"},
+    def test_relacionamentos_da_preview_sao_isolados_por_versao(self):
+        eixo_rascunho = EixoGuia.objects.get(
+            versao=self.rascunho, codigo="eixo-rascunho"
         )
-        rota_subarea = reverse(
-            "guia_preview_subarea",
-            kwargs={"setor_codigo": "setor-dois", "subarea_codigo": "subarea-um"},
+        setor_rascunho = SetorGuia.objects.get(
+            versao=self.rascunho, codigo="setor-rascunho"
+        )
+        subarea_rascunho = SubareaGuia.objects.get(
+            versao=self.rascunho, codigo="subarea-rascunho"
+        )
+        subeixo_rascunho = SubeixoGuia.objects.create(
+            versao=self.rascunho,
+            eixo=eixo_rascunho,
+            codigo="subeixo-isolamento",
+            nome_es="Subeje de otra versión",
+            ordem=99,
+        )
+        pergunta_subeixo = PerguntaGuia.objects.create(
+            versao=self.rascunho,
+            subeixo=subeixo_rascunho,
+            codigo="pergunta-subeixo-isolamento",
+            texto_es="¿Pregunta de otra versión?",
+            tipo_auditoria=PerguntaGuia.TipoAuditoria.CUMPLIMIENTO,
+            ordem=99,
+        )
+        pergunta_subarea = PerguntaGuia.objects.create(
+            versao=self.rascunho,
+            subarea=subarea_rascunho,
+            codigo="pergunta-subarea-isolamento",
+            texto_es="¿Pregunta de subárea de otra versión?",
+            tipo_auditoria=PerguntaGuia.TipoAuditoria.CUMPLIMIENTO,
+            ordem=99,
+        )
+        referencia_rascunho = ReferenciaGuia.objects.create(
+            versao=self.rascunho,
+            codigo="referencia-isolamento",
+            citacao_es="Referencia de otra versión.",
+        )
+        ocorrencia_rascunho = SubareaReferenciaGuia.objects.create(
+            subarea=subarea_rascunho,
+            referencia=referencia_rascunho,
+            ordem=99,
         )
 
-        self.assertEqual(self.client.get(rota_subeixo).status_code, 404)
-        self.assertEqual(self.client.get(rota_subarea).status_code, 404)
+        PerguntaGuia.objects.filter(codigo="pregunta-rascunho").update(
+            eixo=self.eixo_um
+        )
+        SubeixoGuia.objects.filter(pk=subeixo_rascunho.pk).update(eixo=self.eixo_um)
+        PerguntaGuia.objects.filter(pk=pergunta_subeixo.pk).update(
+            subeixo=self.subeixo_um
+        )
+        SubareaGuia.objects.filter(pk=subarea_rascunho.pk).update(
+            setor=self.setor_um, ordem=99
+        )
+        PerguntaGuia.objects.filter(pk=pergunta_subarea.pk).update(
+            subarea=self.subarea_um
+        )
+        SubareaReferenciaGuia.objects.filter(pk=ocorrencia_rascunho.pk).update(
+            subarea=self.subarea_um
+        )
+
+        eixos = list(listar_eixos(self.vigente))
+        setores = list(listar_setores(self.vigente))
+        eixo = queryset_eixo_detalhado(self.vigente).get(pk=self.eixo_um.pk)
+        subeixo = queryset_subeixo_detalhado(self.vigente, self.eixo_um.codigo).get(
+            pk=self.subeixo_um.pk
+        )
+        setor = queryset_setor_detalhado(self.vigente).get(pk=self.setor_um.pk)
+        subarea = queryset_subarea_detalhada(
+            self.vigente, self.setor_um.codigo
+        ).get(pk=self.subarea_um.pk)
+
+        self.assertEqual(eixos[0].total_subeixos, 2)
+        self.assertEqual(eixos[0].total_perguntas, 4)
+        self.assertEqual(setores[0].total_subareas, 2)
+        self.assertNotIn(
+            "subeixo-isolamento", [item.codigo for item in eixo.subeixos_preview]
+        )
+        self.assertNotIn(
+            "pregunta-rascunho", [item.codigo for item in eixo.perguntas_preview]
+        )
+        self.assertNotIn(
+            "pergunta-subeixo-isolamento",
+            [item.codigo for item in subeixo.perguntas_preview],
+        )
+        self.assertNotIn(
+            "subarea-rascunho", [item.codigo for item in setor.subareas_preview]
+        )
+        self.assertNotIn(
+            "pergunta-subarea-isolamento",
+            [item.codigo for item in subarea.perguntas_preview],
+        )
+        self.assertNotIn(
+            "referencia-isolamento",
+            [
+                item.referencia.codigo
+                for item in subarea.ocorrencias_referencias_preview
+            ],
+        )
+
+    def test_hierarquia_incorreta_nao_permite_acesso_cruzado(self):
+        for rota in (
+            reverse(
+                "guia_preview_subeixo",
+                kwargs={
+                    "eixo_codigo": "eixo-dois",
+                    "subeixo_codigo": "subeixo-um",
+                },
+            ),
+            reverse(
+                "guia_preview_subarea",
+                kwargs={
+                    "setor_codigo": "setor-dois",
+                    "subarea_codigo": "subarea-um",
+                },
+            ),
+            reverse(
+                "guia_preview_subarea",
+                kwargs={
+                    "setor_codigo": "setor-um",
+                    "subarea_codigo": "subarea-antiga",
+                },
+            ),
+        ):
+            with self.subTest(rota=rota):
+                self.assertEqual(self.client.get(rota).status_code, 404)
 
     def test_seletores_mantem_numero_de_queries_limitado_por_pagina(self):
         with self.assertNumQueries(1):

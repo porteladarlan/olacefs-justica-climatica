@@ -14,7 +14,7 @@ from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_safe
 
 from .forms import (
     ExperienciaSubmissaoForm,
@@ -1607,6 +1607,7 @@ def sobre_plataforma(request):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_inicio(request):
     versao = obter_versao_publicada_vigente()
     return render(
@@ -1621,6 +1622,7 @@ def guia_preview_inicio(request):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_eixos(request):
     versao = obter_versao_publicada_vigente()
     return render(
@@ -1634,6 +1636,7 @@ def guia_preview_eixos(request):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_eixo(request, eixo_codigo):
     versao = obter_versao_publicada_vigente()
     eixo = get_object_or_404(
@@ -1650,6 +1653,7 @@ def guia_preview_eixo(request, eixo_codigo):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_subeixo(request, eixo_codigo, subeixo_codigo):
     versao = obter_versao_publicada_vigente()
     subeixo = get_object_or_404(
@@ -1666,6 +1670,7 @@ def guia_preview_subeixo(request, eixo_codigo, subeixo_codigo):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_setores(request):
     versao = obter_versao_publicada_vigente()
     return render(
@@ -1679,6 +1684,7 @@ def guia_preview_setores(request):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_setor(request, setor_codigo):
     versao = obter_versao_publicada_vigente()
     setor = get_object_or_404(
@@ -1697,6 +1703,7 @@ def guia_preview_setor(request, setor_codigo):
 
 
 @staff_member_required(login_url="login_usuario")
+@require_safe
 def guia_preview_subarea(request, setor_codigo, subarea_codigo):
     versao = obter_versao_publicada_vigente()
     subarea = get_object_or_404(
