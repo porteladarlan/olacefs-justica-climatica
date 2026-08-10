@@ -52,3 +52,7 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 # 2026-08-10 — Fase 2D.5: Guia público MVP
 
 - Publicada a navegação somente leitura do Guia por eixos, subeixos, setores e subáreas, reutilizando seletores e interface da preview, com conteúdo institucional preservado em espanhol e sem migration.
+
+# 2026-08-10 — Fase 2F: preparação técnica para homologação
+
+- Tornada explícita e fail-closed a configuração de staging/produção para segredos, hosts, CSRF, banco, cookies e proxy HTTPS, preservando desenvolvimento local com SQLite e sem definir infraestrutura institucional.
