@@ -44,3 +44,7 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 - Preservado o conteúdo institucional em espanhol, sem tradução ou fallback definitivo.
 - Adicionados isolamento por versão, validação hierárquica, estados vazios e testes sintéticos, sem migration.
 - Permanecem pendentes GUIA-01, GUIA-05, GUIA-06 e GUIA-08 a GUIA-13.
+
+# 2026-08-09 — Fase 2D.4: hardening técnico do Guia
+
+- Reforçado o isolamento explícito por versão nos relacionamentos da preview e restringidas suas views a GET/HEAD, com cobertura para métodos rejeitados, versão e hierarquia, sem migration.
