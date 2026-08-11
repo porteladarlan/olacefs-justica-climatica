@@ -13,6 +13,7 @@ class Command(BaseCommand):
         ("validar_release_validacao", "Validação dos documentos de release"),
         ("exibir_roteiro_teste_externo", "Materiais de teste externo"),
     ]
+    GATE_TECNICO = "checar_prontidao_ambiente"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -30,7 +31,8 @@ class Command(BaseCommand):
         for comando, descricao in self.COMANDOS:
             self.stdout.write(self.style.MIGRATE_LABEL(f"Executando: {descricao}"))
             try:
-                call_command(comando)
+                opcoes = {"falhar": True} if comando == self.GATE_TECNICO else {}
+                call_command(comando, **opcoes)
                 self.stdout.write(self.style.SUCCESS(f"OK: {descricao}"))
             except SystemExit as exc:
                 if exc.code not in [0, None]:

@@ -64,3 +64,7 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 # 2026-08-10 — Fase 2H: fechamento do feedback negocial da Home e mapa
 
 - Reordenadas as Presidências, alinhados mapa/fundamentos à paleta roxa e incluídos microterritórios e destaque visual de auditorias coordenadas com relação explícita de EFS participantes.
+
+# 2026-08-11 — Fase 2I: gate de prontidão para homologação
+
+- Atualizado o diagnóstico por ambiente para separar falhas críticas, avisos de HTTPS/HSTS e dependências institucionais, com propagação testada pelo gate consolidado.

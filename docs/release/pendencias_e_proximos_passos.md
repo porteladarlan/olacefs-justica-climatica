@@ -18,12 +18,19 @@
 
 ## Pendências técnicas
 
+### Dependências institucionais externas
+
+Estas dependências permanecem separadas das falhas críticas verificadas pelo gate técnico:
+
 - Definir ambiente institucional.
 - Definir banco de dados persistente.
 - Definir armazenamento de anexos.
 - Configurar backup.
 - Definir domínio oficial.
 - Definir logs e monitoramento.
+
+### Avaliações técnicas e institucionais pendentes
+
 - Revisar segurança de upload.
 - Avaliar termos de uso e privacidade, se aplicável.
 

@@ -82,3 +82,9 @@ DEFAULT_FROM_EMAIL=<email-institucional>
 - `staging` e `production` recusam inicialização sem `DEBUG`, `SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` e `DATABASE_URL` explícitos.
 - `staging` e `production` recusam `DEBUG=True`, chave fraca, SQLite, host curinga, origem CSRF sem HTTPS e cookies inseguros.
 - HSTS e confiança em `X-Forwarded-Proto` exigem validação prévia da terminação TLS e do proxy; não habilitar por suposição.
+
+## Gate de prontidão
+
+`python manage.py checar_prontidao_ambiente --falhar` audita a configuração Django já carregada. Em `development` e `test`, SQLite e defaults locais são válidos e as variáveis de implantação não são exigidas. Em `staging` e `production`, falhas críticas de DEBUG, segredo, hosts, CSRF, banco, cookies ou proxy explicitamente habilitado fazem o comando retornar erro.
+
+HTTPS/HSTS ainda não habilitados são avisos operacionais enquanto domínio e TLS não estiverem definidos. PostgreSQL institucional, storage, backup, domínio/TLS, logs e monitoramento são apresentados separadamente como dependências externas, sem serem confundidos com falhas do código.
