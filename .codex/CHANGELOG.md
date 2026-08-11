@@ -60,3 +60,7 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 # 2026-08-10 — Fase 2G: hardening do pipeline de deploy
 
 - Restrito o build automático a dependências, arquivos estáticos e migrations; cargas, retroalimentação e criação de administradores permanecem somente como operações manuais controladas.
+
+# 2026-08-10 — Fase 2H: fechamento do feedback negocial da Home e mapa
+
+- Reordenadas as Presidências, alinhados mapa/fundamentos à paleta roxa e incluídos microterritórios e destaque visual de auditorias coordenadas com relação explícita de EFS participantes.

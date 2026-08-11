@@ -213,6 +213,16 @@ class Experiencia(models.Model):
     titulo_en = models.CharField(max_length=220, blank=True)
 
     efs = models.ForeignKey(EFS, on_delete=models.PROTECT, related_name="experiencias")
+    efs_participantes = models.ManyToManyField(
+        EFS,
+        blank=True,
+        related_name="experiencias_como_participante",
+        verbose_name="EFS adicionais participantes",
+        help_text=(
+            "Selecione somente as EFS participantes adicionais; "
+            "a EFS líder permanece no campo EFS."
+        ),
+    )
     pais = models.ForeignKey(Pais, on_delete=models.PROTECT, related_name="experiencias")
     tipo_experiencia = models.ForeignKey(TipoExperiencia, on_delete=models.PROTECT, related_name="experiencias")
     ano_execucao = models.PositiveIntegerField()

@@ -172,6 +172,40 @@ def _payload_mapa_regional():
     for pais_id, norma_id in pares_criterios:
         criterios_ids_por_pais[pais_id].append(norma_id)
 
+    efs_participantes_mapa = (
+        EFS.objects.select_related("pais")
+        .only(
+            "id",
+            "nome",
+            "nome_es",
+            "nome_en",
+            "sigla",
+            "pais_id",
+            "pais__id",
+            "pais__nome",
+            "pais__nome_es",
+            "pais__nome_en",
+            "pais__sigla",
+        )
+        .order_by("nome")
+    )
+    experiencias_coordenadas = (
+        Experiencia.objects.filter(
+            status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+            efs_participantes__isnull=False,
+        )
+        .select_related("efs__pais")
+        .prefetch_related(
+            Prefetch(
+                "efs_participantes",
+                queryset=efs_participantes_mapa,
+                to_attr="efs_participantes_mapa",
+            )
+        )
+        .distinct()
+        .order_by("titulo", "pk")
+    )
+
     paises_publicos = []
     for pais in paises:
         paises_publicos.append(
@@ -196,9 +230,50 @@ def _payload_mapa_regional():
             }
         )
 
+    auditorias_coordenadas = []
+    for experiencia in experiencias_coordenadas:
+        efs_adicionais = [
+            efs
+            for efs in experiencia.efs_participantes_mapa
+            if efs.pk != experiencia.efs_id
+        ]
+        if not efs_adicionais:
+            continue
+
+        paises_da_auditoria = {
+            experiencia.efs.pais_id: experiencia.efs.pais,
+        }
+        for efs_participante in efs_adicionais:
+            paises_da_auditoria[efs_participante.pais_id] = efs_participante.pais
+
+        paises_ordenados = sorted(
+            paises_da_auditoria.values(),
+            key=lambda pais: (pais.nome_exibicao.casefold(), pais.pk),
+        )
+        auditorias_coordenadas.append(
+            {
+                "id": experiencia.pk,
+                "titulo": experiencia.titulo_exibicao,
+                "efs_lider": {
+                    "id": experiencia.efs_id,
+                    "nome": experiencia.efs.nome_exibicao,
+                    "sigla": experiencia.efs.sigla,
+                },
+                "paises": [
+                    {
+                        "id": pais.pk,
+                        "nome": pais.nome_exibicao,
+                        "geo_id": MAPA_REGIONAL_ISO3_PARA_GEO_ID.get(pais.sigla),
+                    }
+                    for pais in paises_ordenados
+                ],
+            }
+        )
+
     return {
         "paises": paises_publicos,
         "geo_ids_regiao": MAPA_REGIONAL_GEO_IDS,
+        "auditorias_coordenadas": auditorias_coordenadas,
     }
 
 

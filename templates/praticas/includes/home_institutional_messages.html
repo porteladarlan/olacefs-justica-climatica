@@ -9,23 +9,6 @@
 
     <div class="home-voices-grid">
         <figure class="home-voice-card">
-            <img class="home-voice-photo" src="{% static 'praticas/img/camilo-benitez.jpg' %}" alt="Dr. Camilo Ben&iacute;tez" width="112" height="112" loading="lazy" decoding="async">
-            <blockquote class="home-voice-quote">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Climate justice requires placing human rights and equity at the center of public oversight; this platform was therefore born as a regional space to systematize good practices, exchange tools and strengthen the audit response to climate change.
-                {% elif LANGUAGE_CODE == 'es' %}
-                    La justicia clim&aacute;tica exige poner los derechos humanos y la equidad en el centro del control p&uacute;blico; por eso, esta plataforma nace como un espacio regional para sistematizar buenas pr&aacute;cticas, intercambiar herramientas y fortalecer la respuesta de la auditor&iacute;a ante el cambio clim&aacute;tico.
-                {% else %}
-                    A justi&ccedil;a clim&aacute;tica exige colocar os direitos humanos e a equidade no centro do controle p&uacute;blico; portanto, essa plataforma nasceu como um espa&ccedil;o regional para sistematizar boas pr&aacute;ticas, trocar ferramentas e fortalecer a resposta de auditoria &agrave;s mudan&ccedil;as clim&aacute;ticas.
-                {% endif %}
-            </blockquote>
-            <figcaption>
-                <span class="home-voice-name">Dr. Camilo Ben&iacute;tez</span>
-                <span class="home-voice-role">{% if LANGUAGE_CODE == 'en' %}President of COMTEMA{% elif LANGUAGE_CODE == 'es' %}Presidente de la COMTEMA{% else %}Presidente da COMTEMA{% endif %}</span>
-            </figcaption>
-        </figure>
-
-        <figure class="home-voice-card">
             <img class="home-voice-photo" src="{% static 'praticas/img/pamela-calletti.jpg' %}" alt="Dra. Pamela Calletti" width="112" height="112" loading="lazy" decoding="async">
             <blockquote class="home-voice-quote">
                 {% if LANGUAGE_CODE == 'en' %}
@@ -39,6 +22,23 @@
             <figcaption>
                 <span class="home-voice-name">Dra. Pamela Calletti</span>
                 <span class="home-voice-role">{% if LANGUAGE_CODE == 'en' %}President of CGID{% elif LANGUAGE_CODE == 'es' %}Presidenta de la CGID{% else %}Presidenta da CGID{% endif %}</span>
+            </figcaption>
+        </figure>
+
+        <figure class="home-voice-card">
+            <img class="home-voice-photo" src="{% static 'praticas/img/camilo-benitez.jpg' %}" alt="Dr. Camilo Ben&iacute;tez" width="112" height="112" loading="lazy" decoding="async">
+            <blockquote class="home-voice-quote">
+                {% if LANGUAGE_CODE == 'en' %}
+                    Climate justice requires placing human rights and equity at the center of public oversight; this platform was therefore born as a regional space to systematize good practices, exchange tools and strengthen the audit response to climate change.
+                {% elif LANGUAGE_CODE == 'es' %}
+                    La justicia clim&aacute;tica exige poner los derechos humanos y la equidad en el centro del control p&uacute;blico; por eso, esta plataforma nace como un espacio regional para sistematizar buenas pr&aacute;cticas, intercambiar herramientas y fortalecer la respuesta de la auditor&iacute;a ante el cambio clim&aacute;tico.
+                {% else %}
+                    A justi&ccedil;a clim&aacute;tica exige colocar os direitos humanos e a equidade no centro do controle p&uacute;blico; portanto, essa plataforma nasceu como um espa&ccedil;o regional para sistematizar boas pr&aacute;ticas, trocar ferramentas e fortalecer a resposta de auditoria &agrave;s mudan&ccedil;as clim&aacute;ticas.
+                {% endif %}
+            </blockquote>
+            <figcaption>
+                <span class="home-voice-name">Dr. Camilo Ben&iacute;tez</span>
+                <span class="home-voice-role">{% if LANGUAGE_CODE == 'en' %}President of COMTEMA{% elif LANGUAGE_CODE == 'es' %}Presidente de la COMTEMA{% else %}Presidente da COMTEMA{% endif %}</span>
             </figcaption>
         </figure>
     </div>

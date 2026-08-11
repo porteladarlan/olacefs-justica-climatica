@@ -146,6 +146,7 @@ class ExperienciaAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = ("pais", "efs", "tipo_experiencia", "setor")
     filter_horizontal = (
+        "efs_participantes",
         "temas_transversais",
         "normas_internacionais",
         "dimensoes_consideradas",

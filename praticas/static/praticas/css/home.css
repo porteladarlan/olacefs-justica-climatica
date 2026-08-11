@@ -178,11 +178,16 @@
 .home-design .home-foundation-tab {
     min-height: 44px;
     padding: 12px 20px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--purple-soft);
     border-radius: 11px;
-    background: var(--surface);
+    background: var(--lilac-pale);
     color: var(--purple);
     font: 700 14px/1.25 'Raleway', sans-serif;
+}
+
+.home-design .home-foundation-tab:focus-visible {
+    outline: 3px solid var(--purple-mid);
+    outline-offset: 3px;
 }
 
 .home-design .home-foundation-tab:hover {
@@ -335,7 +340,7 @@
 }
 
 .home-design .home-map-country.is-member {
-    fill: #a999bf;
+    fill: var(--purple-soft);
     cursor: pointer;
 }
 
@@ -344,15 +349,70 @@
 }
 
 .home-design .home-map-country.is-selected {
-    fill: var(--green-dark);
+    fill: var(--purple);
     stroke: #fff;
     stroke-width: 2px;
 }
 
-.home-design .home-map-country.is-member:focus {
+.home-design .home-map-country.is-coordinated {
+    fill: var(--purple);
+    stroke: var(--purple-soft);
+    stroke-dasharray: 5 2;
+    stroke-width: 2.5px;
+}
+
+.home-design .home-map-country.is-member:focus-visible {
     outline: none;
-    stroke: var(--focus-ring, #f4b400);
+    stroke: var(--purple);
     stroke-width: 3px;
+}
+
+.home-design .home-map-country.is-selected:focus-visible,
+.home-design .home-map-country.is-coordinated:focus-visible {
+    stroke: var(--purple-soft);
+    stroke-width: 4px;
+}
+
+.home-design .home-map-country.is-microterritory {
+    pointer-events: none;
+}
+
+.home-design .home-map-microterritory-control {
+    cursor: pointer;
+    outline: none;
+}
+
+.home-design .home-map-microterritory-hit {
+    fill: transparent;
+    pointer-events: all;
+    stroke: transparent;
+}
+
+.home-design .home-map-microterritory-marker {
+    fill: var(--purple-soft);
+    pointer-events: none;
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
+    fill: var(--purple-mid);
+}
+
+.home-design .home-map-microterritory-control.is-selected .home-map-microterritory-marker,
+.home-design .home-map-microterritory-control.is-coordinated .home-map-microterritory-marker {
+    fill: var(--purple);
+    stroke: var(--purple-soft);
+    stroke-width: 2px;
+}
+
+.home-design .home-map-microterritory-control.is-coordinated .home-map-microterritory-marker {
+    stroke-dasharray: 3 1;
+}
+
+.home-design .home-map-microterritory-control:focus-visible .home-map-microterritory-hit {
+    stroke: var(--purple);
+    stroke-width: 2px;
 }
 
 .home-design .home-map-loading,
@@ -409,7 +469,12 @@
 }
 
 .home-design .home-map-dot.is-selected {
-    background: var(--green-dark);
+    background: var(--purple);
+}
+
+.home-design .home-map-dot.is-coordinated {
+    border: 2px dashed var(--purple-soft);
+    background: var(--purple);
 }
 
 .home-design .home-map-dot.is-other {
@@ -435,6 +500,47 @@
     margin: 0 0 10px;
     color: var(--purple);
     font-size: 20px;
+}
+
+.home-design .home-map-coordinated-control {
+    margin: 0 0 18px;
+    padding: 14px;
+    border: 1px solid var(--purple-soft);
+    border-radius: 11px;
+    background: var(--lilac-pale);
+}
+
+.home-design .home-map-coordinated-control label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--purple);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.home-design .home-map-coordinated-control select {
+    min-height: 44px;
+    border-color: var(--purple-soft);
+    color: var(--purple);
+}
+
+.home-design .home-map-coordinated-control select:focus-visible {
+    border-color: var(--purple);
+    outline: 3px solid var(--purple-mid);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.home-design .home-map-coordinated-control select:disabled {
+    cursor: not-allowed;
+    opacity: .7;
+}
+
+.home-design .home-map-coordinated-control p {
+    margin: 8px 0 0;
+    color: var(--text-soft);
+    font-size: 11.5px;
+    line-height: 1.45;
 }
 
 .home-design .home-map-empty {
@@ -482,7 +588,7 @@
 .home-design .home-map-chip:focus-visible,
 .home-design .home-map-clear:focus-visible,
 .home-design .home-map-country-option input:focus-visible + label {
-    outline: 3px solid var(--focus-ring, #f4b400);
+    outline: 3px solid var(--purple-mid);
     outline-offset: 3px;
 }
 
@@ -503,7 +609,7 @@
 }
 
 .home-design .home-map-summary ul:focus-visible {
-    outline: 3px solid var(--focus-ring, #f4b400);
+    outline: 3px solid var(--purple-mid);
     outline-offset: 3px;
 }
 
@@ -611,6 +717,12 @@
     min-height: 44px;
     justify-content: center;
     white-space: normal;
+}
+
+.home-design .home-map-actions .btn:focus-visible {
+    outline: 3px solid var(--purple-mid);
+    outline-offset: 3px;
+    box-shadow: none;
 }
 
 .home-design .home-map-actions .btn:disabled {
@@ -782,13 +894,19 @@ html.a11y-high-contrast .home-design .home-map-country.is-member {
 }
 
 html.a11y-high-contrast .home-design .home-map-country.is-selected {
-    fill: #006b4f;
+    fill: #24102d;
     stroke: #fff;
     stroke-width: 3px;
 }
 
-html.a11y-high-contrast .home-design .home-map-country.is-member:focus {
-    stroke: #ffd800;
+html.a11y-high-contrast .home-design .home-map-country.is-coordinated {
+    fill: #24102d;
+    stroke: #fff;
+    stroke-dasharray: 5 2;
+}
+
+html.a11y-high-contrast .home-design .home-map-country.is-member:focus-visible {
+    stroke: #fff;
     stroke-width: 4px;
 }
 
@@ -843,23 +961,6 @@ html.a11y-high-contrast .home-design .home-map-country.is-member:focus {
     border-color: #432054;
     background: #432054;
     color: #ffffff;
-}
-
-/* Seleção do mapa sem o amarelo usado anteriormente. */
-.home-design .home-map-country.is-selected {
-    fill: #698D8B;
-    stroke: #432054;
-    stroke-width: 2px;
-}
-
-.home-design .home-map-country.is-member:focus {
-    outline: none;
-    stroke: #432054;
-    stroke-width: 3px;
-}
-
-.home-design .home-map-dot.is-selected {
-    background: #698D8B;
 }
 
 /* Desktop: hero mais horizontal e mapa com maior área útil. */
