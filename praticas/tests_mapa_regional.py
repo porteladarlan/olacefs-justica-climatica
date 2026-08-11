@@ -2,11 +2,13 @@ import json
 from pathlib import Path
 from urllib.parse import urlencode
 
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import finders
 from django.test import TestCase
 from django.urls import reverse
 
+from .forms import ExperienciaSubmissaoForm
 from .models import EFS, Experiencia, NormaInternacional, Pais, Setor, TipoExperiencia
 from .views import MAPA_REGIONAL_ISO3_PARA_GEO_ID, _payload_mapa_regional
 
@@ -137,16 +139,36 @@ class MapaRegionalTests(TestCase):
 
     def test_home_trilingue_exibe_mapa_funcional_e_remove_estado_futuro(self):
         casos = (
-            ("/", "Mapa interativo", "EFS da Am&eacute;rica Latina e Caribe"),
-            ("/es/", "Mapa interactivo", "EFS de Am&eacute;rica Latina y el Caribe"),
-            ("/en/", "Interactive map", "SAIs of Latin America and the Caribbean"),
+            (
+                "/",
+                "Mapa interativo",
+                "EFS da Am&eacute;rica Latina e Caribe",
+                "Auditoria coordenada",
+                "Selecione uma auditoria coordenada",
+            ),
+            (
+                "/es/",
+                "Mapa interactivo",
+                "EFS de Am&eacute;rica Latina y el Caribe",
+                "Auditor&iacute;a coordinada",
+                "Seleccione una auditor&iacute;a coordinada",
+            ),
+            (
+                "/en/",
+                "Interactive map",
+                "SAIs of Latin America and the Caribbean",
+                "Coordinated audit",
+                "Select a coordinated audit",
+            ),
         )
-        for caminho, eyebrow, titulo in casos:
+        for caminho, eyebrow, titulo, rotulo, opcao in casos:
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, eyebrow)
                 self.assertContains(response, titulo, html=False)
+                self.assertContains(response, rotulo, html=False)
+                self.assertContains(response, opcao, html=False)
                 self.assertNotContains(response, "Etapa futura")
                 self.assertNotContains(response, "Future stage")
 
@@ -157,8 +179,10 @@ class MapaRegionalTests(TestCase):
             {
                 "paises",
                 "geo_ids_regiao",
+                "auditorias_coordenadas",
             },
         )
+        self.assertEqual(payload["auditorias_coordenadas"], [])
         campos_pais = {
             "id",
             "sigla",
@@ -213,7 +237,7 @@ class MapaRegionalTests(TestCase):
         self.assertNotIn("ZZZ", por_sigla)
 
     def test_payload_e_montado_sem_consulta_por_pais(self):
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             payload = _payload_mapa_regional()
         self.assertEqual(len(payload["paises"]), 3)
 
@@ -269,6 +293,11 @@ class MapaRegionalTests(TestCase):
         self.assertContains(response, 'name="pais"', count=3)
         self.assertContains(response, 'id="regionalMapCount"')
         self.assertContains(response, 'aria-live="polite"')
+        self.assertContains(response, 'id="regionalMapCoordinatedAudit"')
+        self.assertContains(response, 'aria-describedby="regionalMapCoordinatedStatus"')
+        self.assertContains(response, 'id="regionalMapCoordinatedStatus"')
+        self.assertContains(response, 'id="regionalMapCoordinatedAudit"', html=False)
+        self.assertContains(response, "disabled")
         self.assertContains(response, '<noscript>')
         self.assertContains(response, 'formaction="/catalogo/"')
         self.assertContains(response, 'formaction="/normas-internacionais/"')
@@ -308,11 +337,152 @@ class MapaRegionalTests(TestCase):
         self.assertIn("country.criterios_normativos_ids", script)
         self.assertIn('form.addEventListener("reset"', script)
         self.assertIn("selectedIds.clear();", script)
+        self.assertIn("const coordinatedHighlightedIds = new Set();", script)
+        self.assertIn('.classed("is-coordinated"', script)
+        self.assertIn('coordinatedSelect.addEventListener("change"', script)
         self.assertNotIn('clearButton.addEventListener("click"', script)
         self.assertNotIn("totalNorms +=", script)
         self.assertNotIn("innerHTML", script)
         self.assertNotIn("geolocation", script)
         self.assertNotIn("https://", script)
+
+    def test_aruba_e_curacao_preservam_geo_ids_e_payload_institucional(self):
+        aruba = Pais.objects.create(
+            nome="Aruba",
+            nome_es="Aruba",
+            nome_en="Aruba",
+            sigla="ABW",
+        )
+        curacao = Pais.objects.create(
+            nome="Curaçao",
+            nome_es="Curazao",
+            nome_en="Curaçao",
+            sigla="CUW",
+        )
+        EFS.objects.create(nome="EFS Aruba", sigla="EFA", pais=aruba)
+        EFS.objects.create(nome="EFS Curaçao", sigla="EFC", pais=curacao)
+
+        payload = _payload_mapa_regional()
+        por_sigla = {pais["sigla"]: pais for pais in payload["paises"]}
+
+        self.assertEqual(MAPA_REGIONAL_ISO3_PARA_GEO_ID["ABW"], "533")
+        self.assertEqual(MAPA_REGIONAL_ISO3_PARA_GEO_ID["CUW"], "531")
+        self.assertEqual(por_sigla["ABW"]["geo_id"], "533")
+        self.assertEqual(por_sigla["CUW"]["geo_id"], "531")
+
+    def test_auditoria_coordenada_publicada_une_e_deduplica_paises(self):
+        efs_argentina_adicional = EFS.objects.create(
+            nome="Segunda EFS Argentina",
+            sigla="A2",
+            pais=self.argentina,
+        )
+        self.publicada_brasil.efs_participantes.add(
+            self.efs_argentina,
+            efs_argentina_adicional,
+            self.efs_chile,
+        )
+
+        payload = _payload_mapa_regional()
+        self.assertEqual(len(payload["auditorias_coordenadas"]), 1)
+        auditoria = payload["auditorias_coordenadas"][0]
+
+        self.assertEqual(auditoria["id"], self.publicada_brasil.pk)
+        self.assertEqual(
+            auditoria["efs_lider"],
+            {
+                "id": self.efs_brasil.pk,
+                "nome": "Tribunal de Contas do Brasil",
+                "sigla": "TCB",
+            },
+        )
+        self.assertEqual(
+            [pais["id"] for pais in auditoria["paises"]],
+            [self.argentina.pk, self.brasil.pk, self.chile.pk],
+        )
+        self.assertEqual(
+            len({pais["id"] for pais in auditoria["paises"]}),
+            3,
+        )
+        self.assertEqual(self.publicada_brasil.efs_participantes.count(), 3)
+
+    def test_payload_coordenado_exclui_rascunhos_e_experiencias_sem_participantes(self):
+        self.rascunho.efs_participantes.add(self.efs_argentina)
+        self.publicada_argentina.efs_participantes.add(self.efs_argentina)
+
+        payload = _payload_mapa_regional()
+        ids = {auditoria["id"] for auditoria in payload["auditorias_coordenadas"]}
+
+        self.assertNotIn(self.rascunho.pk, ids)
+        self.assertNotIn(self.publicada_brasil.pk, ids)
+        self.assertNotIn(self.publicada_argentina.pk, ids)
+        self.assertFalse(self.publicada_brasil.efs_participantes.exists())
+        self.assertQuerySetEqual(
+            self.publicada_argentina.efs_participantes.all(),
+            [self.efs_argentina],
+        )
+
+    def test_payload_coordenado_respeita_idioma_atual(self):
+        self.publicada_brasil.titulo = "Auditoria coordenada PT"
+        self.publicada_brasil.titulo_es = "Auditoría coordinada ES"
+        self.publicada_brasil.titulo_en = "Coordinated audit EN"
+        self.publicada_brasil.save(
+            update_fields=["titulo", "titulo_es", "titulo_en"]
+        )
+        self.publicada_brasil.efs_participantes.add(self.efs_argentina)
+
+        casos = (
+            ("/", "Auditoria coordenada PT"),
+            ("/es/", "Auditoría coordinada ES"),
+            ("/en/", "Coordinated audit EN"),
+        )
+        for caminho, titulo in casos:
+            with self.subTest(caminho=caminho):
+                _, payload = self._payload(caminho)
+                self.assertEqual(
+                    payload["auditorias_coordenadas"][0]["titulo"],
+                    titulo,
+                )
+
+    def test_many_to_many_e_curadoria_admin_sem_expor_formulario_publico(self):
+        self.publicada_brasil.efs_participantes.add(
+            self.efs_argentina,
+            self.efs_chile,
+        )
+
+        self.assertQuerySetEqual(
+            self.publicada_brasil.efs_participantes.order_by("pk"),
+            [self.efs_argentina, self.efs_chile],
+        )
+        experiencia_admin = admin.site._registry[Experiencia]
+        self.assertIn("efs_participantes", experiencia_admin.filter_horizontal)
+        self.assertNotIn("efs_participantes", ExperienciaSubmissaoForm().fields)
+
+    def test_destaque_coordenado_nao_altera_selecao_manual(self):
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(
+            encoding="utf-8"
+        )
+        funcao = script.split(
+            "function updateCoordinatedHighlight", 1
+        )[1].split("function showTooltip", 1)[0]
+
+        self.assertIn("coordinatedHighlightedIds.clear();", funcao)
+        self.assertIn("coordinatedHighlightedIds.add", funcao)
+        self.assertNotIn("selectedIds", funcao)
+        self.assertNotIn("countryCheckboxes", funcao)
+        self.assertNotIn("form.submit", funcao)
+        self.assertNotIn("window.location", funcao)
+
+    def test_microterritorios_usam_centroid_hit_target_e_controle_acessivel(self):
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('new Set(["531", "533"])', script)
+        self.assertIn("path.centroid(feature)", script)
+        self.assertIn('attr("class", "home-map-microterritory-hit")', script)
+        self.assertIn('attr("r", 16)', script)
+        self.assertIn("bindCountryControl(microterritoryControls)", script)
+        self.assertIn('.append("title")', script)
 
     def test_ids_geograficos_configurados_existem_no_world_atlas_local(self):
         caminho = Path(finders.find("praticas/data/countries-50m.json"))

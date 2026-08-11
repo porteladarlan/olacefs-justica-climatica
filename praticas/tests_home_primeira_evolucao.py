@@ -1,5 +1,7 @@
 import re
+from pathlib import Path
 
+from django.contrib.staticfiles import finders
 from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
@@ -97,6 +99,10 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertContains(response, f'src="{static("praticas/img/camilo-benitez.jpg")}"')
         self.assertContains(response, f'src="{static("praticas/img/pamela-calletti.jpg")}"')
         self.assertIsNone(re.search(r'<img[^>]+src=["\']https?://', html, re.IGNORECASE))
+        self.assertLess(
+            html.index("Dra. Pamela Calletti"),
+            html.index("Dr. Camilo Ben&iacute;tez"),
+        )
 
     def test_fundamentos_tem_exatamente_tres_abas_acessiveis(self):
         response = self.client.get(reverse("pagina_inicial"))
@@ -134,6 +140,51 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertContains(response, 'tab.addEventListener("shown.bs.tab", handleShown, { once: true });', count=1)
         self.assertContains(response, "bootstrap.Tab.getOrCreateInstance(tab).show();", count=1)
         self.assertContains(response, 'event.key === "Enter" || event.key === " "')
+
+    def test_home_usa_estados_roxos_sem_foco_amarelo(self):
+        css = Path(finders.find("praticas/css/home.css")).read_text(
+            encoding="utf-8"
+        )
+
+        self.assertRegex(
+            css,
+            r"\.home-foundation-tab\s*\{[^}]*background: var\(--lilac-pale\)",
+        )
+        self.assertRegex(
+            css,
+            r"\.home-foundation-tab\.active,[^{]+\{[^}]*background: var\(--purple\)",
+        )
+        self.assertRegex(
+            css,
+            r"\.home-map-country\.is-member\s*\{[^}]*fill: var\(--purple-soft\)",
+        )
+        self.assertRegex(
+            css,
+            r"\.home-map-country\.is-selected\s*\{[^}]*fill: var\(--purple\)",
+        )
+        self.assertIn(".home-map-country.is-coordinated", css)
+        self.assertIn("outline: 3px solid var(--purple-mid);", css)
+        self.assertNotIn("#f4b400", css.lower())
+        self.assertNotIn("#ffd800", css.lower())
+        self.assertNotIn("fill: #698D8B", css)
+
+    def test_links_nao_homologados_permanecem_sem_url_inventada(self):
+        response = self.client.get(reverse("pagina_inicial"))
+        html = response.content.decode("utf-8")
+        fundamentos = html.split(
+            '<section class="home-foundations', 1
+        )[1].split("</section>", 1)[0]
+
+        self.assertEqual(
+            fundamentos.count(f'href="{reverse("sobre_plataforma")}"'),
+            3,
+        )
+        self.assertEqual(
+            fundamentos.count('data-bs-target="#ejemplosModal"'),
+            3,
+        )
+        self.assertNotIn("Position_Paper_Miolo_ESP.pdf", fundamentos)
+        self.assertNotIn("Denny", fundamentos)
 
     def test_fundamentos_preservam_conteudo_nos_tres_idiomas(self):
         casos = [

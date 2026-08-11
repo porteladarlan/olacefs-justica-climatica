@@ -18,6 +18,11 @@
     const experiences = document.getElementById("regionalMapExperiences");
     const norms = document.getElementById("regionalMapNorms");
     const clearButton = document.getElementById("regionalMapClear");
+    const coordinatedSelect = document.getElementById("regionalMapCoordinatedAudit");
+    const coordinatedStatus = document.getElementById("regionalMapCoordinatedStatus");
+    const coordinatedInitialStatus = coordinatedStatus
+        ? coordinatedStatus.textContent.trim()
+        : "";
     const actionButtons = Array.from(form.querySelectorAll("button[type='submit']"));
     const countryCheckboxes = Array.from(form.querySelectorAll("input[name='pais']"));
 
@@ -30,6 +35,9 @@
     }
 
     const countries = Array.isArray(payload.paises) ? payload.paises : [];
+    const coordinatedAudits = Array.isArray(payload.auditorias_coordenadas)
+        ? payload.auditorias_coordenadas
+        : [];
     const countriesByGeoId = new Map(
         countries.map(function (country) {
             return [String(country.geo_id).padStart(3, "0"), country];
@@ -45,8 +53,17 @@
             return String(geoId).padStart(3, "0");
         })
     );
+    const coordinatedAuditsById = new Map(
+        coordinatedAudits.map(function (audit) {
+            return [String(audit.id), audit];
+        })
+    );
+    const microterritoryGeoIds = new Set(["531", "533"]);
     const selectedIds = new Set();
+    const coordinatedHighlightedIds = new Set();
     let memberPaths = null;
+    let interactiveCountryPaths = null;
+    let microterritoryControls = null;
 
     function selectedCountries() {
         return countries.filter(function (country) {
@@ -54,11 +71,19 @@
         });
     }
 
-    function accessibleCountryLabel(country, isSelected) {
+    function accessibleCountryLabel(country, isSelected, isCoordinated) {
         const state = isSelected
             ? section.dataset.selectedLabel
             : section.dataset.unselectedLabel;
-        return section.dataset.countryLabel + " " + country.nome + ", " + state;
+        let label = section.dataset.countryLabel + " " + country.nome + ", " + state;
+        if (isCoordinated) {
+            label += ", " + section.dataset.coordinatedLabel;
+        }
+        return label;
+    }
+
+    function countryForFeature(feature) {
+        return countriesByGeoId.get(String(feature.id).padStart(3, "0"));
     }
 
     function updatePathState() {
@@ -67,26 +92,57 @@
         }
         memberPaths
             .classed("is-selected", function (feature) {
-                const country = countriesByGeoId.get(
-                    String(feature.id).padStart(3, "0")
-                );
+                const country = countryForFeature(feature);
                 return country && selectedIds.has(String(country.id));
             })
-            .attr("aria-pressed", function (feature) {
-                const country = countriesByGeoId.get(
-                    String(feature.id).padStart(3, "0")
-                );
-                return country && selectedIds.has(String(country.id)) ? "true" : "false";
-            })
-            .attr("aria-label", function (feature) {
-                const country = countriesByGeoId.get(
-                    String(feature.id).padStart(3, "0")
-                );
-                return accessibleCountryLabel(
-                    country,
-                    selectedIds.has(String(country.id))
-                );
+            .classed("is-coordinated", function (feature) {
+                const country = countryForFeature(feature);
+                return country && coordinatedHighlightedIds.has(String(country.id));
             });
+
+        if (interactiveCountryPaths) {
+            interactiveCountryPaths
+                .attr("aria-pressed", function (feature) {
+                    const country = countryForFeature(feature);
+                    return country && selectedIds.has(String(country.id))
+                        ? "true"
+                        : "false";
+                })
+                .attr("aria-label", function (feature) {
+                    const country = countryForFeature(feature);
+                    return accessibleCountryLabel(
+                        country,
+                        selectedIds.has(String(country.id)),
+                        coordinatedHighlightedIds.has(String(country.id))
+                    );
+                });
+        }
+
+        if (microterritoryControls) {
+            microterritoryControls
+                .classed("is-selected", function (feature) {
+                    const country = countryForFeature(feature);
+                    return country && selectedIds.has(String(country.id));
+                })
+                .classed("is-coordinated", function (feature) {
+                    const country = countryForFeature(feature);
+                    return country && coordinatedHighlightedIds.has(String(country.id));
+                })
+                .attr("aria-pressed", function (feature) {
+                    const country = countryForFeature(feature);
+                    return country && selectedIds.has(String(country.id))
+                        ? "true"
+                        : "false";
+                })
+                .attr("aria-label", function (feature) {
+                    const country = countryForFeature(feature);
+                    return accessibleCountryLabel(
+                        country,
+                        selectedIds.has(String(country.id)),
+                        coordinatedHighlightedIds.has(String(country.id))
+                    );
+                });
+        }
     }
 
     function updateCount(total) {
@@ -173,6 +229,29 @@
         setCountrySelected(countryId, !selectedIds.has(countryId));
     }
 
+    function updateCoordinatedHighlight(auditId) {
+        coordinatedHighlightedIds.clear();
+        const audit = coordinatedAuditsById.get(String(auditId));
+
+        if (audit) {
+            (audit.paises || []).forEach(function (country) {
+                coordinatedHighlightedIds.add(String(country.id));
+            });
+            if (coordinatedStatus) {
+                const countryNames = (audit.paises || []).map(function (country) {
+                    return country.nome;
+                });
+                coordinatedStatus.textContent = section.dataset.coordinatedSummary
+                    .replace("{audit}", audit.titulo)
+                    .replace("{countries}", countryNames.join(", "));
+            }
+        } else if (coordinatedStatus) {
+            coordinatedStatus.textContent = coordinatedInitialStatus;
+        }
+
+        updatePathState();
+    }
+
     function showTooltip(event, country) {
         if (!tooltip || !country) {
             return;
@@ -205,6 +284,33 @@
         message.setAttribute("role", "alert");
         message.textContent = section.dataset.loadError;
         mapContainer.append(message);
+    }
+
+    function bindCountryControl(selection) {
+        return selection
+            .attr("role", "button")
+            .attr("tabindex", "0")
+            .attr("data-country-id", function (feature) {
+                return String(countryForFeature(feature).id);
+            })
+            .attr("aria-pressed", "false")
+            .attr("aria-label", function (feature) {
+                return accessibleCountryLabel(countryForFeature(feature), false, false);
+            })
+            .on("click", function (event, feature) {
+                toggleCountry(countryForFeature(feature));
+            })
+            .on("keydown", function (event, feature) {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    toggleCountry(countryForFeature(feature));
+                }
+            })
+            .on("pointermove", function (event, feature) {
+                showTooltip(event, countryForFeature(feature));
+            })
+            .on("pointerleave", hideTooltip)
+            .on("blur", hideTooltip);
     }
 
     function buildMap(topology) {
@@ -260,42 +366,56 @@
         memberPaths = paths
             .filter(function (feature) {
                 return countriesByGeoId.has(String(feature.id).padStart(3, "0"));
-            })
-            .attr("role", "button")
-            .attr("tabindex", "0")
-            .attr("data-country-id", function (feature) {
-                return String(
-                    countriesByGeoId.get(String(feature.id).padStart(3, "0")).id
+            });
+
+        memberPaths
+            .filter(function (feature) {
+                return microterritoryGeoIds.has(
+                    String(feature.id).padStart(3, "0")
                 );
             })
-            .attr("aria-pressed", "false")
-            .attr("aria-label", function (feature) {
-                return accessibleCountryLabel(
-                    countriesByGeoId.get(String(feature.id).padStart(3, "0")),
-                    false
+            .classed("is-microterritory", true)
+            .attr("aria-hidden", "true")
+            .attr("focusable", "false");
+
+        interactiveCountryPaths = bindCountryControl(
+            memberPaths.filter(function (feature) {
+                return !microterritoryGeoIds.has(
+                    String(feature.id).padStart(3, "0")
                 );
             })
-            .on("click", function (event, feature) {
-                toggleCountry(
-                    countriesByGeoId.get(String(feature.id).padStart(3, "0"))
-                );
-            })
-            .on("keydown", function (event, feature) {
-                if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    toggleCountry(
-                        countriesByGeoId.get(String(feature.id).padStart(3, "0"))
-                    );
-                }
-            })
-            .on("pointermove", function (event, feature) {
-                showTooltip(
-                    event,
-                    countriesByGeoId.get(String(feature.id).padStart(3, "0"))
-                );
-            })
-            .on("pointerleave", hideTooltip)
-            .on("blur", hideTooltip);
+        );
+
+        const microterritoryFeatures = features.filter(function (feature) {
+            const geoId = String(feature.id).padStart(3, "0");
+            return microterritoryGeoIds.has(geoId) && countriesByGeoId.has(geoId);
+        });
+        microterritoryControls = svg
+            .append("g")
+            .attr("class", "home-map-microterritory-layer")
+            .selectAll("g")
+            .data(microterritoryFeatures)
+            .join("g")
+            .attr("class", "home-map-microterritory-control")
+            .attr("transform", function (feature) {
+                const centroid = path.centroid(feature);
+                return "translate(" + centroid[0] + "," + centroid[1] + ")";
+            });
+
+        microterritoryControls
+            .append("circle")
+            .attr("class", "home-map-microterritory-hit")
+            .attr("r", 16);
+        microterritoryControls
+            .append("circle")
+            .attr("class", "home-map-microterritory-marker")
+            .attr("r", 5);
+        microterritoryControls
+            .append("title")
+            .text(function (feature) {
+                return countryForFeature(feature).nome;
+            });
+        bindCountryControl(microterritoryControls);
 
         updatePathState();
     }
@@ -306,13 +426,19 @@
         });
     });
 
+    if (coordinatedSelect) {
+        coordinatedSelect.addEventListener("change", function () {
+            updateCoordinatedHighlight(coordinatedSelect.value);
+        });
+    }
+
     chips.addEventListener("click", function (event) {
         const button = event.target.closest("button[data-country-id]");
         if (button) {
             const countryId = button.dataset.countryId;
             setCountrySelected(countryId, false);
             const mapControl = mapContainer.querySelector(
-                ".home-map-country[data-country-id='" + countryId + "']"
+                "[data-country-id='" + countryId + "']"
             );
             if (mapControl) {
                 mapControl.focus();

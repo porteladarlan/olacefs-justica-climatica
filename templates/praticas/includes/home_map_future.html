@@ -11,6 +11,8 @@
     data-selected-one="{% if LANGUAGE_CODE == 'en' %}1 country selected{% elif LANGUAGE_CODE == 'es' %}1 pa&iacute;s seleccionado{% else %}1 pa&iacute;s selecionado{% endif %}"
     data-selected-many="{% if LANGUAGE_CODE == 'en' %}{count} countries selected{% elif LANGUAGE_CODE == 'es' %}{count} pa&iacute;ses seleccionados{% else %}{count} pa&iacute;ses selecionados{% endif %}"
     data-remove-label="{% if LANGUAGE_CODE == 'en' %}Remove{% elif LANGUAGE_CODE == 'es' %}Quitar{% else %}Remover{% endif %}"
+    data-coordinated-label="{% if LANGUAGE_CODE == 'en' %}highlighted by the coordinated audit{% elif LANGUAGE_CODE == 'es' %}destacado por la auditor&iacute;a coordinada{% else %}destacado pela auditoria coordenada{% endif %}"
+    data-coordinated-summary="{% if LANGUAGE_CODE == 'en' %}Coordinated audit: {audit}. Highlighted countries: {countries}.{% elif LANGUAGE_CODE == 'es' %}Auditor&iacute;a coordinada: {audit}. Pa&iacute;ses destacados: {countries}.{% else %}Auditoria coordenada: {audit}. Pa&iacute;ses destacados: {countries}.{% endif %}"
     data-load-error="{% if LANGUAGE_CODE == 'en' %}The regional map could not be loaded. Use the country list, which remains fully functional.{% elif LANGUAGE_CODE == 'es' %}No se pudo cargar el mapa regional. Utiliza la lista de pa&iacute;ses, que sigue totalmente funcional.{% else %}N&atilde;o foi poss&iacute;vel carregar o mapa regional. Use a lista de pa&iacute;ses, que continua totalmente funcional.{% endif %}"
 >
     <div class="home-section-wrap">
@@ -43,6 +45,7 @@
                 <div class="home-map-legend" aria-label="{% if LANGUAGE_CODE == 'en' %}Map legend{% elif LANGUAGE_CODE == 'es' %}Leyenda del mapa{% else %}Legenda do mapa{% endif %}">
                     <span><span class="home-map-dot is-member" aria-hidden="true"></span>{% if LANGUAGE_CODE == 'en' %}OLACEFS member SAI{% elif LANGUAGE_CODE == 'es' %}EFS miembro OLACEFS{% else %}EFS membro OLACEFS{% endif %}</span>
                     <span><span class="home-map-dot is-selected" aria-hidden="true"></span>{% if LANGUAGE_CODE == 'en' %}Selected{% elif LANGUAGE_CODE == 'es' %}Seleccionado{% else %}Selecionado{% endif %}</span>
+                    <span><span class="home-map-dot is-coordinated" aria-hidden="true"></span>{% if LANGUAGE_CODE == 'en' %}Coordinated audit{% elif LANGUAGE_CODE == 'es' %}Auditor&iacute;a coordinada{% else %}Auditoria coordenada{% endif %}</span>
                     <span><span class="home-map-dot is-other" aria-hidden="true"></span>{% if LANGUAGE_CODE == 'en' %}Other countries{% elif LANGUAGE_CODE == 'es' %}Otros pa&iacute;ses{% else %}Outros pa&iacute;ses{% endif %}</span>
                 </div>
                 <noscript>
@@ -56,6 +59,29 @@
                 <h3 id="home-map-panel-title">
                     {% if LANGUAGE_CODE == 'en' %}Regional selection{% elif LANGUAGE_CODE == 'es' %}Selecci&oacute;n regional{% else %}Sele&ccedil;&atilde;o regional{% endif %}
                 </h3>
+                <div class="home-map-coordinated-control">
+                    <label for="regionalMapCoordinatedAudit">
+                        {% if LANGUAGE_CODE == 'en' %}Coordinated audit{% elif LANGUAGE_CODE == 'es' %}Auditor&iacute;a coordinada{% else %}Auditoria coordenada{% endif %}
+                    </label>
+                    <select
+                        class="form-select"
+                        id="regionalMapCoordinatedAudit"
+                        aria-describedby="regionalMapCoordinatedStatus"
+                        {% if not mapa_regional.auditorias_coordenadas %}disabled{% endif %}
+                    >
+                        <option value="">{% if LANGUAGE_CODE == 'en' %}Select a coordinated audit{% elif LANGUAGE_CODE == 'es' %}Seleccione una auditor&iacute;a coordinada{% else %}Selecione uma auditoria coordenada{% endif %}</option>
+                        {% for auditoria in mapa_regional.auditorias_coordenadas %}
+                            <option value="{{ auditoria.id }}">{{ auditoria.titulo }}</option>
+                        {% endfor %}
+                    </select>
+                    <p id="regionalMapCoordinatedStatus" aria-live="polite" aria-atomic="true">
+                        {% if mapa_regional.auditorias_coordenadas %}
+                            {% if LANGUAGE_CODE == 'en' %}Visual highlight only; the manual country selection remains unchanged.{% elif LANGUAGE_CODE == 'es' %}El destaque es solo visual; la selecci&oacute;n manual de pa&iacute;ses no cambia.{% else %}O destaque &eacute; apenas visual; a sele&ccedil;&atilde;o manual de pa&iacute;ses n&atilde;o muda.{% endif %}
+                        {% else %}
+                            {% if LANGUAGE_CODE == 'en' %}No coordinated audits with additional participating SAIs are available.{% elif LANGUAGE_CODE == 'es' %}No hay auditor&iacute;as coordinadas con EFS participantes adicionales disponibles.{% else %}N&atilde;o h&aacute; auditorias coordenadas com EFS participantes adicionais dispon&iacute;veis.{% endif %}
+                        {% endif %}
+                    </p>
+                </div>
                 <p class="home-map-empty" id="regionalMapEmpty">
                     {% if LANGUAGE_CODE == 'en' %}Click countries on the map to select them. You can choose several at once.{% elif LANGUAGE_CODE == 'es' %}Haz clic en los pa&iacute;ses del mapa para seleccionarlos. Puedes elegir varios a la vez.{% else %}Clique nos pa&iacute;ses do mapa para selecion&aacute;-los. Voc&ecirc; pode escolher v&aacute;rios ao mesmo tempo.{% endif %}
                 </p>
