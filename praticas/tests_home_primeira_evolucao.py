@@ -126,7 +126,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
 
         self.assertEqual(len(re.findall(r"<h2\b", fundamentos)), 1)
         self.assertEqual(len(re.findall(r"<h3\b", fundamentos)), 3)
-        self.assertEqual(len(re.findall(r"<h4\b", fundamentos)), 6)
+        self.assertEqual(len(re.findall(r"<h4\b", fundamentos)), 5)
         self.assertIsNone(re.search(r"<h(?:1|5|6)\b", fundamentos))
         self.assertIsNone(re.search(r"<h[2-4][^>]*>\s*</h[2-4]>", fundamentos))
 
@@ -168,28 +168,82 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertNotIn("#ffd800", css.lower())
         self.assertNotIn("fill: #698D8B", css)
 
-    def test_links_nao_homologados_permanecem_sem_url_inventada(self):
+    def test_ctas_usam_position_paper_e_pagina_de_exemplos(self):
+        response = self.client.get(reverse("pagina_inicial"))
+        html = response.content.decode("utf-8")
+        fundamentos = html.split(
+            '<section class="home-foundations', 1
+        )[1].split("</section>", 1)[0]
+        position_paper = (
+            "https://olacefs.com/giz/wp-content/uploads/sites/14/2025/11/"
+            "Position_Paper_Miolo_ESP.pdf"
+        )
+
+        self.assertEqual(
+            fundamentos.count(f'href="{position_paper}"'),
+            3,
+        )
+        self.assertEqual(
+            fundamentos.count('target="_blank" rel="noopener noreferrer"'),
+            3,
+        )
+        self.assertEqual(
+            fundamentos.count(
+                f'href="{reverse("exemplos_injustica_climatica")}"'
+            ),
+            3,
+        )
+        self.assertNotIn(f'href="{reverse("sobre_plataforma")}"', fundamentos)
+        self.assertNotIn("#ejemplosModal", fundamentos)
+
+    def test_caixas_conceituais_aparecem_antes_dos_ctas_em_todas_as_abas(self):
         response = self.client.get(reverse("pagina_inicial"))
         html = response.content.decode("utf-8")
         fundamentos = html.split(
             '<section class="home-foundations', 1
         )[1].split("</section>", 1)[0]
 
-        self.assertEqual(
-            fundamentos.count(f'href="{reverse("sobre_plataforma")}"'),
-            3,
+        for pane_id in ("concepto-pane", "controle-pane", "genero-pane"):
+            with self.subTest(pane_id=pane_id):
+                painel = fundamentos.split(f'id="{pane_id}"', 1)[1]
+                if pane_id != "genero-pane":
+                    self.assertLess(
+                        painel.index('class="home-foundation-strategies"'),
+                        painel.index('class="home-foundation-actions"'),
+                    )
+                self.assertLess(
+                    painel.index('class="home-foundation-top"'),
+                    painel.index('class="home-foundation-actions"'),
+                )
+
+    def test_texto_negocial_portugues_e_integralmente_renderizado(self):
+        response = self.client.get(reverse("pagina_inicial"))
+
+        trechos = (
+            "Justiça climática é uma abordagem que integra os Direitos Humanos, "
+            "a justiça social e proteção ambiental",
+            "Equidade e Inclusão",
+            "Não apenas, minimizar impactos negativos das mudanças climáticas",
+            "Participação Social",
+            "Incorporar a consulta, envolvimento e participação efetiva",
+            "Responsabilidades comuns, mas compartilhadas",
+            "a responsabilidade pelo enfrentamento da mudança do clima é comum, "
+            "porém diferenciada",
         )
-        self.assertEqual(
-            fundamentos.count('data-bs-target="#ejemplosModal"'),
-            3,
-        )
-        self.assertNotIn("Position_Paper_Miolo_ESP.pdf", fundamentos)
-        self.assertNotIn("Denny", fundamentos)
+        for trecho in trechos:
+            with self.subTest(trecho=trecho):
+                self.assertContains(response, trecho)
+
+    def test_home_nao_renderiza_modal_legado_de_exemplos(self):
+        response = self.client.get(reverse("pagina_inicial"))
+
+        self.assertNotContains(response, 'id="ejemplosModal"')
+        self.assertNotContains(response, 'data-bs-target="#ejemplosModal"')
 
     def test_fundamentos_preservam_conteudo_nos_tres_idiomas(self):
         casos = [
-            ("/", "Fundamentos e estrat&eacute;gias", "Participa&ccedil;&atilde;o nos benef&iacute;cios", "Estrat&eacute;gia de g&ecirc;nero"),
-            ("/es/", "Fundamentos y estrategias", "Participaci&oacute;n en los beneficios", "Estrategia de g&eacute;nero"),
+            ("/", "Fundamentos e estratégias", "Equidade e Inclusão", "Estratégia de gênero"),
+            ("/es/", "Fundamentos y estrategias", "Participación en los beneficios", "Estrategia de género"),
             ("/en/", "Foundations and strategies", "Benefit sharing", "Gender strategy"),
         ]
 
@@ -200,6 +254,69 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertContains(response, titulo, html=False)
                 self.assertContains(response, beneficio, html=False)
                 self.assertContains(response, genero, html=False)
+
+    def test_home_preserva_textos_institucionais_existentes_em_es_e_en(self):
+        casos = (
+            (
+                "/es/",
+                "Justicia climática significa poner la equidad y los derechos "
+                "humanos en el centro",
+            ),
+            (
+                "/en/",
+                "Climate justice means putting equity and human rights at the "
+                "center",
+            ),
+        )
+
+        for caminho, trecho in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, trecho)
+
+    def test_pagina_de_exemplos_e_publica_trilingue_e_usa_acervo_oficial(self):
+        casos = (
+            ("/exemplos-injustica-climatica/", "Exemplos de injustiça climática"),
+            ("/es/exemplos-injustica-climatica/", "Ejemplos de injusticia climática"),
+            ("/en/exemplos-injustica-climatica/", "Examples of climate injustice"),
+        )
+
+        for caminho, titulo in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, titulo)
+                self.assertContains(response, "OLACEFS + GIZ")
+                self.assertContains(response, "Gustavo Mansur / Agência Senado")
+                self.assertContains(response, "FAO (2019)")
+                self.assertContains(response, "Denisa Starbova")
+                self.assertContains(
+                    response,
+                    'src="/static/praticas/img/ejemplo-rs2024.jpg"',
+                )
+                self.assertContains(
+                    response,
+                    'src="/static/praticas/img/ejemplo-corredor-seco.jpg"',
+                )
+                self.assertContains(
+                    response,
+                    'src="/static/praticas/img/ejemplo-huni-kui.jpg"',
+                )
+
+    def test_pagina_de_exemplos_tem_breadcrumb_e_hierarquia_semantica(self):
+        response = self.client.get(reverse("exemplos_injustica_climatica"))
+        html = response.content.decode("utf-8")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'aria-label="Navegação estrutural"')
+        self.assertContains(response, f'href="{reverse("pagina_inicial")}"')
+        self.assertContains(
+            response,
+            f'href="{reverse("pagina_inicial")}#pillarsSection"',
+        )
+        self.assertEqual(len(re.findall(r"<h1\b", html)), 1)
+        self.assertGreaterEqual(len(re.findall(r"<h2\b", html)), 4)
 
     def test_mapa_funcional_e_video_honesto_sem_dados_falsos(self):
         casos = [

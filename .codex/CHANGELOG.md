@@ -65,6 +65,10 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 
 - Reordenadas as Presidências, alinhados mapa/fundamentos à paleta roxa e incluídos microterritórios e destaque visual de auditorias coordenadas com relação explícita de EFS participantes.
 
+# 2026-08-12 — Correção negocial de Fundamentos e estratégias
+
+- Atualizado o conteúdo em português, reposicionados os CTAs e publicada a página trilíngue de exemplos com o acervo do protótipo oficial.
+
 # 2026-08-11 — Fase 2I: gate de prontidão para homologação
 
 - Atualizado o diagnóstico por ambiente para separar falhas críticas, avisos de HTTPS/HSTS e dependências institucionais, com propagação testada pelo gate consolidado.

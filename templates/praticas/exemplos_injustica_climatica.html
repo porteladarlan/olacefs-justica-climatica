@@ -1,0 +1,87 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Examples of climate injustice{% elif LANGUAGE_CODE == 'es' %}Ejemplos de injusticia climática{% else %}Exemplos de injustiça climática{% endif %} | Plataforma Regional{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'praticas/css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+{% get_static_prefix as STATIC_PREFIX %}
+<article class="climate-examples" aria-labelledby="climate-examples-title">
+    <nav class="climate-examples-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Migas de pan{% else %}Navegação estrutural{% endif %}">
+        <ol>
+            <li><a href="{% url 'pagina_inicial' %}">{% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}Home{% endif %}</a></li>
+            <li><a href="{% url 'pagina_inicial' %}#pillarsSection">{% if LANGUAGE_CODE == 'en' %}Foundations and strategies{% elif LANGUAGE_CODE == 'es' %}Fundamentos y estrategias{% else %}Fundamentos e estratégias{% endif %}</a></li>
+            <li aria-current="page">{% if LANGUAGE_CODE == 'en' %}Examples of climate injustice{% elif LANGUAGE_CODE == 'es' %}Ejemplos de injusticia climática{% else %}Exemplos de injustiça climática{% endif %}</li>
+        </ol>
+    </nav>
+
+    <header class="climate-examples-header">
+        <p class="climate-examples-eyebrow">{% if LANGUAGE_CODE == 'en' %}Official collection · OLACEFS + GIZ{% elif LANGUAGE_CODE == 'es' %}Acervo oficial · OLACEFS + GIZ{% else %}Acervo oficial · OLACEFS + GIZ{% endif %}</p>
+        <h1 id="climate-examples-title">{% if LANGUAGE_CODE == 'en' %}Examples of climate injustice{% elif LANGUAGE_CODE == 'es' %}Ejemplos de injusticia climática{% else %}Exemplos de injustiça climática{% endif %}</h1>
+    </header>
+
+    <div class="climate-examples-introduction">
+        {% if LANGUAGE_CODE == 'en' %}
+            <p>The Latin American and Caribbean Organization of Supreme Audit Institutions (OLACEFS) is an autonomous, independent international body that, since 1963, has acted as a regional space for cooperation and knowledge exchange among the SAIs of its 22 member countries, promoting external government control, transparency and governance.</p>
+            <p>OLACEFS and German Cooperation (GIZ), commissioned by Germany's Federal Ministry for Economic Cooperation and Development (BMZ), implement the regional project promoting SAI-driven climate adaptation measures, enabling sustainable-infrastructure audits focused on climate justice, human rights and sustainability.</p>
+            <p>Below are three cases of climate injustice in Latin America and the Caribbean, showing how climate change deepens pre-existing natural and socioeconomic inequalities.</p>
+            <p class="climate-examples-note">Real photographs of the cited cases. Credits shown on each image.</p>
+            <h2>Climate injustice in the region</h2>
+            <p>It is important to distinguish natural hazards from disasters. Hurricanes, droughts, earthquakes or heavy rains are hazards, but only become disasters when they reach exposed and vulnerable populations, infrastructure or ecosystems. Disasters are not natural: they result from the interaction of hazard, exposure and social, economic, environmental and institutional vulnerabilities.</p>
+            <p>Risk does not affect everyone equally. Populations in poverty, social exclusion or forced displacement face greater exposure and lower response capacity, so disasters deepen pre-existing inequalities.</p>
+        {% elif LANGUAGE_CODE == 'es' %}
+            <p>La Organización Latinoamericana y del Caribe de Entidades Fiscalizadoras Superiores (OLACEFS) es un organismo internacional, autónomo e independiente que, desde 1963, actúa como espacio regional de cooperación e intercambio de conocimientos entre las EFS de sus 22 países miembros, promoviendo el control externo gubernamental, la transparencia y la gobernanza.</p>
+            <p>La OLACEFS y la Cooperación Alemana (GIZ), por encargo del Ministerio Federal de Cooperación Económica y Desarrollo (BMZ) de Alemania, implementan el proyecto regional de promoción de medidas de adaptación al cambio climático impulsadas por las EFS, creando condiciones para auditorías de infraestructura sostenible con enfoque en justicia climática, derechos humanos y sostenibilidad.</p>
+            <p>A continuación se presentan tres casos de injusticia climática en América Latina y el Caribe, que evidencian cómo el cambio climático agrava desigualdades naturales y socioeconómicas preexistentes.</p>
+            <p class="climate-examples-note">Fotografías reales de los casos citados. Créditos indicados en cada imagen.</p>
+            <h2>Injusticia climática en la región</h2>
+            <p>Es importante distinguir entre amenazas naturales y desastres. Huracanes, sequías, terremotos o lluvias intensas son amenazas, pero solo se transforman en desastres cuando alcanzan poblaciones, infraestructuras o ecosistemas expuestos y vulnerables. Los desastres no son naturales: resultan de la interacción entre la amenaza, la exposición y las vulnerabilidades sociales, económicas, ambientales e institucionales.</p>
+            <p>El riesgo no afecta a todas las personas de igual forma. Poblaciones en situación de pobreza, exclusión social o desplazamiento forzado presentan mayor exposición y menor capacidad de respuesta, de modo que los desastres profundizan desigualdades preexistentes.</p>
+        {% else %}
+            <p>A Organização Latino-Americana e do Caribe de Entidades Fiscalizadoras Superiores (OLACEFS) é um organismo internacional, autônomo e independente que, desde 1963, atua como espaço regional de cooperação e intercâmbio de conhecimentos entre as EFS de seus 22 países membros, promovendo o controle externo governamental, a transparência e a governança.</p>
+            <p>A OLACEFS e a Cooperação Alemã (GIZ), por encomenda do Ministério Federal da Cooperação Econômica e do Desenvolvimento (BMZ) da Alemanha, implementam o projeto regional de promoção de medidas de adaptação às mudanças climáticas impulsionadas pelas EFS, criando condições para auditorias de infraestrutura sustentável com enfoque em justiça climática, direitos humanos e sustentabilidade.</p>
+            <p>A seguir, três casos de injustiça climática na América Latina e no Caribe evidenciam como a mudança do clima agrava desigualdades naturais e socioeconômicas preexistentes.</p>
+            <p class="climate-examples-note">Fotografias reais dos casos citados. Créditos indicados em cada imagem.</p>
+            <h2>Injustiça climática na região</h2>
+            <p>É importante distinguir entre ameaças naturais e desastres. Furacões, secas, terremotos ou chuvas intensas são ameaças, mas só se transformam em desastres quando atingem populações, infraestruturas ou ecossistemas expostos e vulneráveis. Os desastres não são naturais: resultam da interação entre a ameaça, a exposição e as vulnerabilidades sociais, econômicas, ambientais e institucionais.</p>
+            <p>O risco não afeta todas as pessoas da mesma forma. Populações em situação de pobreza, exclusão social ou deslocamento forçado apresentam maior exposição e menor capacidade de resposta, de modo que os desastres aprofundam desigualdades preexistentes.</p>
+        {% endif %}
+    </div>
+
+    <section class="climate-example-case" aria-labelledby="climate-example-rs">
+        <h2 id="climate-example-rs">{% if LANGUAGE_CODE == 'en' %}1. Floods in Rio Grande do Sul (Brazil, 2024){% elif LANGUAGE_CODE == 'es' %}1. Inundaciones en Rio Grande do Sul (Brasil, 2024){% else %}1. Enchentes no Rio Grande do Sul (Brasil, 2024){% endif %}</h2>
+        <p>{% if LANGUAGE_CODE == 'en' %}The floods of April–May 2024 were one of the largest socio-environmental disasters in Brazil's recent history. Impacts fell most heavily on populations in areas of greater socio-environmental insecurity, with precarious housing, irregular settlement and historical urban-infrastructure deficits.{% elif LANGUAGE_CODE == 'es' %}Las inundaciones ocurridas entre abril y mayo de 2024 configuraron uno de los mayores desastres socioambientales de la historia reciente de Brasil. Los efectos recayeron con más intensidad sobre poblaciones en áreas de mayor inseguridad socioambiental, con viviendas precarias, ocupación irregular y déficits históricos de infraestructura urbana.{% else %}As inundações ocorridas entre abril e maio de 2024 configuraram um dos maiores desastres socioambientais da história recente do Brasil. Os efeitos recaíram de maneira mais intensa sobre populações em áreas de maior insegurança socioambiental, com habitações precárias, ocupação irregular e déficits históricos de infraestrutura urbana.{% endif %}</p>
+        <div class="climate-example-stats" aria-label="{% if LANGUAGE_CODE == 'en' %}Flood statistics{% elif LANGUAGE_CODE == 'es' %}Estadísticas de las inundaciones{% else %}Estatísticas das enchentes{% endif %}">
+            <div><strong>{% if LANGUAGE_CODE == 'en' %}2.4 M{% elif LANGUAGE_CODE == 'es' %}2,4 M{% else %}2,4 mi{% endif %}</strong><span>{% if LANGUAGE_CODE == 'en' %}potentially affected{% elif LANGUAGE_CODE == 'es' %}personas potencialmente afectadas{% else %}pessoas potencialmente afetadas{% endif %}</span></div>
+            <div><strong>183</strong><span>{% if LANGUAGE_CODE == 'en' %}deaths{% elif LANGUAGE_CODE == 'es' %}fallecidos{% else %}mortes{% endif %}</span></div>
+            <div><strong>{% if LANGUAGE_CODE == 'en' %}582k{% else %}582 mil{% endif %}</strong><span>{% if LANGUAGE_CODE == 'en' %}displaced{% elif LANGUAGE_CODE == 'es' %}desalojados{% else %}desalojadas{% endif %}</span></div>
+        </div>
+        <figure>
+            <img src="{{ STATIC_PREFIX }}praticas/img/ejemplo-rs2024.jpg" alt="{% if LANGUAGE_CODE == 'en' %}Figure 1 — Flooding in Rio Grande do Sul, Brazil, 2024{% elif LANGUAGE_CODE == 'es' %}Figura 1 — Inundación en Rio Grande do Sul, Brasil, 2024{% else %}Figura 1 — Inundação no Rio Grande do Sul, Brasil, em 2024{% endif %}" width="638" height="420" loading="lazy" decoding="async">
+            <figcaption>{% if LANGUAGE_CODE == 'en' %}Figure 1 — Flooding in Rio Grande do Sul, Brazil, 2024. Photo: Gustavo Mansur / Agência Senado{% elif LANGUAGE_CODE == 'es' %}Figura 1 — Inundación en Rio Grande do Sul, Brasil, 2024. Foto: Gustavo Mansur / Agência Senado{% else %}Figura 1 — Inundação no Rio Grande do Sul, Brasil, em 2024. Foto: Gustavo Mansur / Agência Senado{% endif %}</figcaption>
+        </figure>
+    </section>
+
+    <section class="climate-example-case" aria-labelledby="climate-example-dry-corridor">
+        <h2 id="climate-example-dry-corridor">{% if LANGUAGE_CODE == 'en' %}2. Central American Dry Corridor{% elif LANGUAGE_CODE == 'es' %}2. Corredor Seco Centroamericano{% else %}2. Corredor Seco Centro-Americano{% endif %}</h2>
+        <p>{% if LANGUAGE_CODE == 'en' %}The Dry Corridor and arid zones of the SICA countries are home to around 21 million rural people (mainly Guatemala, Honduras, El Salvador and Nicaragua). More frequent and intense droughts, alternating with extreme rainfall, compromise agricultural production, water availability and food security, hitting subsistence family farming hardest.{% elif LANGUAGE_CODE == 'es' %}El Corredor Seco y las zonas áridas de los países del SICA constituyen un territorio donde viven cerca de 21 millones de personas en áreas rurales (principalmente Guatemala, Honduras, El Salvador y Nicaragua). El aumento de la frecuencia e intensidad de las sequías, alternadas con precipitaciones extremas, compromete la producción agrícola, la disponibilidad de agua y la seguridad alimentaria, afectando sobre todo a la agricultura familiar de subsistencia.{% else %}O Corredor Seco e as zonas áridas dos países do SICA constituem um território onde vivem cerca de 21 milhões de pessoas em áreas rurais (principalmente Guatemala, Honduras, El Salvador e Nicarágua). O aumento da frequência e intensidade das secas, alternadas com precipitação extrema, compromete a produção agrícola, a disponibilidade de água e a segurança alimentar, afetando sobretudo a agricultura familiar de subsistência.{% endif %}</p>
+        <figure>
+            <img src="{{ STATIC_PREFIX }}praticas/img/ejemplo-corredor-seco.jpg" alt="{% if LANGUAGE_CODE == 'en' %}Figure 2 — Impact on agricultural production in the Central American Dry Corridor{% elif LANGUAGE_CODE == 'es' %}Figura 2 — Compromiso de la producción agrícola en el Corredor Seco Centroamericano{% else %}Figura 2 — Comprometimento da produção agrícola no Corredor Seco Centro-Americano{% endif %}" width="554" height="334" loading="lazy" decoding="async">
+            <figcaption>{% if LANGUAGE_CODE == 'en' %}Figure 2 — Impact on agricultural production in the Central American Dry Corridor. Photo: FAO (2019){% elif LANGUAGE_CODE == 'es' %}Figura 2 — Compromiso de la producción agrícola en el Corredor Seco Centroamericano. Foto: FAO (2019){% else %}Figura 2 — Comprometimento da produção agrícola no Corredor Seco Centro-Americano. Foto: FAO (2019){% endif %}</figcaption>
+        </figure>
+    </section>
+
+    <section class="climate-example-case" aria-labelledby="climate-example-amazon">
+        <h2 id="climate-example-amazon">{% if LANGUAGE_CODE == 'en' %}3. Impacts on Amazonian indigenous peoples{% elif LANGUAGE_CODE == 'es' %}3. Impactos sobre pueblos indígenas amazónicos{% else %}3. Impactos sobre povos indígenas amazônicos{% endif %}</h2>
+        <p>{% if LANGUAGE_CODE == 'en' %}The Amazon concentrates some of the most striking cases of climate injustice. Indigenous peoples face cumulative impacts from climate change, deforestation, fires and the expansion of major infrastructure. Though they contributed minimally to global emissions and play a key role in forest conservation, they are among the groups at greatest risk.{% elif LANGUAGE_CODE == 'es' %}La Amazonía concentra algunos de los casos más expresivos de injusticia climática. Los pueblos indígenas enfrentan impactos acumulativos del cambio climático, la deforestación, los incendios y la expansión de grandes obras de infraestructura. Aunque contribuyeron mínimamente a las emisiones globales y cumplen un papel fundamental en la conservación de los bosques, están entre los grupos bajo mayor riesgo.{% else %}A Amazônia concentra alguns dos casos mais expressivos de injustiça climática. Povos indígenas enfrentam impactos cumulativos da mudança do clima, do desmatamento, dos incêndios e da expansão de grandes obras de infraestrutura. Embora tenham contribuído minimamente para as emissões globais e desempenhem papel fundamental na conservação das florestas, estão entre os grupos sob maiores riscos.{% endif %}</p>
+        <figure>
+            <img src="{{ STATIC_PREFIX }}praticas/img/ejemplo-huni-kui.jpg" alt="{% if LANGUAGE_CODE == 'en' %}Figure 3 — Fires devastated the Huni Kui territory in Rio Branco/AC, 2019{% elif LANGUAGE_CODE == 'es' %}Figura 3 — Incendios devastaron el territorio Huni Kui, en Rio Branco/AC, 2019{% else %}Figura 3 — Queimadas devastaram território Huni Kui, em Rio Branco/AC, em 2019{% endif %}" width="484" height="323" loading="lazy" decoding="async">
+            <figcaption>{% if LANGUAGE_CODE == 'en' %}Figure 3 — Fires devastated the Huni Kui territory in Rio Branco/AC, 2019. Photo: Denisa Starbova{% elif LANGUAGE_CODE == 'es' %}Figura 3 — Incendios devastaron el territorio Huni Kui, en Rio Branco/AC, 2019. Foto: Denisa Starbova{% else %}Figura 3 — Queimadas devastaram território Huni Kui, em Rio Branco/AC, em 2019. Foto: Denisa Starbova{% endif %}</figcaption>
+        </figure>
+    </section>
+</article>
+{% endblock %}

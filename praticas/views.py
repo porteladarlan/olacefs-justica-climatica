@@ -633,6 +633,11 @@ def pagina_inicial(request):
     return render(request, "praticas/pagina_inicial.html", contexto)
 
 
+@require_safe
+def exemplos_injustica_climatica(request):
+    return render(request, "praticas/exemplos_injustica_climatica.html")
+
+
 def catalogo_experiencias(request):
     experiencias_base = experiencias_publicas()
     experiencias = (

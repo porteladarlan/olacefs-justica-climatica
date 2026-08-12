@@ -4,6 +4,11 @@ from . import views
 
 urlpatterns = [
     path("", views.pagina_inicial, name="pagina_inicial"),
+    path(
+        "exemplos-injustica-climatica/",
+        views.exemplos_injustica_climatica,
+        name="exemplos_injustica_climatica",
+    ),
     path("cadastro/", views.registrar_usuario, name="registrar_usuario"),
     path("entrar/", views.login_usuario, name="login_usuario"),
     path("sair/", views.logout_usuario, name="logout_usuario"),
