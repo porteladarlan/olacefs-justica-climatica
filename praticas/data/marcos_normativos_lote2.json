@@ -1,0 +1,1678 @@
+{
+  "versao": 1,
+  "quantidade": 34,
+  "marcos": [
+    {
+      "nome_es": "ACUERDO DE ESCAZÚ ACUERDO REGIONAL SOBRE EL ACCESO A LA INFORMACIÓN, LA PARTICIPACIÓN PÚBLICA Y EL ACCESO A LA JUSTICIA EN ASUNTOS AMBIENTALES EN AMÉRICA LATINA Y EL CARIBE",
+      "ano": 2018,
+      "ano_texto": "2018",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://repositorio.cepal.org/handle/11362/43595",
+      "introducao_es": "El Acuerdo de Escazú (2018) es el primer tratado regional vinculante de América Latina y el Caribe en materia de derechos de acceso en asuntos ambientales. Emerge del Principio 10 de la Declaración de Río (1992) y es el único acuerdo vinculante derivado de Río+20. Su relevancia climática es doble: por un lado, establece el marco procedimental mínimo que los Estados deben garantizar para que las políticas climáticas sean legítimas, participativas y exigibles; por otro, reconoce el derecho de toda persona a vivir en un medio ambiente sano, que constituye una base normativa para reclamar acción climática efectiva.\n\nPara las EFS de OLACEFS, el Acuerdo ofrece estándares objetivos y verificables — plazos, formatos, mecanismos — aplicables transversalmente a cualquier auditoría con perspectiva climática, desde la evaluación de inventarios de GEI hasta la fiscalización de procesos de participación en proyectos de energía renovable o infraestructura costera.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 27.566 (2020)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "Fuera del ámbito regional del Acuerdo"
+        },
+        {
+          "pais": "Belize",
+          "status": "Adhesión Poder Ejecutivo, 07/03/2023"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 1182 (2019)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Firmado (2018), no ratificado"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto 209/2022 (adhesión)"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 2273 (2022)"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Firmado (2018), no ratificado"
+        },
+        {
+          "pais": "Cuba",
+          "status": "No firmante"
+        },
+        {
+          "pais": "Curazao",
+          "status": "Fuera del ámbito regional del Acuerdo"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Ratificado en Asamblea Nacional el 21/05/2020"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "No firmante"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Firmado (2018), no ratificado"
+        },
+        {
+          "pais": "Honduras",
+          "status": "No firmante"
+        },
+        {
+          "pais": "México",
+          "status": "Aprob. Senado (DOF 09/12/2020)"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Ratificado en Asamblea Nacional el 09/03/2020"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 125 (2020)"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Firmado (2018), no ratificado"
+        },
+        {
+          "pais": "Perú",
+          "status": "Firmado (2018), no ratificado"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Fuera del ámbito regional del Acuerdo"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Firmado (2018), no ratificado"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ley 19.773 (2019)"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "No firmante"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Acuerdo de Escazú es un tratado vinculante, pero solo genera obligaciones jurídicas para los Estados que lo han ratificado o se han adherido a él. Es un instrumento regional abierto únicamente a los Estados de América Latina y el Caribe, por lo que Curazao, Aruba y Puerto Rico —al no ser Estados independientes— no están habilitados a ser Parte. De los 20 Estados soberanos miembros de OLACEFS:\n\n10 son actualmente Estados Parte (Argentina, Belize, Bolivia, Chile, Colombia, Ecuador, México, Nicaragua, Panamá y Uruguay)\n\n6 lo firmaron pero aún no lo han ratificado\n\n4 no son signatarios\n\nLa siguiente tabla indica, para cada país, la norma nacional o el acto por el que incorporó el Acuerdo o, en su defecto, su situación respecto de la firma y la ratificación."
+    },
+    {
+      "nome_es": "ACUERDO DE PARÍS",
+      "ano": 2015,
+      "ano_texto": "2015",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://unfccc.int/sites/default/files/spanish_paris_agreement.pdf",
+      "introducao_es": "El Acuerdo de París (2015) es el instrumento climático vinculante más ambicioso y universalmente adoptado. Reemplaza al Protocolo de Kioto y establece un régimen climático que abarca a todos los países del mundo, bajo el principio de responsabilidades comunes pero diferenciadas. Su arquitectura central descansa en las Contribuciones Determinadas a Nivel Nacional (NDC), que cada Parte debe preparar, comunicar y actualizar progresivamente cada cinco años.\n\nPara las EFS de OLACEFS, el Acuerdo de París es el principal marco de referencia para auditorías climáticas. Sus disposiciones sobre mitigación, adaptación, pérdidas y daños, financiamiento climático y transparencia generan obligaciones concretas y verificables que las entidades fiscalizadoras pueden auditar. El principio de progresión de las NDC — cada nueva contribución debe ser más ambiciosa que la anterior — crea un estándar de mejora continua que puede ser evaluado objetivamente.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 27.270 (2016)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratificado el 22/04/2016"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 835 (2016)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 140/2016; Decreto 9.073/2017"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto 30/2017 MRE"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 1844 de 2017"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 9405 (2016)"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Ratificación depositada el 28/12/2016"
+        },
+        {
+          "pais": "Curazao",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Decreto Ejecutivo 98 (2017)"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Acuerdo Ejec. 1765/2016; instrumentado el 14/03/2017"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Ratificado por el Congreso 2016 (depósito 25/01/2017)"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Decreto Legislativo 118-2016"
+        },
+        {
+          "pais": "México",
+          "status": "Decreto promulgatorio DOF 04/11/2016"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Adhesión ejecutiva el 23/10/2017"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 40 (2016)"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 5681 (2016)"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 30518 + D.S. 058-2016-RE"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Estados Unidos se retiró del Acuerdo (efectivo enero 2026)"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Resolución 122-17 (2017)"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ley 19.439 (2016)"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley Aprobatoria (G.O. 40.819, 2015)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "De los 23 miembros plenos de OLACEFS, los 20 Estados soberanos son Parte del Acuerdo de París, que entró en vigor el 4 de noviembre de 2016. Curazao y Aruba no están cubiertos (la ratificación del Reino de los Países Bajos aplica solo a su territorio europeo) y Puerto Rico tampoco, tras el retiro de Estados Unidos del Acuerdo, efectivo en enero de 2026. La siguiente tabla indica, para cada país, la norma nacional por la que lo ratificó, aprobó o se adhirió a él."
+    },
+    {
+      "nome_es": "ACUERDOS DE CANCÚN MARCO DE ADAPTACIÓN DE CANCÚN (COP16 CMNUCC, 2010)",
+      "ano": 2010,
+      "ano_texto": "2010",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://unfccc.int/topics/adaptation-and-resilience/workstreams/national-adaptation-plans",
+      "introducao_es": "Los Acuerdos de Cancún fueron adoptados en la COP16 de la CMNUCC (Cancún, México, 2010) y representan el primer marco político comprehensivo adoptado por consenso dentro del régimen climático para abordar simultáneamente la mitigación, la adaptación, el financiamiento, la tecnología y el fomento de capacidades. Aunque de naturaleza no vinculante, los Acuerdos de Cancún tienen una importancia normativa significativa porque establecieron el Marco de Adaptación de Cancún (MAC), que define los principios y componentes básicos de la adaptación que debían incorporar los planes nacionales de los países en desarrollo.\n\nPara las EFS de OLACEFS, los Acuerdos de Cancún son especialmente relevantes porque establecieron los Planes Nacionales de Adaptación (PNA) como instrumento central de la planificación adaptativa, y definieron los componentes que deben integrar las estrategias de reducción del riesgo de desastres. El MAC es el antecedente directo del proceso de PNA que el Acuerdo de París posteriormente reforzó con carácter obligatorio.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Los Acuerdos de Cancún fueron adoptados por consenso en la COP16 de la Convención Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC) mediante las decisiones 1/CP.16 y 2/CP.16. No constituyen un tratado sujeto a firma ni ratificación, por lo que no se incorporan al derecho interno mediante una ley aprobatoria. Son aplicables a los 23 miembros plenos de OLACEFS en su condición de Partes de la CMNUCC, y su fuerza deriva del consenso alcanzado, de su carácter programático y de su articulación con instrumentos vinculantes: la propia CMNUCC y, posteriormente, el Acuerdo de París, que dio carácter obligatorio a varios de sus componentes —en particular los planes nacionales de adaptación (PNA)—. Su aplicabilidad se refuerza cuando sus contenidos se integran en la planificación climática nacional, en las estrategias de reducción del riesgo de desastres y en las políticas sectoriales."
+    },
+    {
+      "nome_es": "AGENDA 2030 PARA EL DESARROLLO SOSTENIBLE OBJETIVOS DE DESARROLLO SOSTENIBLE",
+      "ano": 2015,
+      "ano_texto": "2015",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://undocs.org/es/A/RES/70/1",
+      "introducao_es": "La Agenda 2030 establece 17 Objetivos de Desarrollo Sostenible (ODS) con 169 metas y más de 230 indicadores. Representa el compromiso universal de los Estados con un desarrollo que no deje a nadie atrás, con especial atención a quienes se encuentran en mayor situación de vulnerabilidad.\n\nLa Agenda 2030 es indivisible e integral: todos los ODS están interrelacionados, y la acción climática no puede disociarse de la erradicación de la pobreza, la igualdad de género, la reducción de las desigualdades ni el acceso al agua, entre otros. Para las EFS de la región OLACEFS, los ODS constituyen un marco de rendición de cuentas de amplio alcance que articula la acción climática con el seguimiento de los compromisos nacionales voluntarios en materia de desarrollo sostenible.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Agenda 2030 fue adoptada por todos los Estados miembros de las Naciones Unidas el 25 de septiembre de 2015. Como resolución de la Asamblea General, no está sujeta a ratificación y aplica universalmente a los 23 miembros plenos de OLACEFS."
+    },
+    {
+      "nome_es": "CONVENIO SOBRE LA DIVERSIDAD BIOLÓGICA (CDB)",
+      "ano": 1992,
+      "ano_texto": "1992",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://www.cbd.int/convention/text/",
+      "introducao_es": "El CDB es el tratado internacional de referencia para la biodiversidad y tiene una relación simbiótica con la política climática: el cambio climático es una de las principales causas de pérdida de biodiversidad, y la pérdida de biodiversidad reduce la resiliencia de los ecosistemas ante el cambio climático. Las soluciones basadas en la naturaleza (conservación de bosques, restauración de humedales, manejo sostenible de tierras) son simultáneamente estrategias del CDB y herramientas de mitigación y adaptación climática.\n\nEl CDB proporciona estándares verificables de conservación y uso sostenible que las EFS pueden auditar para evaluar si los países están cumpliendo sus obligaciones de protección de los ecosistemas que sirven como infraestructura verde para la adaptación climática.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 24.375"
+        },
+        {
+          "pais": "Aruba",
+          "status": "Reino de los Países Bajos, ratif. 12/07/1994"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratif. Poder Ejecutivo, 30/12/1993"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 1580"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 2/1994; Decreto 2.519/1998"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto Supremo 1.963/1994"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 165"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 7416"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Ratif. Consejo de Estado, 08/03/1994"
+        },
+        {
+          "pais": "Curazao",
+          "status": "Reino de los Países Bajos, ratif. 12/07/1994"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "R.O. 647"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Decreto Legislativo 833"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Decreto 5-95"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Decreto Legislativo 30-95"
+        },
+        {
+          "pais": "México",
+          "status": "Aprob. Senado 03/12/1992"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Decreto 56-95"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 2 de 1995"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 253/93"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 26181"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Resolución 25-96"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ley 16.408"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley Aprobatoria (G.O. 4.780, 12/09/1994)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Los 20 Estados soberanos miembros de OLACEFS son Partes del Convenio sobre la Diversidad Biológica y están sujetos a sus obligaciones jurídicamente vinculantes; la mayoría ratificó entre 1992 y 1994, tras la Cumbre de la Tierra de Río de Janeiro (1992). La ratificación del Reino de los Países Bajos se extiende al Caribe neerlandés, por lo que Curazao y Aruba quedan cubiertos; Puerto Rico no, porque Estados Unidos no ratificó el Convenio. El CDB tiene 196 Partes a nivel mundial, lo que lo convierte en uno de los tratados ambientales con mayor adhesión universal."
+    },
+    {
+      "nome_es": "RECOMENDACIÓN GENERAL N. 37 DEL COMITÉ CEDAW DIMENSIONES DE GÉNERO DEL CAMBIO CLIMÁTICO Y LA REDUCCIÓN DEL RIESGO DE DESASTRES",
+      "ano": 2018,
+      "ano_texto": "2018 (Comité CEDAW, 71. período de sesiones)",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.ohchr.org/en/documents/general-comments-and-recommendations/general-recommendation-no-37-2018-gender-related",
+      "introducao_es": "La Recomendación General 37 de la CEDAW es el instrumento de referencia para incorporar la perspectiva de género en la acción climática y en la gestión del riesgo de desastres. Su fortaleza radica en que deriva de un tratado vinculante (la CEDAW), ratificado por todos los países OLACEFS, lo que le otorga un peso normativo significativo. Precisa el estándar de las políticas climáticas gender-responsive: no basta con que tengan componentes de género, sino que los impactos diferenciados deben estar analizados y las medidas ser efectivas. Los artículos de la CEDAW interpretados por la RG 37 son obligaciones de derechos humanos exigibles, y articula la dimensión de género con los marcos de gestión del riesgo de desastres (Marco de Sendai) y de adaptación climática (Acuerdo de París).",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Recomendación General 37 es una interpretación autorizada de la Convención sobre la Eliminación de Todas las Formas de Discriminación contra la Mujer (CEDAW, por sus siglas en inglés), aplicable a los 23 miembros plenos de OLACEFS. Constituye una interpretación autorizada del alcance y contenido de las obligaciones de la Convención."
+    },
+    {
+      "nome_es": "CONVENCIÓN MARCO DE LAS NACIONES UNIDAS SOBRE EL CAMBIO CLIMÁTICO (CMNUCC)",
+      "ano": 1992,
+      "ano_texto": "1992",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://unfccc.int/resource/docs/convkp/convsp.pdf",
+      "introducao_es": "La Convención Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC), adoptada en 1992 y en vigor desde 1994, constituye el tratado fundacional del régimen climático internacional. Establece el objetivo central de estabilizar las concentraciones de gases de efecto invernadero (GEI) en la atmósfera a un nivel que impida interferencias antropógenas peligrosas en el sistema climático. La CMNUCC creó la arquitectura institucional (Conferencia de las Partes, órganos subsidiarios, Secretaría) que ha generado todos los acuerdos climáticos posteriores, incluyendo el Protocolo de Kioto y el Acuerdo de París.\n\nPara las EFS de OLACEFS, la CMNUCC es el marco jurídico de referencia obligatorio. Sus principios y compromisos — incluidos los de transparencia, equidad, responsabilidades comunes pero diferenciadas y principio de precaución — proveen los estándares contra los cuales auditar la acción climática de los Estados de la región.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 24.295 (1993)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratificado por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 1576 (1994)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 1/1994; Decreto 2.652/1998"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto Supremo 123/1995 MRE"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 164 de 1994"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 7414 (1994)"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Ratificado por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Curazao",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Res. Legislativa, R.O. 148 (1993)"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Decreto Legislativo 424 (1995)"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Decreto 15-95"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Decreto Legislativo 26-95"
+        },
+        {
+          "pais": "México",
+          "status": "Ratificación 11/03/1993 (aprob. Senado)"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Decreto Legislativo 1010/1995"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 10 de 1995"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 251/93"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 26185 (1993)"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Estados Unidos, ratif. 15/10/1992"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Resolución 182-98"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ley 16.517 (1994)"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley Aprobatoria (G.O. 4.825, 1994)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Los 20 Estados soberanos miembros de OLACEFS son Parte de la CMNUCC, que entró en vigor el 21 de marzo de 1994. Puerto Rico queda cubierto por la ratificación de Estados Unidos. Curazao y Aruba no están comprendidos: la ratificación del Reino de los Países Bajos aplica solo a su territorio europeo. La siguiente tabla indica, para cada país, la norma nacional por la que la ratificó, aprobó o se adhirió a ella."
+    },
+    {
+      "nome_es": "CONVENCIÓN DE LAS NACIONES UNIDAS DE LUCHA CONTRA LA DESERTIFICACIÓN (UNCCD)",
+      "ano": 1994,
+      "ano_texto": "1994",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "La UNCCD es el único tratado ambiental vinculante dedicado específicamente a la degradación de las tierras, la desertificación y la sequía. Su relevancia para auditorías climáticas radica en que el cambio climático agrava directamente estos procesos: el incremento de temperaturas, los cambios en los patrones de precipitación y los eventos extremos aceleran la desertificación. Permite auditar los programas de acción nacionales (PAN) de lucha contra la desertificación; evaluar la gestión sostenible de la tierra; y verificar los sistemas de alerta temprana para la sequía, obligaciones jurídicamente vinculantes para los Estados Partes.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 24.701 (1996)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratificada por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 1688 (1996)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 28/1997"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto 2.065/1997"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 461 de 1998"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 7699 (1997)"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Ratificada por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Curazao",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Ratificación 1997"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Ratificación 1997"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Decreto 13-98"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificación 1997"
+        },
+        {
+          "pais": "México",
+          "status": "Ratificación 01/06/1995"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Decreto 38-98 (1998)"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 9 de 1996"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 970/97"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 26536 (1996)"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Estados Unidos, ratif. 17/11/2000"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Resolución 99-97 (1997)"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ley 17.026 (1998)"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley Aprobatoria (G.O. 5.239, 1998)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Los 20 Estados soberanos miembros de OLACEFS son Parte de la UNCCD, que entró en vigor el 26 de diciembre de 1996; su Anexo III está dedicado específicamente a América Latina y el Caribe. Puerto Rico queda cubierto por la ratificación de Estados Unidos; Curazao y Aruba no, ya que la ratificación del Reino de los Países Bajos aplica solo a su territorio europeo. La siguiente tabla indica, para cada país, la norma nacional por la que la ratificó, aprobó o se adhirió a ella."
+    },
+    {
+      "nome_es": "CONVENIO 169 DE LA OIT SOBRE PUEBLOS INDÍGENAS Y TRIBALES",
+      "ano": 1989,
+      "ano_texto": "1989",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://normlex.ilo.org/dyn/normlex/es/f?p=NORMLEXPUB:12100:0::NO::P12100_ILO_CODE:C169",
+      "introducao_es": "El Convenio 169 de la OIT es el único instrumento internacional jurídicamente vinculante que protege específicamente los derechos de los pueblos indígenas y tribales. Adoptado en 1989 y en vigor desde 1991, establece obligaciones exigibles para los Estados ratificantes respecto de consulta, participación y protección territorial en todos los sectores afectados por el cambio climático.\n\nEl Convenio tiene dos postulados básicos:\n\nEl derecho de los pueblos indígenas a mantener y fortalecer sus culturas, formas de vida e instituciones propias,\n\nSu derecho a participar de manera efectiva en las decisiones que les afectan.\n\nVincula directamente la justicia climática con los derechos territoriales. La pérdida y degradación de territorios indígenas es una dimensión de injusticia climática auditable desde la perspectiva de cumplimiento.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 24.071 (1992)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Belize",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 1257 (1991)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 143/2002; Decreto 5.051/2004"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto 236/2008 (vigor 2009)"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 21 de 1991"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 7316 (1992)"
+        },
+        {
+          "pais": "Cuba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Curazao",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "R.O. 304 (24/04/1998)"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Decreto 9-96"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificado 28/03/1995"
+        },
+        {
+          "pais": "México",
+          "status": "Ratificado 05/09/1990"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Ratificado 2010"
+        },
+        {
+          "pais": "Panamá",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 234/93"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 26253 (1993)"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley 41 Aprobatoria (2001)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "De los 20 Estados soberanos miembros de OLACEFS, 14 han ratificado el Convenio 169 y están sujetos a sus obligaciones jurídicamente vinculantes; los otros 6 no lo han ratificado, por lo que no les es jurídicamente exigible, aunque puede servir como estándar de referencia en auditorías de gestión. Ni Curazao y Aruba (la ratificación del Reino de los Países Bajos aplica solo a su territorio europeo) ni Puerto Rico (Estados Unidos no lo ratificó) están cubiertos."
+    },
+    {
+      "nome_es": "DECLARACIÓN DE ESTOCOLMO SOBRE EL MEDIO AMBIENTE HUMANO",
+      "ano": 1972,
+      "ano_texto": "1972 (16 de junio, Estocolmo, Suecia)",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Industria Extractiva",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://www.un.org/es/conferences/environment/stockholm1972",
+      "introducao_es": "La Declaración de Estocolmo (1972) es el punto de origen de la gobernanza ambiental global y el primer reconocimiento internacional de la relación entre medio ambiente y bienestar humano. Su relevancia para auditorías de justicia climática es histórica, normativa y pedagógica: permite evaluar la coherencia y evolución de los marcos normativos nacionales respecto de los principios fundacionales adoptados hace más de cinco décadas. Proporciona la base conceptual del principio de responsabilidad intergeneracional, central para auditar políticas climáticas de largo plazo. Es antecedente de principios hoy consolidados en el derecho internacional: no daño, prevención, cooperación, y equidad intergeneracional. Como instrumento no vinculante, su uso en auditorías de gestión permite evaluar la adopción voluntaria de estándares de buenas prácticas ambientales en la política pública nacional.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Todos. La Declaración de Estocolmo es un instrumento universal adoptado en el marco de la Conferencia de las Naciones Unidas sobre el Medio Humano. Como declaración de principios no vinculante, aplica a todos los Estados miembros de las Naciones Unidas. Los 23 miembros plenos de OLACEFS están comprendidos por sus disposiciones. Sus 26 principios han sido incorporados en constituciones nacionales, legislaciones ambientales y jurisprudencia de tribunales nacionales e internacionales a lo largo de más de cinco décadas."
+    },
+    {
+      "nome_es": "DECLARACIÓN DE RÍO SOBRE EL MEDIO AMBIENTE Y EL DESARROLLO",
+      "ano": 1992,
+      "ano_texto": "1992",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.un.org/es/conferences/environment/rio1992",
+      "introducao_es": "La Declaración de Río sobre el Medio Ambiente y el Desarrollo (1992) constituye el marco político fundacional del derecho ambiental internacional moderno. Aunque no es jurídicamente vinculante, sus 27 principios han influido decisivamente en la interpretación de tratados ambientales, en la jurisprudencia de tribunales nacionales e internacionales y en los estándares de buenas prácticas aplicables en auditorías con perspectiva climática. Los principios de la Declaración de Río son referencia ineludible para evaluar la coherencia, legitimidad y equidad de las políticas climáticas nacionales.\n\nAdoptada junto con el Programa 21 y los Principios sobre Bosques, la Declaración de Río consagró por primera vez a nivel global el concepto de desarrollo sostenible como eje articulador de la relación entre medio ambiente y desarrollo. Sus principios son de aplicación transversal a todos los sectores y tipos de auditoría con perspectiva climática.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Declaración de Río es un instrumento político universal adoptado en la Conferencia de las Naciones Unidas sobre el Medio Ambiente y el Desarrollo (CNUMAD, 1992). Como declaración de principios no vinculante, no está sujeta a ratificación y aplica a los 23 miembros plenos de OLACEFS: Argentina, Aruba, Belize, Bolivia, Brasil, Chile, Colombia, Costa Rica, Cuba, Curazao, Ecuador, El Salvador, Guatemala, Honduras, México, Nicaragua, Panamá, Paraguay, Perú, Puerto Rico, República Dominicana, Uruguay y Venezuela. Sus 27 principios han sido incorporados en constituciones nacionales, legislación ambiental y jurisprudencia de tribunales nacionales e internacionales."
+    },
+    {
+      "nome_es": "DECLARACIÓN DE JOHANNESBURGO SOBRE EL DESARROLLO SOSTENIBLE",
+      "ano": 2002,
+      "ano_texto": "2002 (4 de septiembre, Johannesburgo, Sudáfrica)",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.un.org/es/conferences/environment/johannesburg2002",
+      "introducao_es": "La Declaración de Johannesburgo y el Plan de Aplicación de la WSSD (2002) representan el punto culminante del ciclo normativo que comenzó en Estocolmo (1972) y se desarrolló en Río (1992). Su valor radica en:\n\nIntroducir metas cuantificables en sectores clave (agua, saneamiento), superando las declaraciones de principios de Estocolmo y Río 1992\n\nEstablecer vínculos explícitos entre pobreza, vulnerabilidad climática y desarrollo sostenible, anticipando el enfoque de justicia climática de la Agenda 2030\n\nServir como punto de referencia histórico del avance de los países OLACEFS en más de 20 años de compromisos de desarrollo sostenible\n\nReafirmar compromisos específicos para los SIDS OLACEFS, articulándolos con el BPOA y anticipando la Estrategia de Mauricio (2005).",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Declaración de Johannesburgo y el Plan de Aplicación de la Cumbre Mundial sobre el Desarrollo Sostenible (WSSD) son instrumentos universales. Como resoluciones de la ONU, aplican a todos los Estados miembros. Los 23 miembros plenos de OLACEFS están comprendidos por sus disposiciones. El Plan de Aplicación de la WSSD retoma específicamente el Programa de Acción de Barbados (BPOA) para los Estados insulares en desarrollo (SIDS), reafirmando compromisos diferenciados para los SIDS miembros de OLACEFS: Belize, Cuba, República Dominicana, Aruba, Curazao y Puerto Rico."
+    },
+    {
+      "nome_es": "DECLARACIÓN SOBRE EL DERECHO AL DESARROLLO (Res. AG 41/128)",
+      "ano": 1986,
+      "ano_texto": "1986",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.ohchr.org/es/instruments-mechanisms/instruments/declaration-right-development",
+      "introducao_es": "La Declaración sobre el Derecho al Desarrollo no es un instrumento específicamente climático, pero proporciona el marco conceptual para evaluar la dimensión de justicia en las políticas climáticas. Define el desarrollo como derecho humano inalienable: esto significa que las políticas climáticas que sacrifican el bienestar de los más vulnerables en nombre del crecimiento o de la transición energética son contrarias al derecho al desarrollo.\n\nLa Declaración provee el fundamento jurídico-político para el concepto de justicia climática: los países que menos han contribuido al problema del cambio climático son los más afectados y tienen derecho a un desarrollo sostenible que no sea sacrificado por las consecuencias de un problema generado por otros.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Declaración fue adoptada con 146 votos a favor, 1 en contra y 8 abstenciones. Todos los 23 miembros plenos de OLACEFS la respaldaron y se aplica como estándar de gestión en la totalidad de los países miembros."
+    },
+    {
+      "nome_es": "DECLARACIÓN DE LAS NACIONES UNIDAS SOBRE LOS DERECHOS DE LOS PUEBLOS INDÍGENAS (DNUDPI)",
+      "ano": 2007,
+      "ano_texto": "2007",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.un.org/development/desa/indigenouspeoples/declaration-on-the-rights-of-indigenous-peoples.html",
+      "introducao_es": "La DNUDPI, aunque no es vinculante, es el estándar internacional más completo sobre derechos indígenas y constituye una referencia ineludible para las auditorías de justicia climática. Establece el estándar del consentimiento libre, previo e informado (CLPI) como condición para la legitimidad de proyectos y políticas climáticas en territorios indígenas, aplicable a todos los países OLACEFS.\n\nCodifica el nexo entre derechos territoriales, conocimientos tradicionales y gestión sostenible del medio ambiente —tres elementos centrales en la adaptación basada en ecosistemas— y ofrece un marco de referencia sobre la equidad en el diseño, la implementación y los beneficios de las políticas climáticas que afectan a los pueblos indígenas.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La DNUDPI fue adoptada por la Asamblea General de la ONU el 13 de septiembre de 2007 con 144 votos a favor. Dado su carácter no vinculante, la Declaración aplica como estándar de gestión en los 23 miembros plenos de OLACEFS, independientemente de si han ratificado el Convenio 169 OIT."
+    },
+    {
+      "nome_es": "ESTRATEGIA DE MAURICIO PARA LA ULTERIOR EJECUCIÓN DEL PROGRAMA DE ACCIÓN DE BARBADOS",
+      "ano": 2005,
+      "ano_texto": "2005 (14 de enero, Port Louis, Mauricio)",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://www.un.org/esa/dsd/dsd_aofw_sids/sids_pdfs/MSI_MDS.pdf",
+      "introducao_es": "La Estrategia de Mauricio es el seguimiento del BPOA y representa el estado del arte en 2005 de los compromisos internacionales con los SIDS. Su relevancia para la justicia climática en los SIDS OLACEFS radica en:\n\nProporcionar un diagnóstico actualizado de las vulnerabilidades climáticas de los SIDS y de las brechas de implementación del BPOA, que sigue siendo relevante en muchos aspectos\n\nIdentificar explícitamente el financiamiento y la transferencia tecnológica como brechas críticas para el acceso efectivo a esos recursos\n\nEstablecer la articulación entre los marcos SIDS y el Marco de Hyogo para la reducción del riesgo de desastres, integrando adaptación y gestión del riesgo.\n\nComo instrumento no vinculante de gestión, orienta las políticas nacionales hacia recursos y metas verificables.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Estrategia de Mauricio fue diseñada específicamente como seguimiento del Programa de Acción de Barbados (BPOA) para los Estados Insulares en Desarrollo (SIDS). Aplica directamente a los SIDS miembros de OLACEFS: Belize, Cuba, República Dominicana, Aruba, Curazao y Puerto Rico. Los demás 17 miembros de OLACEFS (Estados continentales) pueden usar la Estrategia como referencia en materia de gestión costera, resiliencia ante desastres y acceso a financiamiento climático internacional."
+    },
+    {
+      "nome_es": "INFORME DEL ALTO COMISIONADO DE LAS NACIONES UNIDAS PARA LOS DERECHOS HUMANOS SOBRE CAMBIO CLIMÁTICO Y DERECHOS HUMANOS",
+      "ano": 2009,
+      "ano_texto": "2009",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.ohchr.org/en/climate-change",
+      "introducao_es": "El Informe A/HRC/10/61 sistematiza las obligaciones de derechos humanos que derivan de tratados vinculantes (PIDESC, PIDCP, CDN, CEDAW) en relación con el cambio climático. Aporta un enfoque anclado en derechos específicos —evitando un análisis genérico del desempeño climático—, orienta sobre qué poblaciones deben priorizarse (los grupos más vulnerables) y qué sectores son más críticos desde una perspectiva de derechos, y ofrece un lenguaje técnico reconocido internacionalmente, articulándose con marcos sectoriales (Acuerdo de París, Marco de Sendai, CEDAW Resolución General 37, Observación General 26).",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Por tratarse de un documento técnico del sistema universal de derechos humanos, el Informe A/HRC/10/61 no requiere ratificación y es aplicable como referencia normativa e interpretativa a los 23 miembros plenos de OLACEFS. Los Estados soberanos miembros de OLACEFS son Estados Miembros de la ONU y han ratificado los principales tratados de derechos humanos (Pacto Internacional de Derechos Civiles y Políticos (PIDCP) y Pacto Internacional de Derechos Económicos, Sociales y Culturales (PIDESC), entre otros) cuya interpretación en relación al cambio climático sistematiza este informe."
+    },
+    {
+      "nome_es": "INSTRUMENTO DE LAS NACIONES UNIDAS SOBRE LOS BOSQUES Y PLAN ESTRATÉGICO DE LAS NACIONES UNIDAS PARA LOS BOSQUES 2017-2030",
+      "ano": 2007,
+      "ano_texto": "2007 (Instrumento); 2017 (Plan Estratégico)",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.un.org/esa/forests/",
+      "introducao_es": "El Plan Estratégico de las Naciones Unidas para los Bosques 2017-2030 es el marco de referencia mundial más completo para auditar la política forestal con perspectiva climática en los países de OLACEFS. Aunque no es vinculante, fue adoptado por consenso, tiene metas cuantificadas con plazo a 2030 y un sistema de reporte voluntario ante el FNUB. Permite evaluar si los países avanzan hacia los seis Objetivos Mundiales sobre los Bosques y sus 26 metas asociadas; identificar brechas de gobernanza y financiamiento forestal; y auditar la coherencia entre la política forestal y los compromisos climáticos y de biodiversidad.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Instrumento de las Naciones Unidas sobre los Bosques fue adoptado por la Asamblea General de la ONU mediante la Resolución 62/98, del 17 de diciembre de 2007, con el nombre original de “Instrumento jurídicamente no vinculante sobre todos los tipos de bosques”. En 2017, mediante la Resolución 71/285, la Asamblea General le dio su denominación actual, prorrogó su vigencia hasta 2030 y adoptó el Plan Estratégico de las Naciones Unidas para los Bosques 2017-2030, negociado en el Foro de las Naciones Unidas sobre los Bosques (FNUB) y aprobado también por el Consejo Económico y Social (Resolución 2017/4).\n\nNo son tratados sujetos a firma ni ratificación, por lo que no se incorporan al derecho interno mediante una ley aprobatoria, a diferencia de los instrumentos vinculantes. Su adopción es voluntaria y su fuerza normativa deriva del compromiso político asumido por los Estados, de su carácter programático y de su articulación con instrumentos vinculantes como el Convenio sobre la Diversidad Biológica, la Convención Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC) y el Acuerdo de París y la Convención de Lucha contra la Desertificación, así como con la Agenda 2030 (en particular el ODS 15), con los que deben implementarse de manera coherente.\n\nEl Instrumento y el Plan Estratégico son de aplicación para los 23 miembros plenos de OLACEFS, al haber sido adoptados por consenso en la Asamblea General de la ONU. Los países presentan informes nacionales voluntarios al FNUB sobre sus avances hacia los seis Objetivos Mundiales sobre los Bosques —compilados en el Global Forest Goals Report— y pueden anunciar contribuciones nacionales voluntarias en materia forestal. Para las EFS, esto implica que, aunque no exista una norma interna de ratificación, sí existen compromisos reportables y, en particular, programas forestales nacionales, planes de gestión forestal sostenible y metas nacionales de restauración que constituyen criterios verificables. La aplicabilidad se refuerza cuando estos contenidos se integran en la legislación forestal y ambiental nacional, en los planes nacionales de adaptación y en las estrategias de biodiversidad y de lucha contra la desertificación."
+    },
+    {
+      "nome_es": "MARCO MUNDIAL DE BIODIVERSIDAD KUNMING-MONTREAL",
+      "ano": 2022,
+      "ano_texto": "2022",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://www.cbd.int/gbf/",
+      "introducao_es": "El Marco Kunming-Montreal es el principal instrumento de política global en biodiversidad para la década 2022-2030. Establece 23 metas cuantificables para 2030 que pueden servir como estándares de referencia para evaluar el desempeño de los países en conservación y uso sostenible de la biodiversidad, incluyendo las dimensiones que tienen impacto directo sobre la resiliencia climática.\n\nLa biodiversidad es fundamental para el bienestar humano y la prosperidad económica. Dependemos de ella para obtener alimentos, medicamentos, energía, aire y agua limpios y para la protección frente a desastres naturales. El cambio climático es identificado como uno de los cinco principales impulsores directos de la pérdida de biodiversidad, junto con el cambio de uso del suelo, la explotación directa, la contaminación y las especies invasoras.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Marco Kunming-Montreal fue adoptado por consenso en la COP15 del CDB (diciembre 2022) y se aplica a todos los 196 Partes del CDB, incluyendo los 23 miembros plenos de OLACEFS. Al ser adoptado como decisión de la COP — y no como protocolo vinculante — su implementación se da a través de las Estrategias y Planes de Acción Nacionales sobre Biodiversidad (EPANB) de cada país."
+    },
+    {
+      "nome_es": "MARCO DE SENDAI PARA LA REDUCCIÓN DEL RIESGO DE DESASTRES 2015-2030",
+      "ano": 2015,
+      "ano_texto": "2015",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "El Marco de Sendai es el instrumento internacional más directamente aplicable para auditar la gestión del riesgo de desastres climáticos en los países OLACEFS. Aunque no es vinculante, fue adoptado por consenso y tiene un robusto sistema de seguimiento (Sendai Monitor) con indicadores nacionales reportables. Permite evaluar si los países están cumpliendo las siete metas globales del Marco; identificar brechas en la gobernanza del riesgo; y auditar la integración del cambio climático en la planificación de la reducción del riesgo de desastres.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Marco de Sendai para la Reducción del Riesgo de Desastres 2015-2030 fue adoptado por consenso en la Tercera Conferencia Mundial de las Naciones Unidas sobre la Reducción del Riesgo de Desastres, celebrada en Sendai (Japón) el 18 de marzo de 2015, y respaldado por la Asamblea General de la ONU mediante la Resolución 69/283.\n\nNo es un tratado sujeto a firma ni ratificación, por lo que no se incorpora al derecho interno mediante una ley aprobatoria, a diferencia de los instrumentos vinculantes. Su adopción es voluntaria y su fuerza normativa deriva del compromiso político asumido por los Estados, de su carácter programático y de su articulación con instrumentos vinculantes como el Acuerdo de París y con la Agenda 2030 para el Desarrollo Sostenible, con los que debe implementarse de manera coherente.\n\nEl Marco es de aplicación para los 23 miembros plenos de OLACEFS y fue adoptado por consenso en el marco de la Asamblea General de la ONU; a través de puntos focales nacionales, los países reportan voluntariamente sus avances en el Sendai Framework Monitor, con indicadores nacionales asociados a las siete metas globales. Para las EFS, esto implica que, aunque no exista una norma interna de ratificación, sí existen compromisos reportables y, en particular, estrategias nacionales y locales de reducción del riesgo de desastres (Meta E) que constituyen criterios verificables. La aplicabilidad del Marco se refuerza cuando sus contenidos se integran en la legislación nacional de gestión del riesgo de desastres, en los planes nacionales de adaptación y en las políticas sectoriales, así como cuando se articula con el Marco de Acción de Hyogo 2005-2015, al que sucede."
+    },
+    {
+      "nome_es": "MECANISMO INTERNACIONAL DE VARSOVIA PARA LAS PÉRDIDAS Y LOS DAÑOS (WIM)",
+      "ano": 2013,
+      "ano_texto": "2013",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://unfccc.int/wim",
+      "introducao_es": "El Mecanismo Internacional de Varsovia para las Pérdidas y los Daños (WIM, por sus siglas en inglés) fue establecido en la COP19 de la Convención Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC) bajo el Marco de Adaptación de Cancún. Constituye el primer mecanismo del régimen climático internacional dedicado específicamente a abordar las pérdidas y los daños derivados de los efectos adversos del cambio climático, en particular aquellos que no pueden evitarse mediante la mitigación ni adaptarse mediante la resiliencia. El WIM abarca tanto los fenómenos meteorológicos extremos (ciclones, inundaciones, sequías) como los fenómenos de evolución lenta (aumento del nivel del mar, acidificación oceánica, desertificación, deshielo glaciar).\n\nPara las EFS de OLACEFS, el WIM es especialmente relevante dado que los países de América Latina y el Caribe son altamente vulnerables a los fenómenos climáticos extremos y de evolución lenta. El mecanismo establece un marco para la gestión integral del riesgo climático, el intercambio de conocimientos, la coordinación institucional y la movilización de financiamiento específico para pérdidas y daños.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Todos los países miembros de OLACEFS."
+    },
+    {
+      "nome_es": "OPINIÓN CONSULTIVA DE LA CORTE INTERNACIONAL DE JUSTICIA SOBRE OBLIGACIONES DE LOS ESTADOS EN MATERIA DE CAMBIO CLIMÁTICO",
+      "ano": 2024,
+      "ano_texto": "2024",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://www.icj-cij.org/case/187",
+      "introducao_es": "La Corte Internacional de Justicia emitió su Opinión Consultiva sobre las obligaciones de los Estados con respecto al cambio climático en 2024, en respuesta a preguntas formuladas por la Asamblea General de las Naciones Unidas. Es el primer pronunciamiento del principal órgano judicial universal sobre este tema y establece con autoridad jurídica máxima las fuentes del derecho aplicables y las obligaciones que emanan de ellas para todos los Estados.\n\nLa CIJ identificó como derecho aplicable: los tratados climáticos (Convención Marco de las Naciones Unidas sobre el Cambio Climático (CMNUCC), Protocolo de Kioto, Acuerdo de París), el derecho internacional consuetudinario, la Convención sobre el Derecho del Mar, el Convenio sobre Diversidad Biológica (CDB), los principales tratados de derechos humanos, y los principios de desarrollo sostenible, responsabilidades comunes pero diferenciadas y precaución.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Opinión Consultiva de la Corte Internacional de Justicia (CIJ) es el primer pronunciamiento del principal órgano judicial de las Naciones Unidas sobre las obligaciones de los Estados en materia de cambio climático. Aplica a todos los Estados miembros de la ONU, incluyendo todos los miembros de OLACEFS."
+    },
+    {
+      "nome_es": "OC-32/25 DE LA CORTE INTERAMERICANA DE DERECHOS HUMANOS EMERGENCIA CLIMÁTICA Y DERECHOS HUMANOS",
+      "ano": 2025,
+      "ano_texto": "2025",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.corteidh.or.cr/",
+      "introducao_es": "La Opinión Consultiva OC-32/25 es el pronunciamiento más relevante en materia climática emitido por la Corte Interamericana de Derechos Humanos. Establece que la emergencia climática constituye una amenaza real y grave a los derechos humanos protegidos por la Convención Americana, y que los Estados tienen obligaciones jurídicas concretas de respeto, garantía y adecuación normativa frente al cambio climático.\n\nAunque las opiniones consultivas no son formalmente vinculantes, tienen un alto valor interpretativo y orientador que las entidades de fiscalización superior deben considerar al definir los estándares de cumplimiento de los derechos humanos en el contexto climático.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Opinión Consultiva OC-32/25 fue solicitada por Chile y Colombia y emitida el 29 de mayo de 2025. Aplica a todos los países miembros de OLACEFS vinculados al sistema interamericano: Argentina, Bolivia, Brasil, Chile, Colombia, Costa Rica, Ecuador, El Salvador, Guatemala, Honduras, México, Nicaragua, Panamá, Paraguay, Perú, República Dominicana, Uruguay y Venezuela."
+    },
+    {
+      "nome_es": "OBSERVACIÓN GENERAL 26 DEL COMITÉ DE LOS DERECHOS DEL NIÑO LOS DERECHOS DEL NIÑO Y EL CAMBIO CLIMÁTICO",
+      "ano": 2023,
+      "ano_texto": "2023",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "La OG 26 es el instrumento de referencia sobre la justicia intergeneracional y la perspectiva de niñez en la acción climática. Deriva de la Convención sobre los Derechos del Niño, ratificada por todos los países OLACEFS. Fundamenta la dimensión intergeneracional desde obligaciones jurídicas concretas, identifica los sectores más críticos para los derechos de la niñez (salud, educación, agua y alimentación), subraya la participación de la niñez en la planificación climática, y se articula con marcos como la CEDAW RG 37, el informe del ACNUDH (2009) y la Resolución 76/300.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Observación General 26 (OG 26) es una interpretación autorizada de la Convención sobre los Derechos del Niño (CDN). Los 20 Estados soberanos miembros de OLACEFS han ratificado la CDN."
+    },
+    {
+      "nome_es": "PACTO INTERNACIONAL DE DERECHOS CIVILES Y POLÍTICOS (PIDCP)",
+      "ano": 1966,
+      "ano_texto": "1966",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Género y derechos humanos",
+        "Pobreza y desigualdad",
+        "Gestión de Riesgo y Desastres"
+      ],
+      "fonte_oficial_url": "https://www.ohchr.org/es/instruments-mechanisms/instruments/international-covenant-civil-and-political-rights",
+      "introducao_es": "El Pacto Internacional de Derechos Civiles y Políticos (PIDCP) es un tratado de derechos humanos adoptado el 16 de diciembre de 1966 y en vigor desde el 23 de marzo de 1976. Junto con el PIDESC y la Declaración Universal de Derechos Humanos integra la Carta Internacional de Derechos Humanos, y consagra derechos como la vida, la libertad de expresión, reunión y asociación, la participación y el acceso a la justicia.\n\nSu relevancia para auditorías de justicia climática radica en que el cambio climático amenaza el disfrute de derechos protegidos por el Pacto —en primer lugar el derecho a la vida— y en que sus garantías de información, participación, no discriminación y acceso a la justicia son la base jurídica de la gobernanza ambiental y de la litigación climática.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 23.313 (1986)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "Reino de los Países Bajos (1978)"
+        },
+        {
+          "pais": "Belize",
+          "status": "Adhesión 10/06/1996"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Adhesión 12/08/1982"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Adhesión 24/01/1992"
+        },
+        {
+          "pais": "Chile",
+          "status": "Ratificado 10/02/1972"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ratificado 29/10/1969"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ratificado 29/11/1968"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Firmado (2008), no ratificado"
+        },
+        {
+          "pais": "Curazao",
+          "status": "Reino de los Países Bajos (1978)"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Ratificado 06/03/1969"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Ratificado 30/11/1979"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Adhesión 05/05/1992"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificado 25/08/1997"
+        },
+        {
+          "pais": "México",
+          "status": "Adhesión 23/03/1981"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Adhesión 12/03/1980"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ratificado 08/03/1977"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Adhesión 10/06/1992"
+        },
+        {
+          "pais": "Perú",
+          "status": "Ratificado 28/04/1978"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Estados Unidos (ratificó 08/06/1992)"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Adhesión 04/01/1978"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ratificado 01/04/1970"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ratificado 10/05/1978"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Pacto Internacional de Derechos Civiles y Políticos fue adoptado por la Asamblea General de la ONU el 16 de diciembre de 1966 y entró en vigor el 23 de marzo de 1976. De los 20 Estados soberanos miembros de OLACEFS, 19 son Estados Parte; Cuba lo firmó (2008) pero no lo ha ratificado. Curazao y Aruba están cubiertos por la ratificación del Reino de los Países Bajos (1978) y Puerto Rico por la de Estados Unidos (1992). La siguiente tabla indica, para cada país, la norma nacional por la que lo incorporó o su situación."
+    },
+    {
+      "nome_es": "PACTO INTERNACIONAL DE DERECHOS ECONÓMICOS, SOCIALES Y CULTURALES (PIDESC)",
+      "ano": 1966,
+      "ano_texto": "1966",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.ohchr.org/es/instruments-mechanisms/instruments/international-covenant-economic-social-and-cultural-rights",
+      "introducao_es": "El Pacto Internacional de Derechos Económicos, Sociales y Culturales (PIDESC) es un tratado de derechos humanos adoptado el 16 de diciembre de 1966 y en vigor desde el 3 de enero de 1976. Junto con el PIDCP y la Declaración Universal integra la Carta Internacional de Derechos Humanos, y consagra los derechos al trabajo, la salud, la educación, la alimentación, el agua y un nivel de vida adecuado.\n\nSu relevancia para auditorías de justicia climática radica en que el cambio climático afecta directamente los derechos al agua, la alimentación, la salud y un nivel de vida adecuado, y en que el Pacto impone a los Estados obligaciones de progresividad y de destinar el máximo de recursos disponibles, criterios verificables en el gasto y las políticas públicas.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 23.313 (1986)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "Reino de los Países Bajos (1978)"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratificado 09/03/2015"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Adhesión 12/08/1982"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Adhesión 24/01/1992"
+        },
+        {
+          "pais": "Chile",
+          "status": "Ratificado 10/02/1972"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ratificado 29/10/1969"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ratificado 29/11/1968"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Firmado (2008), no ratificado"
+        },
+        {
+          "pais": "Curazao",
+          "status": "Reino de los Países Bajos (1978)"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Ratificado 06/03/1969"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Ratificado 30/11/1979"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Adhesión 19/05/1988"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificado 17/02/1981"
+        },
+        {
+          "pais": "México",
+          "status": "Adhesión 23/03/1981"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Adhesión 12/03/1980"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ratificado 08/03/1977"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Adhesión 10/06/1992"
+        },
+        {
+          "pais": "Perú",
+          "status": "Ratificado 28/04/1978"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Estados Unidos no ratificó el PIDESC"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Adhesión 04/01/1978"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ratificado 01/04/1970"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ratificado 10/05/1978"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Pacto Internacional de Derechos Económicos, Sociales y Culturales fue adoptado por la Asamblea General de la ONU el 16 de diciembre de 1966 y entró en vigor el 3 de enero de 1976. De los 20 Estados soberanos miembros de OLACEFS, 19 son Estados Parte; Cuba lo firmó (2008) pero no lo ha ratificado. Curazao y Aruba están cubiertos por la ratificación del Reino de los Países Bajos (1978); Puerto Rico no lo está, porque Estados Unidos firmó (1977) pero no ratificó el PIDESC. La siguiente tabla indica, para cada país, la norma nacional por la que lo incorporó o su situación."
+    },
+    {
+      "nome_es": "PROGRAMA PARA LA ULTERIOR APLICACIÓN DEL PROGRAMA 21 (RÍO+5)",
+      "ano": 1997,
+      "ano_texto": "1997",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "El Río+5 es un instrumento de relevancia histórica que sirve como evaluación de avances y llamado a la acción reforzada a cinco años de la Cumbre de la Tierra. Permite proporcionar una evaluación honesta del estado de implementación del Programa 21 en 1997, que sirve como línea de base para evaluar la evolución histórica de los compromisos ambientales; identificar brechas (financiamiento, transferencia tecnológica, fortalecimiento institucional) que en muchos casos siguen siendo relevantes; y reafirmar compromisos específicos para los pequeños Estados insulares en desarrollo (SIDS), complementando el Programa de Acción de Barbados (BPOA) con un seguimiento evaluativo.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Plan para la Ulterior Ejecución del Programa 21 (Río+5) fue adoptado en el XIX Período Extraordinario de Sesiones de la Asamblea General de la ONU (junio de 1997). Como resolución de la Asamblea General, no es un instrumento sujeto a ratificación y aplica a los 23 miembros plenos de OLACEFS."
+    },
+    {
+      "nome_es": "PROGRAMA 21 (AGENDA 21)",
+      "ano": 1992,
+      "ano_texto": "1992",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://sustainabledevelopment.un.org/outcomedocuments/agenda21",
+      "introducao_es": "El Programa 21 (Agenda 21) es el plan de acción global adoptado en la Cumbre de la Tierra de Río de Janeiro (1992). Con 40 capítulos organizados en cuatro secciones, propone una agenda integral de medidas concretas para alcanzar el desarrollo sostenible en todas sus dimensiones: social, económica y ambiental. Aunque no es jurídicamente vinculante, el Programa 21 establece mandatos de política detallados en sectores directamente vinculados a la justicia climática: agua, salud, asentamientos humanos, energía, gestión de residuos, biodiversidad, desertificación y pueblos indígenas.\n\nA diferencia de la Declaración de Río, que fija principios, el Programa 21 ofrece marcos de acción sectoriales que los auditores pueden utilizar como referencia para evaluar la pertinencia, coherencia y avance de las políticas públicas nacionales con perspectiva climática. Sus disposiciones sobre participación, información y gestión adaptativa son particularmente relevantes para las EFS de la región OLACEFS.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Programa 21 (Agenda 21) fue adoptado por consenso en la Cumbre para la Tierra (Río de Janeiro, 1992) por todos los Estados miembros de las Naciones Unidas. Como plan de acción no vinculante, no está sujeto a ratificación y aplica a los 23 miembros plenos de OLACEFS."
+    },
+    {
+      "nome_es": "PROGRAMA DE ACCIÓN DE BARBADOS PARA EL DESARROLLO SOSTENIBLE DE LOS PEQUEÑOS ESTADOS INSULARES EN DESARROLLO (SIDS)",
+      "ano": 1994,
+      "ano_texto": "1994 (6 de mayo, Bridgetown, Barbados)",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Salud",
+        "Gestión de Riesgo y Desastres",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "https://www.un.org/esa/dsd/dsd_aofw_sids/sids_pdfs/BPOA.pdf",
+      "introducao_es": "El BPOA es el primer instrumento internacional dedicado específicamente a los Pequeños Estados Insulares en Desarrollo. Su relevancia para auditorías de justicia climática en los SIDS OLACEFS radica en que reconoce la vulnerabilidad desproporcionada de los SIDS al cambio climático y establece que esta vulnerabilidad exige atención y apoyo diferencial de la comunidad internacional. Define 14 áreas de acción prioritaria que siguen siendo relevantes hoy, y que pueden utilizarse como marco de referencia para auditar políticas sectoriales nacionales. Establece el principio de responsabilidad diferenciada: los países desarrollados tienen obligaciones de apoyo financiero y técnico hacia los SIDS, lo que las EFS pueden auditar desde la perspectiva de la recepción y uso de cooperación internacional. Como instrumento no vinculante de gestión, su uso en auditorías permite evaluar si los gobiernos de los SIDS han internalizado el programa en sus políticas nacionales y si los avances son medibles y verificables.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Programa de Acción de Barbados (BPOA) es un instrumento no vinculante, por lo que no está sujeto a ratificación ni se incorpora al derecho interno mediante una ley aprobatoria. Es aplicable a todos los miembros de OLACEFS. Los SIDS miembros de OLACEFS —Belize, Cuba, República Dominicana, Aruba, Curazao y Puerto Rico— son sus principales destinatarios. Los demás 17 miembros (Estados continentales) pueden aplicar el BPOA como referencia para las políticas de gestión costera y de vulnerabilidad climática."
+    },
+    {
+      "nome_es": "Protocolo de Cartagena sobre Seguridad de la Biotecnología del CDB",
+      "ano": 2000,
+      "ano_texto": "2000",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura"
+      ],
+      "fonte_oficial_url": "https://bch.cbd.int/protocol",
+      "introducao_es": "El Protocolo de Cartagena sobre Seguridad de la Biotecnología es un protocolo adicional del Convenio de Biodiversidad adoptado el 29 de enero de 2000 en Montreal y en vigor desde el 11 de septiembre de 2003. Regula el movimiento transfronterizo de organismos vivos modificados (OVM) resultantes de la biotecnología moderna que puedan tener efectos adversos para la conservación y la utilización sostenible de la diversidad biológica, teniendo en cuenta los riesgos para la salud humana.\n\nSu relevancia para auditorías de justicia climática radica en que el cambio climático crea presiones para adoptar OVM como herramientas de adaptación (cultivos resistentes a sequía, calor o inundaciones) lo que requiere marcos de bioseguridad robustos. El principio de precaución consagrado en el Protocolo es un estándar aplicable para la gestión de riesgos en contextos de incertidumbre científica exacerbada por el cambio climático.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Aruba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratificado por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 2274 (2001)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 908/2003; Decreto 5.705/2006"
+        },
+        {
+          "pais": "Chile",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 740 de 2002"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 8537 (2006)"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Ratificado por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Curazao",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "R.O. 704 (2002); R.O. 145 (2003)"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Ratificado 26/09/2003"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Decreto 44-2003"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificado el 18/11/2008"
+        },
+        {
+          "pais": "México",
+          "status": "Ratificado 27/08/2002 (aprob. Senado)"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Decreto A.N. 3248 (2002)"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 72 (2001)"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 2309 (2003)"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 28170 (2004)"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Ratificado 20/06/2006"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ratificado 02/11/2011"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley 80 (G.O. 37.355, 2002)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Protocolo de Cartagena sobre Seguridad de la Biotecnología es un acuerdo complementario del Convenio sobre la Diversidad Biológica, en vigor desde el 11 de septiembre de 2003. De los 20 Estados soberanos miembros de OLACEFS, 18 son Estados Parte; Argentina y Chile no lo han ratificado, aunque ambos son Parte del CDB. Ni Curazao y Aruba (la ratificación del Reino de los Países Bajos aplica solo a su territorio europeo) ni Puerto Rico (Estados Unidos no es Parte) están cubiertos. La siguiente tabla indica, para cada país, la norma nacional por la que lo incorporó o su situación."
+    },
+    {
+      "nome_es": "Protocolo de Kioto de la Convención Marco de las Naciones Unidas sobre el Cambio Climático",
+      "ano": 1997,
+      "ano_texto": "1997",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Industria Extractiva"
+      ],
+      "fonte_oficial_url": "https://unfccc.int/kyoto_protocol",
+      "introducao_es": "El Protocolo de Kioto (1997) fue el primer instrumento vinculante del régimen climático internacional en establecer compromisos cuantificados de reducción de emisiones de gases de efecto invernadero (GEI) para los países industrializados (Anexo I). Si bien sus períodos de compromiso (2008-2012 y 2013-2020) han concluido y ha sido en gran medida reemplazado por el Acuerdo de París, el Protocolo de Kioto sigue siendo relevante para las EFS por tres razones:\n\nEstableció los mecanismos de flexibilidad (MDL, Implementación Conjunta, Comercio de Emisiones) que siguen siendo referencia para los mercados de carbono actuales\n\nDefinió estándares de inventario y reporte de GEI que continúan en uso\n\nEl Mecanismo de Desarrollo Limpio (MDL) generó proyectos en varios países de OLACEFS.\n\nPara los países de OLACEFS, todos clasificados como No-Anexo I, el Protocolo no impuso compromisos cuantificados de reducción, pero sí los incluyó en el Mecanismo de Desarrollo Limpio (MDL) y estableció obligaciones de reporte y de implementación de políticas de mitigación y adaptación.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 25.438 (2001)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Belize",
+          "status": "Ratificado por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Ley 1988 (1999)"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Decreto Leg. 144/2002; Decreto 5.445/2005"
+        },
+        {
+          "pais": "Chile",
+          "status": "Decreto Supremo 349/2005"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Ley 629 de 2000"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ley 8219 (2002)"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Ratificado por el Poder Ejecutivo"
+        },
+        {
+          "pais": "Curazao",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "R.O. 532 (2000)"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Ratificado 30/11/1998"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Decreto 23-99"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificación 1999"
+        },
+        {
+          "pais": "México",
+          "status": "Aprob. Senado (DOF 01/09/2000)"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Decreto A.N. 2295/1999"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ley 88 (1998)"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "Ley 1447/99"
+        },
+        {
+          "pais": "Perú",
+          "status": "Res. Legislativa 27824 (2002) + D.S. 080-2002-RE"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "No ratificado"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Resolución 141-01"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ley 17.279 (2000)"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Ley Aprobatoria (G.O. 38.081, 2004)"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "Los 20 Estados soberanos miembros de OLACEFS son Parte del Protocolo de Kioto, en su condición de países No-Anexo I (países en desarrollo). El Protocolo entró en vigor el 16 de febrero de 2005. Ni Curazao y Aruba (la ratificación del Reino de los Países Bajos aplica solo a su territorio europeo) ni Puerto Rico (Estados Unidos no ratificó Kioto) están cubiertos. La siguiente tabla indica, para cada país, la norma nacional por la que lo ratificó, aprobó o se adhirió a él."
+    },
+    {
+      "nome_es": "PROTOCOLO DE NAGOYA SOBRE ACCESO A LOS RECURSOS GENÉTICOS Y PARTICIPACIÓN JUSTA Y EQUITATIVA EN LOS BENEFICIOS (ABS)",
+      "ano": 2010,
+      "ano_texto": "2010",
+      "natureza_juridica": "Vinculante",
+      "setores_aplicaveis": [
+        "Biodiversidad y Ecosistemas",
+        "Alimentación y Agricultura",
+        "Industria Extractiva",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "https://www.cbd.int/abs/",
+      "introducao_es": "El Protocolo de Nagoya sobre Acceso a los Recursos Genéticos y Participación Justa y Equitativa en los Beneficios que se Deriven de su Utilización es un protocolo adicional del Convenio sobre la Diversidad Biológica, adoptado el 29 de octubre de 2010 en Nagoya (Japón) y en vigor desde el 12 de octubre de 2014. Desarrolla el tercer objetivo del CDB —la distribución justa y equitativa de los beneficios derivados del uso de los recursos genéticos— mediante obligaciones concretas sobre acceso, reparto de beneficios y cumplimiento.\n\nSu relevancia para auditorías de justicia climática radica en que los recursos genéticos y los conocimientos tradicionales asociados son cada vez más demandados para desarrollar cultivos y soluciones de adaptación al cambio climático. El Protocolo asegura que ese aprovechamiento se realice con consentimiento fundamentado previo y con una distribución equitativa de los beneficios hacia los países proveedores y hacia los pueblos indígenas y comunidades locales, un componente central de la equidad climática.",
+      "paises_status": [
+        {
+          "pais": "Argentina",
+          "status": "Ley 27.246 (2015)"
+        },
+        {
+          "pais": "Aruba",
+          "status": "Reino de los Países Bajos (solo territorio europeo)"
+        },
+        {
+          "pais": "Belize",
+          "status": "No es Parte (no firmó)"
+        },
+        {
+          "pais": "Bolivia",
+          "status": "Adhesión 06/10/2016"
+        },
+        {
+          "pais": "Brasil",
+          "status": "Ratificado 04/03/2021"
+        },
+        {
+          "pais": "Chile",
+          "status": "No es Parte (no firmó)"
+        },
+        {
+          "pais": "Colombia",
+          "status": "Firmado (2011), no ratificado"
+        },
+        {
+          "pais": "Costa Rica",
+          "status": "Ratificado 25/09/2024"
+        },
+        {
+          "pais": "Cuba",
+          "status": "Adhesión 17/09/2015"
+        },
+        {
+          "pais": "Curazao",
+          "status": "Reino de los Países Bajos (solo territorio europeo)"
+        },
+        {
+          "pais": "Ecuador",
+          "status": "Ratificado 20/09/2017"
+        },
+        {
+          "pais": "El Salvador",
+          "status": "Firmado (2012), no ratificado"
+        },
+        {
+          "pais": "Guatemala",
+          "status": "Ratificado 18/06/2014"
+        },
+        {
+          "pais": "Honduras",
+          "status": "Ratificado 12/08/2013"
+        },
+        {
+          "pais": "México",
+          "status": "Ratificado 16/05/2012"
+        },
+        {
+          "pais": "Nicaragua",
+          "status": "Adhesión 12/06/2020"
+        },
+        {
+          "pais": "Panamá",
+          "status": "Ratificado 12/12/2012"
+        },
+        {
+          "pais": "Paraguay",
+          "status": "No es Parte (no firmó)"
+        },
+        {
+          "pais": "Perú",
+          "status": "Ratificado 08/07/2014"
+        },
+        {
+          "pais": "Puerto Rico",
+          "status": "Estados Unidos no es Parte del Protocolo"
+        },
+        {
+          "pais": "República Dominicana",
+          "status": "Ratificado 13/11/2014"
+        },
+        {
+          "pais": "Uruguay",
+          "status": "Ratificado 14/07/2014"
+        },
+        {
+          "pais": "Venezuela",
+          "status": "Adhesión 10/10/2018"
+        }
+      ],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "El Protocolo de Nagoya es un acuerdo complementario del Convenio sobre la Diversidad Biológica, adoptado el 29 de octubre de 2010 y en vigor desde el 12 de octubre de 2014. De los 20 Estados soberanos miembros de OLACEFS, 15 son Estados Parte; Belize, Chile y Paraguay no lo han firmado, mientras que Colombia y El Salvador lo firmaron pero no lo ratificaron. Curazao y Aruba (la aceptación del Reino de los Países Bajos aplica solo a su territorio europeo) y Puerto Rico (Estados Unidos no es Parte) no están cubiertos. La siguiente tabla indica, para cada país, la norma nacional por la que lo incorporó o su situación."
+    },
+    {
+      "nome_es": "RESOLUCIÓN 10/4 DEL CONSEJO DE DERECHOS HUMANOS DERECHOS HUMANOS Y CAMBIO CLIMÁTICO",
+      "ano": 2009,
+      "ano_texto": "2009",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Gestión de Riesgo y Desastres",
+        "Género y derechos humanos",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "La Resolución 10/4 del CDH (2009) establece formalmente que el cambio climático es una cuestión de derechos humanos, no solo de política ambiental o económica, e identifica los derechos específicos amenazados por el cambio climático. Reconoce la dimensión de justicia climática: los más vulnerables son quienes menos han contribuido al cambio climático.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Resolución 10/4 del Consejo de Derechos Humanos es un instrumento universal. Como resolución de un órgano subsidiario de la Asamblea General de la ONU, aplica a todos los Estados miembros de las Naciones Unidas. Los 23 miembros plenos de OLACEFS están comprendidos por sus disposiciones."
+    },
+    {
+      "nome_es": "RESOLUCIÓN 76/300 DE LA ASAMBLEA GENERAL DE LA ONU EL DERECHO HUMANO A UN MEDIO AMBIENTE LIMPIO, SALUDABLE Y SOSTENIBLE",
+      "ano": 2022,
+      "ano_texto": "2022",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Alimentación y Agricultura",
+        "Género y derechos humanos"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "La Resolución A/76/300 reconoce el derecho humano a un medio ambiente limpio, saludable y sostenible. Aunque no es vinculante, su reconocimiento universal (161 votos a favor) le otorga una autoridad política y normativa excepcional. Fundamenta la perspectiva de justicia climática desde el derecho más universalmente reconocido en materia ambiental, articula las obligaciones climáticas del Estado con las obligaciones de derechos humanos, y ofrece un estándar para valorar la alineación de los marcos legales nacionales con el reconocimiento internacional del derecho al ambiente sano.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Resolución A/76/300 fue adoptada por la Asamblea General de la ONU y aplica a todos sus Estados Miembros. Los 23 miembros plenos de OLACEFS están comprendidos en su ámbito de aplicación."
+    },
+    {
+      "nome_es": "TRAYECTORIA DE SAMOA MODALIDADES DE ACCIÓN ACELERADA PARA LOS PEQUEÑOS ESTADOS INSULARES EN DESARROLLO",
+      "ano": 2014,
+      "ano_texto": "2014",
+      "natureza_juridica": "No vinculante",
+      "setores_aplicaveis": [
+        "Agua y Energía",
+        "Infraestructura",
+        "Biodiversidad y Ecosistemas",
+        "Salud",
+        "Gestión de Riesgo y Desastres",
+        "Pobreza y desigualdad"
+      ],
+      "fonte_oficial_url": "",
+      "introducao_es": "La Trayectoria de Samoa proporciona el marco político específico para auditar la acción climática de los SIDS. Aunque no es vinculante, fue adoptada por consenso en la ONU y sus disposiciones reflejan compromisos políticos de los Estados. Establece un conjunto coherente de expectativas sobre lo que los SIDS deben hacer y lo que la comunidad internacional debe apoyar; reconoce las limitaciones estructurales de los SIDS y exige que los marcos de apoyo internacional se adapten a esas limitaciones; y complementa al Marco de Sendai y al Acuerdo de París con disposiciones específicas para el contexto insular.",
+      "paises_status": [],
+      "ficha_tecnica_url": "",
+      "cobertura_paises_es": "La Trayectoria de Samoa es el marco internacional específico para los Pequeños Estados Insulares en Desarrollo (SIDS). En el ámbito de OLACEFS, los miembros clasificados como SIDS son: Belize, Cuba, República Dominicana, Aruba, Curazao y Puerto Rico. Estos miembros comparten características estructurales de vulnerabilidad climática: pequeño tamaño territorial, alta exposición a eventos hidrometeorológicos extremos, dependencia de importaciones de alimentos y combustibles, y capacidad institucional limitada. Los demás 17 miembros de OLACEFS aplican el documento en su condición de socios de desarrollo."
+    }
+  ]
+}

@@ -326,6 +326,18 @@ def _url_http_segura(valor):
     return valor
 
 
+def _url_ficha_tecnica_segura(norma):
+    url_externa = _url_http_segura(norma.ficha_tecnica_url)
+    if url_externa:
+        return url_externa
+    if (
+        norma.ficha_tecnica
+        and norma.ficha_tecnica.storage.exists(norma.ficha_tecnica.name)
+    ):
+        return norma.ficha_tecnica.url
+    return ""
+
+
 def ferramentas_catalogadas():
     return Ferramenta.objects.filter(situacao=Ferramenta.Situacao.PUBLICADA)
 
@@ -929,36 +941,38 @@ def detalhe_experiencia(request, pk):
 
 def normas_internacionais(request):
     termo = (request.GET.get("q") or "").strip()[:200]
-    experiencias_relacionadas = experiencias_publicas().select_related(
-        "pais", "setor"
-    )
     paises = Pais.objects.filter(
-        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
-        experiencias__normas_internacionais__isnull=False,
+        normas_internacionais_status__isnull=False
     ).distinct()
-    setores = Setor.objects.filter(
-        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
-        experiencias__normas_internacionais__isnull=False,
-    ).distinct()
+    setores = sorted(
+        {
+            setor.strip()
+            for valor in NormaInternacional.objects.exclude(
+                setores_aplicaveis=""
+            ).values_list("setores_aplicaveis", flat=True)
+            for setor in valor.split(",")
+            if setor.strip()
+        },
+        key=str.casefold,
+    )
+    naturezas_juridicas = list(
+        NormaInternacional.objects.exclude(natureza_juridica="")
+        .values_list("natureza_juridica", flat=True)
+        .distinct()
+        .order_by("natureza_juridica")
+    )
     paises_selecionados = _objetos_selecionados(
         request, "pais", Pais.objects.all()
     )
-    setores_selecionados = _objetos_selecionados(request, "setor", setores)
+    setor_selecionado = (request.GET.get("setor") or "").strip()[:160]
+    if setor_selecionado not in setores:
+        setor_selecionado = ""
+    natureza_selecionada = (request.GET.get("natureza") or "").strip()[:80]
+    if natureza_selecionada not in naturezas_juridicas:
+        natureza_selecionada = ""
 
-    normas = NormaInternacional.objects.annotate(
-        total_experiencias_publicas=Count(
-            "experiencias",
-            filter=Q(
-                experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
-            ),
-            distinct=True,
-        )
-    ).prefetch_related(
-        Prefetch(
-            "experiencias",
-            queryset=experiencias_relacionadas,
-            to_attr="experiencias_publicas_catalogo",
-        )
+    normas = NormaInternacional.objects.prefetch_related(
+        "paises_status__pais"
     )
     if termo:
         normas = normas.filter(
@@ -970,38 +984,25 @@ def normas_internacionais(request):
             | Q(resumo_en__icontains=termo)
         )
 
-    filtros_relacionados = Q()
     if paises_selecionados:
-        filtros_relacionados &= Q(
-            experiencias__pais_id__in=[pais.pk for pais in paises_selecionados]
-        )
-    if setores_selecionados:
-        filtros_relacionados &= Q(
-            experiencias__setor_id__in=[setor.pk for setor in setores_selecionados]
-        )
-    if filtros_relacionados:
         normas = normas.filter(
-            filtros_relacionados,
-            experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
+            paises_status__pais_id__in=[pais.pk for pais in paises_selecionados]
         )
+    if setor_selecionado:
+        normas = normas.filter(setores_aplicaveis__icontains=setor_selecionado)
+    if natureza_selecionada:
+        normas = normas.filter(natureza_juridica=natureza_selecionada)
 
     normas = list(normas.distinct())
     for norma in normas:
         norma.url_publica = _url_http_segura(norma.url_referencia)
-        norma.paises_publicos = sorted(
-            {
-                experiencia.pais.nome_exibicao
-                for experiencia in norma.experiencias_publicas_catalogo
-            },
-            key=str.casefold,
-        )
-        norma.setores_publicos = sorted(
-            {
-                experiencia.setor.nome_exibicao
-                for experiencia in norma.experiencias_publicas_catalogo
-            },
-            key=str.casefold,
-        )
+        norma.ficha_publica = _url_ficha_tecnica_segura(norma)
+        norma.paises_publicos = list(norma.paises_status.all())
+        norma.setores_publicos = [
+            setor.strip()
+            for setor in norma.setores_aplicaveis.split(",")
+            if setor.strip()
+        ]
 
     chips = []
     if termo:
@@ -1011,17 +1012,22 @@ def normas_internacionais(request):
                 "url_remover": _url_sem_valor_filtro(request, "q"),
             }
         )
-    for chave, objetos in (
-        ("pais", paises_selecionados),
-        ("setor", setores_selecionados),
+    for objeto in paises_selecionados:
+        chips.append(
+            {
+                "rotulo": objeto.nome_exibicao,
+                "url_remover": _url_sem_valor_filtro(request, "pais", objeto.pk),
+            }
+        )
+    for chave, valor in (
+        ("setor", setor_selecionado),
+        ("natureza", natureza_selecionada),
     ):
-        for objeto in objetos:
+        if valor:
             chips.append(
                 {
-                    "rotulo": objeto.nome_exibicao,
-                    "url_remover": _url_sem_valor_filtro(
-                        request, chave, objeto.pk
-                    ),
+                    "rotulo": valor,
+                    "url_remover": _url_sem_valor_filtro(request, chave),
                 }
             )
 
@@ -1032,8 +1038,10 @@ def normas_internacionais(request):
             "normas": normas,
             "paises": paises,
             "setores": setores,
+            "naturezas_juridicas": naturezas_juridicas,
             "paises_selecionados": [item.pk for item in paises_selecionados],
-            "setores_selecionados": [item.pk for item in setores_selecionados],
+            "setor_selecionado": setor_selecionado,
+            "natureza_selecionada": natureza_selecionada,
             "chips_filtros": chips,
             "termo_busca": termo,
             "total_resultados": len(normas),

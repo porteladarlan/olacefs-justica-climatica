@@ -125,13 +125,22 @@ class TemaTransversal(models.Model):
 
 
 class NormaInternacional(models.Model):
-    nome = models.CharField(max_length=180, unique=True)
-    nome_es = models.CharField(max_length=180, blank=True)
-    nome_en = models.CharField(max_length=180, blank=True)
+    nome = models.CharField(max_length=300, unique=True)
+    nome_es = models.CharField(max_length=300, blank=True)
+    nome_en = models.CharField(max_length=300, blank=True)
     resumo = models.TextField(blank=True)
     resumo_es = models.TextField(blank=True)
     resumo_en = models.TextField(blank=True)
+    ano = models.PositiveIntegerField(null=True, blank=True)
+    ano_texto = models.CharField(max_length=120, blank=True)
+    natureza_juridica = models.CharField(max_length=80, blank=True, db_index=True)
+    setores_aplicaveis = models.TextField(blank=True)
+    cobertura_paises_es = models.TextField(blank=True)
     url_referencia = models.URLField(blank=True)
+    ficha_tecnica = models.FileField(
+        upload_to="marcos_normativos/fichas/", blank=True
+    )
+    ficha_tecnica_url = models.URLField(blank=True)
 
     class Meta:
         verbose_name = "Norma internacional"
@@ -147,7 +156,45 @@ class NormaInternacional(models.Model):
 
     @property
     def resumo_exibicao(self):
-        return texto_por_idioma(self.resumo, self.resumo_es, self.resumo_en)
+        return texto_por_idioma_com_fallback_es(
+            self.resumo_es, self.resumo, self.resumo_en
+        )
+
+    @property
+    def ficha_tecnica_publica(self):
+        if self.ficha_tecnica_url:
+            return self.ficha_tecnica_url
+        if self.ficha_tecnica:
+            return self.ficha_tecnica.url
+        return ""
+
+
+class NormaInternacionalPais(models.Model):
+    norma = models.ForeignKey(
+        NormaInternacional,
+        on_delete=models.CASCADE,
+        related_name="paises_status",
+    )
+    pais = models.ForeignKey(
+        Pais,
+        on_delete=models.PROTECT,
+        related_name="normas_internacionais_status",
+    )
+    status = models.CharField(max_length=300)
+
+    class Meta:
+        verbose_name = "País/status de marco normativo"
+        verbose_name_plural = "Países/status de marcos normativos"
+        ordering = ["pais__nome"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["norma", "pais"],
+                name="norma_internacional_pais_unico",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.norma.nome_exibicao} — {self.pais.nome_exibicao}: {self.status}"
 
 
 class DimensaoJusticaClimatica(models.Model):

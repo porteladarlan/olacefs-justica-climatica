@@ -22,6 +22,7 @@ from .models import (
     ItemLoteImportacaoConteudo,
     LoteImportacaoConteudo,
     NormaInternacional,
+    NormaInternacionalPais,
     PapelInstitucional,
     Pais,
     PropostaEdicaoExperiencia,
@@ -73,11 +74,18 @@ class TemaTransversalAdmin(admin.ModelAdmin):
     ordering = ("nome",)
 
 
+class NormaInternacionalPaisInline(admin.TabularInline):
+    model = NormaInternacionalPais
+    extra = 0
+
+
 @admin.register(NormaInternacional)
 class NormaInternacionalAdmin(admin.ModelAdmin):
-    list_display = ("nome", "nome_es", "nome_en", "url_referencia")
+    list_display = ("nome", "ano", "natureza_juridica", "url_referencia")
+    list_filter = ("natureza_juridica",)
     search_fields = ("nome", "nome_es", "nome_en", "resumo", "resumo_es", "resumo_en")
     ordering = ("nome",)
+    inlines = (NormaInternacionalPaisInline,)
 
 
 @admin.register(DimensaoJusticaClimatica)

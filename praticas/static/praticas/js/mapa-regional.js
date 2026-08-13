@@ -1,5 +1,82 @@
+const MapaRegionalGeometry = (function () {
+    "use strict";
+
+    function projectedFeatureCentroid(feature, path, projection, d3) {
+        const pathCentroid = path.centroid(feature);
+        if (
+            Array.isArray(pathCentroid) &&
+            Number.isFinite(pathCentroid[0]) &&
+            Number.isFinite(pathCentroid[1])
+        ) {
+            return pathCentroid;
+        }
+
+        const geographicCentroid = d3.geoCentroid(feature);
+        const projectedCentroid = projection(geographicCentroid);
+        if (
+            Array.isArray(projectedCentroid) &&
+            Number.isFinite(projectedCentroid[0]) &&
+            Number.isFinite(projectedCentroid[1])
+        ) {
+            return projectedCentroid;
+        }
+
+        return null;
+    }
+
+    function separatedMicroterritoryPositions(
+        features,
+        path,
+        projection,
+        d3,
+        minimumSeparation
+    ) {
+        const positioned = features.map(function (feature) {
+            return {
+                feature: feature,
+                position: projectedFeatureCentroid(feature, path, projection, d3)
+            };
+        });
+        if (positioned.some(function (item) { return item.position === null; })) {
+            throw new Error("Microterritory geometry has no valid projected centroid.");
+        }
+        if (positioned.length === 2) {
+            const deltaX = positioned[1].position[0] - positioned[0].position[0];
+            const deltaY = positioned[1].position[1] - positioned[0].position[1];
+            const distance = Math.hypot(deltaX, deltaY);
+            if (distance < minimumSeparation) {
+                const directionX = distance > 0 ? deltaX / distance : 1;
+                const directionY = distance > 0 ? deltaY / distance : 0;
+                const displacement = (minimumSeparation - distance) / 2;
+                positioned[0].position = [
+                    positioned[0].position[0] - directionX * displacement,
+                    positioned[0].position[1] - directionY * displacement
+                ];
+                positioned[1].position = [
+                    positioned[1].position[0] + directionX * displacement,
+                    positioned[1].position[1] + directionY * displacement
+                ];
+            }
+        }
+        return positioned;
+    }
+
+    return {
+        projectedFeatureCentroid: projectedFeatureCentroid,
+        separatedMicroterritoryPositions: separatedMicroterritoryPositions
+    };
+})();
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = MapaRegionalGeometry;
+}
+
 (function () {
     "use strict";
+
+    if (typeof document === "undefined") {
+        return;
+    }
 
     const section = document.getElementById("mapSection");
     const dataElement = document.getElementById("regional-map-data");
@@ -61,6 +138,7 @@
         })
     );
     const microterritoryGeoIds = new Set(["531", "533"]);
+    const microterritoryMinimumSeparation = 34;
     const selectedIds = new Set();
     const coordinatedHighlightedIds = new Set();
     let memberPaths = null;
@@ -391,16 +469,30 @@
             const geoId = String(feature.id).padStart(3, "0");
             return microterritoryGeoIds.has(geoId) && countriesByGeoId.has(geoId);
         });
+        const institutionalMicroterritoryGeoIds = new Set(
+            Array.from(microterritoryGeoIds).filter(function (geoId) {
+                return countriesByGeoId.has(geoId);
+            })
+        );
+        if (microterritoryFeatures.length !== institutionalMicroterritoryGeoIds.size) {
+            throw new Error("Institutional microterritory geometry is unavailable.");
+        }
+        const positionedMicroterritories = MapaRegionalGeometry.separatedMicroterritoryPositions(
+            microterritoryFeatures,
+            path,
+            projection,
+            window.d3,
+            microterritoryMinimumSeparation
+        );
         microterritoryControls = svg
             .append("g")
             .attr("class", "home-map-microterritory-layer")
             .selectAll("g")
-            .data(microterritoryFeatures)
+            .data(positionedMicroterritories)
             .join("g")
             .attr("class", "home-map-microterritory-control")
-            .attr("transform", function (feature) {
-                const centroid = path.centroid(feature);
-                return "translate(" + centroid[0] + "," + centroid[1] + ")";
+            .attr("transform", function (item) {
+                return "translate(" + item.position[0] + "," + item.position[1] + ")";
             });
 
         microterritoryControls
@@ -410,13 +502,15 @@
         microterritoryControls
             .append("circle")
             .attr("class", "home-map-microterritory-marker")
-            .attr("r", 5);
+            .attr("r", 8);
         microterritoryControls
             .append("title")
-            .text(function (feature) {
-                return countryForFeature(feature).nome;
+            .text(function (item) {
+                return countryForFeature(item.feature).nome;
             });
-        bindCountryControl(microterritoryControls);
+        bindCountryControl(
+            microterritoryControls.datum(function (item) { return item.feature; })
+        );
 
         updatePathState();
     }

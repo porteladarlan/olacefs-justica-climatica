@@ -206,15 +206,90 @@ class HomePrimeiraEvolucaoTests(TestCase):
         for pane_id in ("concepto-pane", "controle-pane", "genero-pane"):
             with self.subTest(pane_id=pane_id):
                 painel = fundamentos.split(f'id="{pane_id}"', 1)[1]
-                if pane_id != "genero-pane":
+                if pane_id == "concepto-pane":
+                    self.assertLess(
+                        painel.index('class="home-foundation-introduction"'),
+                        painel.index('class="home-foundation-concept-layout"'),
+                    )
+                    self.assertLess(
+                        painel.index('class="home-foundation-concept-layout"'),
+                        painel.index('class="home-foundation-actions"'),
+                    )
+                else:
+                    self.assertLess(
+                        painel.index('class="home-foundation-top"'),
+                        painel.index('class="home-foundation-actions"'),
+                    )
+                if pane_id == "controle-pane":
                     self.assertLess(
                         painel.index('class="home-foundation-strategies"'),
                         painel.index('class="home-foundation-actions"'),
                     )
-                self.assertLess(
-                    painel.index('class="home-foundation-top"'),
-                    painel.index('class="home-foundation-actions"'),
+
+    def test_primeira_aba_tem_layout_e_ordem_equivalentes_nos_tres_idiomas(self):
+        casos = (
+            (
+                "/",
+                "Equidade e Inclusão",
+                "Responsabilidades comuns, mas compartilhadas",
+                "Participação Social",
+            ),
+            (
+                "/es/",
+                "Equidad e Inclusión",
+                "Responsabilidades comunes, pero compartidas",
+                "Participación Social",
+            ),
+            (
+                "/en/",
+                "Equity and Inclusion",
+                "Common but shared responsibilities",
+                "Social Participation",
+            ),
+        )
+
+        for caminho, primeiro, segundo, terceiro in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                html = response.content.decode("utf-8")
+                painel = html.split('id="concepto-pane"', 1)[1].split(
+                    'id="controle-pane"', 1
+                )[0]
+
+                self.assertEqual(
+                    painel.count('class="home-foundation-strategy"'),
+                    3,
                 )
+                self.assertIn('class="home-foundation-introduction"', painel)
+                self.assertIn('class="home-foundation-concept-layout"', painel)
+                self.assertEqual(
+                    painel.count(static("praticas/img/pilar-justicia.jpg")),
+                    1,
+                )
+                self.assertLess(painel.index(primeiro), painel.index(segundo))
+                self.assertLess(painel.index(segundo), painel.index(terceiro))
+                self.assertLess(
+                    painel.index('class="home-foundation-strategies"'),
+                    painel.index(
+                        'class="home-foundation-photo home-foundation-concept-photo"'
+                    ),
+                )
+
+        css = Path(finders.find("praticas/css/home.css")).read_text(
+            encoding="utf-8"
+        )
+        self.assertRegex(
+            css,
+            r"\.home-foundation-concept-layout\s*\{[^}]*"
+            r"grid-template-columns:\s*minmax\(0, 1fr\)\s+minmax\(0, 1\.02fr\)",
+        )
+        responsivo = css.split("@media (max-width: 820px)", 1)[1]
+        self.assertIn(".home-design .home-foundation-concept-layout,", responsivo)
+        self.assertRegex(
+            responsivo,
+            r"\.home-foundation-concept-photo img\s*\{[^}]*height:\s*auto",
+        )
 
     def test_texto_negocial_portugues_e_integralmente_renderizado(self):
         response = self.client.get(reverse("pagina_inicial"))
@@ -243,8 +318,8 @@ class HomePrimeiraEvolucaoTests(TestCase):
     def test_fundamentos_preservam_conteudo_nos_tres_idiomas(self):
         casos = [
             ("/", "Fundamentos e estratégias", "Equidade e Inclusão", "Estratégia de gênero"),
-            ("/es/", "Fundamentos y estrategias", "Participación en los beneficios", "Estrategia de género"),
-            ("/en/", "Foundations and strategies", "Benefit sharing", "Gender strategy"),
+            ("/es/", "Fundamentos y estrategias", "Equidad e Inclusión", "Estrategia de género"),
+            ("/en/", "Foundations and strategies", "Equity and Inclusion", "Gender strategy"),
         ]
 
         for caminho, titulo, beneficio, genero in casos:
@@ -259,13 +334,13 @@ class HomePrimeiraEvolucaoTests(TestCase):
         casos = (
             (
                 "/es/",
-                "Justicia climática significa poner la equidad y los derechos "
-                "humanos en el centro",
+                "La justicia climática es un enfoque que integra los Derechos "
+                "Humanos, la justicia social y la protección ambiental",
             ),
             (
                 "/en/",
-                "Climate justice means putting equity and human rights at the "
-                "center",
+                "Climate justice is an approach that integrates Human Rights, "
+                "social justice and environmental protection",
             ),
         )
 

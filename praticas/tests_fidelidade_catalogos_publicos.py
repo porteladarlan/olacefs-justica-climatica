@@ -234,18 +234,16 @@ class FidelidadeCatalogosPublicosTests(TestCase):
         for icon_name in ("account_circle", "contrast", "balance", "download", "search"):
             self.assertNotContains(response, f">{icon_name}<")
 
-    def test_marcos_filtram_por_pais_e_setor_de_pratica_publica(self):
+    def test_marcos_nao_derivam_filtros_de_pratica_publica(self):
         response = self.client.get(
             reverse("normas_internacionais"),
             {"pais": self.pais_a.pk, "setor": self.setor_a.pk},
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["total_resultados"], 1)
-        self.assertContains(response, self.norma.nome)
+        self.assertEqual(response.context["total_resultados"], 0)
+        self.assertNotContains(response, self.norma.nome)
         self.assertNotContains(response, self.norma_b.nome)
-        self.assertContains(response, self.pais_a.nome)
-        self.assertContains(response, self.setor_a.nome)
 
     def test_ferramentas_e_banco_nao_publicam_dados_demonstrativos(self):
         for nome in ("ferramentas", "banco_tecnico"):

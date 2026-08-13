@@ -27,7 +27,7 @@ class PolimentoHomeApresentacaoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
 
-        self.assertIn("Fundamentos e estrat&eacute;gias", conteudo)
+        self.assertIn("Fundamentos e estratégias", conteudo)
         self.assertNotIn("ODS 13, 16 y 17", conteudo)
 
     def test_home_ingles_e_espanhol_nao_exibem_link_pendente(self):

@@ -47,13 +47,13 @@
 
             <select name="setor" data-auto-submit aria-label="{% if LANGUAGE_CODE == 'en' %}Filter by sector{% elif LANGUAGE_CODE == 'es' %}Filtrar por sector{% else %}Filtrar por setor{% endif %}"{% if not setores %} disabled{% endif %}>
                 <option value="">{% if LANGUAGE_CODE == 'en' %}All sectors{% elif LANGUAGE_CODE == 'es' %}Todos los sectores{% else %}Todos os setores{% endif %}</option>
-                {% for setor in setores %}<option value="{{ setor.pk }}"{% if setor.pk in setores_selecionados %} selected{% endif %}>{{ setor.nome_exibicao }}</option>{% endfor %}
+                {% for setor in setores %}<option value="{{ setor }}"{% if setor == setor_selecionado %} selected{% endif %}>{{ setor }}</option>{% endfor %}
             </select>
 
-            <select disabled aria-describedby="legal-nature-help" aria-label="{% if LANGUAGE_CODE == 'en' %}Legal nature{% elif LANGUAGE_CODE == 'es' %}Naturaleza jur&iacute;dica{% else %}Natureza jur&iacute;dica{% endif %}">
-                <option>{% if LANGUAGE_CODE == 'en' %}All legal natures{% elif LANGUAGE_CODE == 'es' %}Toda naturaleza jur&iacute;dica{% else %}Toda natureza jur&iacute;dica{% endif %}</option>
+            <select name="natureza" data-auto-submit aria-label="{% if LANGUAGE_CODE == 'en' %}Legal nature{% elif LANGUAGE_CODE == 'es' %}Naturaleza jur&iacute;dica{% else %}Natureza jur&iacute;dica{% endif %}"{% if not naturezas_juridicas %} disabled{% endif %}>
+                <option value="">{% if LANGUAGE_CODE == 'en' %}All legal natures{% elif LANGUAGE_CODE == 'es' %}Toda naturaleza jur&iacute;dica{% else %}Toda natureza jur&iacute;dica{% endif %}</option>
+                {% for natureza in naturezas_juridicas %}<option value="{{ natureza }}"{% if natureza == natureza_selecionada %} selected{% endif %}>{{ natureza }}</option>{% endfor %}
             </select>
-            <span class="visually-hidden" id="legal-nature-help">{% if LANGUAGE_CODE == 'en' %}Legal nature is not available in the current data structure.{% elif LANGUAGE_CODE == 'es' %}La naturaleza jur&iacute;dica no est&aacute; disponible en la estructura de datos actual.{% else %}A natureza jur&iacute;dica n&atilde;o est&aacute; dispon&iacute;vel na estrutura de dados atual.{% endif %}</span>
 
             <a class="library-clear" href="{% url 'normas_internacionais' %}">{% if LANGUAGE_CODE == 'en' %}Clear filters{% elif LANGUAGE_CODE == 'es' %}Limpiar filtros{% else %}Limpar filtros{% endif %}</a>
             <noscript><button class="library-noscript-submit" type="submit">{% if LANGUAGE_CODE == 'en' %}Apply filters{% elif LANGUAGE_CODE == 'es' %}Aplicar filtros{% else %}Aplicar filtros{% endif %}</button></noscript>
@@ -69,15 +69,20 @@
 
         <div class="library-grid">
             {% for norma in normas %}
-                <article class="library-card">
+                <article class="library-card" id="norma-card-{{ norma.pk }}">
                     <div class="library-card-top">
                         <span class="library-badge">{% if LANGUAGE_CODE == 'en' %}Normative framework{% elif LANGUAGE_CODE == 'es' %}Marco normativo{% else %}Marco normativo{% endif %}</span>
                     </div>
                     <h2>{{ norma.nome_exibicao }}</h2>
-                    <p>{{ norma.resumo_exibicao|truncatechars:300 }}</p>
+                    <p lang="es">{{ norma.resumo_es|truncatechars:300 }}</p>
+                    {% if norma.ano_texto or norma.natureza_juridica %}<p class="norm-dialog-meta">{% if norma.ano_texto %}<strong>{{ norma.ano_texto }}</strong>{% endif %}{% if norma.ano_texto and norma.natureza_juridica %} &middot; {% endif %}{{ norma.natureza_juridica }}</p>{% endif %}
                     {% if norma.setores_publicos %}<div class="library-sectors">{% for setor in norma.setores_publicos|slice:':3' %}<span>{{ setor }}</span>{% endfor %}</div>{% endif %}
                     <div class="library-card-footer">
-                        <span class="library-applies">{% if LANGUAGE_CODE == 'en' %}Applies to:{% elif LANGUAGE_CODE == 'es' %}Aplica a:{% else %}Aplica-se a:{% endif %} {% if norma.paises_publicos %}{{ norma.paises_publicos|join:', ' }}{% elif LANGUAGE_CODE == 'en' %}not informed{% elif LANGUAGE_CODE == 'es' %}no informado{% else %}n&atilde;o informado{% endif %}</span>
+                        <span class="library-applies">{% if LANGUAGE_CODE == 'en' %}Countries and status:{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;ses y situaci&oacute;n:{% else %}Pa&iacute;ses e situa&ccedil;&atilde;o:{% endif %} {% if norma.paises_publicos %}{% for vinculo in norma.paises_publicos|slice:':3' %}{{ vinculo.pais.nome_exibicao }}: <span lang="es">{{ vinculo.status }}</span>{% if not forloop.last %}; {% endif %}{% endfor %}{% if norma.paises_publicos|length > 3 %}&hellip;{% endif %}{% elif LANGUAGE_CODE == 'en' %}not specified in structured data{% elif LANGUAGE_CODE == 'es' %}no especificada en los datos estructurados{% else %}n&atilde;o especificada nos dados estruturados{% endif %}</span>
+                    </div>
+                    <div class="norm-dialog-actions">
+                        {% if norma.url_publica %}<a class="norm-secondary-action" href="{{ norma.url_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Official source{% elif LANGUAGE_CODE == 'es' %}Fuente oficial{% else %}Fonte oficial{% endif %}</a>{% endif %}
+                        {% if norma.ficha_publica %}<a class="norm-secondary-action" href="{{ norma.ficha_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Learn more{% elif LANGUAGE_CODE == 'es' %}Saber m&aacute;s{% else %}Saiba mais{% endif %}</a>{% endif %}
                     </div>
                     <button class="library-detail" type="button" data-dialog-target="norma-{{ norma.pk }}">{% if LANGUAGE_CODE == 'en' %}View details{% elif LANGUAGE_CODE == 'es' %}Ver detalle{% else %}Ver detalhes{% endif %} <span aria-hidden="true">&rarr;</span></button>
                 </article>
@@ -89,12 +94,19 @@
                         </button>
                         <div class="library-eyebrow">{% if LANGUAGE_CODE == 'en' %}Normative framework{% elif LANGUAGE_CODE == 'es' %}Marco normativo{% else %}Marco normativo{% endif %}</div>
                         <h2 id="norma-title-{{ norma.pk }}">{{ norma.nome_exibicao }}</h2>
-                        <p>{{ norma.resumo_exibicao }}</p>
+                        {% if norma.ano_texto %}<p class="norm-dialog-meta"><strong>{% if LANGUAGE_CODE == 'en' %}Year:{% elif LANGUAGE_CODE == 'es' %}A&ntilde;o:{% else %}Ano:{% endif %}</strong> {{ norma.ano_texto }}</p>{% endif %}
+                        {% if norma.natureza_juridica %}<p class="norm-dialog-meta"><strong>{% if LANGUAGE_CODE == 'en' %}Legal nature:{% elif LANGUAGE_CODE == 'es' %}Naturaleza jur&iacute;dica:{% else %}Natureza jur&iacute;dica:{% endif %}</strong> {{ norma.natureza_juridica }}</p>{% endif %}
+                        <p lang="es">{{ norma.resumo_es }}</p>
                         {% if norma.setores_publicos %}<div class="library-sectors">{% for setor in norma.setores_publicos %}<span>{{ setor }}</span>{% endfor %}</div>{% endif %}
-                        <p class="norm-dialog-meta"><strong>{% if LANGUAGE_CODE == 'en' %}Countries linked to public practices:{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;ses vinculados a pr&aacute;cticas p&uacute;blicas:{% else %}Pa&iacute;ses vinculados a pr&aacute;ticas p&uacute;blicas:{% endif %}</strong> {% if norma.paises_publicos %}{{ norma.paises_publicos|join:', ' }}{% elif LANGUAGE_CODE == 'en' %}not informed{% elif LANGUAGE_CODE == 'es' %}no informado{% else %}n&atilde;o informado{% endif %}</p>
+                        <div class="norm-dialog-meta">
+                            <strong>{% if LANGUAGE_CODE == 'en' %}Countries and status in the framework:{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;ses y situaci&oacute;n en el marco:{% else %}Pa&iacute;ses e situa&ccedil;&atilde;o no marco:{% endif %}</strong>
+                            {% if norma.paises_publicos %}<ul>{% for vinculo in norma.paises_publicos %}<li>{{ vinculo.pais.nome_exibicao }}: <span lang="es">{{ vinculo.status }}</span></li>{% endfor %}</ul>{% elif LANGUAGE_CODE == 'en' %}Not specified in structured data.{% elif LANGUAGE_CODE == 'es' %}No especificado en los datos estructurados.{% else %}N&atilde;o especificado nos dados estruturados.{% endif %}
+                        </div>
+                        {% if norma.cobertura_paises_es %}<div class="norm-dialog-meta"><strong>{% if LANGUAGE_CODE == 'en' %}Institutional source description:{% elif LANGUAGE_CODE == 'es' %}Descripci&oacute;n de la fuente institucional:{% else %}Descri&ccedil;&atilde;o da fonte institucional:{% endif %}</strong><p lang="es">{{ norma.cobertura_paises_es }}</p></div>{% endif %}
                         <div class="norm-dialog-actions">
                             <a class="norm-primary-action" href="{% url 'catalogo_experiencias' %}?norma={{ norma.pk }}">{% if LANGUAGE_CODE == 'en' %}Related practices{% elif LANGUAGE_CODE == 'es' %}Pr&aacute;cticas relacionadas{% else %}Pr&aacute;ticas relacionadas{% endif %}</a>
                             {% if norma.url_publica %}<a class="norm-secondary-action" href="{{ norma.url_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Official source{% elif LANGUAGE_CODE == 'es' %}Fuente oficial{% else %}Fonte oficial{% endif %}</a>{% endif %}
+                            {% if norma.ficha_publica %}<a class="norm-secondary-action" href="{{ norma.ficha_publica }}" target="_blank" rel="noopener noreferrer">{% if LANGUAGE_CODE == 'en' %}Learn more{% elif LANGUAGE_CODE == 'es' %}Saber m&aacute;s{% else %}Saiba mais{% endif %}</a>{% endif %}
                         </div>
                     </div>
                 </dialog>
