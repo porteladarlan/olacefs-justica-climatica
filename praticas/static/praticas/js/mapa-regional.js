@@ -24,7 +24,9 @@
         ? coordinatedStatus.textContent.trim()
         : "";
     const actionButtons = Array.from(form.querySelectorAll("button[type='submit']"));
-    const countryCheckboxes = Array.from(form.querySelectorAll("input[name='pais']"));
+    const countryRadios = Array.from(
+        form.querySelectorAll("input[type='radio'][name='pais']")
+    );
 
     let payload;
     try {
@@ -148,10 +150,8 @@
     function updateCount(total) {
         if (total === 0) {
             count.textContent = section.dataset.selectedZero;
-        } else if (total === 1) {
-            count.textContent = section.dataset.selectedOne;
         } else {
-            count.textContent = section.dataset.selectedMany.replace("{count}", total);
+            count.textContent = section.dataset.selectedOne;
         }
     }
 
@@ -167,8 +167,8 @@
         clearButton.disabled = !hasSelection;
         updateCount(selected.length);
 
-        countryCheckboxes.forEach(function (checkbox) {
-            checkbox.checked = selectedIds.has(checkbox.value);
+        countryRadios.forEach(function (radio) {
+            radio.checked = selectedIds.has(radio.value);
         });
 
         chips.replaceChildren();
@@ -217,6 +217,7 @@
             return;
         }
         if (selected) {
+            selectedIds.clear();
             selectedIds.add(normalizedId);
         } else {
             selectedIds.delete(normalizedId);
@@ -420,9 +421,11 @@
         updatePathState();
     }
 
-    countryCheckboxes.forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-            setCountrySelected(checkbox.value, checkbox.checked);
+    countryRadios.forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            if (radio.checked) {
+                setCountrySelected(radio.value, true);
+            }
         });
     });
 

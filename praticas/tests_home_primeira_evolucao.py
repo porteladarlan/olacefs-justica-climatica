@@ -318,11 +318,11 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertEqual(len(re.findall(r"<h1\b", html)), 1)
         self.assertGreaterEqual(len(re.findall(r"<h2\b", html)), 4)
 
-    def test_mapa_funcional_e_video_honesto_sem_dados_falsos(self):
+    def test_mapa_funcional_e_video_oficial_trilingue(self):
         casos = [
-            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o"),
-            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Contenido audiovisual en preparaci&oacute;n"),
-            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Audiovisual content in preparation"),
+            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Teaser da Plataforma de Justi&ccedil;a Clim&aacute;tica"),
+            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Teaser de la Plataforma de Justicia Clim&aacute;tica"),
+            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Climate Justice Platform Teaser"),
         ]
 
         for caminho, mapa, estado_funcional, video in casos:
@@ -336,3 +336,30 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertNotContains(response, "Future stage")
                 self.assertContains(response, f'formaction="{reverse("catalogo_experiencias")}"')
                 self.assertContains(response, f'formaction="{reverse("normas_internacionais")}"')
+
+    def test_video_home_usa_player_html5_via_media_sem_autoplay(self):
+        response = self.client.get(reverse("pagina_inicial"))
+        html = response.content.decode("utf-8")
+        bloco = html.split('<section class="home-video', 1)[1].split(
+            "</section>", 1
+        )[0]
+
+        self.assertIn("<video", bloco)
+        self.assertIn("controls", bloco)
+        self.assertIn('preload="metadata"', bloco)
+        self.assertIn("playsinline", bloco)
+        self.assertIn(
+            '<source src="/media/videos/teaser-plataforma-jc.mp4" type="video/mp4">',
+            bloco,
+        )
+        self.assertNotIn("autoplay", bloco)
+        self.assertNotIn("Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o", bloco)
+        self.assertNotIn("static/praticas", bloco)
+        self.assertIn(
+            'class="home-video-fallback" id="home-video-error" role="status" hidden',
+            bloco,
+        )
+
+        pagina = response.content.decode("utf-8")
+        self.assertIn('player.addEventListener("error"', pagina)
+        self.assertIn("errorMessage.hidden = false;", pagina)

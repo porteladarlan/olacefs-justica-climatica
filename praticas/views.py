@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
+from django.core.validators import URLValidator, validate_email
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -900,10 +900,30 @@ def detalhe_experiencia(request, pk):
         ),
         pk=pk,
     )
+    contato_nome = (
+        (experiencia.contato_referencia or "").strip()
+        or (experiencia.pessoa_responsavel or "").strip()
+    )
+    contato_email = (experiencia.email_contato or "").strip()
+    contato_email_mailto = ""
+    if contato_email:
+        try:
+            validate_email(contato_email)
+        except ValidationError:
+            pass
+        else:
+            contato_email_mailto = contato_email
+
     return render(
         request,
         "praticas/detalhe_experiencia.html",
-        {"experiencia": experiencia, "favoritos_ids": favoritos_ids(request)},
+        {
+            "experiencia": experiencia,
+            "favoritos_ids": favoritos_ids(request),
+            "contato_nome": contato_nome,
+            "contato_email": contato_email,
+            "contato_email_mailto": contato_email_mailto,
+        },
     )
 
 

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
 from .models import (
     DimensaoJusticaClimatica,
@@ -26,7 +27,7 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
         dimensao = DimensaoJusticaClimatica.objects.create(nome="Participacao", nome_es="Participacion", nome_en="Participation")
         grupo = GrupoVulneravel.objects.create(nome="Povos indigenas", nome_es="Pueblos indigenas", nome_en="Indigenous peoples")
 
-        experiencia = Experiencia.objects.create(
+        cls.experiencia = Experiencia.objects.create(
             titulo="Auditoria climatica exemplo",
             titulo_es="Auditoria climatica ejemplo",
             titulo_en="Climate audit example",
@@ -58,10 +59,16 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
             resultados="Resultado apresentado.",
             status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
         )
-        experiencia.temas_transversais.add(tema)
-        experiencia.normas_internacionais.add(norma)
-        experiencia.dimensoes_consideradas.add(dimensao)
-        experiencia.grupos_vulneraveis.add(grupo)
+        cls.experiencia.temas_transversais.add(tema)
+        cls.experiencia.normas_internacionais.add(norma)
+        cls.experiencia.dimensoes_consideradas.add(dimensao)
+        cls.experiencia.grupos_vulneraveis.add(grupo)
+
+    def setUp(self):
+        translation.activate("pt-br")
+
+    def tearDown(self):
+        translation.deactivate()
 
     def test_ficha_usa_breve_descricao_e_campos_de_justica_climatica(self):
         experiencia = Experiencia.objects.get(titulo="Auditoria climatica exemplo")
@@ -73,7 +80,6 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
         # Validação estrutural: evita falhas por idioma ativo, entidades HTML
         # ou escolha de campos traduzidos no template.
         self.assertIn("detail-layout-card", conteudo)
-        self.assertIn("metadata-grid", conteudo)
         self.assertIn("headingJustica", conteudo)
         self.assertIn("collapseJustica", conteudo)
         self.assertIn("headingAuditoria", conteudo)
@@ -84,7 +90,7 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
         self.assertIn("TC", conteudo)
         self.assertIn("Brasil", conteudo)
         self.assertIn("2026", conteudo)
-        self.assertNotIn("contato@example.org", conteudo)
+        self.assertIn("contato@example.org", conteudo)
 
         # Validação dos novos blocos da retroalimentação sem fixar idioma.
         self.assertTrue(
@@ -104,3 +110,102 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
 
         # A retroalimentação pediu remover a referência visual à Guia.
         self.assertNotIn("Insumo para", conteudo)
+
+    def test_ficha_publica_exibe_contato_no_final_da_coluna_lateral(self):
+        response = self.client.get(
+            reverse("detalhe_experiencia", args=[self.experiencia.pk])
+        )
+        conteudo = response.content.decode("utf-8")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Pessoa responsável", conteudo)
+        self.assertNotIn("Persona responsable", conteudo)
+        self.assertNotIn("Responsible person", conteudo)
+        self.assertIn('id="experience-contact"', conteudo)
+        self.assertIn("Contato", conteudo)
+        self.assertIn("contato@example.org", conteudo)
+        self.assertIn('href="mailto:contato@example.org"', conteudo)
+        self.assertNotIn("Pessoa responsavel", conteudo)
+        self.assertLess(
+            conteudo.index("experience-vulnerable-groups"),
+            conteudo.index("experience-contact"),
+        )
+        self.assertLess(
+            conteudo.index("experience-contact"),
+            conteudo.index(
+                '<form method="post"',
+                conteudo.index("experience-contact"),
+            ),
+        )
+
+    def test_ficha_publica_usa_pessoa_responsavel_como_fallback_legado(self):
+        self.experiencia.contato_referencia = ""
+        self.experiencia.email_contato = ""
+        self.experiencia.pessoa_responsavel = "Responsável legado"
+        self.experiencia.save(
+            update_fields=[
+                "contato_referencia",
+                "email_contato",
+                "pessoa_responsavel",
+            ]
+        )
+
+        response = self.client.get(
+            reverse("detalhe_experiencia", args=[self.experiencia.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="experience-contact"')
+        self.assertContains(response, "Responsável legado")
+        self.assertNotContains(response, "mailto:")
+
+    def test_ficha_publica_oculta_contato_quando_todos_os_dados_estao_vazios(self):
+        self.experiencia.contato_referencia = ""
+        self.experiencia.email_contato = ""
+        self.experiencia.pessoa_responsavel = ""
+        self.experiencia.save(
+            update_fields=[
+                "contato_referencia",
+                "email_contato",
+                "pessoa_responsavel",
+            ]
+        )
+
+        response = self.client.get(
+            reverse("detalhe_experiencia", args=[self.experiencia.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="experience-contact"')
+        self.assertNotContains(response, "mailto:")
+
+    def test_ficha_publica_nao_cria_mailto_para_email_invalido(self):
+        self.experiencia.contato_referencia = "Contato sem e-mail válido"
+        self.experiencia.email_contato = "email-invalido"
+        self.experiencia.save(
+            update_fields=["contato_referencia", "email_contato"]
+        )
+
+        response = self.client.get(
+            reverse("detalhe_experiencia", args=[self.experiencia.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "email-invalido")
+        self.assertNotContains(response, 'href="mailto:email-invalido"')
+
+    def test_ficha_publica_traduz_rotulo_de_contato(self):
+        casos = (
+            (f"/experiencias/{self.experiencia.pk}/", "Contato"),
+            (f"/es/experiencias/{self.experiencia.pk}/", "Contacto"),
+            (f"/en/experiencias/{self.experiencia.pk}/", "Contact"),
+        )
+
+        for caminho, rotulo in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                contato = response.content.decode("utf-8").split(
+                    'id="experience-contact"', 1
+                )[1].split("</section>", 1)[0]
+                self.assertIn(rotulo, contato)

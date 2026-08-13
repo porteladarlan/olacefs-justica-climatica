@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -307,6 +308,100 @@ class MapaRegionalTests(TestCase):
             html=False,
         )
 
+    def test_selecao_manual_e_individual_e_textos_nao_indicam_multisselecao(self):
+        casos = (
+            ("/", "Selecione um pa&iacute;s no mapa", "Selecione um pa&iacute;s"),
+            ("/es/", "Selecciona un pa&iacute;s en el mapa", "Selecciona un pa&iacute;s"),
+            ("/en/", "Select one country on the map", "Select one country"),
+        )
+        textos_multisselecao = (
+            "vários ao mesmo tempo",
+            "varios a la vez",
+            "several at once",
+            "um ou mais países",
+            "uno o más países",
+            "one or more countries",
+        )
+
+        for caminho, instrucao, legenda in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                html = response.content.decode("utf-8")
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, instrucao, html=False)
+                self.assertContains(response, legenda, html=False)
+                for texto in textos_multisselecao:
+                    self.assertNotIn(texto, html)
+
+                inputs = re.findall(
+                    r"<input\s+[^>]*name=\"pais\"[^>]*>",
+                    html,
+                )
+                self.assertGreater(len(inputs), 1)
+                for country_input in inputs:
+                    self.assertIn('type="radio"', country_input)
+                    self.assertNotIn('type="checkbox"', country_input)
+
+                form = html.split('id="regionalMapForm"', 1)[1].split(
+                    "</form>", 1
+                )[0]
+                self.assertNotRegex(
+                    form,
+                    r'type="checkbox"[^>]*name="pais"',
+                )
+
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("const countryRadios", script)
+        self.assertIn("radio.checked = selectedIds.has(radio.value);", script)
+        self.assertIn("selectedIds.clear();", script)
+        self.assertNotIn("countryCheckboxes", script)
+
+    def test_nomenclatura_publica_de_entidades_associadas_e_trilingue(self):
+        casos = (
+            ("/", "Entidades associadas", "Entidades associadas ao pa&iacute;s selecionado"),
+            ("/es/", "Entidades asociadas", "Entidades asociadas al pa&iacute;s seleccionado"),
+            ("/en/", "Associated entities", "Entities associated with the selected country"),
+        )
+
+        for caminho, titulo, aria_label in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, titulo, html=False)
+                self.assertContains(response, f'aria-label="{aria_label}"', html=False)
+
+    def test_select_coordenado_permanece_independente_responsivo_e_sem_dados_ficticios(self):
+        response, payload = self._payload()
+        css = Path(finders.find("praticas/css/home.css")).read_text(
+            encoding="utf-8"
+        )
+
+        self.assertEqual(payload["auditorias_coordenadas"], [])
+        self.assertContains(response, 'id="regionalMapCoordinatedAudit"')
+        self.assertContains(response, "disabled")
+        self.assertContains(
+            response,
+            "N&atilde;o h&aacute; auditorias coordenadas com EFS participantes adicionais dispon&iacute;veis.",
+            html=False,
+        )
+        self.assertRegex(
+            css,
+            r"\.home-map-coordinated-control select\s*\{[^}]*width: 100%[^}]*"
+            r"max-width: 100%[^}]*min-height: 48px[^}]*"
+            r"padding: 10px 42px 10px 12px[^}]*overflow: hidden",
+        )
+
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(
+            encoding="utf-8"
+        )
+        funcao = script.split("function updateCoordinatedHighlight", 1)[1].split(
+            "function showTooltip", 1
+        )[0]
+        self.assertNotIn("selectedIds", funcao)
+        self.assertNotIn("countryRadios", funcao)
+
     def test_assets_sao_locais_e_javascript_e_progressivo(self):
         arquivos = (
             "praticas/js/mapa-regional.js",
@@ -468,7 +563,7 @@ class MapaRegionalTests(TestCase):
         self.assertIn("coordinatedHighlightedIds.clear();", funcao)
         self.assertIn("coordinatedHighlightedIds.add", funcao)
         self.assertNotIn("selectedIds", funcao)
-        self.assertNotIn("countryCheckboxes", funcao)
+        self.assertNotIn("countryRadios", funcao)
         self.assertNotIn("form.submit", funcao)
         self.assertNotIn("window.location", funcao)
 

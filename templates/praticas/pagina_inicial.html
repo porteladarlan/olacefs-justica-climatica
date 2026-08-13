@@ -16,6 +16,18 @@
 <script src="{% static 'praticas/vendor/d3/d3-7.9.0.min.js' %}"></script>
 <script src="{% static 'praticas/vendor/topojson/topojson-client-3.1.0.min.js' %}"></script>
 <script src="{% static 'praticas/js/mapa-regional.js' %}"></script>
+<script>
+    (function () {
+        "use strict";
+        const player = document.getElementById("home-video-player");
+        const errorMessage = document.getElementById("home-video-error");
+        if (player && errorMessage) {
+            player.addEventListener("error", function () {
+                errorMessage.hidden = false;
+            });
+        }
+    })();
+</script>
 {% endblock %}
 
 {% block extra_css %}

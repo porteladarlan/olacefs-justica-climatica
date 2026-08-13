@@ -7,9 +7,8 @@
     data-country-label="{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}Pa&iacute;s{% else %}Pa&iacute;s{% endif %}"
     data-selected-label="{% if LANGUAGE_CODE == 'en' %}selected{% elif LANGUAGE_CODE == 'es' %}seleccionado{% else %}selecionado{% endif %}"
     data-unselected-label="{% if LANGUAGE_CODE == 'en' %}not selected{% elif LANGUAGE_CODE == 'es' %}no seleccionado{% else %}n&atilde;o selecionado{% endif %}"
-    data-selected-zero="{% if LANGUAGE_CODE == 'en' %}No countries selected{% elif LANGUAGE_CODE == 'es' %}Ning&uacute;n pa&iacute;s seleccionado{% else %}Nenhum pa&iacute;s selecionado{% endif %}"
+    data-selected-zero="{% if LANGUAGE_CODE == 'en' %}No country selected{% elif LANGUAGE_CODE == 'es' %}Ning&uacute;n pa&iacute;s seleccionado{% else %}Nenhum pa&iacute;s selecionado{% endif %}"
     data-selected-one="{% if LANGUAGE_CODE == 'en' %}1 country selected{% elif LANGUAGE_CODE == 'es' %}1 pa&iacute;s seleccionado{% else %}1 pa&iacute;s selecionado{% endif %}"
-    data-selected-many="{% if LANGUAGE_CODE == 'en' %}{count} countries selected{% elif LANGUAGE_CODE == 'es' %}{count} pa&iacute;ses seleccionados{% else %}{count} pa&iacute;ses selecionados{% endif %}"
     data-remove-label="{% if LANGUAGE_CODE == 'en' %}Remove{% elif LANGUAGE_CODE == 'es' %}Quitar{% else %}Remover{% endif %}"
     data-coordinated-label="{% if LANGUAGE_CODE == 'en' %}highlighted by the coordinated audit{% elif LANGUAGE_CODE == 'es' %}destacado por la auditor&iacute;a coordinada{% else %}destacado pela auditoria coordenada{% endif %}"
     data-coordinated-summary="{% if LANGUAGE_CODE == 'en' %}Coordinated audit: {audit}. Highlighted countries: {countries}.{% elif LANGUAGE_CODE == 'es' %}Auditor&iacute;a coordinada: {audit}. Pa&iacute;ses destacados: {countries}.{% else %}Auditoria coordenada: {audit}. Pa&iacute;ses destacados: {countries}.{% endif %}"
@@ -24,7 +23,7 @@
                 {% if LANGUAGE_CODE == 'en' %}SAIs of Latin America and the Caribbean{% elif LANGUAGE_CODE == 'es' %}EFS de Am&eacute;rica Latina y el Caribe{% else %}EFS da Am&eacute;rica Latina e Caribe{% endif %}
             </h2>
             <p class="section-subtitle" id="home-map-description">
-                {% if LANGUAGE_CODE == 'en' %}Click countries on the map to select them. You can choose several at once.{% elif LANGUAGE_CODE == 'es' %}Haz clic en los pa&iacute;ses del mapa para seleccionarlos. Puedes elegir varios a la vez.{% else %}Clique nos pa&iacute;ses do mapa para selecion&aacute;-los. Voc&ecirc; pode escolher v&aacute;rios ao mesmo tempo.{% endif %}
+                {% if LANGUAGE_CODE == 'en' %}Select one country on the map. Selecting another replaces the current selection.{% elif LANGUAGE_CODE == 'es' %}Selecciona un pa&iacute;s en el mapa. Al elegir otro, se reemplaza la selecci&oacute;n actual.{% else %}Selecione um pa&iacute;s no mapa. Ao escolher outro, a sele&ccedil;&atilde;o atual ser&aacute; substitu&iacute;da.{% endif %}
             </p>
         </header>
 
@@ -50,7 +49,7 @@
                 </div>
                 <noscript>
                     <p class="home-map-noscript">
-                        {% if LANGUAGE_CODE == 'en' %}The visual map requires JavaScript. Use the accessible country list to select one or more countries and open the filtered catalogs.{% elif LANGUAGE_CODE == 'es' %}El mapa visual requiere JavaScript. Utiliza la lista accesible para seleccionar uno o m&aacute;s pa&iacute;ses y abrir los cat&aacute;logos filtrados.{% else %}O mapa visual requer JavaScript. Use a lista acess&iacute;vel para selecionar um ou mais pa&iacute;ses e abrir os cat&aacute;logos filtrados.{% endif %}
+                        {% if LANGUAGE_CODE == 'en' %}The visual map requires JavaScript. Use the accessible list to choose one country and open the filtered catalogs.{% elif LANGUAGE_CODE == 'es' %}El mapa visual requiere JavaScript. Utiliza la lista accesible para elegir un pa&iacute;s y abrir los cat&aacute;logos filtrados.{% else %}O mapa visual requer JavaScript. Use a lista acess&iacute;vel para escolher um pa&iacute;s e abrir os cat&aacute;logos filtrados.{% endif %}
                     </p>
                 </noscript>
             </div>
@@ -83,7 +82,7 @@
                     </p>
                 </div>
                 <p class="home-map-empty" id="regionalMapEmpty">
-                    {% if LANGUAGE_CODE == 'en' %}Click countries on the map to select them. You can choose several at once.{% elif LANGUAGE_CODE == 'es' %}Haz clic en los pa&iacute;ses del mapa para seleccionarlos. Puedes elegir varios a la vez.{% else %}Clique nos pa&iacute;ses do mapa para selecion&aacute;-los. Voc&ecirc; pode escolher v&aacute;rios ao mesmo tempo.{% endif %}
+                    {% if LANGUAGE_CODE == 'en' %}Select one country to view its associated entities and available records.{% elif LANGUAGE_CODE == 'es' %}Selecciona un pa&iacute;s para consultar sus entidades asociadas y registros disponibles.{% else %}Selecione um pa&iacute;s para consultar suas entidades associadas e registros dispon&iacute;veis.{% endif %}
                 </p>
 
                 <form class="home-map-form" id="regionalMapForm" method="get" action="{% url 'catalogo_experiencias' %}">
@@ -92,16 +91,16 @@
                         <div class="home-map-chips" id="regionalMapChips"></div>
                         <div class="home-map-summary">
                             <section aria-labelledby="regional-map-efs-title">
-                                <h4 id="regional-map-efs-title">{% if LANGUAGE_CODE == 'en' %}Associated SAIs{% elif LANGUAGE_CODE == 'es' %}EFS asociadas{% else %}EFS associadas{% endif %}</h4>
+                                <h4 id="regional-map-efs-title">{% if LANGUAGE_CODE == 'en' %}Associated entities{% elif LANGUAGE_CODE == 'es' %}Entidades asociadas{% else %}Entidades associadas{% endif %}</h4>
                                 <ul
                                     id="regionalMapEfs"
                                     tabindex="0"
-                                    aria-label="{% if LANGUAGE_CODE == 'en' %}Associated SAIs for selected countries{% elif LANGUAGE_CODE == 'es' %}EFS asociadas a los pa&iacute;ses seleccionados{% else %}EFS associadas aos pa&iacute;ses selecionados{% endif %}"
+                                    aria-label="{% if LANGUAGE_CODE == 'en' %}Entities associated with the selected country{% elif LANGUAGE_CODE == 'es' %}Entidades asociadas al pa&iacute;s seleccionado{% else %}Entidades associadas ao pa&iacute;s selecionado{% endif %}"
                                 ></ul>
                             </section>
                             <dl class="home-map-stats">
                                 <div>
-                                    <dt>{% if LANGUAGE_CODE == 'en' %}Experiences registered by these SAIs{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas por estas EFS{% else %}Experi&ecirc;ncias registradas por estas EFS{% endif %}</dt>
+                                    <dt>{% if LANGUAGE_CODE == 'en' %}Experiences registered by associated entities{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas por las entidades asociadas{% else %}Experi&ecirc;ncias registradas pelas entidades associadas{% endif %}</dt>
                                     <dd id="regionalMapExperiences">0</dd>
                                 </div>
                                 <div>
@@ -115,12 +114,12 @@
                     <details class="home-map-text-alternative">
                         <summary>{% if LANGUAGE_CODE == 'en' %}Accessible country list{% elif LANGUAGE_CODE == 'es' %}Lista accesible de pa&iacute;ses{% else %}Lista acess&iacute;vel de pa&iacute;ses{% endif %}</summary>
                         <fieldset>
-                            <legend class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Select countries{% elif LANGUAGE_CODE == 'es' %}Selecciona pa&iacute;ses{% else %}Selecione pa&iacute;ses{% endif %}</legend>
+                            <legend class="visually-hidden">{% if LANGUAGE_CODE == 'en' %}Select one country{% elif LANGUAGE_CODE == 'es' %}Selecciona un pa&iacute;s{% else %}Selecione um pa&iacute;s{% endif %}</legend>
                             <div class="home-map-country-list">
                                 {% for pais in mapa_regional.paises %}
                                     <div class="home-map-country-option">
                                         <input
-                                            type="checkbox"
+                                            type="radio"
                                             name="pais"
                                             value="{{ pais.id }}"
                                             id="map-country-{{ pais.id }}"
@@ -145,7 +144,7 @@
 
                     <div class="home-map-actions">
                         <button class="btn btn-primary" type="submit" formaction="{% url 'catalogo_experiencias' %}">
-                            {% if LANGUAGE_CODE == 'en' %}Experiences registered by these SAIs{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas por estas EFS{% else %}Experi&ecirc;ncias registradas por estas EFS{% endif %}
+                            {% if LANGUAGE_CODE == 'en' %}Experiences registered by associated entities{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas por las entidades asociadas{% else %}Experi&ecirc;ncias registradas pelas entidades associadas{% endif %}
                         </button>
                         <button class="btn btn-outline-primary" type="submit" formaction="{% url 'normas_internacionais' %}">
                             {% if LANGUAGE_CODE == 'en' %}Applicable normative criteria{% elif LANGUAGE_CODE == 'es' %}Criterios normativos aplicables{% else %}Crit&eacute;rios normativos aplic&aacute;veis{% endif %}

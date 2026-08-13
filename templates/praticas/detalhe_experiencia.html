@@ -33,13 +33,6 @@
     </div>
 </section>
 
-<section class="metadata-grid mb-4">
-    <div class="metadata-item">
-        <div class="metadata-label">{% if LANGUAGE_CODE == 'en' %}Responsible person{% elif LANGUAGE_CODE == 'es' %}Persona responsable{% else %}Pessoa respons&aacute;vel{% endif %}</div>
-        <div class="metadata-value">{{ experiencia.pessoa_responsavel|default:"-" }}</div>
-    </div>
-</section>
-
 <div class="row g-4">
     <div class="col-lg-8">
         <section class="detail-layout-card mb-3">
@@ -252,10 +245,22 @@
             <div class="d-flex flex-wrap gap-2">{% for norma in experiencia.normas_internacionais.all %}<span class="badge-soft">{{ norma.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
         </section>
 
-        <section class="detail-layout-card mb-3">
+        <section class="detail-layout-card mb-3" id="experience-vulnerable-groups">
             <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Vulnerable groups{% elif LANGUAGE_CODE == 'es' %}Grupos vulnerables{% else %}Grupos vulner&aacute;veis{% endif %}</div>
             <div class="d-flex flex-wrap gap-2">{% for grupo in experiencia.grupos_vulneraveis.all %}<span class="badge-soft">{{ grupo.nome_exibicao }}</span>{% empty %}<span class="text-muted">-</span>{% endfor %}</div>
         </section>
+
+        {% if contato_nome or contato_email %}
+        <section class="detail-layout-card mb-3" id="experience-contact">
+            <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Contact{% elif LANGUAGE_CODE == 'es' %}Contacto{% else %}Contato{% endif %}</div>
+            {% if contato_nome %}<p class="mb-1">{{ contato_nome }}</p>{% endif %}
+            {% if contato_email %}
+                <p class="mb-0">
+                    {% if contato_email_mailto %}<a href="mailto:{{ contato_email_mailto }}">{{ contato_email }}</a>{% else %}{{ contato_email }}{% endif %}
+                </p>
+            {% endif %}
+        </section>
+        {% endif %}
 
         <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}">
             {% csrf_token %}

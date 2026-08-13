@@ -69,6 +69,10 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 
 - Atualizado o conteúdo em português, reposicionados os CTAs e publicada a página trilíngue de exemplos com o acervo do protótipo oficial.
 
+# 2026-08-12 — Lote 1 de correções negociais
+
+- Tornada unitária a seleção manual do mapa, ajustados o seletor coordenado e a nomenclatura pública, reposicionado o contato da Boa Prática e preparado o player oficial via MEDIA.
+
 # 2026-08-11 — Fase 2I: gate de prontidão para homologação
 
 - Atualizado o diagnóstico por ambiente para separar falhas críticas, avisos de HTTPS/HSTS e dependências institucionais, com propagação testada pelo gate consolidado.

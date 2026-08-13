@@ -1,10 +1,20 @@
 <section class="home-video home-block" id="videoSection" aria-labelledby="home-video-title">
     <div class="home-section-heading text-center">
-        <h2 class="home-section-title" id="home-video-title">{% if LANGUAGE_CODE == 'en' %}A path toward climate justice in OLACEFS{% elif LANGUAGE_CODE == 'es' %}Un camino hacia la justicia clim&aacute;tica en la OLACEFS{% else %}Um caminho rumo &agrave; justi&ccedil;a clim&aacute;tica na OLACEFS{% endif %}</h2>
-        <p>{% if LANGUAGE_CODE == 'en' %}A guided tour of the regional map, normative frameworks, tools and good practices is planned for a future stage.{% elif LANGUAGE_CODE == 'es' %}Se prev&eacute; para una etapa futura un recorrido guiado por el mapa regional, los marcos normativos, las herramientas y las buenas pr&aacute;cticas.{% else %}Est&aacute; previsto para uma etapa futura um percurso guiado pelo mapa regional, marcos normativos, ferramentas e boas pr&aacute;ticas.{% endif %}</p>
+        <h2 class="home-section-title" id="home-video-title">{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform Teaser{% elif LANGUAGE_CODE == 'es' %}Teaser de la Plataforma de Justicia Clim&aacute;tica{% else %}Teaser da Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}</h2>
+        <p>{% if LANGUAGE_CODE == 'en' %}Watch the official introduction to the Climate Justice Platform.{% elif LANGUAGE_CODE == 'es' %}Conoce la presentaci&oacute;n oficial de la Plataforma de Justicia Clim&aacute;tica.{% else %}Conhe&ccedil;a a apresenta&ccedil;&atilde;o oficial da Plataforma de Justi&ccedil;a Clim&aacute;tica.{% endif %}</p>
     </div>
-    <div class="home-video-frame" role="status">
-        <span class="home-video-mark" aria-hidden="true">&#9654;</span>
-        <span class="home-video-status">{% if LANGUAGE_CODE == 'en' %}Audiovisual content in preparation{% elif LANGUAGE_CODE == 'es' %}Contenido audiovisual en preparaci&oacute;n{% else %}Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o{% endif %}</span>
+    <div class="home-video-frame">
+        <video
+            id="home-video-player"
+            class="home-video-player"
+            controls
+            preload="metadata"
+            playsinline
+            aria-label="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform official teaser{% elif LANGUAGE_CODE == 'es' %}Teaser oficial de la Plataforma de Justicia Clim&aacute;tica{% else %}Teaser oficial da Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}"
+        >
+            <source src="/media/videos/teaser-plataforma-jc.mp4" type="video/mp4">
+            {% if LANGUAGE_CODE == 'en' %}Your browser cannot play this video.{% elif LANGUAGE_CODE == 'es' %}Tu navegador no puede reproducir este video.{% else %}Seu navegador n&atilde;o consegue reproduzir este v&iacute;deo.{% endif %}
+        </video>
     </div>
+    <p class="home-video-fallback" id="home-video-error" role="status" hidden>{% if LANGUAGE_CODE == 'en' %}If the video does not load, the official media file is not yet available in this environment.{% elif LANGUAGE_CODE == 'es' %}Si el video no carga, el archivo multimedia oficial a&uacute;n no est&aacute; disponible en este entorno.{% else %}Se o v&iacute;deo n&atilde;o carregar, o arquivo oficial de m&iacute;dia ainda n&atilde;o est&aacute; dispon&iacute;vel neste ambiente.{% endif %}</p>
 </section>

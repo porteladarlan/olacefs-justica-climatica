@@ -503,6 +503,7 @@
 }
 
 .home-design .home-map-coordinated-control {
+    min-width: 0;
     margin: 0 0 18px;
     padding: 14px;
     border: 1px solid var(--purple-soft);
@@ -519,9 +520,19 @@
 }
 
 .home-design .home-map-coordinated-control select {
-    min-height: 44px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 48px;
+    height: auto;
+    padding: 10px 42px 10px 12px;
     border-color: var(--purple-soft);
     color: var(--purple);
+    line-height: 1.35;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
 }
 
 .home-design .home-map-coordinated-control select:focus-visible {
@@ -750,33 +761,32 @@
 }
 
 .home-design .home-video-frame {
-    display: grid;
     width: min(100%, 840px);
-    aspect-ratio: 16 / 9;
     margin-inline: auto;
-    place-items: center;
-    align-content: center;
-    gap: 14px;
-    border: 1px solid var(--border);
     border-radius: 16px;
-    background: var(--lilac-pale);
+    overflow: hidden;
+    background: #18131b;
+    box-shadow: var(--shadow);
 }
 
-.home-design .home-video-mark {
-    display: grid;
-    width: 84px;
-    height: 84px;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--purple);
-    color: #fff;
-    font-size: 28px;
+.home-design .home-video-player {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #18131b;
 }
 
-.home-design .home-video-status {
+.home-design .home-video-fallback {
+    width: min(100%, 840px);
+    margin: 12px auto 0;
     color: var(--purple-mid);
     font-size: 13px;
-    font-weight: 700;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.home-design .home-video-fallback[hidden] {
+    display: none;
 }
 
 @media (max-width: 820px) {
