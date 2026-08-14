@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="{{ idioma_html }}">
+<body>
+    <p>{{ saudacao }}</p>
+    <p>{{ mensagem }}</p>
+    <dl>
+        {% for detalhe in detalhes %}
+            <dt><strong>{{ detalhe.rotulo }}</strong></dt>
+            <dd>{{ detalhe.valor }}</dd>
+        {% endfor %}
+    </dl>
+    {% for acao in acoes %}
+        <p><a href="{{ acao.url }}">{{ acao.rotulo }}</a></p>
+    {% endfor %}
+    <p>Plataforma Regional de Justiça Climática</p>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{{ saudacao }}
+
+{{ mensagem }}
+
+{% for detalhe in detalhes %}{{ detalhe.rotulo }}: {{ detalhe.valor }}
+{% endfor %}
+{% for acao in acoes %}{{ acao.rotulo }}: {{ acao.url }}
+{% endfor %}
+
+Plataforma Regional de Justiça Climática

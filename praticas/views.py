@@ -20,7 +20,14 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
-from .emails import enviar_confirmacao_email
+from .emails import (
+    agendar_notificacao_decisao_edicao,
+    agendar_notificacao_status_experiencia,
+    agendar_notificacoes_nova_submissao,
+    agendar_notificacoes_solicitacao_edicao,
+    enviar_confirmacao_email,
+    primeiro_email_valido,
+)
 from .forms import (
     CadastroUsuarioForm,
     ExperienciaSubmissaoForm,
@@ -1177,22 +1184,25 @@ def adicionar_boa_pratica(request):
         anexos, erros_anexos = validar_anexos_request(request)
 
         if form.is_valid() and not erros_anexos:
-            experiencia = form.save(commit=False)
-            experiencia.autor = request.user
-            experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
-            if request.user.is_authenticated and not experiencia.email_contato:
-                experiencia.email_contato = request.user.email
-            if request.user.is_authenticated and not experiencia.pessoa_responsavel:
-                experiencia.pessoa_responsavel = request.user.get_full_name() or request.user.username
-            if acao == "rascunho":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão."
-            else:
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
-            experiencia.save()
-            form.save_m2m()
-            salvar_anexos_submissao(experiencia, anexos)
+            with transaction.atomic():
+                experiencia = form.save(commit=False)
+                experiencia.autor = request.user
+                experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
+                if request.user.is_authenticated and not experiencia.email_contato:
+                    experiencia.email_contato = request.user.email
+                if request.user.is_authenticated and not experiencia.pessoa_responsavel:
+                    experiencia.pessoa_responsavel = request.user.get_full_name() or request.user.username
+                if acao == "rascunho":
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
+                    mensagem = "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão."
+                else:
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
+                    mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
+                experiencia.save()
+                form.save_m2m()
+                salvar_anexos_submissao(experiencia, anexos)
+                if experiencia.status_publicacao == Experiencia.StatusPublicacao.ENVIADO:
+                    agendar_notificacoes_nova_submissao(request, experiencia)
 
             messages.success(request, mensagem)
             if acao == "rascunho":
@@ -1232,6 +1242,7 @@ def editar_boa_pratica(request, pk):
     if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
         return redirect("solicitar_edicao_publicada", pk=experiencia.pk)
 
+    status_anterior = experiencia.status_publicacao
     acao = request.POST.get("acao_envio", "enviar")
     obrigatorio_para_envio = acao != "rascunho"
 
@@ -1258,19 +1269,25 @@ def editar_boa_pratica(request, pk):
         )
 
         if form.is_valid() and not erros_anexos:
-            Anexo.objects.filter(experiencia=experiencia, id__in=ids_remover).delete()
-            experiencia = form.save(commit=False)
-            if request.user.is_authenticated and not experiencia.autor_id:
-                experiencia.autor = request.user
-            if acao == "rascunho":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = "Alterações salvas como rascunho."
-            else:
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                mensagem = "Boa prática reenviada para revisão."
-            experiencia.save()
-            form.save_m2m()
-            salvar_anexos_submissao(experiencia, anexos)
+            with transaction.atomic():
+                Anexo.objects.filter(experiencia=experiencia, id__in=ids_remover).delete()
+                experiencia = form.save(commit=False)
+                if request.user.is_authenticated and not experiencia.autor_id:
+                    experiencia.autor = request.user
+                if acao == "rascunho":
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
+                    mensagem = "Alterações salvas como rascunho."
+                else:
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
+                    mensagem = "Boa prática reenviada para revisão."
+                experiencia.save()
+                form.save_m2m()
+                salvar_anexos_submissao(experiencia, anexos)
+                if (
+                    status_anterior != Experiencia.StatusPublicacao.ENVIADO
+                    and experiencia.status_publicacao == Experiencia.StatusPublicacao.ENVIADO
+                ):
+                    agendar_notificacoes_nova_submissao(request, experiencia)
 
             messages.success(request, mensagem)
             return redirect("painel_revisao") if request.user.is_staff else redirect("status_envio")
@@ -1328,13 +1345,21 @@ def solicitar_edicao_publicada(request, pk):
             obrigatorio_para_envio=True,
         )
         if form.is_valid():
-            PropostaEdicaoExperiencia.objects.create(
-                experiencia=experiencia,
-                email_contato=experiencia.email_contato or request.user.email,
-                comentario_autor=form.cleaned_data.get("comentario_autor", ""),
-                dados_json=dados_proposta_from_form(form),
-                status=PropostaEdicaoExperiencia.Status.PENDENTE,
+            email_solicitante = primeiro_email_valido(
+                request.user.email,
+                experiencia.email_contato,
             )
+            with transaction.atomic():
+                proposta = PropostaEdicaoExperiencia.objects.create(
+                    experiencia=experiencia,
+                    email_contato=email_solicitante,
+                    comentario_autor=form.cleaned_data.get("comentario_autor", ""),
+                    dados_json=dados_proposta_from_form(form),
+                    status=PropostaEdicaoExperiencia.Status.PENDENTE,
+                )
+                agendar_notificacoes_solicitacao_edicao(
+                    request, proposta, proposta.email_contato
+                )
             messages.success(
                 request,
                 "Proposta de edição enviada para revisão. A versão publicada permanecerá ativa até aprovação.",
@@ -1591,6 +1616,7 @@ def revisar_experiencia(request, pk):
         form = RevisaoExperienciaForm(request.POST, instance=experiencia)
         if form.is_valid():
             acao = form.cleaned_data["acao"]
+            status_anterior = experiencia.status_publicacao
             experiencia.comentario_revisor = form.cleaned_data["comentario_revisor"]
 
             if acao == "em_revisao":
@@ -1611,7 +1637,15 @@ def revisar_experiencia(request, pk):
             else:
                 mensagem = "Revisão registrada."
 
-            experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
+            with transaction.atomic():
+                experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
+                if (
+                    experiencia.status_publicacao != status_anterior
+                    and acao in {"aprovar", "publicar", "devolver", "rejeitar"}
+                ):
+                    agendar_notificacao_status_experiencia(
+                        request, experiencia, acao
+                    )
             messages.success(request, mensagem)
             return redirect("painel_revisao")
     else:
@@ -1659,22 +1693,29 @@ def revisar_edicao_publicada(request, pk):
         form = RevisaoPropostaEdicaoForm(request.POST, instance=proposta)
         if form.is_valid():
             acao = form.cleaned_data["acao"]
+            status_anterior = proposta.status
             proposta.comentario_revisor = form.cleaned_data["comentario_revisor"]
 
-            if acao == "em_revisao":
-                proposta.status = PropostaEdicaoExperiencia.Status.EM_REVISAO
-                mensagem = "Proposta marcada como em revisão."
-            elif acao == "aprovar":
-                aplicar_proposta_edicao(proposta)
-                proposta.status = PropostaEdicaoExperiencia.Status.APROVADA
-                mensagem = "Proposta aprovada e aplicada à experiência publicada."
-            elif acao == "rejeitar":
-                proposta.status = PropostaEdicaoExperiencia.Status.REJEITADA
-                mensagem = "Proposta de edição rejeitada."
-            else:
-                mensagem = "Revisão registrada."
+            with transaction.atomic():
+                if acao == "em_revisao":
+                    proposta.status = PropostaEdicaoExperiencia.Status.EM_REVISAO
+                    mensagem = "Proposta marcada como em revisão."
+                elif acao == "aprovar":
+                    aplicar_proposta_edicao(proposta)
+                    proposta.status = PropostaEdicaoExperiencia.Status.APROVADA
+                    mensagem = "Proposta aprovada e aplicada à experiência publicada."
+                elif acao == "rejeitar":
+                    proposta.status = PropostaEdicaoExperiencia.Status.REJEITADA
+                    mensagem = "Proposta de edição rejeitada."
+                else:
+                    mensagem = "Revisão registrada."
 
-            proposta.save(update_fields=["status", "comentario_revisor", "atualizado_em"])
+                proposta.save(update_fields=["status", "comentario_revisor", "atualizado_em"])
+                if (
+                    proposta.status != status_anterior
+                    and acao in {"aprovar", "rejeitar"}
+                ):
+                    agendar_notificacao_decisao_edicao(request, proposta, acao)
             messages.success(request, mensagem)
             return redirect("painel_revisao_edicoes")
     else:
