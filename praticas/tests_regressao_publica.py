@@ -117,7 +117,6 @@ class RegressaoPublicaTests(TestCase):
         "/sobre/",
         "/entrar/",
         "/cadastro/",
-        "/guia/",
     )
     PREFIXOS = ("", "/es", "/en")
 
@@ -369,7 +368,8 @@ class RegressaoPublicaTests(TestCase):
                 )
                 self.assertEqual(posicoes, tuple(sorted(posicoes)))
                 self.assertEqual(inventario.classes["home-foundation-tab"], 3)
-                self.assertEqual(inventario.classes["home-foundation-strategy"], 5)
+                self.assertEqual(inventario.classes["home-foundation-strategy"], 3)
+                self.assertEqual(inventario.classes["home-foundation-audit-item"], 9)
                 conceito = html.split('id="concepto-pane"', 1)[1].split(
                     'id="controle-pane"', 1
                 )[0]
@@ -525,13 +525,20 @@ class RegressaoPublicaTests(TestCase):
                 self.assertEqual(inventario_ferramentas.classes["tools-row"], 1)
                 self.assertEqual(inventario_ferramentas.classes["tools-link"], 1)
 
-    def test_guia_nao_publica_rascunho_e_preview_permanece_protegida(self):
+    def test_guia_publico_fica_oculto_e_preview_permanece_protegida(self):
+        rotas_guia = (
+            "/guia/",
+            "/guia/eixos/",
+            "/guia/setores/",
+        )
         for prefixo in self.PREFIXOS:
             with self.subTest(prefixo=prefixo or "pt-br"):
-                response = self.client.get(self._caminho(prefixo, "/guia/"))
-                self.assertEqual(response.status_code, 200)
-                self.assertNotContains(response, "Contenido no homologado")
-                self.assertNotContains(response, "Internal preview")
+                home = self.client.get(self._caminho(prefixo, "/"))
+                self.assertEqual(home.status_code, 200)
+                self.assertNotContains(home, f'href="{self._caminho(prefixo, "/guia/")}"')
+                for rota in rotas_guia:
+                    response = self.client.get(self._caminho(prefixo, rota))
+                    self.assertEqual(response.status_code, 404)
                 preview = self.client.get(
                     self._caminho(prefixo, "/guia/preview/")
                 )
