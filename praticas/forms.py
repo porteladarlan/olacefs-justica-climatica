@@ -1,4 +1,10 @@
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import (
+    PasswordResetForm,
+    SetPasswordForm,
+    UserCreationForm,
+)
 from django.utils.translation import get_language
 
 from .models import Anexo, Experiencia, PropostaEdicaoExperiencia
@@ -20,6 +26,124 @@ def texto_idioma(pt, es=None, en=None):
     if idioma == "es":
         return es or pt
     return pt
+
+
+class CadastroUsuarioForm(UserCreationForm):
+    first_name = forms.CharField(max_length=150, required=True)
+    last_name = forms.CharField(max_length=150, required=False)
+    email = forms.EmailField(required=True)
+
+    class Meta(UserCreationForm.Meta):
+        model = get_user_model()
+        fields = (
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "password1",
+            "password2",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        rotulos = {
+            "first_name": texto_idioma("Nome", "Nombre", "First name"),
+            "last_name": texto_idioma("Sobrenome", "Apellido", "Last name"),
+            "username": texto_idioma("Usuário", "Usuario", "Username"),
+            "email": texto_idioma("E-mail", "Correo electrónico", "E-mail"),
+            "password1": texto_idioma("Senha", "Contraseña", "Password"),
+            "password2": texto_idioma(
+                "Confirmação da senha",
+                "Confirmación de la contraseña",
+                "Password confirmation",
+            ),
+        }
+        autocompletes = {
+            "first_name": "given-name",
+            "last_name": "family-name",
+            "username": "username",
+            "email": "email",
+            "password1": "new-password",
+            "password2": "new-password",
+        }
+        for nome, field in self.fields.items():
+            field.label = rotulos[nome]
+            field.widget.attrs.setdefault("class", "form-control")
+            field.widget.attrs.setdefault("autocomplete", autocompletes[nome])
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if get_user_model().objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(
+                texto_idioma(
+                    "Já existe uma conta com este e-mail.",
+                    "Ya existe una cuenta con este correo electrónico.",
+                    "An account with this e-mail already exists.",
+                )
+            )
+        return email
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        usuario.first_name = self.cleaned_data["first_name"].strip()
+        usuario.last_name = self.cleaned_data["last_name"].strip()
+        usuario.email = self.cleaned_data["email"]
+        usuario.is_active = False
+        if commit:
+            usuario.save()
+        return usuario
+
+
+class ReenviarConfirmacaoForm(forms.Form):
+    email = forms.EmailField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].label = texto_idioma(
+            "E-mail", "Correo electrónico", "E-mail"
+        )
+        self.fields["email"].widget.attrs.update(
+            {"class": "form-control", "autocomplete": "email"}
+        )
+
+    def clean_email(self):
+        return self.cleaned_data["email"].strip().lower()
+
+
+class RecuperarSenhaForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].label = texto_idioma(
+            "E-mail", "Correo electrónico", "E-mail"
+        )
+        self.fields["email"].widget.attrs.update(
+            {"class": "form-control", "autocomplete": "email"}
+        )
+
+    def save(self, *args, extra_email_context=None, **kwargs):
+        contexto = {"LANGUAGE_CODE": get_language() or "pt-br"}
+        contexto.update(extra_email_context or {})
+        return super().save(
+            *args,
+            extra_email_context=contexto,
+            **kwargs,
+        )
+
+
+class RedefinirSenhaForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["new_password1"].label = texto_idioma(
+            "Nova senha", "Nueva contraseña", "New password"
+        )
+        self.fields["new_password2"].label = texto_idioma(
+            "Confirmação da nova senha",
+            "Confirmación de la nueva contraseña",
+            "New password confirmation",
+        )
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", "form-control")
+            field.widget.attrs.setdefault("autocomplete", "new-password")
 
 
 EXPERIENCIA_LABELS = {

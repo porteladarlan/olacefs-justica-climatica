@@ -1,0 +1,18 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Invalid confirmation link{% elif LANGUAGE_CODE == 'es' %}Enlace de confirmación inválido{% else %}Link de confirmação inválido{% endif %} | Plataforma Regional{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/meu-espaco.css' %}">{% endblock %}
+
+{% block content %}
+<div class="account-page account-page--narrow account-page--status">
+    <nav class="prototype-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegación{% else %}Navegação estrutural{% endif %}"><a href="{% url 'pagina_inicial' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}Início{% endif %}</a></nav>
+    <header class="account-heading">
+        <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}E-mail confirmation{% elif LANGUAGE_CODE == 'es' %}Confirmación de correo{% else %}Confirmação de e-mail{% endif %}</div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Invalid or expired link{% elif LANGUAGE_CODE == 'es' %}Enlace inválido o vencido{% else %}Link inválido ou expirado{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' %}This confirmation link is invalid, has expired or has already been used.{% elif LANGUAGE_CODE == 'es' %}Este enlace de confirmación es inválido, ha vencido o ya fue utilizado.{% else %}Este link de confirmação é inválido, expirou ou já foi utilizado.{% endif %}</p>
+    </header>
+    <a class="btn btn-primary" href="{% url 'reenviar_confirmacao_email' %}">{% if LANGUAGE_CODE == 'en' %}Request another confirmation{% elif LANGUAGE_CODE == 'es' %}Solicitar otra confirmación{% else %}Solicitar nova confirmação{% endif %}</a>
+</div>
+{% endblock %}

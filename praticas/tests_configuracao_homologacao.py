@@ -18,6 +18,15 @@ class ConfiguracaoHomologacaoTests(SimpleTestCase):
         "SESSION_COOKIE_SECURE",
         "CSRF_COOKIE_SECURE",
         "TRUST_X_FORWARDED_PROTO",
+        "EMAIL_BACKEND",
+        "EMAIL_HOST",
+        "EMAIL_PORT",
+        "EMAIL_HOST_USER",
+        "EMAIL_HOST_PASSWORD",
+        "EMAIL_USE_TLS",
+        "EMAIL_USE_SSL",
+        "EMAIL_TIMEOUT",
+        "DEFAULT_FROM_EMAIL",
     }
 
     def _executar_settings(self, variaveis=None, codigo="import config.settings"):
@@ -139,3 +148,53 @@ print(json.dumps({
 
                 self.assertNotEqual(resultado.returncode, 0)
                 self.assertIn(mensagem, resultado.stderr)
+
+    def test_email_usa_console_por_padrao_e_aceita_configuracao_smtp(self):
+        codigo = """
+import json
+import config.settings as configuracao
+print(json.dumps({
+    "backend": configuracao.EMAIL_BACKEND,
+    "port": configuracao.EMAIL_PORT,
+    "tls": configuracao.EMAIL_USE_TLS,
+    "ssl": configuracao.EMAIL_USE_SSL,
+    "timeout": configuracao.EMAIL_TIMEOUT,
+}))
+"""
+        local = self._executar_settings(codigo=codigo)
+        self.assertEqual(local.returncode, 0, local.stderr)
+        self.assertEqual(
+            json.loads(local.stdout)["backend"],
+            "django.core.mail.backends.console.EmailBackend",
+        )
+
+        smtp = self._executar_settings(
+            {
+                "EMAIL_BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+                "EMAIL_PORT": "587",
+                "EMAIL_USE_TLS": "True",
+                "EMAIL_USE_SSL": "False",
+                "EMAIL_TIMEOUT": "15",
+            },
+            codigo,
+        )
+        self.assertEqual(smtp.returncode, 0, smtp.stderr)
+        configuracao = json.loads(smtp.stdout)
+        self.assertEqual(configuracao["port"], 587)
+        self.assertTrue(configuracao["tls"])
+        self.assertFalse(configuracao["ssl"])
+        self.assertEqual(configuracao["timeout"], 15)
+
+    def test_email_rejeita_inteiro_invalido_e_tls_com_ssl(self):
+        porta = self._executar_settings({"EMAIL_PORT": "smtp"})
+        self.assertNotEqual(porta.returncode, 0)
+        self.assertIn("EMAIL_PORT deve ser um número inteiro", porta.stderr)
+
+        protocolos = self._executar_settings(
+            {"EMAIL_USE_TLS": "True", "EMAIL_USE_SSL": "True"}
+        )
+        self.assertNotEqual(protocolos.returncode, 0)
+        self.assertIn(
+            "EMAIL_USE_TLS e EMAIL_USE_SSL não podem estar ativos simultaneamente",
+            protocolos.stderr,
+        )

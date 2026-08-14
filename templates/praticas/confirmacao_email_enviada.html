@@ -1,0 +1,21 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Confirmation sent{% elif LANGUAGE_CODE == 'es' %}Confirmación enviada{% else %}Confirmação enviada{% endif %} | Plataforma Regional{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/meu-espaco.css' %}">{% endblock %}
+
+{% block content %}
+<div class="account-page account-page--narrow account-page--status">
+    <nav class="prototype-breadcrumb" aria-label="{% if LANGUAGE_CODE == 'en' %}Breadcrumb{% elif LANGUAGE_CODE == 'es' %}Ruta de navegación{% else %}Navegação estrutural{% endif %}"><a href="{% url 'pagina_inicial' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Home{% elif LANGUAGE_CODE == 'es' %}Inicio{% else %}Início{% endif %}</a></nav>
+    <header class="account-heading">
+        <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}E-mail confirmation{% elif LANGUAGE_CODE == 'es' %}Confirmación de correo{% else %}Confirmação de e-mail{% endif %}</div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Check your inbox{% elif LANGUAGE_CODE == 'es' %}Revise su bandeja de entrada{% else %}Verifique sua caixa de entrada{% endif %}</h1>
+        <p>{% if envio_pendente %}{% if LANGUAGE_CODE == 'en' %}Your account remains pending. Request another confirmation message below.{% elif LANGUAGE_CODE == 'es' %}Su cuenta permanece pendiente. Solicite un nuevo mensaje de confirmación a continuación.{% else %}Sua conta permanece pendente. Solicite uma nova mensagem de confirmação abaixo.{% endif %}{% elif LANGUAGE_CODE == 'en' %}We sent a confirmation link to your e-mail.{% elif LANGUAGE_CODE == 'es' %}Enviamos un enlace de confirmación a su correo electrónico.{% else %}Enviamos um link de confirmação para seu e-mail.{% endif %}</p>
+    </header>
+    <div class="account-actions">
+        <a class="linklike" href="{% url 'reenviar_confirmacao_email' %}">{% if LANGUAGE_CODE == 'en' %}Resend confirmation e-mail{% elif LANGUAGE_CODE == 'es' %}Reenviar correo de confirmación{% else %}Reenviar e-mail de confirmação{% endif %}</a>
+        <a class="btn btn-primary" href="{% url 'login_usuario' %}">{% if LANGUAGE_CODE == 'en' %}Go to sign in{% elif LANGUAGE_CODE == 'es' %}Ir a entrar{% else %}Ir para entrar{% endif %}</a>
+    </div>
+</div>
+{% endblock %}

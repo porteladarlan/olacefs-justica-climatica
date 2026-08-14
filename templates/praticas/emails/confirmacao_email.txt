@@ -1,0 +1,22 @@
+{% if LANGUAGE_CODE == 'en' %}Regional Climate Justice Platform
+
+Hello {{ usuario.first_name|default:usuario.username }},
+
+Confirm your e-mail to activate your account:
+{{ confirmacao_url }}
+
+If you did not create this account, ignore this message.{% elif LANGUAGE_CODE == 'es' %}Plataforma Regional de Justicia Climática
+
+Hola {{ usuario.first_name|default:usuario.username }},
+
+Confirme su correo para activar su cuenta:
+{{ confirmacao_url }}
+
+Si no creó esta cuenta, ignore este mensaje.{% else %}Plataforma Regional de Justiça Climática
+
+Olá {{ usuario.first_name|default:usuario.username }},
+
+Confirme seu e-mail para ativar sua conta:
+{{ confirmacao_url }}
+
+Se você não criou esta conta, ignore esta mensagem.{% endif %}

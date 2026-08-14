@@ -1,30 +1,40 @@
 ﻿import json
 from pathlib import Path
+from smtplib import SMTPException
 from urllib.parse import urlencode
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator, validate_email
 
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction
 from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
+from .emails import enviar_confirmacao_email
 from .forms import (
+    CadastroUsuarioForm,
     ExperienciaSubmissaoForm,
     PropostaEdicaoPublicadaForm,
+    ReenviarConfirmacaoForm,
     RevisaoExperienciaForm,
     RevisaoPropostaEdicaoForm,
+    texto_idioma,
 )
+from .tokens import confirmacao_email_token
 from .models import (
     Anexo,
     BancoTecnico,
+    ConfirmacaoEmailPendente,
     DimensaoJusticaClimatica,
     EFS,
     Experiencia,
@@ -512,34 +522,128 @@ def estilizar_formulario_autenticacao(form):
     return form
 
 
+@require_http_methods(["GET", "POST"])
 def registrar_usuario(request):
     if request.user.is_authenticated:
         return redirect(obter_destino_seguro(request))
 
+    destino_apos_login = obter_destino_seguro(request, padrao="")
     if request.method == "POST":
-        form = estilizar_formulario_autenticacao(UserCreationForm(request.POST))
-        email = request.POST.get("email", "").strip().lower()
-        nome = request.POST.get("first_name", "").strip()
-        sobrenome = request.POST.get("last_name", "").strip()
-
-        if not email:
-            form.add_error(None, "Informe um e-mail institucional.")
-        elif form.is_valid():
-            user = form.save(commit=False)
-            user.email = email
-            user.first_name = nome
-            user.last_name = sobrenome
-            user.save()
-            login(request, user)
-            messages.success(request, "Cadastro realizado com sucesso.")
-            return redirect(obter_destino_seguro(request))
+        form = CadastroUsuarioForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                usuario = form.save()
+                ConfirmacaoEmailPendente.objects.create(
+                    usuario=usuario,
+                    destino_apos_login=destino_apos_login,
+                )
+            try:
+                enviar_confirmacao_email(request, usuario)
+            except (OSError, SMTPException):
+                messages.warning(
+                    request,
+                    texto_idioma(
+                        "Não foi possível enviar a mensagem agora. Sua conta permanece "
+                        "pendente e você pode solicitar um novo envio.",
+                        "No fue posible enviar el mensaje ahora. Su cuenta permanece "
+                        "pendiente y puede solicitar un nuevo envío.",
+                        "The message could not be sent now. Your account remains "
+                        "pending and you can request another message.",
+                    ),
+                )
+                return redirect(f"{reverse('confirmacao_email_enviada')}?envio=pendente")
+            return redirect("confirmacao_email_enviada")
     else:
-        form = estilizar_formulario_autenticacao(UserCreationForm())
+        form = CadastroUsuarioForm()
 
     return render(
         request,
         "praticas/registrar_usuario.html",
-        {"form": form, "next": request.GET.get("next", "")},
+        {"form": form, "next": destino_apos_login},
+    )
+
+
+@require_safe
+def confirmacao_email_enviada(request):
+    return render(
+        request,
+        "praticas/confirmacao_email_enviada.html",
+        {"envio_pendente": request.GET.get("envio") == "pendente"},
+    )
+
+
+@require_safe
+def confirmar_email(request, uidb64, token):
+    User = get_user_model()
+    try:
+        usuario_id = force_str(urlsafe_base64_decode(uidb64))
+        usuario_id = int(usuario_id)
+    except (TypeError, ValueError, OverflowError, UnicodeDecodeError):
+        usuario_id = None
+
+    destino_apos_login = ""
+    confirmado = False
+    if usuario_id is not None:
+        with transaction.atomic():
+            usuario = User.objects.select_for_update().filter(pk=usuario_id).first()
+            pendencia = (
+                ConfirmacaoEmailPendente.objects.select_for_update()
+                .filter(usuario_id=usuario_id)
+                .first()
+            )
+            if (
+                usuario is not None
+                and not usuario.is_active
+                and pendencia is not None
+                and confirmacao_email_token.check_token(usuario, token)
+            ):
+                destino_apos_login = pendencia.destino_apos_login
+                usuario.is_active = True
+                usuario.save(update_fields=["is_active"])
+                pendencia.delete()
+                confirmado = True
+
+    if confirmado:
+        messages.success(
+            request,
+            texto_idioma(
+                "E-mail confirmado. Entre com suas credenciais para acessar sua conta.",
+                "Correo confirmado. Ingrese sus credenciales para acceder a su cuenta.",
+                "E-mail confirmed. Sign in with your credentials to access your account.",
+            ),
+        )
+        if destino_apos_login:
+            consulta = urlencode({"next": destino_apos_login})
+            return redirect(f"{reverse('login_usuario')}?{consulta}")
+        return redirect("login_usuario")
+
+    return render(request, "praticas/confirmacao_email_invalida.html", status=400)
+
+
+@require_http_methods(["GET", "POST"])
+def reenviar_confirmacao_email(request):
+    form = ReenviarConfirmacaoForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        pendencia = (
+            ConfirmacaoEmailPendente.objects.select_related("usuario")
+            .filter(
+                usuario__email__iexact=form.cleaned_data["email"],
+                usuario__is_active=False,
+            )
+            .order_by("pk")
+            .first()
+        )
+        if pendencia is not None:
+            try:
+                enviar_confirmacao_email(request, pendencia.usuario)
+            except (OSError, SMTPException):
+                pass
+        return redirect(f"{reverse('reenviar_confirmacao_email')}?enviado=1")
+
+    return render(
+        request,
+        "praticas/reenviar_confirmacao_email.html",
+        {"form": form, "enviado": request.GET.get("enviado") == "1"},
     )
 
 

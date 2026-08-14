@@ -20,27 +20,13 @@
 
     <form method="post" class="account-form">
         {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}">
-
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
         {% if form.errors %}
             <div class="form-error-summary" role="alert" tabindex="-1">
                 <strong>{% if LANGUAGE_CODE == 'en' %}Check the information provided.{% elif LANGUAGE_CODE == 'es' %}Revise la informaci&oacute;n ingresada.{% else %}Revise as informa&ccedil;&otilde;es preenchidas.{% endif %}</strong>
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
-
-        <div class="account-field">
-            <label for="id_first_name">{% if LANGUAGE_CODE == 'en' %}First name{% elif LANGUAGE_CODE == 'es' %}Nombre{% else %}Nome{% endif %}</label>
-            <input type="text" id="id_first_name" name="first_name" class="form-control" value="{{ request.POST.first_name }}" autocomplete="given-name" required>
-        </div>
-        <div class="account-field">
-            <label for="id_last_name">{% if LANGUAGE_CODE == 'en' %}Last name{% elif LANGUAGE_CODE == 'es' %}Apellido{% else %}Sobrenome{% endif %}</label>
-            <input type="text" id="id_last_name" name="last_name" class="form-control" value="{{ request.POST.last_name }}" autocomplete="family-name">
-        </div>
-        <div class="account-field">
-            <label for="id_email">{% if LANGUAGE_CODE == 'en' %}Institutional e-mail{% elif LANGUAGE_CODE == 'es' %}Correo institucional{% else %}E-mail institucional{% endif %}</label>
-            <input type="email" id="id_email" name="email" class="form-control" value="{{ request.POST.email }}" placeholder="nome@efs.gob" autocomplete="email" required>
-        </div>
 
         {% for field in form %}
             <div class="account-field">
@@ -52,7 +38,7 @@
         {% endfor %}
 
         <div class="account-actions">
-            <a href="{% url 'login_usuario' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="linklike">&larr; {% if LANGUAGE_CODE == 'en' %}I already have an account{% elif LANGUAGE_CODE == 'es' %}Ya tengo cuenta{% else %}J&aacute; tenho conta{% endif %}</a>
+            <a href="{% url 'login_usuario' %}" class="linklike">&larr; {% if LANGUAGE_CODE == 'en' %}I already have an account{% elif LANGUAGE_CODE == 'es' %}Ya tengo cuenta{% else %}J&aacute; tenho conta{% endif %}</a>
             <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Create account{% elif LANGUAGE_CODE == 'es' %}Crear cuenta{% else %}Criar conta{% endif %}</button>
         </div>
     </form>

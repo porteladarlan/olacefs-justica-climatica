@@ -968,6 +968,23 @@ class PapelInstitucional(models.Model):
             raise ValidationError(erros)
 
 
+class ConfirmacaoEmailPendente(models.Model):
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="confirmacao_email_pendente",
+    )
+    criado_em = models.DateTimeField(auto_now_add=True)
+    destino_apos_login = models.CharField(max_length=2048, blank=True, default="")
+
+    class Meta:
+        verbose_name = "Confirmacao de e-mail pendente"
+        verbose_name_plural = "Confirmacoes de e-mail pendentes"
+
+    def __str__(self):
+        return f"Confirmacao pendente: {self.usuario.get_username()}"
+
+
 class VinculoUsuarioEFS(models.Model):
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,

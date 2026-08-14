@@ -1,6 +1,8 @@
-from django.urls import path
+from django.contrib.auth import views as auth_views
+from django.urls import path, reverse_lazy
 
 from . import views
+from .forms import RecuperarSenhaForm, RedefinirSenhaForm
 
 urlpatterns = [
     path("", views.pagina_inicial, name="pagina_inicial"),
@@ -10,7 +12,57 @@ urlpatterns = [
         name="exemplos_injustica_climatica",
     ),
     path("cadastro/", views.registrar_usuario, name="registrar_usuario"),
+    path(
+        "cadastro/confirmacao-enviada/",
+        views.confirmacao_email_enviada,
+        name="confirmacao_email_enviada",
+    ),
+    path(
+        "confirmar-email/<uidb64>/<token>/",
+        views.confirmar_email,
+        name="confirmar_email",
+    ),
+    path(
+        "confirmar-email/reenviar/",
+        views.reenviar_confirmacao_email,
+        name="reenviar_confirmacao_email",
+    ),
     path("entrar/", views.login_usuario, name="login_usuario"),
+    path(
+        "senha/esqueci/",
+        auth_views.PasswordResetView.as_view(
+            template_name="praticas/password_reset_form.html",
+            form_class=RecuperarSenhaForm,
+            email_template_name="praticas/emails/password_reset_email.txt",
+            html_email_template_name="praticas/emails/password_reset_email.html",
+            subject_template_name="praticas/emails/password_reset_assunto.txt",
+            success_url=reverse_lazy("password_reset_done"),
+        ),
+        name="password_reset",
+    ),
+    path(
+        "senha/email-enviado/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="praticas/password_reset_done.html"
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "senha/redefinir/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="praticas/password_reset_confirm.html",
+            form_class=RedefinirSenhaForm,
+            success_url=reverse_lazy("password_reset_complete"),
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "senha/redefinida/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="praticas/password_reset_complete.html"
+        ),
+        name="password_reset_complete",
+    ),
     path("sair/", views.logout_usuario, name="logout_usuario"),
     path("meus-envios/", views.meus_envios, name="meus_envios"),
     path("catalogo/", views.catalogo_experiencias, name="catalogo_experiencias"),

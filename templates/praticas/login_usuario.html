@@ -43,5 +43,10 @@
             <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Sign in{% elif LANGUAGE_CODE == 'es' %}Entrar{% else %}Entrar{% endif %}</button>
         </div>
     </form>
+
+    <nav class="account-support-links" aria-label="{% if LANGUAGE_CODE == 'en' %}Account support{% elif LANGUAGE_CODE == 'es' %}Ayuda de la cuenta{% else %}Ajuda da conta{% endif %}">
+        <a href="{% url 'password_reset' %}" class="linklike">{% if LANGUAGE_CODE == 'en' %}Forgot my password{% elif LANGUAGE_CODE == 'es' %}Olvid&eacute; mi contrase&ntilde;a{% else %}Esqueci minha senha{% endif %}</a>
+        <a href="{% url 'reenviar_confirmacao_email' %}" class="linklike">{% if LANGUAGE_CODE == 'en' %}Resend confirmation e-mail{% elif LANGUAGE_CODE == 'es' %}Reenviar correo de confirmaci&oacute;n{% else %}Reenviar e-mail de confirma&ccedil;&atilde;o{% endif %}</a>
+    </nav>
 </div>
 {% endblock %}
