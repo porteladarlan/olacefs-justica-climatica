@@ -60,6 +60,27 @@ Configurar:
 - backup;
 - monitoramento.
 
+#### Limites de upload no proxy
+
+`MAX_UPLOAD_SIZE_MB` limita individualmente cada arquivo depois que o upload
+multipart chega ao Django. Esse controle valida a regra da aplicação, mas não
+protege sozinho o servidor contra um corpo HTTP excessivamente grande.
+
+O reverse proxy escolhido para staging/produção deve limitar o request completo
+para um valor compatível com até três anexos multiplicados por
+`MAX_UPLOAD_SIZE_MB`, acrescido do overhead do formulário multipart. Se Nginx
+for adotado, esse requisito deve ser aplicado por `client_max_body_size` na
+configuração da infraestrutura. O valor definitivo depende do limite configurado
+no ambiente e não deve ser fixado no código Django.
+
+`DATA_UPLOAD_MAX_MEMORY_SIZE` não substitui esse controle porque o Django calcula
+esse limite sem os dados de arquivos presentes em `request.FILES`.
+`FILE_UPLOAD_MAX_MEMORY_SIZE` também não limita o request: ele apenas define a
+partir de que tamanho o arquivo deixa de permanecer em memória e passa a ser
+processado por arquivo temporário. Portanto, o proxy limita o volume HTTP total
+antes da aplicação, enquanto `MAX_UPLOAD_SIZE_MB` rejeita cada arquivo que
+ultrapasse a regra funcional da plataforma.
+
 ### Etapa 3 — Dados
 
 Planejar:

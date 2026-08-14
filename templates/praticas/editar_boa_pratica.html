@@ -154,7 +154,7 @@
                     <p>{% if LANGUAGE_CODE == 'en' %}Optional public files and external references.{% elif LANGUAGE_CODE == 'es' %}Archivos p&uacute;blicos opcionales y referencias externas.{% else %}Arquivos p&uacute;blicos opcionais e refer&ecirc;ncias externas.{% endif %}</p>
                 </div>
             </div>
-            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Keep up to three attachments per experience. Accepted formats: PDF, JPG and PNG, with a maximum of 10 MB each.{% elif LANGUAGE_CODE == 'es' %}Mantenga hasta tres anexos por experiencia. Formatos aceptados: PDF, JPG y PNG, con un m&aacute;ximo de 10 MB cada uno.{% else %}Mantenha at&eacute; tr&ecirc;s anexos por experi&ecirc;ncia. Formatos aceitos: PDF, JPG e PNG, com m&aacute;ximo de 10 MB cada.{% endif %}</p>
+            <p class="section-subtitle small">{% if LANGUAGE_CODE == 'en' %}Keep up to three attachments per experience. Accepted formats: PDF, JPG and PNG, with a maximum of {{ upload_tamanho_max_mb }} MB each.{% elif LANGUAGE_CODE == 'es' %}Mantenga hasta tres anexos por experiencia. Formatos aceptados: PDF, JPG y PNG, con un m&aacute;ximo de {{ upload_tamanho_max_mb }} MB cada uno.{% else %}Mantenha at&eacute; tr&ecirc;s anexos por experi&ecirc;ncia. Formatos aceitos: PDF, JPG e PNG, com m&aacute;ximo de {{ upload_tamanho_max_mb }} MB cada.{% endif %}</p>
 
             {% if experiencia.anexos.all %}
                 <div class="mb-3">

@@ -1,5 +1,4 @@
 ﻿import json
-from pathlib import Path
 from smtplib import SMTPException
 from urllib.parse import urlencode
 
@@ -66,19 +65,11 @@ from .seletores_guia_preview import (
     queryset_subeixo_detalhado,
     separar_perguntas_por_tipo,
 )
+from .uploads import validar_anexo_upload
 
 # Configurações padrão para anexos.
 # Mantém compatibilidade com as três posições disponíveis nos formulários.
 ANEXO_LIMITE_POR_EXPERIENCIA = 3
-ANEXO_TAMANHO_MAX_MB = 10
-ANEXO_TAMANHO_MAX_BYTES = ANEXO_TAMANHO_MAX_MB * 1024 * 1024
-ANEXO_MIME_POR_EXTENSAO = {
-    ".pdf": "application/pdf",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-}
-ANEXO_CONTENT_TYPES_PERMITIDOS = set(ANEXO_MIME_POR_EXTENSAO.values())
 
 # ISO 3166-1 alfa-3 usado no cadastro -> identificador numérico do world-atlas.
 # A lista regional segue a referência visual oficial e permite desenhar também
@@ -402,23 +393,6 @@ def queryset_meus_envios(usuario):
     )
 
 
-def detectar_mime_real(arquivo):
-    posicao_original = arquivo.tell()
-    try:
-        arquivo.seek(0)
-        cabecalho = arquivo.read(16)
-    finally:
-        arquivo.seek(posicao_original)
-
-    if cabecalho.startswith(b"%PDF-"):
-        return "application/pdf"
-    if cabecalho.startswith(b"\x89PNG\r\n\x1a\n"):
-        return "image/png"
-    if cabecalho.startswith(b"\xff\xd8\xff"):
-        return "image/jpeg"
-    return None
-
-
 def obter_indices_anexos_informados(request):
     prefixos = ("anexo_titulo_", "anexo_arquivo_", "anexo_url_")
     indices = set()
@@ -479,26 +453,11 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
         url = anexo["url"]
 
         if arquivo:
-            extensao = Path(arquivo.name).suffix.lower()
-            mime_esperado = ANEXO_MIME_POR_EXTENSAO.get(extensao)
-            if not mime_esperado:
-                erros.append(
-                    f"Anexo {indice}: tipo de arquivo não permitido. Use PDF, JPG ou PNG."
-                )
-            else:
-                mime_declarado = (getattr(arquivo, "content_type", "") or "").split(";", 1)[0].strip().lower()
-                mime_real = detectar_mime_real(arquivo)
-                if mime_declarado not in ANEXO_CONTENT_TYPES_PERMITIDOS or mime_declarado != mime_esperado:
-                    erros.append(
-                        f"Anexo {indice}: o tipo MIME informado não corresponde à extensão do arquivo."
-                    )
-                if mime_real != mime_esperado:
-                    erros.append(
-                        f"Anexo {indice}: o conteúdo do arquivo não corresponde a um PDF, JPG ou PNG válido."
-                    )
-            if arquivo.size > ANEXO_TAMANHO_MAX_BYTES:
-                erros.append(
-                    f"Anexo {indice}: arquivo maior que {ANEXO_TAMANHO_MAX_MB} MB."
+            try:
+                validar_anexo_upload(arquivo)
+            except ValidationError as exc:
+                erros.extend(
+                    f"Anexo {indice}: {mensagem}" for mensagem in exc.messages
                 )
 
         if url:

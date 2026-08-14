@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .forms import AnexoAdminForm, NormaInternacionalAdminForm
 from .models import (
     Anexo,
     AtribuicaoPapelVinculo,
@@ -81,6 +82,7 @@ class NormaInternacionalPaisInline(admin.TabularInline):
 
 @admin.register(NormaInternacional)
 class NormaInternacionalAdmin(admin.ModelAdmin):
+    form = NormaInternacionalAdminForm
     list_display = ("nome", "ano", "natureza_juridica", "url_referencia")
     list_filter = ("natureza_juridica",)
     search_fields = ("nome", "nome_es", "nome_en", "resumo", "resumo_es", "resumo_en")
@@ -104,6 +106,7 @@ class GrupoVulneravelAdmin(admin.ModelAdmin):
 
 class AnexoInline(admin.TabularInline):
     model = Anexo
+    form = AnexoAdminForm
     extra = 0
     fields = ("titulo", "titulo_es", "titulo_en", "arquivo", "url_externa")
 
@@ -177,6 +180,7 @@ class PropostaEdicaoExperienciaAdmin(admin.ModelAdmin):
 
 @admin.register(Anexo)
 class AnexoAdmin(admin.ModelAdmin):
+    form = AnexoAdminForm
     list_display = ("titulo", "titulo_es", "titulo_en", "experiencia", "url_externa")
     list_filter = ("experiencia__pais", "experiencia__setor")
     search_fields = ("titulo", "titulo_es", "titulo_en", "experiencia__titulo", "url_externa")

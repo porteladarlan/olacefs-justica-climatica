@@ -1,6 +1,7 @@
 from html import unescape
 from io import StringIO
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
 from .management.commands.auditar_traducoes_trilingues import (
     Command as AuditoriaTrilingueCommand,
@@ -24,10 +26,15 @@ from .models import (
     TemaTransversal,
     TipoExperiencia,
 )
-from .views import ANEXO_TAMANHO_MAX_BYTES
 
 
 class SegurancaFaseTests(TestCase):
+    def setUp(self):
+        translation.activate("pt-br")
+
+    def tearDown(self):
+        translation.deactivate()
+
     @classmethod
     def setUpTestData(cls):
         User = get_user_model()
@@ -435,7 +442,7 @@ class SegurancaFaseTests(TestCase):
         dados["anexo_titulo_1"] = "PDF grande"
         dados["anexo_arquivo_1"] = SimpleUploadedFile(
             "grande.pdf",
-            b"%PDF-" + b"x" * ANEXO_TAMANHO_MAX_BYTES,
+            b"%PDF-" + b"x" * settings.MAX_UPLOAD_SIZE_BYTES,
             content_type="application/pdf",
         )
 
@@ -444,6 +451,30 @@ class SegurancaFaseTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "arquivo maior que 10 MB")
         self.assertFalse(Anexo.objects.filter(titulo="PDF grande").exists())
+
+    def test_upload_com_traversal_e_normalizado_sem_erro_500(self):
+        self.client.force_login(self.autor)
+        dados = self.dados_validos()
+        dados["anexo_titulo_1"] = "PDF com nome normalizado"
+        arquivo = SimpleUploadedFile(
+            "temporario.pdf",
+            b"%PDF-1.4 conteudo",
+            content_type="application/pdf",
+        )
+        arquivo._name = "..\\..\\relatorio.pdf"
+        dados["anexo_arquivo_1"] = arquivo
+
+        with TemporaryDirectory() as media_root, self.settings(MEDIA_ROOT=media_root):
+            response = self.client.post(reverse("adicionar_boa_pratica"), dados)
+            anexo = Anexo.objects.get(titulo="PDF com nome normalizado")
+            caminho_armazenado = Path(anexo.arquivo.path).resolve()
+
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(
+                caminho_armazenado.is_relative_to(Path(media_root).resolve())
+            )
+            self.assertEqual(caminho_armazenado.parent.name, "anexos")
+            self.assertEqual(caminho_armazenado.name, "relatorio.pdf")
 
     def test_quarta_posicao_de_anexo_e_rejeitada(self):
         self.client.force_login(self.autor)

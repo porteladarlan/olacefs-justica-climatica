@@ -185,6 +185,11 @@ STATIC_ROOT = Path(os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles"))
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
 
+MAX_UPLOAD_SIZE_MB = _env_inteiro_nao_negativo("MAX_UPLOAD_SIZE_MB", 10)
+if MAX_UPLOAD_SIZE_MB == 0:
+    raise ImproperlyConfigured("MAX_UPLOAD_SIZE_MB deve ser maior que zero.")
+MAX_UPLOAD_SIZE_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",

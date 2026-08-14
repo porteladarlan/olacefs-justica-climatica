@@ -7,7 +7,13 @@ from django.contrib.auth.forms import (
 )
 from django.utils.translation import get_language
 
-from .models import Anexo, Experiencia, PropostaEdicaoExperiencia
+from .models import (
+    Anexo,
+    Experiencia,
+    NormaInternacional,
+    PropostaEdicaoExperiencia,
+)
+from .uploads import validar_anexo_upload, validar_ficha_tecnica_upload
 
 
 def idioma_atual():
@@ -474,6 +480,27 @@ class AnexoSubmissaoForm(forms.ModelForm):
         }
         for campo, traducoes in textos.items():
             self.fields[campo].label = traducoes[idioma]
+
+    def clean_arquivo(self):
+        arquivo = self.cleaned_data.get("arquivo")
+        validar_anexo_upload(arquivo)
+        return arquivo
+
+
+class AnexoAdminForm(AnexoSubmissaoForm):
+    class Meta(AnexoSubmissaoForm.Meta):
+        fields = "__all__"
+
+
+class NormaInternacionalAdminForm(forms.ModelForm):
+    class Meta:
+        model = NormaInternacional
+        fields = "__all__"
+
+    def clean_ficha_tecnica(self):
+        arquivo = self.cleaned_data.get("ficha_tecnica")
+        validar_ficha_tecnica_upload(arquivo)
+        return arquivo
 
 
 class RevisaoExperienciaForm(forms.ModelForm):
