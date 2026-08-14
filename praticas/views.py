@@ -11,8 +11,10 @@ from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Prefetch, Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.encoding import force_str
@@ -1880,6 +1882,11 @@ GUIA_ROTAS_PREVIEW = {
 }
 
 
+def _exigir_guia_publico_habilitado():
+    if not settings.GUIA_PUBLICO_HABILITADO:
+        raise Http404
+
+
 def _contexto_navegacao_guia(*, preview_interna):
     rotas = GUIA_ROTAS_PREVIEW if preview_interna else GUIA_ROTAS_PUBLICAS
     return {"guia_preview_interna": preview_interna, **rotas}
@@ -2002,21 +2009,25 @@ def _render_guia_subarea(
 
 @require_safe
 def guia_inicio(request):
+    _exigir_guia_publico_habilitado()
     return _render_guia_inicio(request, preview_interna=False)
 
 
 @require_safe
 def guia_eixos(request):
+    _exigir_guia_publico_habilitado()
     return _render_guia_eixos(request, preview_interna=False)
 
 
 @require_safe
 def guia_eixo(request, eixo_codigo):
+    _exigir_guia_publico_habilitado()
     return _render_guia_eixo(request, eixo_codigo, preview_interna=False)
 
 
 @require_safe
 def guia_subeixo(request, eixo_codigo, subeixo_codigo):
+    _exigir_guia_publico_habilitado()
     return _render_guia_subeixo(
         request,
         eixo_codigo,
@@ -2027,16 +2038,19 @@ def guia_subeixo(request, eixo_codigo, subeixo_codigo):
 
 @require_safe
 def guia_setores(request):
+    _exigir_guia_publico_habilitado()
     return _render_guia_setores(request, preview_interna=False)
 
 
 @require_safe
 def guia_setor(request, setor_codigo):
+    _exigir_guia_publico_habilitado()
     return _render_guia_setor(request, setor_codigo, preview_interna=False)
 
 
 @require_safe
 def guia_subarea(request, setor_codigo, subarea_codigo):
+    _exigir_guia_publico_habilitado()
     return _render_guia_subarea(
         request,
         setor_codigo,

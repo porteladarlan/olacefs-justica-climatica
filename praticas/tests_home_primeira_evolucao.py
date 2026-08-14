@@ -126,7 +126,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
 
         self.assertEqual(len(re.findall(r"<h2\b", fundamentos)), 1)
         self.assertEqual(len(re.findall(r"<h3\b", fundamentos)), 3)
-        self.assertEqual(len(re.findall(r"<h4\b", fundamentos)), 5)
+        self.assertEqual(len(re.findall(r"<h4\b", fundamentos)), 3)
         self.assertIsNone(re.search(r"<h(?:1|5|6)\b", fundamentos))
         self.assertIsNone(re.search(r"<h[2-4][^>]*>\s*</h[2-4]>", fundamentos))
 
@@ -222,7 +222,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
                     )
                 if pane_id == "controle-pane":
                     self.assertLess(
-                        painel.index('class="home-foundation-strategies"'),
+                        painel.index('class="home-foundation-audit-grid"'),
                         painel.index('class="home-foundation-actions"'),
                     )
 
@@ -349,6 +349,146 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, trecho)
+
+    def test_controle_externo_tem_nove_caixas_fechadas_e_trilingues(self):
+        casos = (
+            (
+                "/",
+                (
+                    "1. Integração interna dos princípios de justiça climática",
+                    "2. Incorporação nos planos anuais de auditoria",
+                    "3. Avaliação dos recursos e capacidades do Estado",
+                    "4. Fortalecimento da capacidade institucional",
+                    "5. Promoção da participação pública efetiva",
+                    "6. Auditar políticas públicas",
+                    "7. Avaliação dos impactos sobre grupos vulnerabilizados",
+                    "8. Recomendações para aprimoramento",
+                    "9. Acompanhamento da implementação das recomendações de auditoria",
+                ),
+            ),
+            (
+                "/es/",
+                (
+                    "1. Integración interna de los principios de justicia climática",
+                    "2. Incorporación en los planes anuales de auditoría",
+                    "3. Evaluación de los recursos y capacidades del Estado",
+                    "4. Fortalecimiento de la capacidad institucional",
+                    "5. Promoción de la participación pública efectiva",
+                    "6. Auditar políticas públicas",
+                    "7. Evaluación de los impactos sobre grupos vulnerabilizados",
+                    "8. Recomendaciones para el mejoramiento",
+                    "9. Seguimiento de la implementación de las recomendaciones de auditoría",
+                ),
+            ),
+            (
+                "/en/",
+                (
+                    "1. Internal integration of climate justice principles",
+                    "2. Incorporation into annual audit plans",
+                    "3. Assessment of State resources and capacities",
+                    "4. Strengthening institutional capacity",
+                    "5. Promoting effective public participation",
+                    "6. Audit public policies",
+                    "7. Assessment of impacts on vulnerabilized groups",
+                    "8. Recommendations for improvement",
+                    "9. Follow-up on the implementation of audit recommendations",
+                ),
+            ),
+        )
+
+        for caminho, titulos_esperados in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                html = response.content.decode("utf-8")
+                painel = html.split('id="controle-pane"', 1)[1].split(
+                    'id="genero-pane"', 1
+                )[0]
+                caixas = re.findall(
+                    r'<details class="home-foundation-audit-item"([^>]*)>(.*?)</details>',
+                    painel,
+                    flags=re.DOTALL,
+                )
+                titulos = []
+                for atributos, caixa in caixas:
+                    self.assertNotRegex(atributos, r"\bopen\b")
+                    summary = re.search(r"<summary>(.*?)</summary>", caixa, re.DOTALL)
+                    self.assertIsNotNone(summary)
+                    titulo = re.sub(r"<[^>]+>", "", summary.group(1))
+                    titulos.append(" ".join(titulo.split()))
+
+                self.assertEqual(len(caixas), 9)
+                self.assertEqual(tuple(titulos), titulos_esperados)
+                self.assertEqual(
+                    [caixa.count("<li>") for _, caixa in caixas],
+                    [5, 2, 1, 1, 1, 1, 1, 1, 1],
+                )
+                self.assertEqual(painel.count(titulos_esperados[5][3:]), 1)
+                self.assertEqual(painel.count(titulos_esperados[6][3:]), 1)
+                self.assertIn("home-foundation-top", painel)
+                self.assertEqual(
+                    painel.count(static("praticas/img/pilar-control.jpg")),
+                    1,
+                )
+
+    def test_conteudo_negocial_portugues_das_nove_caixas_e_integral(self):
+        response = self.client.get(reverse("pagina_inicial"))
+        html = response.content.decode("utf-8")
+        painel = html.split('id="controle-pane"', 1)[1].split(
+            'id="genero-pane"', 1
+        )[0]
+        caixas = re.findall(
+            r'<details class="home-foundation-audit-item"[^>]*>(.*?)</details>',
+            painel,
+            flags=re.DOTALL,
+        )
+        textos_esperados = (
+            "Incorporar diretrizes de justiça climática nos regulamentos, políticas internas e códigos de ética das EFS, assegurando coerência entre discurso e prática institucional.",
+            "Promover capacitação contínua das equipes em temas de mudança do clima, direitos humanos, equidade de gênero, raça e diversidade, ampliando a compreensão da interseção entre esses eixos.",
+            "Estabelecer metas e indicadores internos de sustentabilidade, equidade e inclusão, vinculando-os ao planejamento estratégico e ao monitoramento institucional.",
+            "Garantir a diversidade nas equipes de auditoria, valorizando a participação de mulheres, indígenas, afrodescendentes e outros grupos historicamente sub-representados.",
+            "Incentivar a troca de experiências e boas práticas entre as EFS da região para consolidar abordagens inovadoras de integração da justiça climática nos processos internos.",
+            "Incluir em auditorias de programas e políticas públicas relacionadas à justiça climática, assegurando a avaliação da governança, da transparência, da responsabilização e da participação cidadã.",
+            "Definir critérios de equidade e inclusão na fiscalização.",
+            "Examinar a disponibilidade e a adequação dos recursos financeiros, institucionais e humanos destinados à implementação de políticas climáticas, incluindo a justiça climática, e de infraestrutura sustentável, verificando se são suficientes para o cumprimento dos objetivos estabelecidos.",
+            "Assegurar que o Estado disponha de estruturas sólidas, integrando mecanismos de transparência, prestação de contas e participação social, para gerir políticas públicas de forma sustentável, inclusiva e equitativa.",
+            "Verificar se as estruturas institucionais de governança estão alinhadas aos princípios da justiça climática e se existem mecanismos funcionais que assegurem a participação significativa da cidadania, especialmente das comunidades diretamente mais afetadas ou sob maior risco, em todas as fases das políticas públicas.",
+            "Fiscalizar a integração da justiça climática no planejamento, na implementação, no monitoramento e na avaliação de políticas de mitigação e adaptação à mudança do clima e de gestão ambiental.",
+            "Avaliar como políticas e projetos afetam de forma diferente grupos sociais e comunidades vulnerabilizados, considerando a equidade intergeracional, de gênero, étnico-racial e territorial e a não discriminação.",
+            "Garantir que, durante todo o ciclo de políticas e projetos, os órgãos auditados possam reformular estratégias e corrigir falhas para assegurar maior efetividade e alinhamento às metas de justiça climática.",
+            "Emitir relatórios e assegurar que as recomendações sejam efetivamente adotadas pelos órgãos auditados, ajustando políticas e ações quando necessário para reduzir riscos sociais e ambientais.",
+        )
+        textos_renderizados = []
+        for caixa in caixas:
+            for item in re.findall(r"<li>(.*?)</li>", caixa, re.DOTALL):
+                textos_renderizados.append(" ".join(re.sub(r"<[^>]+>", "", item).split()))
+
+        self.assertEqual(tuple(textos_renderizados), textos_esperados)
+
+    def test_grade_das_nove_caixas_e_responsiva(self):
+        css = Path(finders.find("praticas/css/home.css")).read_text(
+            encoding="utf-8"
+        )
+        self.assertRegex(
+            css,
+            r"\.home-foundation-audit-grid\s*\{[^}]*"
+            r"grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)",
+        )
+        tablet = css.split("@media (max-width: 820px)", 1)[1].split(
+            "@media (max-width: 480px)", 1
+        )[0]
+        self.assertRegex(
+            tablet,
+            r"\.home-foundation-audit-grid\s*\{[^}]*"
+            r"grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)",
+        )
+        mobile = css.split("@media (max-width: 480px)", 1)[1].split(
+            "@media (prefers-reduced-motion", 1
+        )[0]
+        self.assertRegex(
+            mobile,
+            r"\.home-foundation-audit-grid\s*\{[^}]*"
+            r"grid-template-columns:\s*1fr",
+        )
 
     def test_pagina_de_exemplos_e_publica_trilingue_e_usa_acervo_oficial(self):
         casos = (

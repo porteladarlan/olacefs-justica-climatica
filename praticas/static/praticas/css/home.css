@@ -301,6 +301,85 @@
     line-height: 1.55;
 }
 
+.home-design .home-foundation-audit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 14px;
+    margin: 22px 0 0;
+}
+
+.home-design .home-foundation-audit-item {
+    border: 1px solid var(--lilac-tint);
+    border-radius: 12px;
+    background: var(--lilac-pale);
+    color: var(--text-soft);
+}
+
+.home-design .home-foundation-audit-item:hover,
+.home-design .home-foundation-audit-item[open] {
+    border-color: var(--purple-soft);
+}
+
+.home-design .home-foundation-audit-item summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 7px;
+    min-height: 72px;
+    padding: 14px 16px;
+    color: var(--purple);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    cursor: pointer;
+    list-style: none;
+}
+
+.home-design .home-foundation-audit-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.home-design .home-foundation-audit-item summary::after {
+    color: var(--purple);
+    font-size: 20px;
+    line-height: 1;
+    content: "+";
+}
+
+.home-design .home-foundation-audit-item[open] summary::after {
+    content: "−";
+}
+
+.home-design .home-foundation-audit-item summary:focus-visible {
+    border-radius: 10px;
+    outline: 3px solid var(--purple-mid);
+    outline-offset: 3px;
+}
+
+.home-design .home-foundation-audit-number {
+    color: var(--purple);
+}
+
+.home-design .home-foundation-audit-content {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--lilac-tint);
+}
+
+.home-design .home-foundation-audit-content ul {
+    margin: 14px 0 0;
+    padding-left: 20px;
+}
+
+.home-design .home-foundation-audit-content li {
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.home-design .home-foundation-audit-content li + li {
+    margin-top: 9px;
+}
+
 .home-design .section-kicker {
     margin-bottom: 10px;
     color: var(--green-dark);
@@ -854,6 +933,10 @@
         grid-template-columns: 1fr;
     }
 
+    .home-design .home-foundation-audit-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .home-design .home-foundation-concept-layout .home-foundation-strategies {
         grid-template-rows: none;
     }
@@ -893,6 +976,10 @@
     .home-design .home-map-actions .btn {
         width: 100%;
         justify-content: center;
+    }
+
+    .home-design .home-foundation-audit-grid {
+        grid-template-columns: 1fr;
     }
 
     .home-design .home-voice-card {
@@ -968,6 +1055,22 @@ html.a11y-high-contrast .home-design .home-map-microterritory-control.is-selecte
 
 html.a11y-high-contrast .home-design .home-map-microterritory-control:focus-visible .home-map-microterritory-hit {
     stroke: #000;
+}
+
+html.a11y-high-contrast .home-design .home-foundation-audit-item {
+    border-color: #000;
+    background: #fff;
+    color: #000;
+}
+
+html.a11y-high-contrast .home-design .home-foundation-audit-item summary,
+html.a11y-high-contrast .home-design .home-foundation-audit-item summary::after,
+html.a11y-high-contrast .home-design .home-foundation-audit-number {
+    color: #000;
+}
+
+html.a11y-high-contrast .home-design .home-foundation-audit-content {
+    border-color: #000;
 }
 
 /* Ajustes negociais homologados em 2026-08-06 */

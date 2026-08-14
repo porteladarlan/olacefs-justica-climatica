@@ -133,6 +133,7 @@ TEMPLATES = [
                 "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "praticas.context_processors.recursos_publicos",
             ],
         },
     },
@@ -159,6 +160,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "pt-br"
+
+# Recurso preservado no código, mas temporariamente fora da experiência pública.
+GUIA_PUBLICO_HABILITADO = _env_bool(
+    "GUIA_PUBLICO_HABILITADO",
+    False,
+)
 
 LANGUAGES = [
     ("pt-br", _("Português")),

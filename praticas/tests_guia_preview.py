@@ -25,6 +25,7 @@ from .seletores_guia_preview import (
 
 
 @override_settings(
+    GUIA_PUBLICO_HABILITADO=True,
     STORAGES={
         "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
         "staticfiles": {
@@ -311,7 +312,8 @@ class GuiaPreviewTests(TestCase):
                     resposta = getattr(self.client, metodo)(rota)
                     self.assertEqual(resposta.status_code, 405)
 
-    def test_guia_publico_permite_acesso_anonimo_e_usuario_comum(self):
+    @override_settings(GUIA_PUBLICO_HABILITADO=True)
+    def test_flag_ativa_reabilita_guia_para_anonimo_e_usuario_comum(self):
         self.client.logout()
         for rota in self._rotas_guia("guia"):
             with self.subTest(perfil="anonimo", rota=rota):
@@ -321,6 +323,15 @@ class GuiaPreviewTests(TestCase):
         for rota in self._rotas_guia("guia"):
             with self.subTest(perfil="comum", rota=rota):
                 self.assertEqual(self.client.get(rota).status_code, 200)
+
+    @override_settings(GUIA_PUBLICO_HABILITADO=False)
+    def test_flag_inativa_bloqueia_todas_as_rotas_publicas_com_hierarquia_valida(self):
+        self.client.logout()
+        for idioma in ("pt-br", "es", "en"):
+            with self.subTest(idioma=idioma), translation.override(idioma):
+                for rota in self._rotas_guia("guia"):
+                    with self.subTest(rota=rota):
+                        self.assertEqual(self.client.get(rota).status_code, 404)
 
     def test_guia_publico_permite_get_head_e_rejeita_metodos_de_escrita(self):
         self.client.logout()
