@@ -1,3 +1,5 @@
+import html
+
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import finders
 from django.test import TestCase
@@ -182,6 +184,40 @@ class FidelidadeCatalogosPublicosTests(TestCase):
                 self.assertNotContains(response, "2099")
                 for icon_name in ("account_circle", "contrast", "balance", "download", "search"):
                     self.assertNotContains(response, f">{icon_name}<")
+
+    def test_filtro_de_fontes_de_informacao_acompanha_idioma(self):
+        casos = (
+            (
+                "/catalogo/",
+                "FONTES DE INFORMAÇÃO OU EVIDÊNCIAS",
+                "Fontes de informação ou evidências",
+                "Nenhuma fonte de informação ou evidência encontrada",
+            ),
+            (
+                "/es/catalogo/",
+                "FUENTES DE INFORMACIÓN O EVIDENCIA",
+                "Fuentes de información o evidencia",
+                "No se encontró ninguna fuente de información o evidencia",
+            ),
+            (
+                "/en/catalogo/",
+                "SOURCES OF INFORMATION OR EVIDENCE",
+                "Sources of information or evidence",
+                "No source of information or evidence found",
+            ),
+        )
+
+        for caminho, label, legenda, estado_vazio in casos:
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho)
+                self.assertEqual(response.status_code, 200)
+                conteudo = html.unescape(response.content.decode("utf-8"))
+                self.assertIn(label, conteudo)
+                self.assertIn(legenda, conteudo)
+                self.assertIn(estado_vazio, conteudo)
+                self.assertNotIn("Ferramentas utilizadas", conteudo)
+                self.assertNotIn("Herramientas utilizadas", conteudo)
+                self.assertNotIn("Tools used", conteudo)
 
     def test_multisselecao_aplica_ou_interno_e_e_entre_dimensoes(self):
         response = self.client.get(
