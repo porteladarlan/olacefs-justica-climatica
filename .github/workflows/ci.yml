@@ -1,4 +1,4 @@
-name: Django tests
+name: CI
 
 on:
   pull_request:
@@ -7,16 +7,19 @@ on:
   push:
     branches:
       - main
-      - "fase**"
+
+permissions:
+  contents: read
 
 jobs:
   test:
-    name: Run Django test suite
+    name: Django checks and tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     env:
-      DJANGO_SETTINGS_MODULE: config.settings
-      SECRET_KEY: github-actions-test-secret-key
+      DJANGO_ENV: test
+      SECRET_KEY: ci-only-not-a-production-secret
       DEBUG: "False"
       ALLOWED_HOSTS: localhost,127.0.0.1,testserver
       PYTHONUNBUFFERED: "1"
@@ -29,19 +32,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-          cache: "pip"
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
+          cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
       - name: Run Django system check
         run: python manage.py check
 
+      - name: Check for missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
-      - name: Run tests
+      - name: Run Django test suite
         run: python manage.py test

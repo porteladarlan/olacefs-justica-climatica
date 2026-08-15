@@ -1,36 +1,29 @@
-# GitHub Actions — Testes automatizados Django
+# Observabilidade básica e integração contínua
 
-Este pacote adiciona um workflow para rodar os testes automaticamente no GitHub.
+## Health check
 
-## Arquivo incluído
+O endpoint público `GET /health/` verifica se a aplicação Django responde e se
+a conexão com o banco de dados está disponível.
 
-- `.github/workflows/django-tests.yml`
+- `200`: aplicação e banco disponíveis;
+- `503`: banco, uma dependência essencial, indisponível.
 
-## Quando roda
+A resposta é um JSON mínimo, possui diretivas para impedir cache e não inclui
+configurações, credenciais nem detalhes da infraestrutura. Outros métodos HTTP
+retornam `405`.
 
-O workflow roda em:
+## GitHub Actions
 
-- Pull Requests para `main`;
-- push na `main`;
-- push em branches iniciadas com `fase`, como:
-  - `fase15i-revisao-aprovacao`;
-  - `fase15h-ajustes-formulario-envio`;
-  - `fase15g-revisao-visual-publica`.
+O workflow `.github/workflows/ci.yml` executa automaticamente em pull requests
+para `main` e em pushes para `main`. Ele usa Python 3.13, SQLite e variáveis
+exclusivas de teste para executar:
 
-## O que executa
+```text
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py collectstatic --noinput
+python manage.py test
+```
 
-- instala Python 3.13;
-- instala dependências do `requirements.txt`;
-- executa `python manage.py check`;
-- executa `python manage.py test`.
-
-## Observação
-
-O workflow usa variáveis de ambiente próprias para teste:
-
-- `DJANGO_SETTINGS_MODULE=config.settings`;
-- `SECRET_KEY=github-actions-test-secret-key`;
-- `DEBUG=False`;
-- `ALLOWED_HOSTS=localhost,127.0.0.1,testserver`.
-
-Isso ajuda a validar a aplicação sem depender do ambiente local.
+O workflow não faz deploy, não acessa servidores e não utiliza credenciais de
+staging ou produção.
