@@ -31,6 +31,7 @@ from .emails import (
 )
 from .forms import (
     CadastroUsuarioForm,
+    EXPERIENCIA_LABELS,
     ExperienciaSubmissaoForm,
     PropostaEdicaoPublicadaForm,
     ReenviarConfirmacaoForm,
@@ -438,13 +439,21 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
     ]
     if indices_excedentes:
         erros.append(
-            f"É permitido informar no máximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiência."
+            texto_idioma(
+                f"É permitido informar no máximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiência.",
+                f"Se permite informar como máximo {ANEXO_LIMITE_POR_EXPERIENCIA} archivos adjuntos por experiencia.",
+                f"A maximum of {ANEXO_LIMITE_POR_EXPERIENCIA} attachments may be provided per experience.",
+            )
         )
 
     quantidade_final = quantidade_existente - len(ids_remover) + len(anexos)
     if quantidade_final > ANEXO_LIMITE_POR_EXPERIENCIA:
         erros.append(
-            f"É permitido manter no máximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiência."
+            texto_idioma(
+                f"É permitido manter no máximo {ANEXO_LIMITE_POR_EXPERIENCIA} anexos por experiência.",
+                f"Se permite mantener como máximo {ANEXO_LIMITE_POR_EXPERIENCIA} archivos adjuntos por experiencia.",
+                f"A maximum of {ANEXO_LIMITE_POR_EXPERIENCIA} attachments may be kept per experience.",
+            )
         )
 
     for anexo in anexos:
@@ -457,7 +466,12 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
                 validar_anexo_upload(arquivo)
             except ValidationError as exc:
                 erros.extend(
-                    f"Anexo {indice}: {mensagem}" for mensagem in exc.messages
+                    texto_idioma(
+                        f"Anexo {indice}: {mensagem}",
+                        f"Archivo adjunto {indice}: {mensagem}",
+                        f"Attachment {indice}: {mensagem}",
+                    )
+                    for mensagem in exc.messages
                 )
 
         if url:
@@ -465,12 +479,20 @@ def validar_anexos_request(request, quantidade_existente=0, ids_remover=None):
                 validador_url(url)
             except ValidationError:
                 erros.append(
-                    f"Anexo {indice}: informe uma URL válida iniciada por http:// ou https://."
+                    texto_idioma(
+                        f"Anexo {indice}: informe uma URL válida iniciada por http:// ou https://.",
+                        f"Archivo adjunto {indice}: informe una URL válida que comience por http:// o https://.",
+                        f"Attachment {indice}: provide a valid URL starting with http:// or https://.",
+                    )
                 )
 
         if not arquivo and not url:
             erros.append(
-                f"Anexo {indice}: informe um arquivo ou um link externo."
+                texto_idioma(
+                    f"Anexo {indice}: informe um arquivo ou um link externo.",
+                    f"Archivo adjunto {indice}: informe un archivo o un enlace externo.",
+                    f"Attachment {indice}: provide a file or an external link.",
+                )
             )
 
     return anexos, erros
@@ -632,7 +654,14 @@ def login_usuario(request):
 
 def logout_usuario(request):
     logout(request)
-    messages.success(request, "Sessão encerrada com sucesso.")
+    messages.success(
+        request,
+        texto_idioma(
+            "Sessão encerrada com sucesso.",
+            "Sesión cerrada correctamente.",
+            "Session closed successfully.",
+        ),
+    )
     return redirect("pagina_inicial")
 
 
@@ -661,10 +690,24 @@ def alternar_favorito(request, pk):
 
     if experiencia.pk in ids:
         ids = [item for item in ids if item != experiencia.pk]
-        messages.success(request, "Experiência removida dos favoritos.")
+        messages.success(
+            request,
+            texto_idioma(
+                "Experiência removida dos favoritos.",
+                "Experiencia eliminada de los favoritos.",
+                "Experience removed from favorites.",
+            ),
+        )
     else:
         ids.append(experiencia.pk)
-        messages.success(request, "Experiência adicionada aos favoritos.")
+        messages.success(
+            request,
+            texto_idioma(
+                "Experiência adicionada aos favoritos.",
+                "Experiencia añadida a los favoritos.",
+                "Experience added to favorites.",
+            ),
+        )
 
     salvar_favoritos_ids(request, ids)
     return redirect(obter_destino_seguro(request, padrao="catalogo_experiencias"))
@@ -1155,10 +1198,18 @@ def adicionar_boa_pratica(request):
                     experiencia.pessoa_responsavel = request.user.get_full_name() or request.user.username
                 if acao == "rascunho":
                     experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                    mensagem = "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão."
+                    mensagem = texto_idioma(
+                        "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão.",
+                        "Borrador guardado correctamente. Todavía no se ha enviado para revisión.",
+                        "Draft saved successfully. It has not yet been submitted for review.",
+                    )
                 else:
                     experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                    mensagem = "Boa prática enviada com sucesso. Ela ficará pendente até a revisão."
+                    mensagem = texto_idioma(
+                        "Boa prática enviada com sucesso. Ela ficará pendente até a revisão.",
+                        "Buena práctica enviada correctamente. Permanecerá pendiente hasta la revisión.",
+                        "Good practice submitted successfully. It will remain pending until review.",
+                    )
                 experiencia.save()
                 form.save_m2m()
                 salvar_anexos_submissao(experiencia, anexos)
@@ -1196,7 +1247,11 @@ def editar_boa_pratica(request, pk):
     if not experiencia_pertence_ao_usuario(experiencia, request.user):
         messages.error(
             request,
-            "Não foi possível validar sua permissão para edição deste envio.",
+            texto_idioma(
+                "Não foi possível validar sua permissão para edição deste envio.",
+                "No fue posible validar su permiso para editar este envío.",
+                "Your permission to edit this submission could not be validated.",
+            ),
         )
         return redirect("meus_envios")
 
@@ -1237,10 +1292,18 @@ def editar_boa_pratica(request, pk):
                     experiencia.autor = request.user
                 if acao == "rascunho":
                     experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                    mensagem = "Alterações salvas como rascunho."
+                    mensagem = texto_idioma(
+                        "Alterações salvas como rascunho.",
+                        "Cambios guardados como borrador.",
+                        "Changes saved as draft.",
+                    )
                 else:
                     experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
-                    mensagem = "Boa prática reenviada para revisão."
+                    mensagem = texto_idioma(
+                        "Boa prática reenviada para revisão.",
+                        "Buena práctica reenviada para revisión.",
+                        "Good practice resubmitted for review.",
+                    )
                 experiencia.save()
                 form.save_m2m()
                 salvar_anexos_submissao(experiencia, anexos)
@@ -1296,7 +1359,14 @@ def solicitar_edicao_publicada(request, pk):
     )
 
     if not experiencia_pertence_ao_usuario(experiencia, request.user):
-        messages.error(request, "Não foi possível validar sua permissão para solicitar edição.")
+        messages.error(
+            request,
+            texto_idioma(
+                "Não foi possível validar sua permissão para solicitar edição.",
+                "No fue posible validar su permiso para solicitar la edición.",
+                "Your permission to request an edit could not be validated.",
+            ),
+        )
         return redirect("meus_envios")
 
     if request.method == "POST":
@@ -1323,7 +1393,11 @@ def solicitar_edicao_publicada(request, pk):
                 )
             messages.success(
                 request,
-                "Proposta de edição enviada para revisão. A versão publicada permanecerá ativa até aprovação.",
+                texto_idioma(
+                    "Proposta de edição enviada para revisão. A versão publicada permanecerá ativa até aprovação.",
+                    "Propuesta de edición enviada para revisión. La versión publicada permanecerá activa hasta su aprobación.",
+                    "Edit proposal submitted for review. The published version will remain active until approval.",
+                ),
             )
             return redirect("status_envio")
     else:
@@ -1341,33 +1415,45 @@ def solicitar_edicao_publicada(request, pk):
 
 
 CAMPOS_COMPARACAO_EDICAO = [
-    ("titulo", "Nome da boa prática / iniciativa"),
-    ("efs", "EFS"),
-    ("pais", "País"),
-    ("tipo_experiencia", "Tipo de boa prática"),
-    ("setor", "Setor"),
-    ("temas_transversais", "Temas transversais"),
-    ("normas_internacionais", "Normas internacionais"),
-    ("email_contato", "E-mail institucional"),
-    ("pessoa_responsavel", "Pessoa responsável"),
-    ("descricao", "Breve descrição da boa prática"),
-    ("enfoque_justica_climatica", "Vínculo com justiça climática"),
-    ("objetivo", "Objetivo"),
-    ("perguntas_chave", "Perguntas de auditoria"),
-    ("criterios_utilizados", "Critérios utilizados"),
-    ("metodologia", "Metodologia"),
-    ("ferramentas_utilizadas", "Metodologias e instrumentos utilizados"),
-    ("resultados", "Resultados"),
-    ("recomendacoes", "Recomendações"),
-    ("replicabilidade", "Replicabilidade"),
-    ("informacoes_adicionais", "Informações adicionais"),
-    ("ano_execucao", "Ano"),
-    ("contribui_para_guia", "Contribui para a Guia"),
+    ("titulo", EXPERIENCIA_LABELS["titulo"]),
+    ("efs", EXPERIENCIA_LABELS["efs"]),
+    ("pais", EXPERIENCIA_LABELS["pais"]),
+    ("tipo_experiencia", EXPERIENCIA_LABELS["tipo_experiencia"]),
+    ("setor", EXPERIENCIA_LABELS["setor"]),
+    ("temas_transversais", EXPERIENCIA_LABELS["temas_transversais"]),
+    ("normas_internacionais", EXPERIENCIA_LABELS["normas_internacionais"]),
+    ("email_contato", EXPERIENCIA_LABELS["email_contato"]),
+    ("pessoa_responsavel", EXPERIENCIA_LABELS["pessoa_responsavel"]),
+    ("descricao", EXPERIENCIA_LABELS["descricao"]),
+    (
+        "enfoque_justica_climatica",
+        EXPERIENCIA_LABELS["enfoque_justica_climatica"],
+    ),
+    ("objetivo", EXPERIENCIA_LABELS["objetivo"]),
+    ("perguntas_chave", EXPERIENCIA_LABELS["perguntas_chave"]),
+    ("criterios_utilizados", EXPERIENCIA_LABELS["criterios_utilizados"]),
+    ("metodologia", EXPERIENCIA_LABELS["metodologia"]),
+    ("ferramentas_utilizadas", EXPERIENCIA_LABELS["ferramentas_utilizadas"]),
+    ("resultados", EXPERIENCIA_LABELS["resultados"]),
+    ("recomendacoes", EXPERIENCIA_LABELS["recomendacoes"]),
+    ("replicabilidade", EXPERIENCIA_LABELS["replicabilidade"]),
+    ("informacoes_adicionais", EXPERIENCIA_LABELS["informacoes_adicionais"]),
+    ("ano_execucao", EXPERIENCIA_LABELS["ano_execucao"]),
+    (
+        "contribui_para_guia",
+        {
+            "pt": "Contribui para a Guia",
+            "es": "Contribuye a la Guía",
+            "en": "Contribution to the Guide",
+        },
+    ),
 ]
 
 
 def texto_booleano(valor):
-    return "Sim" if valor else "Não"
+    if valor:
+        return texto_idioma("Sim", "Sí", "Yes")
+    return texto_idioma("Não", "No", "No")
 
 
 def texto_lista_objetos(objetos):
@@ -1433,10 +1519,15 @@ def montar_comparativo_proposta_edicao(proposta):
     experiencia = proposta.experiencia
     linhas = []
 
-    for campo, rotulo in CAMPOS_COMPARACAO_EDICAO:
+    for campo, traducoes_rotulo in CAMPOS_COMPARACAO_EDICAO:
         valor_atual = valor_atual_para_comparacao(experiencia, campo)
         valor_proposto = valor_proposto_para_comparacao(proposta, campo)
         alterado = valor_atual.strip() != valor_proposto.strip()
+        rotulo = texto_idioma(
+            traducoes_rotulo["pt"],
+            traducoes_rotulo["es"],
+            traducoes_rotulo["en"],
+        )
 
         linhas.append(
             {
@@ -1582,21 +1673,45 @@ def revisar_experiencia(request, pk):
 
             if acao == "em_revisao":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.EM_REVISAO
-                mensagem = "Experiência marcada como em revisão."
+                mensagem = texto_idioma(
+                    "Experiência marcada como em revisão.",
+                    "Experiencia marcada como en revisión.",
+                    "Experience marked as under review.",
+                )
             elif acao == "aprovar":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
-                mensagem = "Experiência aprovada e publicada no catálogo público."
+                mensagem = texto_idioma(
+                    "Experiência aprovada e publicada no catálogo público.",
+                    "Experiencia aprobada y publicada en el catálogo público.",
+                    "Experience approved and published in the public catalog.",
+                )
             elif acao == "publicar":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
-                mensagem = "Experiência publicada no catálogo público."
+                mensagem = texto_idioma(
+                    "Experiência publicada no catálogo público.",
+                    "Experiencia publicada en el catálogo público.",
+                    "Experience published in the public catalog.",
+                )
             elif acao == "devolver":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = "Experiência devolvida para ajustes."
+                mensagem = texto_idioma(
+                    "Experiência devolvida para ajustes.",
+                    "Experiencia devuelta para ajustes.",
+                    "Experience returned for adjustments.",
+                )
             elif acao == "rejeitar":
                 experiencia.status_publicacao = Experiencia.StatusPublicacao.REJEITADO
-                mensagem = "Experiência rejeitada."
+                mensagem = texto_idioma(
+                    "Experiência rejeitada.",
+                    "Experiencia rechazada.",
+                    "Experience rejected.",
+                )
             else:
-                mensagem = "Revisão registrada."
+                mensagem = texto_idioma(
+                    "Revisão registrada.",
+                    "Revisión registrada.",
+                    "Review recorded.",
+                )
 
             with transaction.atomic():
                 experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
@@ -1660,16 +1775,32 @@ def revisar_edicao_publicada(request, pk):
             with transaction.atomic():
                 if acao == "em_revisao":
                     proposta.status = PropostaEdicaoExperiencia.Status.EM_REVISAO
-                    mensagem = "Proposta marcada como em revisão."
+                    mensagem = texto_idioma(
+                        "Proposta marcada como em revisão.",
+                        "Propuesta marcada como en revisión.",
+                        "Proposal marked as under review.",
+                    )
                 elif acao == "aprovar":
                     aplicar_proposta_edicao(proposta)
                     proposta.status = PropostaEdicaoExperiencia.Status.APROVADA
-                    mensagem = "Proposta aprovada e aplicada à experiência publicada."
+                    mensagem = texto_idioma(
+                        "Proposta aprovada e aplicada à experiência publicada.",
+                        "Propuesta aprobada y aplicada a la experiencia publicada.",
+                        "Proposal approved and applied to the published experience.",
+                    )
                 elif acao == "rejeitar":
                     proposta.status = PropostaEdicaoExperiencia.Status.REJEITADA
-                    mensagem = "Proposta de edição rejeitada."
+                    mensagem = texto_idioma(
+                        "Proposta de edição rejeitada.",
+                        "Propuesta de edición rechazada.",
+                        "Edit proposal rejected.",
+                    )
                 else:
-                    mensagem = "Revisão registrada."
+                    mensagem = texto_idioma(
+                        "Revisão registrada.",
+                        "Revisión registrada.",
+                        "Review recorded.",
+                    )
 
                 proposta.save(update_fields=["status", "comentario_revisor", "atualizado_em"])
                 if (
@@ -1694,6 +1825,7 @@ def revisar_edicao_publicada(request, pk):
 
 
 @staff_member_required
+@require_http_methods(["GET", "POST"])
 def excluir_boa_pratica(request, pk):
     experiencia = get_object_or_404(
         Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related("anexos"),
@@ -1710,7 +1842,14 @@ def excluir_boa_pratica(request, pk):
 
     if request.method == "POST":
         if request.POST.get("confirmar_exclusao") != "sim":
-            messages.error(request, "Confirmação de exclusão inválida.")
+            messages.error(
+                request,
+                texto_idioma(
+                    "Confirmação de exclusão inválida.",
+                    "Confirmación de eliminación no válida.",
+                    "Invalid deletion confirmation.",
+                ),
+            )
             return redirect("excluir_boa_pratica", pk=experiencia.pk)
 
         titulo = experiencia.titulo_exibicao
@@ -1718,7 +1857,14 @@ def excluir_boa_pratica(request, pk):
             if anexo.arquivo:
                 anexo.arquivo.delete(save=False)
         experiencia.delete()
-        messages.success(request, f"Boa prática excluída com sucesso: {titulo}")
+        messages.success(
+            request,
+            texto_idioma(
+                f"Boa prática excluída com sucesso: {titulo}",
+                f"Buena práctica eliminada correctamente: {titulo}",
+                f"Good practice deleted successfully: {titulo}",
+            ),
+        )
         if proximo:
             return redirect(proximo)
         return redirect("catalogo_experiencias")

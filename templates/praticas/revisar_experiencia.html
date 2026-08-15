@@ -110,5 +110,6 @@
 
 <div class="mt-3">
     <a class="btn btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
+    <a class="btn btn-outline-danger" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}</a>
 </div>
 {% endblock %}

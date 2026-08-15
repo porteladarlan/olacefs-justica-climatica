@@ -42,4 +42,4 @@ class FormularioEnvioRetroalimentacaoTests(TestCase):
         self.assertIn("Public content", conteudo)
         self.assertIn("Required", conteudo)
         self.assertIn("Responsible person", conteudo)
-        self.assertIn("Methodologies, matrices or instruments used", conteudo)
+        self.assertIn("Sources of information or evidence", conteudo)

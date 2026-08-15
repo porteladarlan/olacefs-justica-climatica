@@ -33,6 +33,12 @@
     </div>
 </section>
 
+{% if request.user.is_staff %}
+<div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-outline-danger" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena pr&aacute;ctica{% else %}Excluir boa pr&aacute;tica{% endif %}</a>
+</div>
+{% endif %}
+
 <div class="row g-4">
     <div class="col-lg-8">
         <section class="detail-layout-card mb-3">

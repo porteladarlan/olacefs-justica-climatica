@@ -43,7 +43,10 @@ class Fase16FRetroalimentacaoTests(TestCase):
         self.assertIn("informacoes_adicionais", form.fields)
         self.assertIn("Critérios não são apenas normas", form.fields["criterios_utilizados"].help_text)
         self.assertIn("abordagem geral", form.fields["metodologia"].help_text)
-        self.assertIn("instrumentos específicos", form.fields["ferramentas_utilizadas"].help_text)
+        self.assertIn(
+            "fontes de informação ou evidências",
+            form.fields["ferramentas_utilizadas"].help_text,
+        )
         self.assertEqual(form.fields["informacoes_adicionais"].label, "Informações adicionais")
 
     def test_modelo_exibe_informacoes_adicionais(self):

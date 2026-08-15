@@ -106,6 +106,9 @@
                             {% endif %}
                             <div class="catalog-card-actions">
                                 <a href="{% url 'detalhe_experiencia' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}View technical sheet{% elif LANGUAGE_CODE == 'es' %}Ver ficha t&eacute;cnica{% else %}Ver ficha t&eacute;cnica{% endif %}</a>
+                                {% if request.user.is_staff %}
+                                    <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena pr&aacute;ctica{% else %}Excluir boa pr&aacute;tica{% endif %}</a>
+                                {% endif %}
                             </div>
                         </article>
                     {% empty %}

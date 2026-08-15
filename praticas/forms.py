@@ -229,9 +229,9 @@ EXPERIENCIA_LABELS = {
         "en": "Methodology",
     },
     "ferramentas_utilizadas": {
-        "pt": "Metodologias, matrizes ou instrumentos utilizados",
-        "es": "Metodologías, matrices o instrumentos utilizados",
-        "en": "Methodologies, matrices or instruments used",
+        "pt": "Fontes de informação ou evidências",
+        "es": "Fuentes de Información o evidencia",
+        "en": "Sources of information or evidence",
     },
     "resultados": {
         "pt": "Resultados",
@@ -292,9 +292,9 @@ EXPERIENCIA_HELP_TEXTS = {
         "en": "Describe the overall work approach: how the experience was planned, implemented and analysed.",
     },
     "ferramentas_utilizadas": {
-        "pt": "Liste instrumentos específicos usados dentro da metodologia, como matrizes, checklists, bases de dados, painéis, roteiros ou modelos.",
-        "es": "Enumere instrumentos específicos usados dentro de la metodología, como matrices, listas de verificación, bases de datos, paneles, guías o modelos.",
-        "en": "List specific instruments used within the methodology, such as matrices, checklists, databases, dashboards, guides or templates.",
+        "pt": "Informe as principais fontes de informação ou evidências utilizadas na boa prática.",
+        "es": "Informe las principales fuentes de información o evidencias utilizadas en la buena práctica.",
+        "en": "Provide the main sources of information or evidence used in the good practice.",
     },
     "informacoes_adicionais": {
         "pt": "Use este campo para registrar observações complementares, contexto institucional ou informações que não se encaixem nos campos anteriores.",
