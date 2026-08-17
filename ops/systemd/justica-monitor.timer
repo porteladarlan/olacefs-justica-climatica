@@ -1,0 +1,12 @@
+[Unit]
+Description=Execução periódica do monitoramento da Justiça Climática
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+RandomizedDelaySec=30s
+Unit=justica-monitor.service
+
+[Install]
+WantedBy=timers.target
