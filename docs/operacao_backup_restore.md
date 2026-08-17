@@ -17,9 +17,26 @@ Os scripts usam os seguintes defaults:
 Para testes controlados, podem ser sobrescritos `POSTGRES_BACKUP_DIR`,
 `MEDIA_BACKUP_SOURCE`, `MEDIA_BACKUP_DIR`, `BACKUP_RETENTION_DAYS` e os caminhos
 dos executáveis documentados no início de cada script. Caminhos de dados devem
-ser absolutos. `DATABASE_URL` é lida somente do ambiente, removida antes dos
-demais subprocessos e fornecida ao cliente libpq como `PGDATABASE`. Ela nunca é
-incluída em argumentos de processo, comandos versionados, documentação ou logs.
+ser absolutos. `DATABASE_URL` é lida somente do ambiente por
+`ops/postgres_client.py`, validada e convertida nas variáveis libpq específicas.
+Ela nunca é incluída em argumentos de processo, comandos versionados,
+documentação ou logs.
+
+```text
+DATABASE_URL
+    ↓
+postgres_client.py
+    ↓
+PGHOST / PGPORT / PGUSER / PGPASSWORD / PGDATABASE
+    ↓
+pg_dump / pg_restore
+```
+
+O helper remove `DATABASE_URL` do ambiente do processo filho, passa o nome do
+banco — e não a URI completa — em `PGDATABASE` e usa execução direta, sem shell.
+Parâmetros de conexão e credenciais chegam ao cliente apenas pelo ambiente
+libpq. Parâmetros de query desconhecidos ou duplicados são rejeitados.
+Configurações libpq `PG*` herdadas são limpas antes de aplicar a conexão derivada.
 
 ## Backup PostgreSQL
 
@@ -85,8 +102,9 @@ executadas pelos services devem ficar no diretório operacional separado:
 
 ```text
 /srv/justica-climatica/app/ops/*.sh
+/srv/justica-climatica/app/ops/postgres_client.py
                  ↓ sudo install
-/srv/justica-climatica/ops/*.sh
+/srv/justica-climatica/ops/
 ```
 
 Uma conta dedicada de backup poderá substituir `deploy` futuramente, mas somente
@@ -112,6 +130,7 @@ sudo install -d -o deploy -g deploy -m 0700 \
   /srv/justica-climatica/backups/media
 sudo install -o root -g deploy -m 0750 \
   /srv/justica-climatica/app/ops/*.sh \
+  /srv/justica-climatica/app/ops/postgres_client.py \
   /srv/justica-climatica/ops/
 if [ ! -e /etc/justica-climatica/backup-postgres.env ]; then
   sudo install -o root -g deploy -m 0640 /dev/null \
@@ -201,10 +220,12 @@ registrar aviso explícito. O restore usa `--single-transaction`,
 `--exit-on-error`, `--no-owner`, `--no-privileges` e `--no-password`. Ele não usa
 `--clean`, `--create` nem executa `DROP DATABASE`.
 
-A conexão também é fornecida ao `pg_restore` via `PGDATABASE`, nunca por argumento
-de processo. O stderr integral é suprimido porque pode conter host ou usuário; a
-mensagem sanitizada indica as categorias prováveis, e o diagnóstico detalhado
-deve usar somente logs protegidos do PostgreSQL.
+A conexão também é convertida pelo helper em `PGHOST`, `PGPORT`, `PGUSER`,
+`PGPASSWORD` e `PGDATABASE`; a URI nunca é passada por argumento de processo e
+`DATABASE_URL` não é herdada pelo `pg_restore`. O stderr integral é suprimido
+porque pode conter host ou usuário; a mensagem sanitizada indica as categorias
+prováveis, e o diagnóstico detalhado deve usar somente logs protegidos do
+PostgreSQL.
 
 O primeiro teste de restore deve ocorrer em banco PostgreSQL temporário, vazio e
 separado de staging. A URL desse banco deve ser fornecida por mecanismo protegido

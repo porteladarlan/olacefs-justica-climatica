@@ -4,6 +4,9 @@ set -Eeuo pipefail
 umask 077
 
 PROGRAM_NAME="restore-postgres"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+POSTGRES_CLIENT_HELPER="${POSTGRES_CLIENT_HELPER:-${SCRIPT_DIR}/postgres_client.py}"
 PG_RESTORE_BIN="${PG_RESTORE_BIN:-pg_restore}"
 SHA256SUM_BIN="${SHA256SUM_BIN:-sha256sum}"
 REALPATH_BIN="${REALPATH_BIN:-realpath}"
@@ -24,10 +27,9 @@ require_command() {
 [[ $# -eq 1 ]] || fail "Informe exatamente o caminho do arquivo .dump."
 [[ "${ALLOW_DATABASE_RESTORE:-}" == "yes" ]] || fail "Defina ALLOW_DATABASE_RESTORE=yes para autorizar o restore."
 [[ -n "${DATABASE_URL:-}" ]] || fail "DATABASE_URL não está definida."
-database_connection="$DATABASE_URL"
-unset DATABASE_URL
+[[ -f "$POSTGRES_CLIENT_HELPER" ]] || fail "Helper PostgreSQL obrigatório indisponível."
 
-for required_command in "$PG_RESTORE_BIN" "$SHA256SUM_BIN" "$REALPATH_BIN"; do
+for required_command in "$PYTHON_BIN" "$PG_RESTORE_BIN" "$SHA256SUM_BIN" "$REALPATH_BIN"; do
     require_command "$required_command"
 done
 
@@ -68,7 +70,7 @@ if ! "$PG_RESTORE_BIN" --list "$DUMP_PATH" >/dev/null 2>&1; then
 fi
 
 log "Iniciando restore PostgreSQL autorizado em banco previamente preparado."
-if ! PGDATABASE="$database_connection" "$PG_RESTORE_BIN" \
+if ! "$PYTHON_BIN" "$POSTGRES_CLIENT_HELPER" "$PG_RESTORE_BIN" \
     --exit-on-error \
     --single-transaction \
     --no-owner \
@@ -78,6 +80,5 @@ if ! PGDATABASE="$database_connection" "$PG_RESTORE_BIN" \
     >/dev/null 2>&1; then
     fail "pg_restore falhou por conexão, autenticação, permissão ou conflito de objetos; restore não foi concluído."
 fi
-database_connection=""
 
 log "Restore PostgreSQL concluído. Execute as validações funcionais antes de promover o banco."

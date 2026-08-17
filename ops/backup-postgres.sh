@@ -4,8 +4,11 @@ set -Eeuo pipefail
 umask 077
 
 PROGRAM_NAME="backup-postgres"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 BACKUP_DIR="${POSTGRES_BACKUP_DIR:-/srv/justica-climatica/backups/postgres}"
 RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-14}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+POSTGRES_CLIENT_HELPER="${POSTGRES_CLIENT_HELPER:-${SCRIPT_DIR}/postgres_client.py}"
 PG_DUMP_BIN="${PG_DUMP_BIN:-pg_dump}"
 SHA256SUM_BIN="${SHA256SUM_BIN:-sha256sum}"
 FLOCK_BIN="${FLOCK_BIN:-flock}"
@@ -60,8 +63,7 @@ trap cleanup EXIT
 trap 'exit 130' INT TERM HUP
 
 [[ -n "${DATABASE_URL:-}" ]] || fail "DATABASE_URL não está definida."
-database_connection="$DATABASE_URL"
-unset DATABASE_URL
+[[ -f "$POSTGRES_CLIENT_HELPER" ]] || fail "Helper PostgreSQL obrigatório indisponível."
 [[ "$BACKUP_DIR" == /* ]] || fail "POSTGRES_BACKUP_DIR deve ser um caminho absoluto."
 [[ "$BACKUP_DIR" != "/" ]] || fail "POSTGRES_BACKUP_DIR não pode ser a raiz do sistema."
 [[ "$RETENTION_DAYS" =~ ^[0-9]+$ ]] || fail "BACKUP_RETENTION_DAYS deve ser inteiro não negativo."
@@ -74,7 +76,7 @@ fi
 [[ ! -L "$BACKUP_DIR" ]] || fail "O diretório de backup não pode ser link simbólico."
 
 for required_command in \
-    "$PG_DUMP_BIN" "$SHA256SUM_BIN" "$FLOCK_BIN" \
+    "$PYTHON_BIN" "$PG_DUMP_BIN" "$SHA256SUM_BIN" "$FLOCK_BIN" \
     "$DATE_BIN" "$MKTEMP_BIN" "$FIND_BIN"; do
     require_command "$required_command"
 done
@@ -102,14 +104,13 @@ TEMP_DUMP="$($MKTEMP_BIN --tmpdir="$BACKUP_DIR" ".${final_name}.tmp.XXXXXX")"
 TEMP_CHECKSUM="$($MKTEMP_BIN --tmpdir="$BACKUP_DIR" ".${final_name}.sha256.tmp.XXXXXX")"
 
 log "Iniciando backup PostgreSQL."
-if ! PGDATABASE="$database_connection" "$PG_DUMP_BIN" \
+if ! "$PYTHON_BIN" "$POSTGRES_CLIENT_HELPER" "$PG_DUMP_BIN" \
     --format=custom \
     --file="$TEMP_DUMP" \
     --no-password \
     2>/dev/null; then
     fail "pg_dump falhou por conexão, autenticação, permissão ou gravação; nenhum backup completo foi publicado."
 fi
-database_connection=""
 [[ -s "$TEMP_DUMP" ]] || fail "pg_dump não produziu arquivo válido."
 
 if ! checksum_output="$($SHA256SUM_BIN "$TEMP_DUMP" 2>/dev/null)"; then
