@@ -20,6 +20,7 @@ QUERY_PARAMETER_ENV = {
     "application_name": "PGAPPNAME",
     "target_session_attrs": "PGTARGETSESSIONATTRS",
 }
+DATABASE_ARGUMENT_OPTION = "--database-argument"
 INVALID_PERCENT_ENCODING = re.compile(r"%(?![0-9A-Fa-f]{2})")
 
 
@@ -138,6 +139,41 @@ def build_client_environment(
     return child_environment
 
 
+def build_client_arguments(
+    arguments: Sequence[str], database_name: str
+) -> list[str]:
+    """Adicione o banco ao argv somente quando o modo explícito for solicitado."""
+
+    client_arguments = list(arguments)
+    if not client_arguments or client_arguments[0] != DATABASE_ARGUMENT_OPTION:
+        return client_arguments
+
+    client_arguments = client_arguments[1:]
+    if not client_arguments:
+        raise ConfigurationError(
+            "Informe o executável PostgreSQL após --database-argument."
+        )
+
+    for argument in client_arguments[1:]:
+        short_database_argument = argument.startswith("-d") and not argument.startswith(
+            "--"
+        )
+        long_database_argument = argument == "--dbname" or argument.startswith(
+            "--dbname="
+        )
+        if short_database_argument or long_database_argument:
+            raise ConfigurationError(
+                "Não informe -d/--dbname junto com --database-argument."
+            )
+
+    return [
+        client_arguments[0],
+        "--dbname",
+        database_name,
+        *client_arguments[1:],
+    ]
+
+
 def main(arguments: Sequence[str] | None = None) -> int:
     client_arguments = list(arguments if arguments is not None else sys.argv[1:])
     if not client_arguments:
@@ -149,6 +185,9 @@ def main(arguments: Sequence[str] | None = None) -> int:
 
     try:
         child_environment = build_client_environment(os.environ)
+        client_arguments = build_client_arguments(
+            client_arguments, child_environment["PGDATABASE"]
+        )
     except ConfigurationError as exc:
         print(f"postgres_client: erro: {exc}", file=sys.stderr)
         return 2

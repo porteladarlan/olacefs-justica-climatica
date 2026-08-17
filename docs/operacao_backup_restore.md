@@ -227,6 +227,11 @@ porque pode conter host ou usuário; a mensagem sanitizada indica as categorias
 prováveis, e o diagnóstico detalhado deve usar somente logs protegidos do
 PostgreSQL.
 
+No restore direto, `pg_restore` exige um banco de destino explícito. O helper
+fornece somente o nome derivado de `PGDATABASE` via `--dbname`; host, usuário e
+senha permanecem no ambiente libpq, e nem `DATABASE_URL` nem a senha entram no
+argv.
+
 O primeiro teste de restore deve ocorrer em banco PostgreSQL temporário, vazio e
 separado de staging. A URL desse banco deve ser fornecida por mecanismo protegido
 somente durante o teste. Exemplo sem credenciais:

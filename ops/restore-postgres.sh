@@ -70,7 +70,9 @@ if ! "$PG_RESTORE_BIN" --list "$DUMP_PATH" >/dev/null 2>&1; then
 fi
 
 log "Iniciando restore PostgreSQL autorizado em banco previamente preparado."
-if ! "$PYTHON_BIN" "$POSTGRES_CLIENT_HELPER" "$PG_RESTORE_BIN" \
+if ! "$PYTHON_BIN" "$POSTGRES_CLIENT_HELPER" \
+    --database-argument \
+    "$PG_RESTORE_BIN" \
     --exit-on-error \
     --single-transaction \
     --no-owner \

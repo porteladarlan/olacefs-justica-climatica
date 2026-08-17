@@ -2,6 +2,8 @@ import importlib.util
 import os
 import subprocess
 import sys
+from contextlib import redirect_stderr
+from io import StringIO
 from pathlib import Path
 from unittest import mock
 
@@ -115,7 +117,7 @@ class PostgresClientTests(SimpleTestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("DATABASE_URL não está definida", result.stderr)
 
-    def test_database_url_nao_e_repassada_e_credenciais_nao_entram_no_argv(self):
+    def test_modo_normal_permanece_inalterado_sem_credenciais_no_argv(self):
         database_url = "postgresql://usuario:senha-secreta@host:5432/banco"
         original_environment = {
             "DATABASE_URL": database_url,
@@ -136,6 +138,76 @@ class PostgresClientTests(SimpleTestCase):
         self.assertEqual(child_environment["PGPASSWORD"], "senha-secreta")
         self.assertNotIn(database_url, arguments)
         self.assertNotIn("senha-secreta", arguments)
+
+    def test_modo_database_argument_adiciona_somente_nome_do_banco(self):
+        database_url = "postgresql://usuario:senha-secreta@host:5432/banco"
+        original_environment = {
+            "DATABASE_URL": database_url,
+            "PATH": os.environ.get("PATH", ""),
+        }
+
+        with mock.patch.object(postgres_client.os, "environ", original_environment):
+            with mock.patch.object(postgres_client.subprocess, "run") as run:
+                run.return_value.returncode = 0
+                result = postgres_client.main(
+                    [
+                        "--database-argument",
+                        "pg_restore",
+                        "--single-transaction",
+                        "dump.dump",
+                    ]
+                )
+
+        arguments = run.call_args.args[0]
+        child_environment = run.call_args.kwargs["env"]
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            arguments,
+            [
+                "pg_restore",
+                "--dbname",
+                "banco",
+                "--single-transaction",
+                "dump.dump",
+            ],
+        )
+        self.assertNotIn(database_url, arguments)
+        self.assertNotIn("senha-secreta", arguments)
+        self.assertEqual(child_environment["PGDATABASE"], "banco")
+        self.assertNotIn("DATABASE_URL", child_environment)
+        self.assertFalse(run.call_args.kwargs["shell"])
+
+    def test_modo_database_argument_rejeita_dbname_informado_manualmente(self):
+        original_environment = {
+            "DATABASE_URL": "postgresql://usuario:senha@host:5432/banco",
+            "PATH": os.environ.get("PATH", ""),
+        }
+        conflicting_arguments = (
+            ["-d", "outro_banco"],
+            ["--dbname", "outro_banco"],
+            ["--dbname=outro_banco"],
+        )
+
+        for conflict in conflicting_arguments:
+            with self.subTest(argument=conflict[0]):
+                error_output = StringIO()
+                with mock.patch.object(
+                    postgres_client.os, "environ", original_environment
+                ):
+                    with mock.patch.object(postgres_client.subprocess, "run") as run:
+                        with redirect_stderr(error_output):
+                            result = postgres_client.main(
+                                [
+                                    "--database-argument",
+                                    "pg_restore",
+                                    *conflict,
+                                    "dump.dump",
+                                ]
+                            )
+
+                self.assertEqual(result, 2)
+                run.assert_not_called()
+                self.assertIn("Não informe -d/--dbname", error_output.getvalue())
 
     def test_configuracoes_pg_herdadas_sao_removidas(self):
         child_environment = postgres_client.build_client_environment(
@@ -198,3 +270,15 @@ class PostgresClientTests(SimpleTestCase):
         )
 
         self.assertIn('"$PG_RESTORE_BIN" --list "$DUMP_PATH"', content)
+
+    def test_restore_real_usa_modo_database_argument(self):
+        content = (Path(settings.BASE_DIR) / "ops" / "restore-postgres.sh").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn(
+            '"$POSTGRES_CLIENT_HELPER" \\\n'
+            '    --database-argument \\\n'
+            '    "$PG_RESTORE_BIN"',
+            content,
+        )
