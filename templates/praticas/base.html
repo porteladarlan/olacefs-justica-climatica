@@ -2281,13 +2281,7 @@
                 {% endif %}
             </span>
             <span class="brand-caption">
-                {% if LANGUAGE_CODE == 'en' %}
-                    Living Guide &middot; CGID + COMTEMA
-                {% elif LANGUAGE_CODE == 'es' %}
-                    Gu&iacute;a Viva &middot; CGID + COMTEMA
-                {% else %}
-                    Guia Viva &middot; CGID + COMTEMA
-                {% endif %}
+                CGID + COMTEMA
             </span>
         </a>
 
@@ -2305,7 +2299,7 @@
 
             <ul class="navbar-nav header-tools-nav mb-2 mb-lg-0 align-items-lg-center">
                 <li class="nav-item dropdown">
-                    <button class="nav-link dropdown-toggle nav-secondary-action header-space-button{% if current_url == 'login_usuario' or current_url == 'registrar_usuario' or current_url == 'meus_envios' or current_url == 'status_envio' or current_url == 'adicionar_boa_pratica' or current_url == 'editar_boa_pratica' or current_url == 'solicitar_edicao_publicada' or current_url == 'confirmacao_envio' or current_url == 'excluir_boa_pratica' or current_url == 'painel_revisao' or current_url == 'revisar_experiencia' or current_url == 'painel_revisao_edicoes' or current_url == 'revisar_edicao_publicada' %} nav-section-current{% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="nav-link dropdown-toggle nav-secondary-action header-space-button{% if current_url == 'login_usuario' or current_url == 'registrar_usuario' or current_url == 'meus_envios' or current_url == 'status_envio' or current_url == 'adicionar_boa_pratica' or current_url == 'editar_ferramenta' or current_url == 'editar_boa_pratica' or current_url == 'solicitar_edicao_publicada' or current_url == 'confirmacao_envio' or current_url == 'excluir_boa_pratica' or current_url == 'painel_revisao' or current_url == 'revisar_experiencia' or current_url == 'painel_revisao_edicoes' or current_url == 'revisar_edicao_publicada' %} nav-section-current{% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="header-account-icon" aria-hidden="true"></span>
                         {% if LANGUAGE_CODE == 'en' %}My space{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}
                     </button>
@@ -2413,7 +2407,6 @@
                 class="footer-logo-bar"
             >
         </div>
-        <p class="footer-meta">{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform &middot; OLACEFS &middot; German Cooperation (GIZ) &middot; BMZ{% elif LANGUAGE_CODE == 'es' %}Plataforma de Justicia Clim&aacute;tica &middot; OLACEFS &middot; Cooperaci&oacute;n Alemana (GIZ) &middot; BMZ{% else %}Plataforma de Justi&ccedil;a Clim&aacute;tica &middot; OLACEFS &middot; Coopera&ccedil;&atilde;o Alem&atilde; (GIZ) &middot; BMZ{% endif %}</p>
     </div>
 </footer>
 

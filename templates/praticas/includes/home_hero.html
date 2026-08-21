@@ -7,16 +7,17 @@
             </h1>
             <p class="jc-hero-text">
                 {% if LANGUAGE_CODE == 'en' %}
-                    Driven by the Presidencies of the Special Technical Commission on the Environment (COMTEMA) and the Commission on Gender, Inclusion and Diversity (CGID). It supports audit teams and decision-makers in integrating climate justice into external-control practice through the exchange of good audit and governance practices.
+                    Driven by the Presidencies of the Commission on Gender, Inclusion and Diversity (CGID) and the Special Technical Commission on the Environment (COMTEMA) of OLACEFS, the Climate Justice Platform offers a channel for exchanging good practices and viewing audit standards and tools to support the audit community and decision-makers in integrating climate justice into external-control practice.
                 {% elif LANGUAGE_CODE == 'es' %}
-                    Impulsada por las Presidencias de la Comisi&oacute;n T&eacute;cnica Especial de Medio Ambiente (COMTEMA) y la Comisi&oacute;n de G&eacute;nero, Inclusi&oacute;n y Diversidad (CGID). Busca apoyar a los equipos de auditor&iacute;a y a las personas tomadoras de decisiones en la integraci&oacute;n de la justicia clim&aacute;tica en la pr&aacute;ctica del control externo, a partir del intercambio de buenas pr&aacute;cticas de auditor&iacute;a y gobernanza.
+                    Impulsada por las Presidencias de la Comisi&oacute;n de G&eacute;nero, Inclusi&oacute;n y Diversidad (CGID) y de la Comisi&oacute;n T&eacute;cnica Especial de Medio Ambiente (COMTEMA) de la OLACEFS, la Plataforma de Justicia Clim&aacute;tica ofrece un canal para el intercambio de buenas pr&aacute;cticas y la visualizaci&oacute;n de normas y herramientas de auditor&iacute;a, con el fin de apoyar a la comunidad auditora y a las personas tomadoras de decisiones en la integraci&oacute;n de la justicia clim&aacute;tica en la pr&aacute;ctica del control externo.
                 {% else %}
-                    Impulsionada pelas Presid&ecirc;ncias da Comiss&atilde;o T&eacute;cnica Especial de Meio Ambiente (COMTEMA) e da Comiss&atilde;o sobre G&ecirc;nero, Inclus&atilde;o e Diversidade (CGID) da OLACEFS, a Plataforma promove um canal para o intercambio de boas pr&aacute;ticas e visualiza&ccedil;&atilde;o de normas e ferramentas de auditoria para apoiar as equipes de auditoria e pessoas tomadoras de decis&atilde;o na integra&ccedil;&atilde;o da justi&ccedil;a clim&aacute;tica na pr&aacute;tica do controle externo.
+                    Impulsionada pelas Presid&ecirc;ncias da Comiss&atilde;o sobre G&ecirc;nero, Inclus&atilde;o e Diversidade (CGID) e da Comiss&atilde;o T&eacute;cnica Especial de Meio Ambiente (COMTEMA) da OLACEFS, a Plataforma de Justi&ccedil;a Clim&aacute;tica oferece um canal para o interc&acirc;mbio de boas pr&aacute;ticas e visualiza&ccedil;&atilde;o de normas e ferramentas de auditoria para apoiar a comunidade auditora e pessoas tomadoras de decis&atilde;o na integra&ccedil;&atilde;o da justi&ccedil;a clim&aacute;tica &agrave; pr&aacute;tica do controle externo.
                 {% endif %}
             </p>
             <div class="jc-hero-actions">
                 <a href="{% url 'normas_internacionais' %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Explore normative frameworks{% elif LANGUAGE_CODE == 'es' %}Explorar marcos normativos{% else %}Explorar marcos normativos{% endif %}</a>
                 <a href="#mapSection" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}View the regional map{% elif LANGUAGE_CODE == 'es' %}Ver mapa de la regi&oacute;n{% else %}Ver mapa da regi&atilde;o{% endif %}</a>
+                <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-success jc-hero-submit">{% if LANGUAGE_CODE == 'en' %}Submit good practice{% elif LANGUAGE_CODE == 'es' %}Enviar buena pr&aacute;ctica{% else %}Enviar boa pr&aacute;tica{% endif %}</a>
             </div>
         </div>
         <div class="jc-hero-art">

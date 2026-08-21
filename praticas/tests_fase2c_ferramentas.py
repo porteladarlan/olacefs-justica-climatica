@@ -103,6 +103,12 @@ class FerramentaModelTests(TestCase):
 
 
 class FerramentasCatalogoTests(TestCase):
+    def setUp(self):
+        translation.activate("pt-br")
+
+    def tearDown(self):
+        translation.deactivate_all()
+
     @classmethod
     def setUpTestData(cls):
         cls.setor_energia = Setor.objects.create(

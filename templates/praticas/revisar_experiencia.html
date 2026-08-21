@@ -47,7 +47,7 @@
             <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Questions, criteria and methodologies{% elif LANGUAGE_CODE == 'es' %}Preguntas, criterios y metodologías{% else %}Perguntas, critérios e metodologias{% endif %}</div>
             <h2 class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Methodological inputs{% elif LANGUAGE_CODE == 'es' %}Insumos metodológicos{% else %}Insumos metodológicos{% endif %}</h2>
             <h3 class="h6 section-title mt-3">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditoría{% else %}Perguntas de auditoria{% endif %}</h3>
-            <p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao|default:"-" }}</p>
+            {% if experiencia.perguntas_auditoria.exists %}<ol class="section-subtitle">{% for pergunta in experiencia.perguntas_auditoria.all %}<li>{{ pergunta.texto }}</li>{% endfor %}</ol>{% else %}<p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao|default:"-" }}</p>{% endif %}
             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Criteria used{% elif LANGUAGE_CODE == 'es' %}Criterios utilizados{% else %}Critérios utilizados{% endif %}</h3>
             <p class="section-subtitle">{{ experiencia.criterios_utilizados_exibicao|default:"-" }}</p>
             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Methodology{% elif LANGUAGE_CODE == 'es' %}Metodología{% else %}Metodologia{% endif %}</h3>

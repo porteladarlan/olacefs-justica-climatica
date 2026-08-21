@@ -35,6 +35,7 @@
 
 <form method="post" enctype="multipart/form-data" class="submission-form">
     {% csrf_token %}
+    <input type="hidden" name="tipo_compartilhamento" value="boa_pratica">
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
     <div class="submission-guidance">
@@ -59,8 +60,8 @@
             </div>
             <div class="row g-3">
                 {% for field in form %}
-                    {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
-                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
+                    {% if field.name in "efs,pais,titulo,tipo_experiencia,tipo_auditoria,outras_efs_envolvidas,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}"{% if field.name == 'tipo_auditoria' %} data-audit-only{% elif field.name == 'outras_efs_envolvidas' %} data-coordinated-field{% endif %}>
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
                             {{ field.label }}
                             {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
@@ -96,6 +97,14 @@
                     {% for error in form.temas_transversais.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
                     </fieldset>
                 </div>
+                <div class="col-lg-6" data-coordinated-field>
+                    <fieldset class="submission-fieldset">
+                    <legend>{{ form.paises_participantes.label }}</legend>
+                    {{ form.paises_participantes }}
+                    {% if form.paises_participantes.help_text %}<div class="form-text">{{ form.paises_participantes.help_text }}</div>{% endif %}
+                    {% for error in form.paises_participantes.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </fieldset>
+                </div>
                 <div class="col-lg-6">
                     <fieldset class="submission-fieldset">
                     <legend>{{ form.normas_internacionais.label }}</legend>
@@ -118,9 +127,25 @@
                 </div>
             </div>
             <div class="row g-3">
+                <div class="col-12 audit-questions" data-audit-only data-audit-questions data-question-label="{% if LANGUAGE_CODE == 'en' %}Question{% elif LANGUAGE_CODE == 'es' %}Pregunta{% else %}Pergunta{% endif %}" data-remove-label="{% if LANGUAGE_CODE == 'en' %}Remove question{% elif LANGUAGE_CODE == 'es' %}Eliminar pregunta{% else %}Remover pergunta{% endif %}">
+                    <h3>{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditoría{% else %}Perguntas de auditoria{% endif %}</h3>
+                    <div data-question-list>
+                        {% for pergunta in perguntas_auditoria %}
+                        <div class="audit-question-row" data-question-row>
+                            <label for="id_pergunta_auditoria_{{ forloop.counter }}"><span data-question-number>{% if LANGUAGE_CODE == 'en' %}Question{% elif LANGUAGE_CODE == 'es' %}Pregunta{% else %}Pergunta{% endif %} {{ forloop.counter }}</span></label>
+                            <div class="audit-question-control">
+                                <textarea class="form-control" rows="3" maxlength="2000" id="id_pergunta_auditoria_{{ forloop.counter }}" name="perguntas_auditoria">{{ pergunta }}</textarea>
+                                <button class="btn btn-outline-secondary audit-question-remove" type="button" data-remove-question aria-label="{% if LANGUAGE_CODE == 'en' %}Remove question {{ forloop.counter }}{% elif LANGUAGE_CODE == 'es' %}Eliminar pregunta {{ forloop.counter }}{% else %}Remover pergunta {{ forloop.counter }}{% endif %}">&times;</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="btn btn-outline-primary" type="button" data-add-question>{% if LANGUAGE_CODE == 'en' %}Add more questions{% elif LANGUAGE_CODE == 'es' %}Agregar más preguntas{% else %}Adicionar mais perguntas{% endif %}</button>
+                    {% if form.instance.pk and form.instance.perguntas_chave %}<p class="legacy-question-notice">{% if LANGUAGE_CODE == 'en' %}Legacy audit-question text remains preserved in the historical record.{% elif LANGUAGE_CODE == 'es' %}El texto heredado de preguntas de auditoría permanece preservado en el registro histórico.{% else %}O texto legado de perguntas de auditoria permanece preservado no registro histórico.{% endif %}</p>{% endif %}
+                </div>
                 {% for field in form %}
                     {% if field.name in "objetivo,perguntas_chave,criterios_utilizados,metodologia,ferramentas_utilizadas,resultados,recomendacoes,replicabilidade" %}
-                    <div class="col-12">
+                    <div class="col-12"{% if field.name == 'perguntas_chave' %} data-evaluation-only{% endif %}>
                         <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
                             {{ field.label }}
                             {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,descricao,enfoque_justica_climatica,ano_execucao" %}
@@ -190,3 +215,5 @@
 </form>
 </div>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'praticas/js/submissao-conteudo.js' %}" defer></script>{% endblock %}

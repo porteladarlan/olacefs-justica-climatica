@@ -66,6 +66,22 @@
     line-height: 1.55;
 }
 
+.home-design .home-foundation-panel p,
+.home-design .home-foundation-panel li,
+.home-design .home-voice-quote,
+.home-design .home-video p {
+    font-size: 17px;
+}
+
+.home-design .home-foundation-gender-groups {
+    margin: 18px 0;
+    padding-left: 1.4rem;
+}
+
+.home-design .home-foundation-gender-groups li + li {
+    margin-top: 8px;
+}
+
 .home-design .jc-hero-actions,
 .home-design .home-foundation-actions,
 .home-design .home-map-actions {
@@ -73,6 +89,19 @@
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 30px;
+}
+
+.home-design .jc-hero-actions .jc-hero-submit {
+    border-color: var(--green);
+    color: #ffffff;
+    background: var(--green);
+}
+
+.home-design .jc-hero-actions .jc-hero-submit:hover,
+.home-design .jc-hero-actions .jc-hero-submit:focus-visible {
+    border-color: var(--green-dark);
+    color: #ffffff;
+    background: var(--green-dark);
 }
 
 .home-design .jc-hero-art {
@@ -231,16 +260,22 @@
 .home-design .home-foundation-lead {
     margin: 0;
     color: var(--text-soft);
-    font-size: 15px;
+    font-size: 17px;
     line-height: 1.65;
+}
+
+.home-design .home-foundation-lead-followup {
+    margin-top: 14px;
 }
 
 .home-design .home-foundation-photo img {
     display: block;
     width: 100%;
-    max-height: 320px;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
     border-radius: 14px;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .home-design .home-foundation-actions {
@@ -272,12 +307,12 @@
     margin: 0;
 }
 
-.home-design .home-foundation-concept-photo,
-.home-design .home-foundation-concept-photo img {
+.home-design .home-foundation-concept-photo {
     height: 100%;
 }
 
 .home-design .home-foundation-concept-photo img {
+    height: auto;
     max-height: none;
 }
 
@@ -297,7 +332,7 @@
 .home-design .home-foundation-strategy p {
     margin: 0;
     color: var(--text-soft);
-    font-size: 13px;
+    font-size: 17px;
     line-height: 1.55;
 }
 
@@ -307,6 +342,13 @@
     align-items: start;
     gap: 14px;
     margin: 22px 0 0;
+}
+
+.home-design .home-foundation-audit-heading {
+    margin: 26px 0 0;
+    color: var(--purple);
+    font-size: 20px;
+    line-height: 1.4;
 }
 
 .home-design .home-foundation-audit-item {
@@ -323,7 +365,7 @@
 
 .home-design .home-foundation-audit-item summary {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 7px;
     min-height: 72px;
@@ -371,8 +413,24 @@
     padding-left: 20px;
 }
 
+.home-design .home-foundation-audit-content h5 {
+    margin: 14px 0 6px;
+    color: var(--purple);
+    font-size: 16px;
+}
+
+.home-design .home-foundation-audit-content p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.55;
+}
+
+.home-design .home-foundation-audit-content p + h5 {
+    margin-top: 18px;
+}
+
 .home-design .home-foundation-audit-content li {
-    font-size: 13px;
+    font-size: 17px;
     line-height: 1.55;
 }
 
@@ -393,7 +451,7 @@
     max-width: 640px;
     margin: 12px 0 0;
     color: var(--text-soft);
-    font-size: 15.5px;
+    font-size: 17px;
     line-height: 1.6;
 }
 
@@ -1215,6 +1273,7 @@ html.a11y-high-contrast .home-design .home-foundation-audit-content {
 }
 
 .climate-examples p {
+    font-size: 17px;
     line-height: 1.72;
 }
 
@@ -1232,7 +1291,7 @@ html.a11y-high-contrast .home-design .home-foundation-audit-content {
     border-radius: 10px;
     background: var(--bg-alt);
     color: var(--text-soft);
-    font-size: 13px;
+    font-size: 17px;
     font-style: italic;
 }
 

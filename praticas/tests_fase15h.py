@@ -12,7 +12,7 @@ class FormularioEnvioRetroalimentacaoTests(TestCase):
         self.client.force_login(self.usuario)
 
     def test_formulario_envio_exibe_orientacao_de_fluxo_e_campos_obrigatorios(self):
-        response = self.client.get("/adicionar-boa-pratica/")
+        response = self.client.get("/adicionar-boa-pratica/?tipo=boa_pratica")
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
 
@@ -33,7 +33,7 @@ class FormularioEnvioRetroalimentacaoTests(TestCase):
         self.assertNotIn("Contribución a la Guía", conteudo)
 
     def test_formulario_envio_em_ingles_mantem_orientacao_trilingue(self):
-        response = self.client.get("/en/adicionar-boa-pratica/")
+        response = self.client.get("/en/adicionar-boa-pratica/?tipo=boa_pratica")
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
 

@@ -48,7 +48,7 @@ class RevisaoTraducaoTrilingueTests(TestCase):
         )
         self.client.force_login(usuario)
 
-        response = self.client.get("/en/adicionar-boa-pratica/")
+        response = self.client.get("/en/adicionar-boa-pratica/?tipo=boa_pratica")
 
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")

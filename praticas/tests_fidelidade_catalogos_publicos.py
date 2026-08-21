@@ -185,36 +185,15 @@ class FidelidadeCatalogosPublicosTests(TestCase):
                 for icon_name in ("account_circle", "contrast", "balance", "download", "search"):
                     self.assertNotContains(response, f">{icon_name}<")
 
-    def test_filtro_de_fontes_de_informacao_acompanha_idioma(self):
-        casos = (
-            (
-                "/catalogo/",
-                "FONTES DE INFORMAÇÃO OU EVIDÊNCIAS",
-                "Fontes de informação ou evidências",
-                "Nenhuma fonte de informação ou evidência encontrada",
-            ),
-            (
-                "/es/catalogo/",
-                "FUENTES DE INFORMACIÓN O EVIDENCIA",
-                "Fuentes de información o evidencia",
-                "No se encontró ninguna fuente de información o evidencia",
-            ),
-            (
-                "/en/catalogo/",
-                "SOURCES OF INFORMATION OR EVIDENCE",
-                "Sources of information or evidence",
-                "No source of information or evidence found",
-            ),
-        )
-
-        for caminho, label, legenda, estado_vazio in casos:
+    def test_catalogo_remove_filtro_publico_de_fontes_de_informacao(self):
+        for caminho in ("/catalogo/", "/es/catalogo/", "/en/catalogo/"):
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
                 conteudo = html.unescape(response.content.decode("utf-8"))
-                self.assertIn(label, conteudo)
-                self.assertIn(legenda, conteudo)
-                self.assertIn(estado_vazio, conteudo)
+                self.assertNotIn("FONTES DE INFORMAÇÃO OU EVIDÊNCIAS", conteudo)
+                self.assertNotIn("FUENTES DE INFORMACIÓN O EVIDENCIA", conteudo)
+                self.assertNotIn("SOURCES OF INFORMATION OR EVIDENCE", conteudo)
                 self.assertNotIn("Ferramentas utilizadas", conteudo)
                 self.assertNotIn("Herramientas utilizadas", conteudo)
                 self.assertNotIn("Tools used", conteudo)
@@ -240,17 +219,16 @@ class FidelidadeCatalogosPublicosTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["total_resultados"], 2)
 
-    def test_filtro_de_ferramenta_textual_altera_queryset_e_gera_chip(self):
+    def test_parametro_legado_de_ferramenta_nao_altera_os_quatro_filtros_oficiais(self):
         response = self.client.get(
             reverse("catalogo_experiencias"),
             {"ferramenta": "Matriz de critérios"},
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["total_resultados"], 1)
+        self.assertEqual(response.context["total_resultados"], 2)
         self.assertContains(response, self.publica_a.titulo)
-        self.assertNotContains(response, self.publica_b.titulo)
-        self.assertContains(response, "Matriz de critérios")
+        self.assertContains(response, self.publica_b.titulo)
 
     def test_marcos_sao_biblioteca_com_busca_e_drawer_acessivel(self):
         response = self.client.get(

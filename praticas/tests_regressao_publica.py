@@ -347,9 +347,9 @@ class RegressaoPublicaTests(TestCase):
 
     def test_home_preserva_ordem_componentes_e_fundamentos_semanticos(self):
         conceitos = {
-            "": ("Equidade e Inclusão", "Participação Social", "Responsabilidades comuns, mas compartilhadas"),
-            "/es": ("Equidad e Inclusión", "Participación Social", "Responsabilidades comunes, pero compartidas"),
-            "/en": ("Equity and Inclusion", "Social Participation", "Common but shared responsibilities"),
+            "": ("Equidade e Inclusão", "Participação Social", "Responsabilidades comuns, porém diferenciadas"),
+            "/es": ("Equidad e Inclusión", "Participación Social", "Responsabilidades comunes, pero diferenciadas"),
+            "/en": ("Equity and Inclusion", "Social Participation", "Common but differentiated responsibilities"),
         }
         position_paper = (
             "https://olacefs.com/giz/wp-content/uploads/sites/14/2025/11/"
@@ -369,16 +369,16 @@ class RegressaoPublicaTests(TestCase):
                 self.assertEqual(posicoes, tuple(sorted(posicoes)))
                 self.assertEqual(inventario.classes["home-foundation-tab"], 3)
                 self.assertEqual(inventario.classes["home-foundation-strategy"], 3)
-                self.assertEqual(inventario.classes["home-foundation-audit-item"], 9)
+                self.assertEqual(inventario.classes["home-foundation-audit-item"], 6)
                 conceito = html.split('id="concepto-pane"', 1)[1].split(
                     'id="controle-pane"', 1
                 )[0]
                 self.assertEqual(conceito.count('class="home-foundation-strategy"'), 3)
                 for titulo in titulos:
                     self.assertIn(titulo, conceito)
-                self.assertEqual(html.count(f'href="{position_paper}"'), 3)
+                self.assertEqual(html.count(f'href="{position_paper}"'), 1)
                 self.assertEqual(
-                    html.count('class="home-foundation-actions"'), 3
+                    html.count('class="home-foundation-actions"'), 2
                 )
                 self.assertIn('id="regionalMap"', html)
                 self.assertIn('id="home-video-error" role="status" hidden', html)

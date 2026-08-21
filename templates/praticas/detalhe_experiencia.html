@@ -29,7 +29,10 @@
             <strong>{{ experiencia.efs.sigla|default:experiencia.efs.nome_exibicao }}</strong>
             &bull; {{ experiencia.pais.nome_exibicao }}
             &bull; {{ experiencia.tipo_experiencia.nome_exibicao }}
+            {% if experiencia.tipo_auditoria %}&bull; {{ experiencia.tipo_auditoria_exibicao }}{% endif %}
         </p>
+        {% if experiencia.paises_participantes.exists %}<p class="hero-subtitle mb-0"><strong>{% if LANGUAGE_CODE == 'en' %}Other participating countries{% elif LANGUAGE_CODE == 'es' %}Otros países participantes{% else %}Demais países participantes{% endif %}:</strong> {% for pais in experiencia.paises_participantes.all %}{{ pais.nome_exibicao }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+        {% if experiencia.outras_efs_envolvidas %}<p class="hero-subtitle mb-0"><strong>{% if LANGUAGE_CODE == 'en' %}Other SAIs involved{% elif LANGUAGE_CODE == 'es' %}Otras EFS involucradas{% else %}Demais EFS envolvidas{% endif %}:</strong> {{ experiencia.outras_efs_envolvidas }}</p>{% endif %}
     </div>
 </section>
 
@@ -131,7 +134,10 @@
                             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Objective{% elif LANGUAGE_CODE == 'es' %}Objetivo{% else %}Objetivo{% endif %}</h3>
                             <p class="section-subtitle">{{ experiencia.objetivo_exibicao }}</p>
                         {% endif %}
-                        {% if experiencia.perguntas_chave_exibicao %}
+                        {% if experiencia.perguntas_auditoria.exists %}
+                            <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditoría{% else %}Perguntas de auditoria{% endif %}</h3>
+                            <ol class="section-subtitle">{% for pergunta in experiencia.perguntas_auditoria.all %}<li>{{ pergunta.texto }}</li>{% endfor %}</ol>
+                        {% elif experiencia.perguntas_chave_exibicao %}
                             <h3 class="h6 section-title">{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditor&iacute;a{% else %}Perguntas de auditoria{% endif %}</h3>
                             <p class="section-subtitle">{{ experiencia.perguntas_chave_exibicao }}</p>
                         {% endif %}

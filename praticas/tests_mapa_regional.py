@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import finders
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import override
 
 from .forms import ExperienciaSubmissaoForm
 from .models import EFS, Experiencia, NormaInternacional, Pais, Setor, TipoExperiencia
@@ -462,7 +463,8 @@ class MapaRegionalTests(TestCase):
         EFS.objects.create(nome="EFS Aruba", sigla="EFA", pais=aruba)
         EFS.objects.create(nome="SOAB Curaçao", sigla="SOAB", pais=curacao)
 
-        payload = _payload_mapa_regional()
+        with override("pt-br"):
+            payload = _payload_mapa_regional()
         por_sigla = {pais["sigla"]: pais for pais in payload["paises"]}
 
         self.assertEqual(MAPA_REGIONAL_ISO3_PARA_GEO_ID["ABW"], "533")

@@ -12,13 +12,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Max, Prefetch, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from .emails import (
@@ -33,6 +34,7 @@ from .forms import (
     CadastroUsuarioForm,
     EXPERIENCIA_LABELS,
     ExperienciaSubmissaoForm,
+    FerramentaSubmissaoForm,
     PropostaEdicaoPublicadaForm,
     ReenviarConfirmacaoForm,
     RevisaoExperienciaForm,
@@ -51,6 +53,7 @@ from .models import (
     GrupoVulneravel,
     NormaInternacional,
     Pais,
+    PerguntaAuditoria,
     PropostaEdicaoExperiencia,
     Setor,
     TemaTransversal,
@@ -203,15 +206,28 @@ def _payload_mapa_regional():
     experiencias_coordenadas = (
         Experiencia.objects.filter(
             status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
-            efs_participantes__isnull=False,
         )
-        .select_related("efs__pais")
+        .filter(
+            Q(efs_participantes__isnull=False)
+            | Q(
+                tipo_experiencia__codigo="auditoria_coordenada",
+                paises_participantes__isnull=False,
+            )
+        )
+        .select_related("efs__pais", "pais", "tipo_experiencia")
         .prefetch_related(
             Prefetch(
                 "efs_participantes",
                 queryset=efs_participantes_mapa,
                 to_attr="efs_participantes_mapa",
-            )
+            ),
+            Prefetch(
+                "paises_participantes",
+                queryset=Pais.objects.only(
+                    "id", "nome", "nome_es", "nome_en", "sigla"
+                ).order_by("nome"),
+                to_attr="paises_participantes_mapa",
+            ),
         )
         .distinct()
         .order_by("titulo", "pk")
@@ -248,14 +264,23 @@ def _payload_mapa_regional():
             for efs in experiencia.efs_participantes_mapa
             if efs.pk != experiencia.efs_id
         ]
-        if not efs_adicionais:
+        paises_adicionais = []
+        if experiencia.tipo_experiencia.codigo == "auditoria_coordenada":
+            paises_adicionais = [
+                pais
+                for pais in experiencia.paises_participantes_mapa
+                if pais.pk != experiencia.pais_id
+            ]
+        if not efs_adicionais and not paises_adicionais:
             continue
 
         paises_da_auditoria = {
-            experiencia.efs.pais_id: experiencia.efs.pais,
+            experiencia.pais_id: experiencia.pais,
         }
         for efs_participante in efs_adicionais:
             paises_da_auditoria[efs_participante.pais_id] = efs_participante.pais
+        for pais_participante in paises_adicionais:
+            paises_da_auditoria[pais_participante.pk] = pais_participante
 
         paises_ordenados = sorted(
             paises_da_auditoria.values(),
@@ -668,11 +693,21 @@ def logout_usuario(request):
 @login_required(login_url="login_usuario")
 def meus_envios(request):
     experiencias = queryset_meus_envios(request.user)
+    ferramentas = Ferramenta.objects.all() if request.user.is_staff else Ferramenta.objects.filter(autor=request.user)
+    ferramentas = ferramentas.select_related("setor").order_by("-atualizado_em")
     propostas = PropostaEdicaoExperiencia.objects.select_related("experiencia")
     if not request.user.is_staff:
         propostas = propostas.filter(experiencia__autor=request.user)
     propostas = propostas.order_by("-atualizado_em")
-    return render(request, "praticas/meus_envios.html", {"experiencias": experiencias, "propostas": propostas})
+    return render(
+        request,
+        "praticas/meus_envios.html",
+        {
+            "experiencias": experiencias,
+            "ferramentas_enviadas": ferramentas,
+            "propostas": propostas,
+        },
+    )
 
 def favoritos_ids(request):
     return [int(item) for item in request.session.get("favoritos_experiencias", []) if str(item).isdigit()]
@@ -780,17 +815,27 @@ def catalogo_experiencias(request):
     )
 
     paises = Pais.objects.filter(
-        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+        Q(experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO)
+        | Q(
+            experiencias_como_pais_participante__status_publicacao=
+            Experiencia.StatusPublicacao.PUBLICADO
+        )
     ).distinct()
     efs_lista = EFS.objects.filter(
         experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
     ).select_related("pais").distinct()
     tipos = TipoExperiencia.objects.filter(
         experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
-    ).distinct()
+    )
+    if TipoExperiencia.objects.filter(codigo__isnull=False).exists():
+        tipos = tipos.filter(codigo__isnull=False)
+    tipos = tipos.distinct()
     setores = Setor.objects.filter(
         experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
-    ).distinct()
+    )
+    if Setor.objects.filter(codigo__isnull=False).exists():
+        setores = setores.filter(codigo__isnull=False)
+    setores = setores.distinct()
     temas = TemaTransversal.objects.filter(
         experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
     ).distinct()
@@ -808,32 +853,6 @@ def catalogo_experiencias(request):
         .distinct()
         .order_by("-ano_execucao")
     )
-    idioma = getattr(request, "LANGUAGE_CODE", "pt-br")
-    ferramentas_opcoes = []
-    ferramentas_por_valor = {}
-    for valor_pt, valor_es, valor_en in experiencias_base.values_list(
-        "ferramentas_utilizadas",
-        "ferramentas_utilizadas_es",
-        "ferramentas_utilizadas_en",
-    ):
-        valor = (valor_pt or valor_es or valor_en or "").strip()
-        if not valor or len(valor) > 200 or valor in ferramentas_por_valor:
-            continue
-        if idioma == "en":
-            rotulo = (valor_en or valor_pt or valor_es or valor).strip()
-        elif idioma == "es":
-            rotulo = (valor_es or valor_pt or valor_en or valor).strip()
-        else:
-            rotulo = (valor_pt or valor_es or valor_en or valor).strip()
-        opcao = {"valor": valor, "rotulo": rotulo}
-        ferramentas_por_valor[valor] = opcao
-        ferramentas_opcoes.append(opcao)
-    ferramentas_opcoes.sort(key=lambda opcao: opcao["rotulo"].casefold())
-    ferramentas_selecionadas = []
-    for valor in request.GET.getlist("ferramenta"):
-        if valor in ferramentas_por_valor and valor not in ferramentas_selecionadas:
-            ferramentas_selecionadas.append(valor)
-
     selecoes = {
         "pais": _objetos_selecionados(request, "pais", Pais.objects.all()),
         "efs": _objetos_selecionados(request, "efs", efs_lista),
@@ -854,7 +873,6 @@ def catalogo_experiencias(request):
             anos_selecionados.append(ano)
 
     campos_filtro = {
-        "pais": "pais_id__in",
         "efs": "efs_id__in",
         "tipo": "tipo_experiencia_id__in",
         "setor": "setor_id__in",
@@ -863,6 +881,12 @@ def catalogo_experiencias(request):
         "dimensao": "dimensoes_consideradas__id__in",
         "grupo": "grupos_vulneraveis__id__in",
     }
+    if selecoes["pais"]:
+        paises_ids = [objeto.pk for objeto in selecoes["pais"]]
+        experiencias = experiencias.filter(
+            Q(pais_id__in=paises_ids)
+            | Q(paises_participantes__id__in=paises_ids)
+        )
     for chave, campo in campos_filtro.items():
         if selecoes[chave]:
             experiencias = experiencias.filter(
@@ -870,13 +894,6 @@ def catalogo_experiencias(request):
             )
     if anos_selecionados:
         experiencias = experiencias.filter(ano_execucao__in=anos_selecionados)
-    if ferramentas_selecionadas:
-        experiencias = experiencias.filter(
-            Q(ferramentas_utilizadas__in=ferramentas_selecionadas)
-            | Q(ferramentas_utilizadas_es__in=ferramentas_selecionadas)
-            | Q(ferramentas_utilizadas_en__in=ferramentas_selecionadas)
-        )
-
     termo = (request.GET.get("q") or "").strip()[:200]
     if termo:
         experiencias = experiencias.filter(
@@ -945,17 +962,6 @@ def catalogo_experiencias(request):
                 "url_remover": _url_sem_valor_filtro(request, "ano", ano),
             }
         )
-    for valor in ferramentas_selecionadas:
-        chips.append(
-            {
-                "chave": "ferramenta",
-                "rotulo": ferramentas_por_valor[valor]["rotulo"],
-                "url_remover": _url_sem_valor_filtro(
-                    request, "ferramenta", valor
-                ),
-            }
-        )
-
     contexto = {
         "experiencias": experiencias,
         "paises": paises,
@@ -972,8 +978,6 @@ def catalogo_experiencias(request):
             for chave, objetos in selecoes.items()
         },
         "anos_selecionados": anos_selecionados,
-        "ferramentas_opcoes": ferramentas_opcoes,
-        "ferramentas_selecionadas": ferramentas_selecionadas,
         "termo_busca": termo,
         "chips_filtros": chips,
         "total_resultados": experiencias.count(),
@@ -1174,10 +1178,158 @@ def salvar_anexos_submissao(experiencia, anexos):
         )
 
 
+def salvar_perguntas_auditoria(experiencia, perguntas):
+    experiencia.perguntas_auditoria.all().delete()
+    PerguntaAuditoria.objects.bulk_create(
+        [
+            PerguntaAuditoria(experiencia=experiencia, texto=texto, ordem=ordem)
+            for ordem, texto in enumerate(perguntas, start=1)
+        ]
+    )
+
+
+def idioma_submissao_ferramenta(codigo_idioma):
+    codigo = (codigo_idioma or "").lower()
+    if codigo.startswith("en"):
+        return Ferramenta.IdiomaSubmissao.INGLES
+    if codigo.startswith("es"):
+        return Ferramenta.IdiomaSubmissao.ESPANHOL
+    return Ferramenta.IdiomaSubmissao.PORTUGUES
+
+
+def dados_iniciais_ferramenta(ferramenta):
+    campos_idioma = {
+        Ferramenta.IdiomaSubmissao.PORTUGUES: ("titulo", "descricao"),
+        Ferramenta.IdiomaSubmissao.ESPANHOL: ("titulo_es", "descricao_es"),
+        Ferramenta.IdiomaSubmissao.INGLES: ("titulo_en", "descricao_en"),
+    }
+    campo_titulo, campo_descricao = campos_idioma.get(
+        ferramenta.idioma_submissao,
+        ("titulo_es", "descricao_es"),
+    )
+    return {
+        "nome": getattr(ferramenta, campo_titulo),
+        "ano": ferramenta.ano,
+        "descricao": getattr(ferramenta, campo_descricao),
+        "setor": ferramenta.setor_id,
+        "link_acesso": ferramenta.url,
+        "pais_ou_instancia": ferramenta.pais_ou_instancia,
+    }
+
+
+def salvar_ferramenta_submetida(form, usuario, situacao, ferramenta=None):
+    dados = form.cleaned_data
+    if ferramenta is None:
+        base_codigo = slugify(dados.get("nome") or "ferramenta")[:140] or "ferramenta"
+        codigo = base_codigo
+        sufixo = 2
+        while Ferramenta.objects.filter(codigo=codigo).exists():
+            codigo = f"{base_codigo}-{sufixo}"
+            sufixo += 1
+        proxima_ordem = (Ferramenta.objects.aggregate(maior=Max("ordem"))["maior"] or 0) + 1
+        ferramenta = Ferramenta(
+            autor=usuario,
+            codigo=codigo,
+            ordem=proxima_ordem,
+        )
+        ferramenta.idioma_submissao = idioma_submissao_ferramenta(
+            getattr(form, "language_code", None)
+        )
+
+    nome = dados.get("nome", "")
+    descricao = dados.get("descricao", "")
+    if ferramenta.idioma_submissao == Ferramenta.IdiomaSubmissao.INGLES:
+        ferramenta.titulo_en = nome
+        ferramenta.descricao_en = descricao
+    elif ferramenta.idioma_submissao == Ferramenta.IdiomaSubmissao.PORTUGUES:
+        ferramenta.titulo = nome
+        ferramenta.descricao = descricao
+    else:
+        ferramenta.titulo_es = nome
+        ferramenta.descricao_es = descricao
+    ferramenta.ano = dados.get("ano")
+    ferramenta.periodo = str(dados.get("ano") or "")
+    ferramenta.pais_ou_instancia = dados.get("pais_ou_instancia", "")
+    ferramenta.responsavel = dados.get("pais_ou_instancia", "")
+    ferramenta.setor = dados.get("setor")
+    ferramenta.url = dados.get("link_acesso", "")
+    ferramenta.situacao = situacao
+    ferramenta.save()
+    return ferramenta
+
+
 @login_required(login_url="login_usuario")
 def adicionar_boa_pratica(request):
+    tipo_compartilhamento = (
+        request.POST.get("tipo_compartilhamento")
+        or request.GET.get("tipo")
+        or ""
+    )
+    if (
+        request.method == "POST"
+        and not tipo_compartilhamento
+        and any(
+            campo in request.POST
+            for campo in ("titulo", "tipo_experiencia", "descricao", "acao_envio")
+        )
+    ):
+        # Compatibilidade com formulários abertos antes da introdução da etapa
+        # de escolha. Um tipo explicitamente inválido continua sendo rejeitado.
+        tipo_compartilhamento = "boa_pratica"
+    tipos_validos = {"boa_pratica", "ferramenta"}
+    if request.method == "POST" and tipo_compartilhamento not in tipos_validos:
+        return render(
+            request,
+            "praticas/escolher_compartilhamento.html",
+            {"escolha_invalida": True},
+            status=400,
+        )
+    if not tipo_compartilhamento:
+        return render(request, "praticas/escolher_compartilhamento.html")
+
     acao = request.POST.get("acao_envio", "enviar")
     obrigatorio_para_envio = acao != "rascunho"
+
+    if tipo_compartilhamento == "ferramenta":
+        if request.method == "POST":
+            form = FerramentaSubmissaoForm(
+                request.POST,
+                obrigatorio_para_envio=obrigatorio_para_envio,
+            )
+            form.language_code = getattr(request, "LANGUAGE_CODE", "pt-br")
+            if form.is_valid():
+                with transaction.atomic():
+                    salvar_ferramenta_submetida(
+                        form,
+                        request.user,
+                        Ferramenta.Situacao.RASCUNHO
+                        if acao == "rascunho"
+                        else Ferramenta.Situacao.ENVIADA,
+                    )
+                messages.success(
+                    request,
+                    texto_idioma(
+                        "Ferramenta salva como rascunho."
+                        if acao == "rascunho"
+                        else "Ferramenta enviada para revisão.",
+                        "Herramienta guardada como borrador."
+                        if acao == "rascunho"
+                        else "Herramienta enviada para revisión.",
+                        "Tool saved as a draft."
+                        if acao == "rascunho"
+                        else "Tool submitted for review.",
+                    ),
+                )
+                if acao == "rascunho":
+                    return redirect("meus_envios")
+                return redirect(f"{reverse('confirmacao_envio')}?tipo=ferramenta")
+        else:
+            form = FerramentaSubmissaoForm()
+        return render(
+            request,
+            "praticas/submeter_ferramenta.html",
+            {"form": form, "tipo_compartilhamento": "ferramenta"},
+        )
 
     if request.method == "POST":
         form = ExperienciaSubmissaoForm(
@@ -1212,6 +1364,9 @@ def adicionar_boa_pratica(request):
                     )
                 experiencia.save()
                 form.save_m2m()
+                salvar_perguntas_auditoria(
+                    experiencia, form.perguntas_auditoria_limpas
+                )
                 salvar_anexos_submissao(experiencia, anexos)
                 if experiencia.status_publicacao == Experiencia.StatusPublicacao.ENVIADO:
                     agendar_notificacoes_nova_submissao(request, experiencia)
@@ -1230,7 +1385,101 @@ def adicionar_boa_pratica(request):
             }
         )
 
-    return render(request, "praticas/adicionar_boa_pratica.html", {"form": form})
+    return render(
+        request,
+        "praticas/adicionar_boa_pratica.html",
+        {
+            "form": form,
+            "tipo_compartilhamento": "boa_pratica",
+            "perguntas_auditoria": form.perguntas_auditoria_valores,
+        },
+    )
+
+
+@login_required(login_url="login_usuario")
+def editar_ferramenta(request, pk):
+    ferramenta = get_object_or_404(Ferramenta.objects.select_related("setor"), pk=pk)
+    pertence_ao_usuario = ferramenta.autor_id == request.user.id
+    if not request.user.is_staff and not pertence_ao_usuario:
+        messages.error(
+            request,
+            texto_idioma(
+                "Você não tem permissão para editar esta ferramenta.",
+                "No tiene permiso para editar esta herramienta.",
+                "You do not have permission to edit this tool.",
+            ),
+        )
+        return redirect("meus_envios")
+    if ferramenta.situacao == Ferramenta.Situacao.PUBLICADA:
+        messages.error(
+            request,
+            texto_idioma(
+                "Ferramentas publicadas não podem ser alteradas por este fluxo.",
+                "Las herramientas publicadas no pueden modificarse mediante este flujo.",
+                "Published tools cannot be changed through this workflow.",
+            ),
+        )
+        return redirect("meus_envios")
+    if not request.user.is_staff and ferramenta.situacao != Ferramenta.Situacao.RASCUNHO:
+        messages.error(
+            request,
+            texto_idioma(
+                "Somente rascunhos podem ser retomados para edição.",
+                "Solo los borradores pueden retomarse para su edición.",
+                "Only drafts can be resumed for editing.",
+            ),
+        )
+        return redirect("meus_envios")
+
+    acao = request.POST.get("acao_envio", "rascunho")
+    obrigatorio_para_envio = acao != "rascunho"
+    if request.method == "POST":
+        form = FerramentaSubmissaoForm(
+            request.POST,
+            obrigatorio_para_envio=obrigatorio_para_envio,
+        )
+        form.language_code = ferramenta.idioma_submissao
+        if form.is_valid():
+            with transaction.atomic():
+                salvar_ferramenta_submetida(
+                    form,
+                    ferramenta.autor or request.user,
+                    Ferramenta.Situacao.RASCUNHO
+                    if acao == "rascunho"
+                    else Ferramenta.Situacao.ENVIADA,
+                    ferramenta=ferramenta,
+                )
+            messages.success(
+                request,
+                texto_idioma(
+                    "Rascunho da ferramenta atualizado."
+                    if acao == "rascunho"
+                    else "Ferramenta enviada para revisão.",
+                    "Borrador de la herramienta actualizado."
+                    if acao == "rascunho"
+                    else "Herramienta enviada para revisión.",
+                    "Tool draft updated."
+                    if acao == "rascunho"
+                    else "Tool submitted for review.",
+                ),
+            )
+            return redirect("meus_envios")
+    else:
+        form = FerramentaSubmissaoForm(
+            initial=dados_iniciais_ferramenta(ferramenta),
+            obrigatorio_para_envio=False,
+        )
+
+    return render(
+        request,
+        "praticas/submeter_ferramenta.html",
+        {
+            "form": form,
+            "ferramenta": ferramenta,
+            "edicao": True,
+            "tipo_compartilhamento": "ferramenta",
+        },
+    )
 
 
 @login_required(login_url="login_usuario")
@@ -1306,6 +1555,9 @@ def editar_boa_pratica(request, pk):
                     )
                 experiencia.save()
                 form.save_m2m()
+                salvar_perguntas_auditoria(
+                    experiencia, form.perguntas_auditoria_limpas
+                )
                 salvar_anexos_submissao(experiencia, anexos)
                 if (
                     status_anterior != Experiencia.StatusPublicacao.ENVIADO
@@ -1325,13 +1577,18 @@ def editar_boa_pratica(request, pk):
         {
             "form": form,
             "experiencia": experiencia,
+            "perguntas_auditoria": form.perguntas_auditoria_valores,
         },
     )
 
 
 def dados_proposta_from_form(form):
     dados = {}
-    campos_many_to_many = {"temas_transversais", "normas_internacionais"}
+    campos_many_to_many = {
+        "paises_participantes",
+        "temas_transversais",
+        "normas_internacionais",
+    }
     campos_fk = {"efs", "pais", "tipo_experiencia", "setor"}
 
     for campo in ExperienciaSubmissaoForm.Meta.fields:
@@ -1344,6 +1601,7 @@ def dados_proposta_from_form(form):
         else:
             dados[campo] = valor
 
+    dados["perguntas_auditoria"] = form.perguntas_auditoria_limpas
     return dados
 
 
@@ -1409,6 +1667,7 @@ def solicitar_edicao_publicada(request, pk):
         {
             "form": form,
             "experiencia": experiencia,
+            "perguntas_auditoria": form.perguntas_auditoria_valores,
         },
     )
 
@@ -1418,7 +1677,10 @@ CAMPOS_COMPARACAO_EDICAO = [
     ("titulo", EXPERIENCIA_LABELS["titulo"]),
     ("efs", EXPERIENCIA_LABELS["efs"]),
     ("pais", EXPERIENCIA_LABELS["pais"]),
+    ("paises_participantes", EXPERIENCIA_LABELS["paises_participantes"]),
     ("tipo_experiencia", EXPERIENCIA_LABELS["tipo_experiencia"]),
+    ("tipo_auditoria", EXPERIENCIA_LABELS["tipo_auditoria"]),
+    ("outras_efs_envolvidas", EXPERIENCIA_LABELS["outras_efs_envolvidas"]),
     ("setor", EXPERIENCIA_LABELS["setor"]),
     ("temas_transversais", EXPERIENCIA_LABELS["temas_transversais"]),
     ("normas_internacionais", EXPERIENCIA_LABELS["normas_internacionais"]),
@@ -1430,7 +1692,14 @@ CAMPOS_COMPARACAO_EDICAO = [
         EXPERIENCIA_LABELS["enfoque_justica_climatica"],
     ),
     ("objetivo", EXPERIENCIA_LABELS["objetivo"]),
-    ("perguntas_chave", EXPERIENCIA_LABELS["perguntas_chave"]),
+    (
+        "perguntas_auditoria",
+        {
+            "pt": "Perguntas de auditoria",
+            "es": "Preguntas de auditoría",
+            "en": "Audit questions",
+        },
+    ),
     ("criterios_utilizados", EXPERIENCIA_LABELS["criterios_utilizados"]),
     ("metodologia", EXPERIENCIA_LABELS["metodologia"]),
     ("ferramentas_utilizadas", EXPERIENCIA_LABELS["ferramentas_utilizadas"]),
@@ -1466,8 +1735,18 @@ def valor_atual_para_comparacao(experiencia, campo):
         objeto = getattr(experiencia, campo, None)
         return getattr(objeto, "nome_exibicao", str(objeto)) if objeto else "-"
 
-    if campo in {"temas_transversais", "normas_internacionais"}:
+    if campo in {"paises_participantes", "temas_transversais", "normas_internacionais"}:
         return texto_lista_objetos(getattr(experiencia, campo).all())
+
+    if campo == "perguntas_auditoria":
+        return "\n".join(
+            experiencia.perguntas_auditoria.order_by("ordem").values_list(
+                "texto", flat=True
+            )
+        ) or "-"
+
+    if campo == "tipo_auditoria":
+        return experiencia.tipo_auditoria_exibicao or "-"
 
     valor = getattr(experiencia, campo, "")
 
@@ -1505,6 +1784,20 @@ def valor_proposto_para_comparacao(proposta, campo):
 
     if campo == "normas_internacionais":
         return texto_lista_objetos(NormaInternacional.objects.filter(pk__in=valor or []))
+
+    if campo == "paises_participantes":
+        return texto_lista_objetos(Pais.objects.filter(pk__in=valor or []))
+
+    if campo == "perguntas_auditoria":
+        return "\n".join(valor or []) or "-"
+
+    if campo == "tipo_auditoria":
+        traducoes = {
+            Experiencia.TipoAuditoria.DESEMPENHO: ("Desempenho", "Desempeño", "Performance"),
+            Experiencia.TipoAuditoria.CUMPRIMENTO: ("Cumprimento", "Cumplimiento", "Compliance"),
+            Experiencia.TipoAuditoria.FINANCEIRA: ("Financeira", "Financiera", "Financial"),
+        }
+        return texto_idioma(*traducoes[valor]) if valor in traducoes else "-"
 
     if campo == "contribui_para_guia":
         return texto_booleano(bool(valor))
@@ -1553,6 +1846,7 @@ def aplicar_proposta_edicao(proposta):
         "setor": Setor,
     }
     campos_many_to_many = {
+        "paises_participantes": Pais,
         "temas_transversais": TemaTransversal,
         "normas_internacionais": NormaInternacional,
     }
@@ -1589,15 +1883,26 @@ def aplicar_proposta_edicao(proposta):
     for campo, modelo in campos_many_to_many.items():
         ids = dados.get(campo, [])
         getattr(experiencia, campo).set(modelo.objects.filter(pk__in=ids))
+    if "perguntas_auditoria" in dados:
+        salvar_perguntas_auditoria(
+            experiencia,
+            [texto for texto in dados.get("perguntas_auditoria", []) if texto],
+        )
 
 
 def confirmacao_envio(request):
-    return render(request, "praticas/confirmacao_envio.html")
+    return render(
+        request,
+        "praticas/confirmacao_envio.html",
+        {"ferramenta_enviada": request.GET.get("tipo") == "ferramenta"},
+    )
 
 
 @login_required(login_url="login_usuario")
 def status_envio(request):
     experiencias = queryset_meus_envios(request.user)
+    ferramentas = Ferramenta.objects.all() if request.user.is_staff else Ferramenta.objects.filter(autor=request.user)
+    ferramentas = ferramentas.select_related("setor").order_by("-atualizado_em")
     propostas = PropostaEdicaoExperiencia.objects.select_related("experiencia")
     if not request.user.is_staff:
         propostas = propostas.filter(experiencia__autor=request.user)
@@ -1608,6 +1913,7 @@ def status_envio(request):
         "praticas/status_envio.html",
         {
             "experiencias": experiencias,
+            "ferramentas_enviadas": ferramentas,
             "propostas": propostas,
         },
     )
@@ -1920,7 +2226,10 @@ def ferramentas(request):
     total_publicadas = recursos_base.count()
     setores = Setor.objects.filter(
         ferramentas__situacao=Ferramenta.Situacao.PUBLICADA
-    ).distinct().order_by("nome_es", "nome")
+    )
+    if Setor.objects.filter(codigo__isnull=False).exists():
+        setores = setores.filter(codigo__isnull=False)
+    setores = setores.distinct().order_by("nome_es", "nome")
     setor_selecionado = _objetos_selecionados(
         request, "setor", setores
     )

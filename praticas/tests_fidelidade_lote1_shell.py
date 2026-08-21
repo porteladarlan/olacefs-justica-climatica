@@ -114,9 +114,9 @@ class ShellGlobalLote1Tests(TestCase):
 
     def test_shell_exibe_marca_navegacao_e_rotulos_em_pt_es_en(self):
         cases = [
-            ("/", "Plataforma de Justiça Climática", "Guia Viva · CGID + COMTEMA", "Boas Práticas", "Ferramentas"),
-            ("/es/", "Plataforma de Justicia Climática", "Guía Viva · CGID + COMTEMA", "Buenas Prácticas", "Herramientas"),
-            ("/en/", "Climate Justice Platform", "Living Guide · CGID + COMTEMA", "Good Practices", "Tools"),
+            ("/", "Plataforma de Justiça Climática", "CGID + COMTEMA", "Boas Práticas", "Ferramentas"),
+            ("/es/", "Plataforma de Justicia Climática", "CGID + COMTEMA", "Buenas Prácticas", "Herramientas"),
+            ("/en/", "Climate Justice Platform", "CGID + COMTEMA", "Good Practices", "Tools"),
         ]
         for path, brand, caption, practices, tools in cases:
             with self.subTest(path=path):

@@ -97,7 +97,9 @@ class FidelidadeMeuEspacoTests(TestCase):
 
     def test_formulario_de_envio_preserva_contratos_reais(self):
         self.client.force_login(self.usuario)
-        response = self.client.get(reverse("adicionar_boa_pratica"))
+        response = self.client.get(
+            f"{reverse('adicionar_boa_pratica')}?tipo=boa_pratica"
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'class="submission-page"', html=False)
         self.assertContains(response, 'method="post"')

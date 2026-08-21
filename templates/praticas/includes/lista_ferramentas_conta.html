@@ -1,0 +1,26 @@
+{% if ferramentas_enviadas %}
+<div class="workspace-list">
+    {% for ferramenta in ferramentas_enviadas %}
+    <article class="workspace-card">
+        <div>
+            <h3>{{ ferramenta.titulo_exibicao }}</h3>
+            <p>{{ ferramenta.setor.nome_exibicao }}{% if ferramenta.ano %} · {{ ferramenta.ano }}{% endif %}{% if ferramenta.pais_ou_instancia %} · {{ ferramenta.pais_ou_instancia }}{% endif %}</p>
+        </div>
+        <span class="badge-soft">
+            {% if ferramenta.situacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
+            {% elif ferramenta.situacao == 'enviada' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviada{% else %}Enviada{% endif %}
+            {% elif ferramenta.situacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
+            {% elif ferramenta.situacao == 'aprovada' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobada{% else %}Aprovada{% endif %}
+            {% elif ferramenta.situacao == 'publicada' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicada{% else %}Publicada{% endif %}
+            {% elif ferramenta.situacao == 'rejeitada' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazada{% else %}Rejeitada{% endif %}
+            {% else %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivada{% else %}Arquivada{% endif %}{% endif %}
+        </span>
+        {% if ferramenta.situacao == 'rascunho' %}
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_ferramenta' ferramenta.pk %}">{% if LANGUAGE_CODE == 'en' %}Continue editing{% elif LANGUAGE_CODE == 'es' %}Continuar editando{% else %}Continuar editando{% endif %}</a>
+        {% endif %}
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<p>{% if LANGUAGE_CODE == 'en' %}No tool submission yet.{% elif LANGUAGE_CODE == 'es' %}Aún no hay envíos de herramientas.{% else %}Ainda não há envio de ferramenta.{% endif %}</p>
+{% endif %}

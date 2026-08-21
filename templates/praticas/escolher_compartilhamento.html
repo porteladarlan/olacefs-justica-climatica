@@ -1,0 +1,35 @@
+{% extends 'praticas/base.html' %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Share content{% elif LANGUAGE_CODE == 'es' %}Compartir contenido{% else %}Compartilhar conteúdo{% endif %} | Plataforma Regional{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/envio-pratica.css' %}">{% endblock %}
+
+{% block content %}
+<section class="submission-choice" aria-labelledby="submission-choice-title">
+    <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Contribution{% elif LANGUAGE_CODE == 'es' %}Contribución{% else %}Contribuição{% endif %}</div>
+    <div class="submission-choice-heading">
+        <h1 id="submission-choice-title">{% if LANGUAGE_CODE == 'en' %}What would you like to share?{% elif LANGUAGE_CODE == 'es' %}¿Qué desea compartir?{% else %}Você deseja compartilhar:{% endif %}</h1>
+        <details class="accessible-info">
+            <summary aria-label="{% if LANGUAGE_CODE == 'en' %}Learn the difference between a good practice and a tool{% elif LANGUAGE_CODE == 'es' %}Conozca la diferencia entre una buena práctica y una herramienta{% else %}Entenda a diferença entre boa prática e ferramenta{% endif %}"><span aria-hidden="true">i</span></summary>
+            <div>
+                {% if LANGUAGE_CODE == 'en' %}
+                    <p>A good practice is an experience that has already been implemented and whose results and lessons can be shared and potentially replicated by other SAIs. Examples include coordinated audits or public-policy evaluations.</p>
+                    <p>A tool is an instrument that supports SAIs in implementing their activities, strengthening capacities and improving audit processes. Examples include training, studies and research, digital platforms, methodologies and guides.</p>
+                {% elif LANGUAGE_CODE == 'es' %}
+                    <p>Una buena práctica es una experiencia ya implementada, cuyos resultados y aprendizajes pueden compartirse y ser potencialmente replicados por otras EFS. Algunos ejemplos son las auditorías coordinadas o las evaluaciones de políticas públicas.</p>
+                    <p>Una herramienta es un instrumento que apoya a las EFS en la implementación de sus actividades, fortaleciendo capacidades y mejorando los procesos de auditoría. Algunos ejemplos son capacitaciones, estudios e investigaciones, plataformas digitales, metodologías y guías.</p>
+                {% else %}
+                    <p>Uma boa prática é uma experiência já implementada, cujos resultados e aprendizados possam ser compartilhados e potencialmente replicados por outras EFS. São exemplos: auditorias coordenadas ou avaliações de políticas públicas.</p>
+                    <p>Uma ferramenta é um instrumento que apoia as EFS na implementação de suas atividades, fortalecendo capacidades e aprimorando processos de auditoria. São exemplos: capacitações e treinamentos, estudos e pesquisas, plataformas digitais, metodologias, guias, entre outros.</p>
+                {% endif %}
+            </div>
+        </details>
+    </div>
+    {% if escolha_invalida %}<p class="alert alert-danger" role="alert">{% if LANGUAGE_CODE == 'en' %}Choose one of the valid content types.{% elif LANGUAGE_CODE == 'es' %}Seleccione uno de los tipos de contenido válidos.{% else %}Escolha um dos tipos de conteúdo válidos.{% endif %}</p>{% endif %}
+    <div class="submission-choice-grid">
+        <a class="submission-choice-card" href="{% url 'adicionar_boa_pratica' %}?tipo=boa_pratica"><strong>{% if LANGUAGE_CODE == 'en' %}Good practice{% elif LANGUAGE_CODE == 'es' %}Buena práctica{% else %}Boa prática{% endif %}</strong></a>
+        <a class="submission-choice-card" href="{% url 'adicionar_boa_pratica' %}?tipo=ferramenta"><strong>{% if LANGUAGE_CODE == 'en' %}Tool{% elif LANGUAGE_CODE == 'es' %}Herramienta{% else %}Ferramenta{% endif %}</strong></a>
+    </div>
+</section>
+{% endblock %}

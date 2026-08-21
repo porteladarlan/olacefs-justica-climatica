@@ -1,8 +1,9 @@
 {% extends 'praticas/base.html' %}
-{% load i18n %}
+{% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Request edit{% elif LANGUAGE_CODE == 'es' %}Solicitar edici&oacute;n{% else %}Solicitar edi&ccedil;&atilde;o{% endif %} | Plataforma Regional{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/envio-pratica.css' %}">{% endblock %}
 
 {% block content %}
 <section class="mb-4">
@@ -37,7 +38,7 @@
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name != "comentario_autor" %}
-                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' or field.name == 'objetivo' or field.name == 'resultados' or field.name == 'recomendacoes' or field.name == 'replicabilidade' or field.name == 'perguntas_chave' or field.name == 'criterios_utilizados' or field.name == 'metodologia' or field.name == 'ferramentas_utilizadas' or field.name == 'informacoes_adicionais' %}col-12{% endif %}">
+                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' or field.name == 'objetivo' or field.name == 'resultados' or field.name == 'recomendacoes' or field.name == 'replicabilidade' or field.name == 'perguntas_chave' or field.name == 'criterios_utilizados' or field.name == 'metodologia' or field.name == 'ferramentas_utilizadas' or field.name == 'informacoes_adicionais' %}col-12{% endif %}"{% if field.name == 'perguntas_chave' %} data-evaluation-only{% elif field.name == 'tipo_auditoria' %} data-audit-only{% elif field.name == 'outras_efs_envolvidas' or field.name == 'paises_participantes' %} data-coordinated-field{% endif %}>
                         <label class="form-label fw-semibold">{{ field.label }}</label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
@@ -45,6 +46,11 @@
                     </div>
                     {% endif %}
                 {% endfor %}
+                <div class="col-12 audit-questions" data-audit-only data-audit-questions data-question-label="{% if LANGUAGE_CODE == 'en' %}Question{% elif LANGUAGE_CODE == 'es' %}Pregunta{% else %}Pergunta{% endif %}" data-remove-label="{% if LANGUAGE_CODE == 'en' %}Remove question{% elif LANGUAGE_CODE == 'es' %}Eliminar pregunta{% else %}Remover pergunta{% endif %}">
+                    <h3>{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditoría{% else %}Perguntas de auditoria{% endif %}</h3>
+                    <div data-question-list>{% for pergunta in perguntas_auditoria %}<div class="audit-question-row" data-question-row><label for="id_pergunta_auditoria_{{ forloop.counter }}"><span data-question-number>{% if LANGUAGE_CODE == 'en' %}Question{% elif LANGUAGE_CODE == 'es' %}Pregunta{% else %}Pergunta{% endif %} {{ forloop.counter }}</span></label><div class="audit-question-control"><textarea class="form-control" rows="3" maxlength="2000" id="id_pergunta_auditoria_{{ forloop.counter }}" name="perguntas_auditoria">{{ pergunta }}</textarea><button class="btn btn-outline-secondary audit-question-remove" type="button" data-remove-question aria-label="{% if LANGUAGE_CODE == 'en' %}Remove question {{ forloop.counter }}{% elif LANGUAGE_CODE == 'es' %}Eliminar pregunta {{ forloop.counter }}{% else %}Remover pergunta {{ forloop.counter }}{% endif %}">&times;</button></div></div>{% endfor %}</div>
+                    <button class="btn btn-outline-primary" type="button" data-add-question>{% if LANGUAGE_CODE == 'en' %}Add more questions{% elif LANGUAGE_CODE == 'es' %}Agregar más preguntas{% else %}Adicionar mais perguntas{% endif %}</button>
+                </div>
             </div>
         </div>
     </div>
@@ -55,3 +61,4 @@
     </div>
 </form>
 {% endblock %}
+{% block extra_js %}<script src="{% static 'praticas/js/submissao-conteudo.js' %}" defer></script>{% endblock %}

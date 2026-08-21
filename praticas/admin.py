@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .forms import AnexoAdminForm, NormaInternacionalAdminForm
+from .forms import AnexoAdminForm, ExperienciaAdminForm, NormaInternacionalAdminForm
 from .models import (
     Anexo,
     AtribuicaoPapelVinculo,
@@ -13,6 +13,7 @@ from .models import (
     Ferramenta,
     EixoGuia,
     PerguntaGuia,
+    PerguntaAuditoria,
     ReferenciaGuia,
     SetorGuia,
     SubareaGuia,
@@ -56,15 +57,15 @@ class EFSAdmin(admin.ModelAdmin):
 
 @admin.register(TipoExperiencia)
 class TipoExperienciaAdmin(admin.ModelAdmin):
-    list_display = ("nome", "nome_es", "nome_en")
-    search_fields = ("nome", "nome_es", "nome_en")
+    list_display = ("codigo", "nome", "nome_es", "nome_en")
+    search_fields = ("codigo", "nome", "nome_es", "nome_en")
     ordering = ("nome",)
 
 
 @admin.register(Setor)
 class SetorAdmin(admin.ModelAdmin):
-    list_display = ("nome", "nome_es", "nome_en")
-    search_fields = ("nome", "nome_es", "nome_en")
+    list_display = ("codigo", "nome", "nome_es", "nome_en")
+    search_fields = ("codigo", "nome", "nome_es", "nome_en")
     ordering = ("nome",)
 
 
@@ -111,13 +112,22 @@ class AnexoInline(admin.TabularInline):
     fields = ("titulo", "titulo_es", "titulo_en", "arquivo", "url_externa")
 
 
+class PerguntaAuditoriaInline(admin.TabularInline):
+    model = PerguntaAuditoria
+    extra = 0
+    fields = ("ordem", "texto")
+    ordering = ("ordem",)
+
+
 @admin.register(Experiencia)
 class ExperienciaAdmin(admin.ModelAdmin):
+    form = ExperienciaAdminForm
     list_display = (
         "titulo",
         "pais",
         "efs",
         "tipo_experiencia",
+        "tipo_auditoria",
         "setor",
         "ano_execucao",
         "status_publicacao",
@@ -131,6 +141,7 @@ class ExperienciaAdmin(admin.ModelAdmin):
         "pais",
         "efs",
         "tipo_experiencia",
+        "tipo_auditoria",
         "setor",
         "temas_transversais",
         "normas_internacionais",
@@ -158,13 +169,14 @@ class ExperienciaAdmin(admin.ModelAdmin):
     autocomplete_fields = ("pais", "efs", "tipo_experiencia", "setor")
     filter_horizontal = (
         "efs_participantes",
+        "paises_participantes",
         "temas_transversais",
         "normas_internacionais",
         "dimensoes_consideradas",
         "grupos_vulneraveis",
     )
     readonly_fields = ("criado_em", "atualizado_em")
-    inlines = [AnexoInline]
+    inlines = [PerguntaAuditoriaInline, AnexoInline]
     date_hierarchy = "criado_em"
     list_per_page = 20
 
@@ -200,10 +212,13 @@ class BancoTecnicoAdmin(admin.ModelAdmin):
 class FerramentaAdmin(admin.ModelAdmin):
     list_display = (
         "ordem",
-        "titulo_es",
+        "titulo_exibicao",
+        "idioma_submissao",
         "setor",
         "responsavel",
         "periodo",
+        "ano",
+        "pais_ou_instancia",
         "situacao",
     )
     list_filter = ("situacao", "setor")
@@ -216,6 +231,8 @@ class FerramentaAdmin(admin.ModelAdmin):
         "descricao_es",
         "descricao_en",
         "responsavel",
+        "pais_ou_instancia",
+        "autor__username",
         "setor__nome",
         "setor__nome_es",
         "setor__nome_en",

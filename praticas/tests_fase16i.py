@@ -254,7 +254,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
             with self.subTest(idioma=idioma):
                 with translation.override(idioma):
                     url = reverse("adicionar_boa_pratica")
-                resposta = self.client.get(url)
+                resposta = self.client.get(f"{url}?tipo=boa_pratica")
                 self.assertEqual(resposta.status_code, 200)
                 self.assertContains(resposta, label)
                 self.assertContains(resposta, ajuda)

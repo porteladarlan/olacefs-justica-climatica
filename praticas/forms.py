@@ -5,13 +5,18 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
     UserCreationForm,
 )
+from django.db.models import Q
 from django.utils.translation import get_language
 
 from .models import (
     Anexo,
     Experiencia,
+    Ferramenta,
     NormaInternacional,
+    SETORES_OFICIAIS_CODIGOS,
+    TIPOS_BOA_PRATICA_OFICIAIS,
     PropostaEdicaoExperiencia,
+    Setor,
 )
 from .uploads import validar_anexo_upload, validar_ficha_tecnica_upload
 
@@ -163,6 +168,11 @@ EXPERIENCIA_LABELS = {
         "es": "País",
         "en": "Country",
     },
+    "paises_participantes": {
+        "pt": "Demais países envolvidos",
+        "es": "Demás países involucrados",
+        "en": "Other countries involved",
+    },
     "titulo": {
         "pt": "Nome da boa prática / iniciativa",
         "es": "Nombre de la buena práctica / iniciativa",
@@ -172,6 +182,16 @@ EXPERIENCIA_LABELS = {
         "pt": "Tipo de boa prática",
         "es": "Tipo de buena práctica",
         "en": "Type of good practice",
+    },
+    "tipo_auditoria": {
+        "pt": "Tipo de auditoria",
+        "es": "Tipo de auditoría",
+        "en": "Type of audit",
+    },
+    "outras_efs_envolvidas": {
+        "pt": "Em caso de auditoria coordenada, liste as demais EFS envolvidas",
+        "es": "En caso de auditoría coordinada, indique las demás EFS involucradas",
+        "en": "For a coordinated audit, list the other SAIs involved",
     },
     "setor": {
         "pt": "Setor",
@@ -261,6 +281,21 @@ EXPERIENCIA_LABELS = {
 }
 
 EXPERIENCIA_HELP_TEXTS = {
+    "pais": {
+        "pt": "Em caso de auditoria coordenada, escolha o país líder.",
+        "es": "En caso de auditoría coordinada, seleccione el país líder.",
+        "en": "For a coordinated audit, select the lead country.",
+    },
+    "efs": {
+        "pt": "Em caso de auditoria coordenada, escolha a EFS líder.",
+        "es": "En caso de auditoría coordinada, seleccione la EFS líder.",
+        "en": "For a coordinated audit, select the lead SAI.",
+    },
+    "paises_participantes": {
+        "pt": "Não repita o país líder nesta lista.",
+        "es": "No repita el país líder en esta lista.",
+        "en": "Do not repeat the lead country in this list.",
+    },
     "descricao": {
         "pt": "Inclua uma descrição objetiva, suficiente para que outra EFS entenda o que foi feito.",
         "es": "Incluya una descripción objetiva, suficiente para que otra EFS entienda lo que se hizo.",
@@ -329,30 +364,26 @@ def aplicar_textos_experiencia(form):
             form.fields[campo].help_text = traducoes[idioma]
 
 
+class TipoExperienciaSelect(forms.Select):
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        instancia = getattr(value, "instance", None)
+        if instancia is not None:
+            option["attrs"]["data-tipo-codigo"] = instancia.codigo or ""
+        return option
+
+
 class ExperienciaSubmissaoForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Fase 16K: manter apenas e-mail no formulario publico de envio.
-        # O campo legado contato_referencia pode continuar no modelo/banco,
-        # mas nao deve ser exibido nem validado no formulario publico.
-        self.fields.pop("contato_referencia", None)
-
-        if "email_contato" in self.fields:
-            self.fields["email_contato"].label = "E-mail"
-            self.fields["email_contato"].help_text = (
-                "Provide the institutional e-mail to track the submission "
-                "and receive review guidance."
-            )
-
     class Meta:
         model = Experiencia
         fields = [
             "efs",
             "pais",
+            "paises_participantes",
             "titulo",
             "tipo_experiencia",
+            "tipo_auditoria",
+            "outras_efs_envolvidas",
             "setor",
             "temas_transversais",
             "normas_internacionais",
@@ -374,8 +405,13 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
         widgets = {
             "efs": forms.Select(attrs={"class": "form-select"}),
             "pais": forms.Select(attrs={"class": "form-select"}),
+            "paises_participantes": forms.CheckboxSelectMultiple(),
             "titulo": forms.TextInput(attrs={"class": "form-control"}),
-            "tipo_experiencia": forms.Select(attrs={"class": "form-select"}),
+            "tipo_experiencia": TipoExperienciaSelect(attrs={"class": "form-select"}),
+            "tipo_auditoria": forms.Select(attrs={"class": "form-select"}),
+            "outras_efs_envolvidas": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3}
+            ),
             "setor": forms.Select(attrs={"class": "form-select"}),
             "temas_transversais": forms.CheckboxSelectMultiple(),
             "normas_internacionais": forms.CheckboxSelectMultiple(),
@@ -384,7 +420,9 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "descricao": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
             "enfoque_justica_climatica": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
             "objetivo": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "perguntas_chave": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "perguntas_chave": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3}
+            ),
             "criterios_utilizados": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "metodologia": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "ferramentas_utilizadas": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
@@ -400,8 +438,146 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         aplicar_textos_experiencia(self)
 
+        tipo_atual = self.instance.tipo_experiencia_id if self.instance.pk else None
+        setor_atual = self.instance.setor_id if self.instance.pk else None
+        if self.fields["tipo_experiencia"].queryset.filter(
+            codigo__in=TIPOS_BOA_PRATICA_OFICIAIS
+        ).exists():
+            filtro_tipos = Q(codigo__in=TIPOS_BOA_PRATICA_OFICIAIS)
+        else:
+            filtro_tipos = Q()
+        if self.fields["setor"].queryset.filter(
+            codigo__in=SETORES_OFICIAIS_CODIGOS
+        ).exists():
+            filtro_setores = Q(codigo__in=SETORES_OFICIAIS_CODIGOS)
+        else:
+            filtro_setores = Q()
+        if tipo_atual:
+            filtro_tipos |= Q(pk=tipo_atual)
+        if setor_atual:
+            filtro_setores |= Q(pk=setor_atual)
+        self.fields["tipo_experiencia"].queryset = (
+            self.fields["tipo_experiencia"].queryset.filter(filtro_tipos).distinct()
+        )
+        self.fields["setor"].queryset = (
+            self.fields["setor"].queryset.filter(filtro_setores).distinct()
+        )
+        self.fields["tipo_auditoria"].choices = [
+            ("", "---------"),
+            (
+                Experiencia.TipoAuditoria.DESEMPENHO,
+                texto_idioma("Desempenho", "Desempeño", "Performance"),
+            ),
+            (
+                Experiencia.TipoAuditoria.CUMPRIMENTO,
+                texto_idioma("Cumprimento", "Cumplimiento", "Compliance"),
+            ),
+            (
+                Experiencia.TipoAuditoria.FINANCEIRA,
+                texto_idioma("Financeira", "Financiera", "Financial"),
+            ),
+        ]
+
+        if self.is_bound:
+            self.perguntas_auditoria_valores = self.data.getlist(
+                "perguntas_auditoria"
+            )
+        elif self.instance.pk:
+            self.perguntas_auditoria_valores = list(
+                self.instance.perguntas_auditoria.order_by("ordem").values_list(
+                    "texto", flat=True
+                )
+            )
+        else:
+            self.perguntas_auditoria_valores = [""]
+        if not self.perguntas_auditoria_valores:
+            self.perguntas_auditoria_valores = [""]
+        self.perguntas_auditoria_limpas = []
+
     def clean(self):
         cleaned_data = super().clean()
+
+        tipo = cleaned_data.get("tipo_experiencia")
+        tipo_codigo = getattr(tipo, "codigo", None)
+        eh_auditoria = tipo_codigo in {"auditoria", "auditoria_coordenada"}
+        eh_coordenada = tipo_codigo == "auditoria_coordenada"
+        pais = cleaned_data.get("pais")
+        efs = cleaned_data.get("efs")
+        paises_participantes = cleaned_data.get("paises_participantes")
+
+        # O texto legado continua editável apenas para avaliação de política
+        # pública. Auditorias usam PerguntaAuditoria e nunca podem apagar ou
+        # sobrescrever um histórico já armazenado neste campo.
+        if eh_auditoria:
+            cleaned_data["perguntas_chave"] = (
+                self.instance.perguntas_chave if self.instance.pk else ""
+            )
+
+        if pais and efs and efs.pais_id != pais.pk:
+            self.add_error(
+                "efs",
+                texto_idioma(
+                    "A EFS líder deve pertencer ao país líder selecionado.",
+                    "La EFS líder debe pertenecer al país líder seleccionado.",
+                    "The lead SAI must belong to the selected lead country.",
+                ),
+            )
+        if pais and paises_participantes and paises_participantes.filter(pk=pais.pk).exists():
+            self.add_error(
+                "paises_participantes",
+                texto_idioma(
+                    "O país líder não pode ser repetido entre os participantes.",
+                    "El país líder no puede repetirse entre los participantes.",
+                    "The lead country cannot be repeated among participants.",
+                ),
+            )
+        if not eh_coordenada and (
+            cleaned_data.get("outras_efs_envolvidas") or paises_participantes
+        ):
+            mensagem = texto_idioma(
+                "Esses dados só podem ser informados para auditoria coordenada.",
+                "Estos datos solo pueden informarse para una auditoría coordinada.",
+                "These data may only be provided for a coordinated audit.",
+            )
+            if cleaned_data.get("outras_efs_envolvidas"):
+                self.add_error("outras_efs_envolvidas", mensagem)
+            if paises_participantes:
+                self.add_error("paises_participantes", mensagem)
+        if not eh_auditoria and cleaned_data.get("tipo_auditoria"):
+            self.add_error(
+                "tipo_auditoria",
+                texto_idioma(
+                    "Tipo de auditoria não se aplica a esta categoria.",
+                    "El tipo de auditoría no se aplica a esta categoría.",
+                    "Audit type does not apply to this category.",
+                ),
+            )
+
+        for indice, valor in enumerate(self.perguntas_auditoria_valores, start=1):
+            texto = valor.strip()
+            if not texto:
+                continue
+            if len(texto) > 2000:
+                self.add_error(
+                    None,
+                    texto_idioma(
+                        f"A pergunta {indice} excede 2.000 caracteres.",
+                        f"La pregunta {indice} supera los 2.000 caracteres.",
+                        f"Question {indice} exceeds 2,000 characters.",
+                    ),
+                )
+                continue
+            self.perguntas_auditoria_limpas.append(texto)
+
+        if not eh_auditoria and self.perguntas_auditoria_limpas:
+            self.add_error(
+                None,
+                texto_idioma(
+                    "Perguntas de auditoria só podem ser informadas para categorias de auditoria.",
+                    "Las preguntas de auditoría solo pueden informarse para categorías de auditoría.",
+                    "Audit questions may only be provided for audit categories.",
+                ),
+            )
 
         if not self.obrigatorio_para_envio:
             return cleaned_data
@@ -427,6 +603,15 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
                         "Required field to submit the good practice.",
                     ),
                 )
+        if eh_auditoria and not cleaned_data.get("tipo_auditoria"):
+            self.add_error(
+                "tipo_auditoria",
+                texto_idioma(
+                    "Campo obrigatório para categorias de auditoria.",
+                    "Campo obligatorio para categorías de auditoría.",
+                    "Required field for audit categories.",
+                ),
+            )
         if not cleaned_data.get("temas_transversais"):
             self.add_error(
                 "temas_transversais",
@@ -445,6 +630,61 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
                     "Select at least one international standard.",
                 ),
             )
+        return cleaned_data
+
+
+class FerramentaSubmissaoForm(forms.Form):
+    nome = forms.CharField(max_length=220)
+    ano = forms.IntegerField(min_value=1900, max_value=2100)
+    descricao = forms.CharField(widget=forms.Textarea(attrs={"rows": 5}))
+    setor = forms.ModelChoiceField(queryset=Setor.objects.none())
+    link_acesso = forms.URLField(max_length=500)
+    pais_ou_instancia = forms.CharField(max_length=255)
+
+    def __init__(self, *args, obrigatorio_para_envio=True, **kwargs):
+        self.obrigatorio_para_envio = obrigatorio_para_envio
+        super().__init__(*args, **kwargs)
+        setores = Setor.objects.all()
+        if setores.filter(codigo__in=SETORES_OFICIAIS_CODIGOS).exists():
+            setores = setores.filter(codigo__in=SETORES_OFICIAIS_CODIGOS)
+        self.fields["setor"].queryset = setores.order_by("nome")
+        textos = {
+            "nome": ("Nome", "Nombre", "Name"),
+            "ano": ("Ano", "Año", "Year"),
+            "descricao": ("Descrição", "Descripción", "Description"),
+            "setor": ("Setor", "Sector", "Sector"),
+            "link_acesso": ("Link de acesso", "Enlace de acceso", "Access link"),
+            "pais_ou_instancia": (
+                "País ou Instância",
+                "País o Instancia",
+                "Country or Body",
+            ),
+        }
+        for nome, (pt, es, en) in textos.items():
+            self.fields[nome].label = texto_idioma(pt, es, en)
+            classe = "form-select" if nome == "setor" else "form-control"
+            self.fields[nome].widget.attrs.setdefault("class", classe)
+            if not obrigatorio_para_envio:
+                self.fields[nome].required = False
+        self.fields["pais_ou_instancia"].help_text = texto_idioma(
+            "Instância OLACEFS pode ser uma comissão, grupo de trabalho ou outra instância da organização relacionada à iniciativa.",
+            "Una instancia de la OLACEFS puede ser una comisión, un grupo de trabajo u otra instancia de la organización relacionada con la iniciativa.",
+            "An OLACEFS body may be a commission, working group or another organizational body related to the initiative.",
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.obrigatorio_para_envio:
+            for nome in self.fields:
+                if not cleaned_data.get(nome):
+                    self.add_error(
+                        nome,
+                        texto_idioma(
+                            "Campo obrigatório para envio da ferramenta.",
+                            "Campo obligatorio para enviar la herramienta.",
+                            "Required field to submit the tool.",
+                        ),
+                    )
         return cleaned_data
 
 
@@ -490,6 +730,43 @@ class AnexoSubmissaoForm(forms.ModelForm):
 class AnexoAdminForm(AnexoSubmissaoForm):
     class Meta(AnexoSubmissaoForm.Meta):
         fields = "__all__"
+
+
+class ExperienciaAdminForm(forms.ModelForm):
+    class Meta:
+        model = Experiencia
+        fields = "__all__"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo = cleaned_data.get("tipo_experiencia")
+        tipo_codigo = getattr(tipo, "codigo", None)
+        pais = cleaned_data.get("pais")
+        paises_participantes = cleaned_data.get("paises_participantes")
+
+        if tipo_codigo in {"auditoria", "auditoria_coordenada"}:
+            valor_historico = self.instance.perguntas_chave if self.instance.pk else ""
+            if cleaned_data.get("perguntas_chave", "") != valor_historico:
+                self.add_error(
+                    "perguntas_chave",
+                    "Auditorias usam perguntas estruturadas; o texto legado não pode ser alterado.",
+                )
+
+        if paises_participantes and tipo_codigo != "auditoria_coordenada":
+            self.add_error(
+                "paises_participantes",
+                "Países participantes só podem ser informados em auditoria coordenada.",
+            )
+        if (
+            pais
+            and paises_participantes
+            and paises_participantes.filter(pk=pais.pk).exists()
+        ):
+            self.add_error(
+                "paises_participantes",
+                "O país líder não pode ser repetido entre os países participantes.",
+            )
+        return cleaned_data
 
 
 class NormaInternacionalAdminForm(forms.ModelForm):

@@ -71,7 +71,7 @@
 .library-heading p {
     margin: 0;
     color: var(--text-soft);
-    font-size: 15.5px;
+    font-size: 17px;
     line-height: 1.55;
 }
 
@@ -303,7 +303,7 @@
 .library-card > p {
     margin: 0;
     color: var(--text-soft);
-    font-size: 13px;
+    font-size: 17px;
     line-height: 1.55;
 }
 
@@ -371,7 +371,7 @@
 
 .library-empty p {
     margin: 0;
-    font-size: 13px;
+    font-size: 17px;
 }
 
 .norm-dialog {
@@ -407,7 +407,7 @@
 .norm-dialog-content > p {
     margin: 0 0 16px;
     color: var(--text);
-    font-size: 14.5px;
+    font-size: 17px;
     line-height: 1.72;
 }
 

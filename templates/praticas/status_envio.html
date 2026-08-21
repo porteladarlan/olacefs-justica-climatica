@@ -31,5 +31,10 @@
         <h2 id="status-edit-request-list-title">{% if LANGUAGE_CODE == 'en' %}Edit requests for published content{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n de contenidos publicados{% else %}Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o de conte&uacute;dos publicados{% endif %}</h2>
         {% include 'praticas/includes/lista_propostas_edicao_conta.html' %}
     </section>
+
+    <section class="workspace-section" aria-labelledby="tool-status-list-title">
+        <h2 id="tool-status-list-title">{% if LANGUAGE_CODE == 'en' %}Tool submissions{% elif LANGUAGE_CODE == 'es' %}Envíos de herramientas{% else %}Envios de ferramentas{% endif %}</h2>
+        {% include 'praticas/includes/lista_ferramentas_conta.html' %}
+    </section>
 </div>
 {% endblock %}

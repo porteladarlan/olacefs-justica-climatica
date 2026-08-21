@@ -9,13 +9,13 @@ class AjustesNegociaisHome20260806Tests(TestCase):
 
         self.assertContains(
             resposta,
-            "Palavras das Presid&ecirc;ncias da COMTEMA e da CGID",
+            "Palavras das Presid&ecirc;ncias da CGID e da COMTEMA",
         )
 
         self.assertContains(
             resposta,
-            "a Plataforma promove um canal para o intercambio de boas "
-            "pr&aacute;ticas e visualiza&ccedil;&atilde;o de normas e "
+            "a Plataforma de Justi&ccedil;a Clim&aacute;tica oferece um canal "
+            "para o interc&acirc;mbio de boas pr&aacute;ticas e visualiza&ccedil;&atilde;o de normas e "
             "ferramentas de auditoria",
         )
 

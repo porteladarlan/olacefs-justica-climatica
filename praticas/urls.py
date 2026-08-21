@@ -73,6 +73,7 @@ urlpatterns = [
     path("excluir-boa-pratica/<int:pk>/", views.excluir_boa_pratica, name="excluir_boa_pratica"),
     path("normas-internacionais/", views.normas_internacionais, name="normas_internacionais"),
     path("adicionar-boa-pratica/", views.adicionar_boa_pratica, name="adicionar_boa_pratica"),
+    path("editar-ferramenta/<int:pk>/", views.editar_ferramenta, name="editar_ferramenta"),
     path("editar-boa-pratica/<int:pk>/", views.editar_boa_pratica, name="editar_boa_pratica"),
     path("solicitar-edicao-publicada/<int:pk>/", views.solicitar_edicao_publicada, name="solicitar_edicao_publicada"),
     path("envio-confirmado/", views.confirmacao_envio, name="confirmacao_envio"),

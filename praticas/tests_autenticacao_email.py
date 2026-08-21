@@ -458,6 +458,13 @@ class ConfirmacaoEmailPendenteMigrationTests(TransactionTestCase):
     migrate_from = ("praticas", "0015_lote2_marcos_normativos")
     migrate_to = ("praticas", "0016_confirmacao_email_pendente")
 
+    def tearDown(self):
+        # O teste exercita deliberadamente um estado histórico. Restaure todas as
+        # migrations-folha para que novos campos não desapareçam dos testes seguintes.
+        executor = MigrationExecutor(connection)
+        executor.migrate(executor.loader.graph.leaf_nodes())
+        super().tearDown()
+
     def test_migration_preserva_estado_das_contas_existentes_sem_criar_pendencias(self):
         executor = MigrationExecutor(connection)
         executor.migrate([self.migrate_from])

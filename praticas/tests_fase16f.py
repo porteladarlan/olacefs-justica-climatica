@@ -56,7 +56,7 @@ class Fase16FRetroalimentacaoTests(TestCase):
     def test_tela_envio_renderiza_campo_final(self):
         user = User.objects.create_user(username="autor", password="Teste@123", email="autor@efs.org")
         self.client.force_login(user)
-        resposta = self.client.get("/adicionar-boa-pratica/")
+        resposta = self.client.get("/adicionar-boa-pratica/?tipo=boa_pratica")
         self.assertEqual(resposta.status_code, 200)
         self.assertContains(resposta, "Informações adicionais")
         self.assertContains(resposta, 'name="informacoes_adicionais"')

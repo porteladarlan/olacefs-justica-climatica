@@ -7,6 +7,27 @@ from django.db import models, transaction
 from django.utils.translation import get_language
 
 
+SETORES_OFICIAIS_CODIGOS = (
+    "agua_energia",
+    "infraestrutura",
+    "biodiversidade_ecossistemas",
+    "saude",
+    "alimentacao_agricultura",
+    "industria_extrativa",
+    "gestao_risco_desastres",
+    "genero_direitos_humanos",
+    "outro",
+    "pobreza_desigualdade",
+    "transversal",
+)
+
+TIPOS_BOA_PRATICA_OFICIAIS = (
+    "auditoria",
+    "auditoria_coordenada",
+    "avaliacao_politica_publica",
+)
+
+
 def idioma_atual():
     return (get_language() or "pt-br").lower()
 
@@ -26,7 +47,9 @@ def texto_por_idioma_com_fallback_es(texto_es, texto_pt="", texto_en=""):
         return texto_en
     if idioma.startswith("pt") and texto_pt:
         return texto_pt
-    return texto_es
+    if idioma.startswith("es") and texto_es:
+        return texto_es
+    return texto_es or texto_pt or texto_en
 
 
 class Pais(models.Model):
@@ -71,6 +94,13 @@ class EFS(models.Model):
 
 
 class TipoExperiencia(models.Model):
+    codigo = models.SlugField(
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
     nome = models.CharField(max_length=120, unique=True)
     nome_es = models.CharField(max_length=120, blank=True)
     nome_en = models.CharField(max_length=120, blank=True)
@@ -89,6 +119,13 @@ class TipoExperiencia(models.Model):
 
 
 class Setor(models.Model):
+    codigo = models.SlugField(
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
     nome = models.CharField(max_length=120, unique=True)
     nome_es = models.CharField(max_length=120, blank=True)
     nome_en = models.CharField(max_length=120, blank=True)
@@ -247,6 +284,11 @@ class Experiencia(models.Model):
         PUBLICADO = "publicado", "Publicado"
         REJEITADO = "rejeitado", "Rejeitado"
 
+    class TipoAuditoria(models.TextChoices):
+        DESEMPENHO = "desempenho", "Desempenho"
+        CUMPRIMENTO = "cumprimento", "Cumprimento"
+        FINANCEIRA = "financeira", "Financeira"
+
     autor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -271,7 +313,23 @@ class Experiencia(models.Model):
         ),
     )
     pais = models.ForeignKey(Pais, on_delete=models.PROTECT, related_name="experiencias")
+    paises_participantes = models.ManyToManyField(
+        Pais,
+        blank=True,
+        related_name="experiencias_como_pais_participante",
+        verbose_name="Países adicionais participantes",
+        help_text=(
+            "Selecione somente os países participantes adicionais; "
+            "o país líder permanece no campo País."
+        ),
+    )
     tipo_experiencia = models.ForeignKey(TipoExperiencia, on_delete=models.PROTECT, related_name="experiencias")
+    tipo_auditoria = models.CharField(
+        max_length=20,
+        choices=TipoAuditoria.choices,
+        blank=True,
+    )
+    outras_efs_envolvidas = models.TextField(blank=True)
     ano_execucao = models.PositiveIntegerField()
     status_iniciativa = models.CharField(max_length=30, choices=StatusIniciativa.choices, default=StatusIniciativa.CONCLUIDA)
     setor = models.ForeignKey(Setor, on_delete=models.PROTECT, related_name="experiencias")
@@ -408,6 +466,36 @@ class Experiencia(models.Model):
     def __str__(self):
         return self.titulo_exibicao
 
+    def clean(self):
+        super().clean()
+        erros = {}
+        tipo_codigo = getattr(self.tipo_experiencia, "codigo", None)
+        eh_auditoria = tipo_codigo in {"auditoria", "auditoria_coordenada"}
+        eh_coordenada = tipo_codigo == "auditoria_coordenada"
+
+        if self.efs_id and self.pais_id and self.efs.pais_id != self.pais_id:
+            erros["efs"] = "A EFS líder deve pertencer ao país líder selecionado."
+        if (
+            eh_auditoria
+            and self.status_publicacao != self.StatusPublicacao.RASCUNHO
+            and not self.tipo_auditoria
+        ):
+            erros["tipo_auditoria"] = "Informe o tipo de auditoria."
+        if not eh_auditoria and self.tipo_auditoria:
+            erros["tipo_auditoria"] = (
+                "Tipo de auditoria só pode ser informado para categorias de auditoria."
+            )
+        if not eh_coordenada and self.outras_efs_envolvidas:
+            erros["outras_efs_envolvidas"] = (
+                "Demais EFS envolvidas só podem ser informadas em auditoria coordenada."
+            )
+        if self.pk and self.pais_id and self.paises_participantes.filter(pk=self.pais_id).exists():
+            erros["paises_participantes"] = (
+                "O país líder não pode ser repetido entre os países participantes."
+            )
+        if erros:
+            raise ValidationError(erros)
+
     @property
     def titulo_exibicao(self):
         return texto_por_idioma(self.titulo, self.titulo_es, self.titulo_en)
@@ -415,6 +503,16 @@ class Experiencia(models.Model):
     @property
     def descricao_exibicao(self):
         return texto_por_idioma(self.descricao, self.descricao_es, self.descricao_en)
+
+    @property
+    def tipo_auditoria_exibicao(self):
+        traducoes = {
+            self.TipoAuditoria.DESEMPENHO: ("Desempenho", "Desempeño", "Performance"),
+            self.TipoAuditoria.CUMPRIMENTO: ("Cumprimento", "Cumplimiento", "Compliance"),
+            self.TipoAuditoria.FINANCEIRA: ("Financeira", "Financiera", "Financial"),
+        }
+        valores = traducoes.get(self.tipo_auditoria)
+        return texto_por_idioma(*valores) if valores else ""
 
     @property
     def problema_climatico_exibicao(self):
@@ -521,6 +619,34 @@ class Experiencia(models.Model):
         )
 
 
+class PerguntaAuditoria(models.Model):
+    experiencia = models.ForeignKey(
+        Experiencia,
+        on_delete=models.CASCADE,
+        related_name="perguntas_auditoria",
+    )
+    texto = models.TextField()
+    ordem = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name = "Pergunta de auditoria"
+        verbose_name_plural = "Perguntas de auditoria"
+        ordering = ["ordem", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["experiencia", "ordem"],
+                name="pergunta_auditoria_ordem_unica",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(ordem__gte=1),
+                name="pergunta_auditoria_ordem_positiva",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.experiencia}: {self.ordem}"
+
+
 class Anexo(models.Model):
     experiencia = models.ForeignKey(Experiencia, on_delete=models.CASCADE, related_name="anexos")
     titulo = models.CharField(max_length=200)
@@ -608,26 +734,51 @@ class BancoTecnico(models.Model):
 
 
 class Ferramenta(models.Model):
+    class IdiomaSubmissao(models.TextChoices):
+        PORTUGUES = "pt", "Português"
+        ESPANHOL = "es", "Español"
+        INGLES = "en", "English"
+
     class Situacao(models.TextChoices):
         RASCUNHO = "rascunho", "Rascunho"
+        ENVIADA = "enviada", "Enviada"
+        EM_REVISAO = "em_revisao", "Em revisão"
+        APROVADA = "aprovada", "Aprovada"
         PUBLICADA = "publicada", "Publicada"
+        REJEITADA = "rejeitada", "Rejeitada"
         ARQUIVADA = "arquivada", "Arquivada"
 
+    autor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ferramentas_enviadas",
+    )
     codigo = models.SlugField(max_length=160, unique=True)
     titulo = models.CharField(max_length=220, blank=True)
-    titulo_es = models.CharField(max_length=220)
+    titulo_es = models.CharField(max_length=220, blank=True)
     titulo_en = models.CharField(max_length=220, blank=True)
     descricao = models.TextField(blank=True)
-    descricao_es = models.TextField()
+    descricao_es = models.TextField(blank=True)
     descricao_en = models.TextField(blank=True)
-    responsavel = models.CharField(max_length=255)
-    periodo = models.CharField(max_length=30)
+    idioma_submissao = models.CharField(
+        max_length=5,
+        choices=IdiomaSubmissao.choices,
+        default=IdiomaSubmissao.ESPANHOL,
+    )
+    responsavel = models.CharField(max_length=255, blank=True)
+    periodo = models.CharField(max_length=30, blank=True)
+    ano = models.PositiveIntegerField(null=True, blank=True)
+    pais_ou_instancia = models.CharField(max_length=255, blank=True)
     setor = models.ForeignKey(
         Setor,
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="ferramentas",
     )
-    url = models.URLField(max_length=500)
+    url = models.URLField(max_length=500, blank=True)
     situacao = models.CharField(
         max_length=20,
         choices=Situacao.choices,
@@ -668,13 +819,53 @@ class Ferramenta(models.Model):
     def __str__(self):
         return self.titulo_exibicao
 
+    def clean(self):
+        super().clean()
+        if self.autor_id is None or self.situacao == self.Situacao.RASCUNHO:
+            return
+
+        estados_que_exigem_conteudo = {
+            self.Situacao.ENVIADA,
+            self.Situacao.EM_REVISAO,
+            self.Situacao.APROVADA,
+            self.Situacao.PUBLICADA,
+            self.Situacao.REJEITADA,
+        }
+        if self.situacao not in estados_que_exigem_conteudo:
+            return
+
+        campos_idioma = {
+            self.IdiomaSubmissao.PORTUGUES: ("titulo", "descricao"),
+            self.IdiomaSubmissao.ESPANHOL: ("titulo_es", "descricao_es"),
+            self.IdiomaSubmissao.INGLES: ("titulo_en", "descricao_en"),
+        }
+        campo_titulo, campo_descricao = campos_idioma.get(
+            self.idioma_submissao,
+            ("titulo_es", "descricao_es"),
+        )
+        obrigatorios = {
+            campo_titulo: getattr(self, campo_titulo),
+            "ano": self.ano,
+            campo_descricao: getattr(self, campo_descricao),
+            "setor": self.setor_id,
+            "url": self.url,
+            "pais_ou_instancia": self.pais_ou_instancia,
+        }
+        erros = {
+            campo: "Campo obrigatório para ferramenta de usuário fora do rascunho."
+            for campo, valor in obrigatorios.items()
+            if not valor
+        }
+        if erros:
+            raise ValidationError(erros)
+
     @property
     def titulo_exibicao(self):
         return texto_por_idioma_com_fallback_es(
             self.titulo_es,
             self.titulo,
             self.titulo_en,
-        )
+        ) or self.codigo
 
     @property
     def descricao_exibicao(self):
