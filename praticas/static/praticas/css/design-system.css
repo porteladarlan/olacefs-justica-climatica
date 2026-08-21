@@ -59,11 +59,11 @@
     --radius-md: var(--radius-sm);
 
     --font-size-hero-title: 44px;
-    --font-size-page-title: 30px;
-    --font-size-form-title: 28px;
-    --font-size-space-title: 26px;
+    --font-size-page-title: 32px;
+    --font-size-form-title: 30px;
+    --font-size-space-title: 30px;
     --font-size-card-title: 16px;
-    --font-size-body: 16px;
+    --font-size-body: 17px;
     --font-size-body-small: 13.5px;
     --font-size-eyebrow: 12px;
 }
@@ -142,9 +142,32 @@ textarea {
     line-height: 1.15;
 }
 
+.page-title {
+    margin: 8px 0 10px;
+    color: var(--purple);
+    font-size: var(--font-size-page-title);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+}
+
 .section-subtitle,
 .hero-subtitle {
     color: var(--text-soft);
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+.form-label,
+.form-check-label {
+    font-size: 14px;
+}
+
+.form-text,
+.helptext,
+small,
+.small {
+    font-size: 13px;
 }
 
 .btn {

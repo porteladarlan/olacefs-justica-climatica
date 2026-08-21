@@ -10,7 +10,7 @@
 <section class="page-hero mb-4">
     <div class="hero-content">
         <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Submission review{% elif LANGUAGE_CODE == 'es' %}Revisión del envío{% else %}Revisão de submissão{% endif %}</span>
-        <h1 class="hero-title">{{ experiencia.titulo_exibicao }}</h1>
+        <h1 class="page-title">{{ experiencia.titulo_exibicao }}</h1>
         <p class="hero-subtitle">
             {{ experiencia.efs.nome_exibicao }} &bull; {{ experiencia.pais.nome_exibicao }} &bull;
             {% if LANGUAGE_CODE == 'en' %}Current status{% elif LANGUAGE_CODE == 'es' %}Estado actual{% else %}Status atual{% endif %}:

@@ -8,7 +8,7 @@
 {% block content %}
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Edit before publication{% elif LANGUAGE_CODE == 'es' %}Editar antes de la publicaci&oacute;n{% else %}Editar antes da publica&ccedil;&atilde;o{% endif %}</div>
-    <h1 class="section-title display-6 mb-2">{{ experiencia.titulo_exibicao }}</h1>
+    <h1 class="page-title mb-2">{{ experiencia.titulo_exibicao }}</h1>
     <p class="section-subtitle">
         {% if LANGUAGE_CODE == 'en' %}
             Update the submission and send it again for review. You may also save it as a draft.

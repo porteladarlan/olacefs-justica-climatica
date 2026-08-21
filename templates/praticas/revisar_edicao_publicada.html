@@ -10,7 +10,7 @@
 <section class="page-hero mb-4">
     <div class="hero-content">
         <span class="hero-eyebrow">{% if LANGUAGE_CODE == 'en' %}Published edit proposal{% elif LANGUAGE_CODE == 'es' %}Propuesta de edici&oacute;n publicada{% else %}Proposta de edi&ccedil;&atilde;o publicada{% endif %}</span>
-        <h1 class="hero-title">{{ proposta.experiencia.titulo_exibicao }}</h1>
+        <h1 class="page-title">{{ proposta.experiencia.titulo_exibicao }}</h1>
         <p class="hero-subtitle">
             {% if LANGUAGE_CODE == 'en' %}Proposal status{% elif LANGUAGE_CODE == 'es' %}Estado de la propuesta{% else %}Status da proposta{% endif %}: {{ proposta.get_status_display }} &bull;
             {% if LANGUAGE_CODE == 'en' %}Author{% elif LANGUAGE_CODE == 'es' %}Autor{% else %}Autor{% endif %}: {{ proposta.email_contato }}

@@ -509,7 +509,11 @@ class RegressaoPublicaTests(TestCase):
                 self.assertIn("Ratificado", html_normas)
                 self.assertEqual(html_normas.count('href="https://example.org/fonte"'), 2)
                 self.assertEqual(html_normas.count('href="https://example.org/ficha"'), 2)
-                self.assertIn('class="library-compendium" type="button" disabled', html_normas)
+                self.assertIn('<p class="library-compendium-status">', html_normas)
+                self.assertNotIn('class="library-compendium"', html_normas)
+                self.assertNotIn("Baixar comp&ecirc;ndio em PDF", html_normas)
+                self.assertNotIn("Descargar compendio en PDF", html_normas)
+                self.assertNotIn("Download PDF compendium", html_normas)
                 self.assertNotIn("download=", html_normas)
                 normas_filtradas = self.client.get(
                     self._caminho(prefixo, "/normas-internacionais/"),

@@ -643,3 +643,21 @@ class HomePrimeiraEvolucaoTests(TestCase):
         pagina = response.content.decode("utf-8")
         self.assertIn('player.addEventListener("error"', pagina)
         self.assertIn("errorMessage.hidden = false;", pagina)
+
+    def test_refinamento_visual_remove_alturas_e_linhas_artificiais(self):
+        css = Path(finders.find("praticas/css/home.css")).read_text(
+            encoding="utf-8"
+        )
+        base = Path("templates/praticas/base.html").read_text(encoding="utf-8")
+
+        self.assertIn("align-items: start;", css)
+        self.assertRegex(
+            css,
+            r"\.home-design \.home-voice-quote\s*\{[^}]*font-size:\s*17px",
+        )
+        self.assertRegex(
+            css,
+            r"\.home-foundation-concept-layout \.home-foundation-strategies\s*\{"
+            r"[^}]*grid-template-rows:\s*none",
+        )
+        self.assertNotIn("min-height: 29rem", base)

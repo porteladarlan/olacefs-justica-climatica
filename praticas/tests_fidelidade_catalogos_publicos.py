@@ -1,4 +1,6 @@
 import html
+import re
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import finders
@@ -315,7 +317,7 @@ class FidelidadeCatalogosPublicosTests(TestCase):
                 self.assertNotContains(response, "Phase 2C")
                 self.assertNotContains(response, "publication or origin marker")
 
-    def test_compendio_indisponivel_tem_ajuda_visivel_trilingue(self):
+    def test_compendio_sem_pdf_real_exibe_apenas_status_institucional(self):
         casos = (
             ("/normas-internacionais/", "Comp&ecirc;ndio institucional em prepara&ccedil;&atilde;o."),
             ("/es/normas-internacionais/", "Compendio institucional en preparaci&oacute;n."),
@@ -325,12 +327,45 @@ class FidelidadeCatalogosPublicosTests(TestCase):
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
-                self.assertContains(response, 'class="library-compendium"')
-                self.assertContains(response, "disabled")
-                self.assertContains(response, 'aria-describedby="compendium-help"')
-                self.assertContains(response, 'class="library-compendium-help"')
+                rendered = response.content.decode()
+
+                self.assertContains(response, 'class="library-compendium-status"')
                 self.assertContains(response, texto, html=False)
+                self.assertNotRegex(
+                    rendered,
+                    r'<(?:a|button)[^>]*class="[^"]*library-compendium-status',
+                )
+                interactive_compendium = [
+                    match.group(0)
+                    for match in re.finditer(
+                        r"<(?P<tag>a|button)\b[^>]*>.*?</(?P=tag)>",
+                        rendered,
+                        flags=re.IGNORECASE | re.DOTALL,
+                    )
+                    if re.search(
+                        r"comp[eê]ndio|compendium", match.group(0), re.IGNORECASE
+                    )
+                ]
+                self.assertEqual(interactive_compendium, [])
+                self.assertNotContains(response, "Download PDF compendium")
+                self.assertNotContains(response, "Descargar compendio en PDF")
+                self.assertNotContains(
+                    response, "Baixar comp&ecirc;ndio em PDF", html=False
+                )
                 self.assertNotContains(response, "download=")
+
+    def test_toolbar_normativa_usa_grade_fluida_sem_larguras_fracionadas(self):
+        css = Path(finders.find("praticas/css/marcos-publicos.css")).read_text(
+            encoding="utf-8"
+        )
+        toolbar = css.split(".library-toolbar {", 1)[1].split("}", 1)[0]
+
+        self.assertIn("minmax(260px, 2fr)", toolbar)
+        self.assertIn("auto", toolbar)
+        self.assertNotIn("291.729187px", css)
+        self.assertIn(".library-compendium-status", css)
+        self.assertNotIn(".library-compendium {", css)
+        self.assertNotIn(".library-compendium-wrap", css)
 
     def test_assets_progressivos_dos_catalogos_existem(self):
         for asset in (

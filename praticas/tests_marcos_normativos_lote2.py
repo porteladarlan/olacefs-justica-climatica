@@ -222,16 +222,21 @@ class MarcosNormativosLote2Tests(TestCase):
                 self.assertIn(ficha, card)
                 self.assertIn(ficha, dialogo)
 
-    def test_compendio_sem_pdf_final_permanece_indisponivel(self):
+    def test_compendio_sem_pdf_final_exibe_status_nao_interativo(self):
         response = self.client.get(reverse("normas_internacionais"))
+        rendered = response.content.decode()
 
         self.assertContains(
             response,
-            "Comp&ecirc;ndio institucional em prepara&ccedil;&atilde;o",
+            "Comp&ecirc;ndio institucional em prepara&ccedil;&atilde;o.",
             html=False,
         )
-        self.assertContains(response, "library-compendium", html=False)
-        self.assertContains(response, "disabled")
+        self.assertContains(response, '<p class="library-compendium-status">')
+        self.assertNotRegex(
+            rendered,
+            r'<(?:a|button)[^>]*class="[^"]*library-compendium-status',
+        )
+        self.assertNotContains(response, "Baixar comp&ecirc;ndio em PDF", html=False)
         self.assertNotContains(response, "download=")
 
     def test_fonte_versionada_nao_depende_de_local(self):

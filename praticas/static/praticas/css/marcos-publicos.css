@@ -36,16 +36,12 @@
 }
 
 .library-heading {
-    display: flex;
     max-width: none;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20px;
     margin-bottom: 36px;
 }
 
 .library-heading-copy {
-    max-width: 640px;
+    max-width: 760px;
 }
 
 .library-eyebrow {
@@ -75,53 +71,28 @@
     line-height: 1.55;
 }
 
-.library-compendium {
+.library-heading .library-compendium-status {
     display: inline-flex;
-    min-height: 46px;
-    align-items: center;
-    gap: 8px;
-    border: 1.5px solid var(--purple);
-    border-radius: 11px;
-    padding: 10px 22px;
-    color: #fff;
-    background: var(--purple);
-    cursor: not-allowed;
-    font: inherit;
-    font-size: 14px;
+    width: fit-content;
+    margin-top: 14px;
+    padding: 7px 11px;
+    border: 1px solid var(--lilac-tint);
+    border-radius: 999px;
+    color: var(--purple);
+    background: var(--lilac-pale);
+    font-size: 13px;
     font-weight: 700;
-}
-
-.library-compendium-wrap {
-    display: flex;
-    max-width: 260px;
-    align-items: flex-end;
-    flex: 0 0 auto;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.library-compendium:disabled,
-.library-compendium:disabled:hover,
-.library-compendium:disabled:focus-visible {
-    border-color: var(--purple);
-    color: #fff;
-    background: var(--purple);
-    box-shadow: none;
-    cursor: not-allowed;
-    opacity: .64;
-    transform: none;
-}
-
-.library-compendium-help {
-    color: var(--text-soft);
-    font-size: 12.5px;
-    line-height: 1.4;
-    text-align: right;
+    line-height: 1.35;
 }
 
 .library-toolbar {
     display: grid;
-    grid-template-columns: 291.729187px 180.666672px 227.333344px 238px 112.9375px;
+    grid-template-columns:
+        minmax(260px, 2fr)
+        minmax(150px, 1fr)
+        minmax(180px, 1.15fr)
+        minmax(180px, 1.15fr)
+        auto;
     align-items: center;
     gap: 12px;
     margin-bottom: 26px;
@@ -477,7 +448,7 @@
     background: var(--lilac-pale);
 }
 
-@media (max-width: 1199.98px) {
+@media (max-width: 1099.98px) {
     .library-toolbar {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
@@ -491,15 +462,6 @@
     .library-heading {
         align-items: flex-start;
         flex-direction: column;
-    }
-
-    .library-compendium-wrap {
-        max-width: 100%;
-        align-items: flex-start;
-    }
-
-    .library-compendium-help {
-        text-align: left;
     }
 
     .library-toolbar {

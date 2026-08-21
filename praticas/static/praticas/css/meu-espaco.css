@@ -65,8 +65,8 @@
 .account-heading p {
     margin: 0 0 22px;
     color: var(--text-soft);
-    font-size: 13.5px;
-    line-height: 1.55;
+    font-size: 17px;
+    line-height: 1.65;
 }
 
 .account-page--status .account-heading p {
