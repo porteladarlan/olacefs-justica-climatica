@@ -34,11 +34,16 @@
 }
 
 .home-design .home-section-wrap,
-.home-design .jc-hero-grid,
 .home-design > .home-foundations,
 .home-design > .home-video {
     width: 100%;
     max-width: 1136px;
+    margin-inline: auto;
+}
+
+.home-design .jc-hero-grid {
+    width: 100%;
+    max-width: 1440px;
     margin-inline: auto;
 }
 
@@ -138,11 +143,15 @@
 .home-design .home-voices-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
+    align-items: stretch;
     gap: 26px;
 }
 
 .home-design .home-voice-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
     min-height: 0;
     margin: 0;
     padding: 38px 34px;
@@ -163,13 +172,38 @@
 }
 
 .home-design .home-voice-quote {
+    position: relative;
+    display: block;
     max-width: 42ch;
     margin: 0 auto;
+    padding-inline: 22px;
     color: var(--text);
     font-size: 17px;
     font-style: italic;
     font-weight: 400;
     line-height: 1.65;
+}
+
+.home-design .home-voice-quote::before,
+.home-design .home-voice-quote::after {
+    position: absolute;
+    color: var(--purple-soft);
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.home-design .home-voice-quote::before {
+    top: 0;
+    left: 0;
+    content: "\201C";
+}
+
+.home-design .home-voice-quote::after {
+    right: 0;
+    bottom: 0;
+    content: "\201D";
 }
 
 .home-design .home-voice-card figcaption {
@@ -190,12 +224,11 @@
 }
 
 .home-design .home-foundations {
-    margin-block: 64px;
-    padding: 34px 36px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: var(--surface);
-    box-shadow: var(--shadow);
+    margin-block: 28px 48px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .home-design .home-foundation-tabs {
@@ -233,10 +266,11 @@
 }
 
 .home-design .home-foundation-panel {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
+    padding: 34px 36px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
 }
 
 .home-design .home-foundation-top {
@@ -512,17 +546,31 @@
 }
 
 .home-design .home-map-country.is-member {
-    fill: var(--purple-soft);
+    fill: #c9ddd6;
     cursor: pointer;
+}
+
+.home-design .home-map-country.is-member[data-palette-index="1"] {
+    fill: #d8cce3;
+}
+
+.home-design .home-map-country.is-member[data-palette-index="2"] {
+    fill: #eadfc9;
+}
+
+.home-design .home-map-country.is-member[data-palette-index="3"] {
+    fill: #cbdfe4;
 }
 
 .home-design .home-map-country.is-member:hover,
 .home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
-    fill: #876ca5;
+    filter: brightness(.92);
+    stroke: var(--purple);
+    stroke-width: 2px;
 }
 
 .home-design .home-map-country.is-selected {
-    fill: var(--purple);
+    fill: var(--green);
     stroke: #fff;
     stroke-width: 2px;
 }
@@ -562,11 +610,23 @@
 }
 
 .home-design .home-map-microterritory-marker {
-    fill: var(--purple-soft);
+    fill: #c9ddd6;
     pointer-events: none;
     stroke: #fff;
     stroke-width: 2px;
     transition: fill .16s ease, stroke .16s ease, stroke-width .16s ease;
+}
+
+.home-design .home-map-microterritory-control[data-palette-index="1"] .home-map-microterritory-marker {
+    fill: #d8cce3;
+}
+
+.home-design .home-map-microterritory-control[data-palette-index="2"] .home-map-microterritory-marker {
+    fill: #eadfc9;
+}
+
+.home-design .home-map-microterritory-control[data-palette-index="3"] .home-map-microterritory-marker {
+    fill: #cbdfe4;
 }
 
 .home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
@@ -574,7 +634,7 @@
 }
 
 .home-design .home-map-microterritory-control.is-selected .home-map-microterritory-marker {
-    fill: var(--purple);
+    fill: var(--green);
     stroke: #fff;
     stroke-width: 2px;
 }
@@ -646,11 +706,11 @@
 }
 
 .home-design .home-map-dot.is-member {
-    background: #a999bf;
+    background: linear-gradient(135deg, #c9ddd6 0 25%, #d8cce3 25% 50%, #eadfc9 50% 75%, #cbdfe4 75%);
 }
 
 .home-design .home-map-dot.is-selected {
-    background: var(--purple);
+    background: var(--green);
 }
 
 .home-design .home-map-dot.is-coordinated {
@@ -690,6 +750,10 @@
     border: 1px solid var(--purple-soft);
     border-radius: 11px;
     background: var(--lilac-pale);
+}
+
+.home-design .home-map-coordinated-control[hidden] {
+    display: none !important;
 }
 
 .home-design .home-map-coordinated-control label {
@@ -1008,6 +1072,10 @@
 
     .home-design .home-foundations {
         margin-block: 48px;
+        padding: 0;
+    }
+
+    .home-design .home-foundation-panel {
         padding: 28px 24px;
     }
 
@@ -1133,16 +1201,10 @@ html.a11y-high-contrast .home-design .home-foundation-audit-content {
     border-color: #000;
 }
 
-/* Ajustes negociais homologados em 2026-08-06 */
+/* Ajustes negociais homologados em 2026-08-06 e refinados em 2026-08-21. */
 
-.home-design .jc-hero-title-line {
-    display: block;
-}
-
-@media (min-width: 768px) {
-    .home-design .jc-hero-title-nowrap {
-        white-space: nowrap;
-    }
+.home-design .home-voices .home-section-wrap {
+    padding-block: 0;
 }
 
 .home-design .home-voices .home-section-heading {
@@ -1150,13 +1212,13 @@ html.a11y-high-contrast .home-design .home-foundation-audit-content {
 }
 
 .home-design .home-voice-photo {
-    width: 112px;
-    height: 112px;
+    width: 180px;
+    height: 180px;
     margin-bottom: 18px;
 }
 
 .home-design .home-foundations {
-    margin-block: 40px;
+    margin-block: 28px 48px;
 }
 
 /* Botões do mapa dentro da identidade visual aprovada. */
@@ -1196,8 +1258,8 @@ html.a11y-high-contrast .home-design .home-foundation-audit-content {
 
     .home-design .jc-hero-grid {
         grid-template-columns:
-            minmax(0, 1.25fr)
-            minmax(300px, .75fr);
+            minmax(0, 1.4fr)
+            minmax(340px, .75fr);
         gap: 40px;
     }
 
@@ -1207,17 +1269,41 @@ html.a11y-high-contrast .home-design .home-foundation-audit-content {
 
     .home-design .home-map-layout {
         grid-template-columns:
-            minmax(0, 1.65fr)
-            minmax(280px, .65fr);
+            minmax(0, 1.55fr)
+            minmax(320px, .8fr);
         gap: 20px;
     }
 
     .home-design .home-map-stage {
-        min-height: 500px;
+        min-height: 560px;
     }
 
     .home-design .home-map-stage svg {
-        max-height: 580px;
+        max-height: 620px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .home-design .jc-hero {
+        padding-inline: max(
+            var(--layout-gutter),
+            calc((100% - 1440px) / 2 + var(--layout-gutter))
+        );
+    }
+
+    .home-design .jc-hero-grid {
+        grid-template-columns:
+            minmax(0, 1.55fr)
+            minmax(380px, .75fr);
+    }
+
+    .home-design .jc-hero-title {
+        white-space: nowrap;
+    }
+
+    .home-design .jc-hero-art img {
+        width: 440px;
+        max-width: 100%;
     }
 }
 .climate-examples {

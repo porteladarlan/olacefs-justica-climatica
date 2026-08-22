@@ -162,7 +162,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertContains(response, "bootstrap.Tab.getOrCreateInstance(tab).show();", count=1)
         self.assertContains(response, 'event.key === "Enter" || event.key === " "')
 
-    def test_home_usa_estados_roxos_sem_foco_amarelo(self):
+    def test_home_usa_estados_pastel_sem_foco_amarelo(self):
         css = Path(finders.find("praticas/css/home.css")).read_text(
             encoding="utf-8"
         )
@@ -177,12 +177,15 @@ class HomePrimeiraEvolucaoTests(TestCase):
         )
         self.assertRegex(
             css,
-            r"\.home-map-country\.is-member\s*\{[^}]*fill: var\(--purple-soft\)",
+            r"\.home-map-country\.is-member\s*\{[^}]*fill: #c9ddd6",
         )
         self.assertRegex(
             css,
-            r"\.home-map-country\.is-selected\s*\{[^}]*fill: var\(--purple\)",
+            r"\.home-map-country\.is-selected\s*\{[^}]*fill: var\(--green\)",
         )
+        self.assertIn('data-palette-index="1"', css)
+        self.assertIn('data-palette-index="2"', css)
+        self.assertIn('data-palette-index="3"', css)
         self.assertIn(".home-map-country.is-coordinated", css)
         self.assertIn("outline: 3px solid var(--purple-mid);", css)
         self.assertNotIn("#f4b400", css.lower())
@@ -650,7 +653,14 @@ class HomePrimeiraEvolucaoTests(TestCase):
         )
         base = Path("templates/praticas/base.html").read_text(encoding="utf-8")
 
-        self.assertIn("align-items: start;", css)
+        self.assertRegex(
+            css,
+            r"\.home-design \.home-voices-grid\s*\{[^}]*align-items:\s*stretch",
+        )
+        self.assertRegex(
+            css,
+            r"\.home-design \.home-voice-card\s*\{[^}]*height:\s*100%",
+        )
         self.assertRegex(
             css,
             r"\.home-design \.home-voice-quote\s*\{[^}]*font-size:\s*17px",

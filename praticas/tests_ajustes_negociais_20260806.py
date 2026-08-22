@@ -26,5 +26,6 @@ class AjustesNegociaisHome20260806Tests(TestCase):
 
         self.assertContains(
             resposta,
-            'class="jc-hero-title-line jc-hero-title-nowrap"',
+            "Plataforma de Justi&ccedil;a Clim&aacute;tica",
         )
+        self.assertNotContains(resposta, "jc-hero-title-line")

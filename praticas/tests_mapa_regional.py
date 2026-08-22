@@ -218,6 +218,20 @@ class MapaRegionalTests(TestCase):
             self.assertNotIn(segredo, serialized)
             self.assertNotIn(segredo, html)
 
+    def test_auditoria_coordenada_fica_oculta_no_controle_publico(self):
+        response = self.client.get(reverse("pagina_inicial"))
+        self.assertContains(
+            response,
+            'class="home-map-coordinated-control" hidden inert aria-hidden="true"',
+            html=False,
+        )
+        css = Path(finders.find("praticas/css/home.css")).read_text(encoding="utf-8")
+        self.assertIn(
+            ".home-design .home-map-coordinated-control[hidden]",
+            css,
+        )
+        self.assertIn("display: none !important", css)
+
     def test_norma_compartilhada_usa_uniao_distinta_e_ignora_rascunhos(self):
         _, payload = self._payload()
         por_sigla = {pais["sigla"]: pais for pais in payload["paises"]}

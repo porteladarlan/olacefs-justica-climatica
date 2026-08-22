@@ -18,6 +18,7 @@ from .models import (
     NormaInternacional,
     Pais,
     PerguntaAuditoria,
+    SETORES_OFICIAIS_CODIGOS,
     Setor,
     TemaTransversal,
     TipoExperiencia,
@@ -397,6 +398,38 @@ class PacoteDesignNegocialTests(TestCase):
         experiencia.save(update_fields=["fontes_informacao"])
         experiencia.refresh_from_db()
         self.assertEqual(experiencia.fontes_informacao, "Evidência histórica preservada")
+
+    def test_catalogo_lista_os_onze_setores_e_aceita_setor_sem_publicacoes(self):
+        for indice, codigo in enumerate(SETORES_OFICIAIS_CODIGOS, start=1):
+            Setor.objects.update_or_create(
+                codigo=codigo,
+                defaults={
+                    "nome": f"Setor oficial {indice:02d}",
+                    "nome_es": f"Sector oficial {indice:02d}",
+                    "nome_en": f"Official sector {indice:02d}",
+                },
+            )
+        setor_sem_publicacoes = Setor.objects.get(codigo="saude")
+
+        resposta = self.client.get(reverse("catalogo_experiencias"))
+        codigos = set(resposta.context["setores"].values_list("codigo", flat=True))
+        self.assertSetEqual(codigos, set(SETORES_OFICIAIS_CODIGOS))
+        self.assertEqual(len(codigos), 11)
+        self.assertNotIn(self.setor_historico, resposta.context["setores"])
+        self.assertContains(resposta, 'class="catalog-filter-group"', count=4)
+
+        filtrada = self.client.get(
+            reverse("catalogo_experiencias"),
+            {"setor": setor_sem_publicacoes.pk},
+        )
+        self.assertEqual(filtrada.status_code, 200)
+        self.assertEqual(filtrada.context["total_resultados"], 0)
+        self.assertContains(filtrada, "Nenhuma boa pr&aacute;tica encontrada")
+        self.assertContains(
+            filtrada,
+            f'name="setor" value="{setor_sem_publicacoes.pk}" checked',
+            html=False,
+        )
 
     def test_design_home_mapa_guia_rodape_e_links_institucionais(self):
         resposta = self.client.get(reverse("pagina_inicial"))

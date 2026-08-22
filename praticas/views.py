@@ -55,6 +55,7 @@ from .models import (
     Pais,
     PerguntaAuditoria,
     PropostaEdicaoExperiencia,
+    SETORES_OFICIAIS_CODIGOS,
     Setor,
     TemaTransversal,
     TipoExperiencia,
@@ -830,12 +831,11 @@ def catalogo_experiencias(request):
     if TipoExperiencia.objects.filter(codigo__isnull=False).exists():
         tipos = tipos.filter(codigo__isnull=False)
     tipos = tipos.distinct()
-    setores = Setor.objects.filter(
-        experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+    setores = Setor.objects.filter(codigo__in=SETORES_OFICIAIS_CODIGOS)
+    setores_para_filtro = Setor.objects.filter(
+        Q(codigo__in=SETORES_OFICIAIS_CODIGOS)
+        | Q(pk__in=[valor for valor in request.GET.getlist("setor") if str(valor).isdigit()])
     )
-    if Setor.objects.filter(codigo__isnull=False).exists():
-        setores = setores.filter(codigo__isnull=False)
-    setores = setores.distinct()
     temas = TemaTransversal.objects.filter(
         experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
     ).distinct()
@@ -857,7 +857,7 @@ def catalogo_experiencias(request):
         "pais": _objetos_selecionados(request, "pais", Pais.objects.all()),
         "efs": _objetos_selecionados(request, "efs", efs_lista),
         "tipo": _objetos_selecionados(request, "tipo", tipos),
-        "setor": _objetos_selecionados(request, "setor", setores),
+        "setor": _objetos_selecionados(request, "setor", setores_para_filtro),
         "tema": _objetos_selecionados(request, "tema", temas),
         "norma": _objetos_selecionados(request, "norma", normas),
         "dimensao": _objetos_selecionados(request, "dimensao", dimensoes),

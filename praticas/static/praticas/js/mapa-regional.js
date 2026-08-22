@@ -61,9 +61,19 @@ const MapaRegionalGeometry = (function () {
         return positioned;
     }
 
+    function pastelPaletteIndex(geoId) {
+        const normalizedId = String(geoId || "")
+            .split("")
+            .reduce(function (total, digit) {
+                return total + (Number(digit) || 0);
+            }, 0);
+        return normalizedId % 4;
+    }
+
     return {
         projectedFeatureCentroid: projectedFeatureCentroid,
-        separatedMicroterritoryPositions: separatedMicroterritoryPositions
+        separatedMicroterritoryPositions: separatedMicroterritoryPositions,
+        pastelPaletteIndex: pastelPaletteIndex
     };
 })();
 
@@ -408,12 +418,12 @@ if (typeof module !== "undefined" && module.exports) {
         }
 
         mapContainer.replaceChildren();
-        const width = 720;
-        const height = 520;
+        const width = 620;
+        const height = 600;
         const collection = {type: "FeatureCollection", features: features};
         const projection = window.d3
             .geoMercator()
-            .fitExtent([[24, 18], [width - 24, height - 18]], collection);
+            .fitExtent([[12, 12], [width - 12, height - 12]], collection);
         const path = window.d3.geoPath(projection);
         const svg = window.d3
             .select(mapContainer)
@@ -445,6 +455,11 @@ if (typeof module !== "undefined" && module.exports) {
         memberPaths = paths
             .filter(function (feature) {
                 return countriesByGeoId.has(String(feature.id).padStart(3, "0"));
+            })
+            .attr("data-palette-index", function (feature) {
+                return MapaRegionalGeometry.pastelPaletteIndex(
+                    String(feature.id).padStart(3, "0")
+                );
             });
 
         memberPaths
@@ -491,6 +506,11 @@ if (typeof module !== "undefined" && module.exports) {
             .data(positionedMicroterritories)
             .join("g")
             .attr("class", "home-map-microterritory-control")
+            .attr("data-palette-index", function (item) {
+                return MapaRegionalGeometry.pastelPaletteIndex(
+                    String(item.feature.id).padStart(3, "0")
+                );
+            })
             .attr("transform", function (item) {
                 return "translate(" + item.position[0] + "," + item.position[1] + ")";
             });

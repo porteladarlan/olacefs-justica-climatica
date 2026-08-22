@@ -58,7 +58,7 @@
                 <h3 id="home-map-panel-title">
                     {% if LANGUAGE_CODE == 'en' %}Regional selection{% elif LANGUAGE_CODE == 'es' %}Selecci&oacute;n regional{% else %}Sele&ccedil;&atilde;o regional{% endif %}
                 </h3>
-                <div class="home-map-coordinated-control">
+                <div class="home-map-coordinated-control" hidden inert aria-hidden="true">
                     <label for="regionalMapCoordinatedAudit">
                         {% if LANGUAGE_CODE == 'en' %}Coordinated audit{% elif LANGUAGE_CODE == 'es' %}Auditor&iacute;a coordinada{% else %}Auditoria coordenada{% endif %}
                     </label>
