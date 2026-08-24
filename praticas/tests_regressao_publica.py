@@ -455,7 +455,8 @@ class RegressaoPublicaTests(TestCase):
         self.assertIn('form.addEventListener("reset"', script)
         self.assertIn('event.key === "Enter"', script)
         self.assertIn('event.key === " "', script)
-        self.assertIn("showTooltip(event, countryForFeature(feature))", script)
+        self.assertIn("showTooltip(event, country)", script)
+        self.assertIn("selectedIds.has(String(country.id))", script)
         funcao_coordenada = script.split(
             "function updateCoordinatedHighlight", 1
         )[1].split("function showTooltip", 1)[0]

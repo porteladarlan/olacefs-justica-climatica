@@ -466,15 +466,27 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             ("", "---------"),
             (
                 Experiencia.TipoAuditoria.DESEMPENHO,
-                texto_idioma("Desempenho", "Desempeño", "Performance"),
+                texto_idioma(
+                    "Auditoria de Desempenho / Gestão",
+                    "Auditoría de Desempeño / Gestión",
+                    "Performance / Management Audit",
+                ),
             ),
             (
                 Experiencia.TipoAuditoria.CUMPRIMENTO,
-                texto_idioma("Cumprimento", "Cumplimiento", "Compliance"),
+                texto_idioma(
+                    "Auditoria de Cumprimento",
+                    "Auditoría de Cumplimiento",
+                    "Compliance Audit",
+                ),
             ),
             (
                 Experiencia.TipoAuditoria.FINANCEIRA,
-                texto_idioma("Financeira", "Financiera", "Financial"),
+                texto_idioma(
+                    "Auditoria Financeira",
+                    "Auditoría Financiera",
+                    "Financial Audit",
+                ),
             ),
         ]
 

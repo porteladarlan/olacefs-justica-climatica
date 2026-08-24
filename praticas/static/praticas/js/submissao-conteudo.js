@@ -69,7 +69,10 @@
     renumber();
 
     const typeSelect = document.getElementById("id_tipo_experiencia");
-    const auditFields = Array.from(document.querySelectorAll("[data-audit-only]"));
+    const auditTypeSelect = document.getElementById("id_tipo_auditoria");
+    const auditFields = Array.from(
+        document.querySelectorAll("[data-audit-questions]")
+    );
     const evaluationFields = Array.from(
         document.querySelectorAll("[data-evaluation-only]")
     );
@@ -95,6 +98,12 @@
         const isAudit = typeCode === "auditoria" || typeCode === "auditoria_coordenada";
         const isCoordinated = typeCode === "auditoria_coordenada";
         const isEvaluation = typeCode === "avaliacao_politica_publica";
+        if (auditTypeSelect) {
+            auditTypeSelect.disabled = !isAudit;
+            if (clearHidden && !isAudit) {
+                auditTypeSelect.value = "";
+            }
+        }
         auditFields.forEach(function (field) {
             field.hidden = !isAudit;
             if (clearHidden && !isAudit) {

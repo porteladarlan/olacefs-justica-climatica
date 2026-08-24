@@ -38,7 +38,7 @@
             <div class="row g-3">
                 {% for field in form %}
                     {% if field.name != "comentario_autor" %}
-                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' or field.name == 'objetivo' or field.name == 'resultados' or field.name == 'recomendacoes' or field.name == 'replicabilidade' or field.name == 'perguntas_chave' or field.name == 'criterios_utilizados' or field.name == 'metodologia' or field.name == 'ferramentas_utilizadas' or field.name == 'informacoes_adicionais' %}col-12{% endif %}"{% if field.name == 'perguntas_chave' %} data-evaluation-only{% elif field.name == 'tipo_auditoria' %} data-audit-only{% elif field.name == 'outras_efs_envolvidas' or field.name == 'paises_participantes' %} data-coordinated-field{% endif %}>
+                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' or field.name == 'objetivo' or field.name == 'resultados' or field.name == 'recomendacoes' or field.name == 'replicabilidade' or field.name == 'perguntas_chave' or field.name == 'criterios_utilizados' or field.name == 'metodologia' or field.name == 'ferramentas_utilizadas' or field.name == 'informacoes_adicionais' %}col-12{% endif %}"{% if field.name == 'perguntas_chave' %} data-evaluation-only{% elif field.name == 'outras_efs_envolvidas' or field.name == 'paises_participantes' %} data-coordinated-field{% endif %}>
                         <label class="form-label fw-semibold">{{ field.label }}</label>
                         {{ field }}
                         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}

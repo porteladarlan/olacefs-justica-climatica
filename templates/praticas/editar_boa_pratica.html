@@ -73,8 +73,24 @@
             </div>
             <div class="row g-3">
                 {% for field in form %}
-                    {% if field.name in "efs,pais,titulo,tipo_experiencia,tipo_auditoria,outras_efs_envolvidas,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
-                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}"{% if field.name == 'tipo_auditoria' %} data-audit-only{% elif field.name == 'outras_efs_envolvidas' %} data-coordinated-field{% endif %}>
+                    {% if field.name in "efs,pais,titulo,tipo_experiencia,tipo_auditoria,outras_efs_envolvidas" %}
+                        <div class="col-md-6"{% if field.name == 'outras_efs_envolvidas' %} data-coordinated-field{% endif %}>
+                            <label class="form-label fw-semibold">
+                                {{ field.label }}
+                                {% if field.name in "efs,pais,titulo,tipo_experiencia" %}
+                                    <span class="badge-soft ms-1">{% if LANGUAGE_CODE == 'en' %}Required{% elif LANGUAGE_CODE == 'es' %}Obligatorio{% else %}Obrigatório{% endif %}</span>
+                                {% endif %}
+                                {% if field.help_text %}<span class="info-hint" title="{{ field.help_text }}">i</span>{% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% for field in form %}
+                    {% if field.name in "setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}
+                    <div class="col-md-6 {% if field.name == 'descricao' or field.name == 'enfoque_justica_climatica' %}col-12{% endif %}">
                         <label class="form-label fw-semibold">
                             {{ field.label }}
                             {% if field.name in "efs,pais,titulo,tipo_experiencia,setor,email_contato,pessoa_responsavel,descricao,enfoque_justica_climatica,ano_execucao" %}

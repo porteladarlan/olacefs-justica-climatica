@@ -304,6 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
         if (!countriesById.has(normalizedId)) {
             return;
         }
+        hideTooltip();
         if (selected) {
             selectedIds.clear();
             selectedIds.add(normalizedId);
@@ -387,6 +388,7 @@ if (typeof module !== "undefined" && module.exports) {
                 return accessibleCountryLabel(countryForFeature(feature), false, false);
             })
             .on("click", function (event, feature) {
+                hideTooltip();
                 toggleCountry(countryForFeature(feature));
             })
             .on("keydown", function (event, feature) {
@@ -396,7 +398,12 @@ if (typeof module !== "undefined" && module.exports) {
                 }
             })
             .on("pointermove", function (event, feature) {
-                showTooltip(event, countryForFeature(feature));
+                const country = countryForFeature(feature);
+                if (country && selectedIds.has(String(country.id))) {
+                    hideTooltip();
+                    return;
+                }
+                showTooltip(event, country);
             })
             .on("pointerleave", hideTooltip)
             .on("blur", hideTooltip);

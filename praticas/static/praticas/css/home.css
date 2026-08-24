@@ -562,15 +562,8 @@
     fill: #cbdfe4;
 }
 
-.home-design .home-map-country.is-member:hover,
-.home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
-    filter: brightness(.92);
-    stroke: var(--purple);
-    stroke-width: 2px;
-}
-
-.home-design .home-map-country.is-selected {
-    fill: var(--green);
+.home-design .home-map-country.is-member:not(.is-selected):hover {
+    fill: var(--green-dark);
     stroke: #fff;
     stroke-width: 2px;
 }
@@ -580,6 +573,12 @@
     stroke: var(--purple-soft);
     stroke-dasharray: 5 2;
     stroke-width: 2.5px;
+}
+
+.home-design .home-map-country.is-member.is-selected {
+    fill: var(--purple);
+    stroke: #fff;
+    stroke-width: 2px;
 }
 
 .home-design .home-map-country.is-member:focus-visible {
@@ -630,11 +629,13 @@
 }
 
 .home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
+    fill: var(--green-dark);
+    stroke: #fff;
     stroke-width: 2.5px;
 }
 
 .home-design .home-map-microterritory-control.is-selected .home-map-microterritory-marker {
-    fill: var(--green);
+    fill: var(--purple);
     stroke: #fff;
     stroke-width: 2px;
 }
@@ -710,7 +711,7 @@
 }
 
 .home-design .home-map-dot.is-selected {
-    background: var(--green);
+    background: var(--purple);
 }
 
 .home-design .home-map-dot.is-coordinated {

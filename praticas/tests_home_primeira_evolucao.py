@@ -181,8 +181,14 @@ class HomePrimeiraEvolucaoTests(TestCase):
         )
         self.assertRegex(
             css,
-            r"\.home-map-country\.is-selected\s*\{[^}]*fill: var\(--green\)",
+            r"\.home-map-country\.is-member\.is-selected\s*\{[^}]*fill: var\(--purple\)",
         )
+        self.assertRegex(
+            css,
+            r"\.home-map-country\.is-member:not\(\.is-selected\):hover\s*\{[^}]*fill: var\(--green-dark\)[^}]*stroke: #fff",
+        )
+        self.assertNotIn("filter: brightness(.92)", css)
+        self.assertNotIn(".home-map-country.is-selected {\n    fill: var(--green)", css)
         self.assertIn('data-palette-index="1"', css)
         self.assertIn('data-palette-index="2"', css)
         self.assertIn('data-palette-index="3"', css)

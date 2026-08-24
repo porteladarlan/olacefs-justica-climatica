@@ -1,4 +1,5 @@
 import importlib
+from html.parser import HTMLParser
 from pathlib import Path
 
 from django.apps import apps
@@ -538,8 +539,135 @@ class PacoteDesignNegocialTests(TestCase):
             finders.find("praticas/js/submissao-conteudo.js")
         ).read_text(encoding="utf-8")
         self.assertIn("dataset.tipoCodigo", javascript)
+        self.assertIn('document.getElementById("id_tipo_auditoria")', javascript)
+        self.assertIn("auditTypeSelect.disabled = !isAudit", javascript)
+        self.assertIn('auditTypeSelect.value = ""', javascript)
+        self.assertIn("document.querySelectorAll(\"[data-audit-questions]\")", javascript)
+        self.assertNotIn("auditTypeSelect.hidden", javascript)
         self.assertIn('typeCode === "avaliacao_politica_publica"', javascript)
         self.assertNotIn('label.includes("audit")', javascript)
+
+    def test_tipo_auditoria_tem_posicao_labels_e_valores_trilingues(self):
+        resposta = self.client.get("/adicionar-boa-pratica/?tipo=boa_pratica")
+        html = resposta.content.decode("utf-8")
+        self.assertIn('name="tipo_auditoria"', html)
+        self.assertNotIn('name="tipo_auditoria" data-audit-only', html)
+        self.assertEqual(html.count('name="tipo_auditoria"'), 1)
+
+        class LayoutParser(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.depth = 0
+                self.row_depth = None
+                self.current_field = None
+                self.rows = []
+                self.row = None
+
+            def handle_starttag(self, tag, attrs):
+                attrs = dict(attrs)
+                classes = attrs.get("class", "").split()
+                if tag == "div" and "row" in classes and "g-3" in classes:
+                    self.row_depth = self.depth
+                    self.row = []
+                elif (
+                    self.row_depth is not None
+                    and tag == "div"
+                    and self.depth == self.row_depth + 1
+                    and "col-md-6" in classes
+                ):
+                    self.current_field = []
+                elif self.current_field is not None and tag in {"input", "select", "textarea"}:
+                    field_id = attrs.get("id")
+                    if field_id:
+                        self.current_field.append(field_id)
+                if tag not in {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}:
+                    self.depth += 1
+
+            def handle_endtag(self, tag):
+                self.depth -= 1
+                if (
+                    self.row_depth is not None
+                    and tag == "div"
+                    and self.depth == self.row_depth + 1
+                    and self.current_field is not None
+                ):
+                    self.row.extend(self.current_field)
+                    self.current_field = None
+                elif (
+                    self.row_depth is not None
+                    and tag == "div"
+                    and self.depth == self.row_depth
+                ):
+                    self.rows.append(self.row)
+                    self.row_depth = None
+                    self.row = None
+
+        layout = LayoutParser()
+        layout.feed(html)
+        identification_rows = [row for row in layout.rows if "id_efs" in row]
+        self.assertEqual(len(identification_rows), 1)
+        self.assertEqual(
+            identification_rows[0][:6],
+            [
+                "id_efs",
+                "id_pais",
+                "id_titulo",
+                "id_tipo_experiencia",
+                "id_tipo_auditoria",
+                "id_outras_efs_envolvidas",
+            ],
+        )
+        for label in (
+            "Auditoria de Desempenho / Gestão",
+            "Auditoria de Cumprimento",
+            "Auditoria Financeira",
+        ):
+            self.assertIn(label, html)
+
+        labels_por_idioma = {
+            "pt-br": (
+                "Auditoria de Desempenho / Gestão",
+                "Auditoria de Cumprimento",
+                "Auditoria Financeira",
+            ),
+            "es": (
+                "Auditoría de Desempeño / Gestión",
+                "Auditoría de Cumplimiento",
+                "Auditoría Financiera",
+            ),
+            "en": (
+                "Performance / Management Audit",
+                "Compliance Audit",
+                "Financial Audit",
+            ),
+        }
+        for idioma, labels in labels_por_idioma.items():
+            with self.subTest(idioma=idioma), translation.override(idioma):
+                form = ExperienciaSubmissaoForm()
+                self.assertEqual(
+                    [choice[1] for choice in form.fields["tipo_auditoria"].choices[1:]],
+                    list(labels),
+                )
+        self.assertEqual(
+            [choice[0] for choice in ExperienciaSubmissaoForm().fields["tipo_auditoria"].choices[1:]],
+            ["desempenho", "cumprimento", "financeira"],
+        )
+
+    def test_tipo_auditoria_continua_obrigatorio_apenas_para_auditorias(self):
+        sem_tipo = self.dados_pratica(tipo_auditoria="")
+        resposta = self.client.post(reverse("adicionar_boa_pratica"), sem_tipo)
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, "Campo obrigatório para categorias de auditoria")
+
+        avaliacao = self.dados_pratica(
+            tipo_experiencia=str(self.avaliacao.pk),
+            tipo_auditoria="",
+            perguntas_auditoria=[],
+        )
+        resposta = self.client.post(reverse("adicionar_boa_pratica"), avaliacao)
+        self.assertRedirects(
+            resposta, reverse("confirmacao_envio"), fetch_redirect_response=False
+        )
 
     def test_avaliacao_edita_legado_sem_criar_perguntas_estruturadas(self):
         dados = self.dados_pratica(
