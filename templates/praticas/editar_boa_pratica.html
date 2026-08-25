@@ -2,21 +2,15 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Edit submission{% elif LANGUAGE_CODE == 'es' %}Editar env&iacute;o{% else %}Editar envio{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena pr&aacute;ctica{% else %}Editar boa pr&aacute;tica{% endif %} | Plataforma Regional{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/envio-pratica.css' %}">{% endblock %}
 
 {% block content %}
 <section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Edit before publication{% elif LANGUAGE_CODE == 'es' %}Editar antes de la publicaci&oacute;n{% else %}Editar antes da publica&ccedil;&atilde;o{% endif %}</div>
+    <div class="section-kicker">{% if experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Edit archived good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena pr&aacute;ctica archivada{% else %}Editar boa pr&aacute;tica arquivada{% endif %}{% elif experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Edit published good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena pr&aacute;ctica publicada{% else %}Editar boa pr&aacute;tica publicada{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Edit before publication{% elif LANGUAGE_CODE == 'es' %}Editar antes de la publicaci&oacute;n{% else %}Editar antes da publica&ccedil;&atilde;o{% endif %}{% endif %}</div>
     <h1 class="page-title mb-2">{{ experiencia.titulo_exibicao }}</h1>
     <p class="section-subtitle">
-        {% if LANGUAGE_CODE == 'en' %}
-            Update the submission and send it again for review. You may also save it as a draft.
-        {% elif LANGUAGE_CODE == 'es' %}
-            Actualice el env&iacute;o y vuelva a enviarlo para revisi&oacute;n. Tambi&eacute;n puede guardarlo como borrador.
-        {% else %}
-            Atualize o envio e reenvie para revis&atilde;o. Voc&ecirc; tamb&eacute;m pode salvar como rascunho.
-        {% endif %}
+        {% if experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Saved changes will be reflected immediately in the published content.{% elif LANGUAGE_CODE == 'es' %}Los cambios guardados se reflejar&aacute;n inmediatamente en la publicaci&oacute;n.{% else %}As altera&ccedil;&otilde;es salvas ser&atilde;o refletidas imediatamente na publica&ccedil;&atilde;o.{% endif %}{% elif experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Changes will be saved, but the good practice will remain archived until restored by the review team.{% elif LANGUAGE_CODE == 'es' %}Los cambios se guardar&aacute;n, pero la buena pr&aacute;ctica continuar&aacute; archivada hasta que el equipo revisor la restaure.{% else %}As altera&ccedil;&otilde;es ser&atilde;o salvas, mas a boa pr&aacute;tica continuar&aacute; arquivada at&eacute; ser restaurada pela equipe revisora.{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Update the submission. You can save it as a draft or publish the good practice immediately.{% elif LANGUAGE_CODE == 'es' %}Actualice el env&iacute;o. Puede guardarlo como borrador o publicar la buena pr&aacute;ctica de inmediato.{% else %}Atualize o envio. Voc&ecirc; pode salv&aacute;-lo como rascunho ou publicar a boa pr&aacute;tica imediatamente.{% endif %}{% endif %}
     </p>
 
     {% if experiencia.comentario_revisor %}
@@ -32,22 +26,16 @@
 
     {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger">{{ form.non_field_errors }}</div></div>{% endif %}
 
-    <div class="col-12">
-        <div class="status-help-grid">
-            <div class="status-help-card">
-                <strong>{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</strong>
-                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Use this option to save partial information and continue later.{% elif LANGUAGE_CODE == 'es' %}Use esta opción para guardar información parcial y continuar después.{% else %}Use esta opção para salvar informações parciais e continuar depois.{% endif %}</p>
-            </div>
-            <div class="status-help-card">
-                <strong>{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</strong>
-                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Required fields are validated before the experience is sent to the editorial workflow.{% elif LANGUAGE_CODE == 'es' %}Los campos obligatorios se validan antes de enviar la experiencia al flujo editorial.{% else %}Os campos obrigatórios são validados antes de enviar a experiência ao fluxo editorial.{% endif %}</p>
-            </div>
-            <div class="status-help-card">
-                <strong>{% if LANGUAGE_CODE == 'en' %}Public content{% elif LANGUAGE_CODE == 'es' %}Contenido público{% else %}Conteúdo público{% endif %}</strong>
-                <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Only approved content will become visible in the public catalog.{% elif LANGUAGE_CODE == 'es' %}Solo el contenido aprobado será visible en el catálogo público.{% else %}Somente o conteúdo aprovado ficará visível no catálogo público.{% endif %}</p>
+    {% if experiencia.status_publicacao != 'publicado' and experiencia.status_publicacao != 'arquivado' %}
+        <div class="col-12">
+            <div class="status-help-grid">
+                <div class="status-help-card">
+                    <strong>{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}</strong>
+                    <p class="small text-muted mb-0">{% if LANGUAGE_CODE == 'en' %}Use this option to save partial information and continue later.{% elif LANGUAGE_CODE == 'es' %}Use esta opción para guardar información parcial y continuar después.{% else %}Use esta opção para salvar informações parciais e continuar depois.{% endif %}</p>
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 
     <div class="col-12">
         <div class="alert alert-warning mb-0">
@@ -247,8 +235,12 @@
 
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
         <a href="{% url 'status_envio' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to status{% elif LANGUAGE_CODE == 'es' %}Volver al estado{% else %}Voltar ao status{% endif %}</a>
-        <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
-        <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Resubmit for review{% elif LANGUAGE_CODE == 'es' %}Reenviar para revisi&oacute;n{% else %}Reenviar para revis&atilde;o{% endif %}</button>
+        {% if experiencia.status_publicacao == 'publicado' or experiencia.status_publicacao == 'arquivado' %}
+            <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Save changes{% elif LANGUAGE_CODE == 'es' %}Guardar cambios{% else %}Salvar altera&ccedil;&otilde;es{% endif %}</button>
+        {% else %}
+            <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
+            <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Publish good practice{% elif LANGUAGE_CODE == 'es' %}Publicar buena pr&aacute;ctica{% else %}Publicar boa pr&aacute;tica{% endif %}</button>
+        {% endif %}
     </div>
 </form>
 {% endblock %}

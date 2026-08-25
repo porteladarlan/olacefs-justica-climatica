@@ -15,7 +15,7 @@
 <header class="submission-heading">
     <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Contribute experience{% elif LANGUAGE_CODE == 'es' %}Aportar experiencia{% else %}Contribuir com experi&ecirc;ncia{% endif %}</div>
     <h1>{% if LANGUAGE_CODE == 'en' %}Register a good practice{% elif LANGUAGE_CODE == 'es' %}Registrar una buena pr&aacute;ctica{% else %}Registrar uma boa pr&aacute;tica{% endif %}</h1>
-    <p>{% if LANGUAGE_CODE == 'en' %}You can save a draft or submit the experience for review. Only approved content is published.{% elif LANGUAGE_CODE == 'es' %}Puede guardar un borrador o enviar la experiencia para revisi&oacute;n. Solo se publica el contenido aprobado.{% else %}Voc&ecirc; pode salvar um rascunho ou enviar a experi&ecirc;ncia para revis&atilde;o. Somente conte&uacute;do aprovado &eacute; publicado.{% endif %}</p>
+    <p>{% if LANGUAGE_CODE == 'en' %}You can save a draft or publish the good practice. When published, it will be immediately available in the catalog.{% elif LANGUAGE_CODE == 'es' %}Puede guardar un borrador o publicar la buena pr&aacute;ctica. Al publicarla, estar&aacute; disponible de inmediato en el cat&aacute;logo.{% else %}Voc&ecirc; pode salvar um rascunho ou publicar a boa pr&aacute;tica. Ao publicar, ela ficar&aacute; imediatamente dispon&iacute;vel no cat&aacute;logo.{% endif %}</p>
 </header>
 
 <div class="status-help-grid" aria-label="{% if LANGUAGE_CODE == 'en' %}Submission flow{% elif LANGUAGE_CODE == 'es' %}Flujo de env&iacute;o{% else %}Fluxo do envio{% endif %}">
@@ -24,12 +24,12 @@
         <p>{% if LANGUAGE_CODE == 'en' %}Save partial information and continue later.{% elif LANGUAGE_CODE == 'es' %}Guarde la información parcial y continúe después.{% else %}Salve informações parciais e continue depois.{% endif %}</p>
     </div>
     <div class="status-help-card">
-        <strong>{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</strong>
-        <p>{% if LANGUAGE_CODE == 'en' %}Required fields are validated before editorial review.{% elif LANGUAGE_CODE == 'es' %}Los campos obligatorios se validan antes de la revisión editorial.{% else %}Os campos obrigatórios são validados antes da revisão editorial.{% endif %}</p>
+        <strong>{% if LANGUAGE_CODE == 'en' %}Publication{% elif LANGUAGE_CODE == 'es' %}Publicaci&oacute;n{% else %}Publica&ccedil;&atilde;o{% endif %}</strong>
+        <p>{% if LANGUAGE_CODE == 'en' %}The complete good practice is published immediately after validation.{% elif LANGUAGE_CODE == 'es' %}La buena pr&aacute;ctica completa se publica inmediatamente despu&eacute;s de la validaci&oacute;n.{% else %}A boa pr&aacute;tica completa &eacute; publicada imediatamente ap&oacute;s a valida&ccedil;&atilde;o.{% endif %}</p>
     </div>
     <div class="status-help-card">
-        <strong>{% if LANGUAGE_CODE == 'en' %}Public content{% elif LANGUAGE_CODE == 'es' %}Contenido público{% else %}Conteúdo público{% endif %}</strong>
-        <p>{% if LANGUAGE_CODE == 'en' %}Only approved content is shown in the catalog.{% elif LANGUAGE_CODE == 'es' %}Solo el contenido aprobado se muestra en el catálogo.{% else %}Somente conteúdo aprovado aparece no catálogo.{% endif %}</p>
+        <strong>{% if LANGUAGE_CODE == 'en' %}Public content{% elif LANGUAGE_CODE == 'es' %}Contenido p&uacute;blico{% else %}Conte&uacute;do p&uacute;blico{% endif %}</strong>
+        <p>{% if LANGUAGE_CODE == 'en' %}Published content is immediately available in the catalog.{% elif LANGUAGE_CODE == 'es' %}El contenido publicado est&aacute; disponible de inmediato en el cat&aacute;logo.{% else %}O conte&uacute;do publicado fica imediatamente dispon&iacute;vel no cat&aacute;logo.{% endif %}</p>
     </div>
 </div>
 
@@ -226,7 +226,7 @@
     <div class="submission-actions">
         <a href="{% url 'catalogo_experiencias' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
         <button type="submit" name="acao_envio" value="rascunho" class="btn btn-outline-primary">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
-        <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisi&oacute;n{% else %}Enviar para revis&atilde;o{% endif %}</button>
+        <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Publish good practice{% elif LANGUAGE_CODE == 'es' %}Publicar buena pr&aacute;ctica{% else %}Publicar boa pr&aacute;tica{% endif %}</button>
     </div>
 </form>
 </div>

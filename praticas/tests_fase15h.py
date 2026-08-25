@@ -17,8 +17,8 @@ class FormularioEnvioRetroalimentacaoTests(TestCase):
         conteudo = response.content.decode("utf-8")
 
         self.assertIn("Rascunho", conteudo)
-        self.assertIn("Enviar para revisão", conteudo)
-        self.assertIn("Conteúdo público", conteudo)
+        self.assertIn("Publica&ccedil;&atilde;o", conteudo)
+        self.assertIn("Conte&uacute;do p&uacute;blico", conteudo)
         self.assertIn("Obrigatório", conteudo)
         self.assertIn("Pessoa responsável", conteudo)
 
@@ -38,7 +38,7 @@ class FormularioEnvioRetroalimentacaoTests(TestCase):
         conteudo = response.content.decode("utf-8")
 
         self.assertIn("Draft", conteudo)
-        self.assertIn("Submit for review", conteudo)
+        self.assertIn("Publication", conteudo)
         self.assertIn("Public content", conteudo)
         self.assertIn("Required", conteudo)
         self.assertIn("Responsible person", conteudo)

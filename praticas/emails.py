@@ -35,10 +35,10 @@ TEXTOS = {
         "revisar_pratica": "Abrir revisão da boa prática",
         "ver_publicacao": "Ver boa prática publicada",
         "revisar_edicao": "Abrir revisão da solicitação de edição",
-        "submissao_assunto": "Recebemos sua boa prática",
-        "submissao_mensagem": "A submissão foi recebida e seguirá para análise.",
-        "revisor_submissao_assunto": "Nova boa prática aguardando revisão",
-        "revisor_submissao_mensagem": "Uma nova boa prática foi enviada para análise.",
+        "submissao_assunto": "Boa prática publicada",
+        "submissao_mensagem": "Sua boa prática foi publicada com sucesso e está disponível no catálogo público.",
+        "revisor_submissao_assunto": "Nova boa prática publicada",
+        "revisor_submissao_mensagem": "Uma nova boa prática foi publicada automaticamente e está disponível para acompanhamento.",
         "edicao_solicitante_assunto": "Recebemos sua solicitação de edição",
         "edicao_solicitante_mensagem": (
             "A solicitação foi recebida e seguirá para análise. A versão publicada "
@@ -56,6 +56,8 @@ TEXTOS = {
         "devolver_mensagem": "Revise as orientações e ajuste o envio antes de reenviar.",
         "rejeitar_assunto": "Sua boa prática foi rejeitada",
         "rejeitar_mensagem": "A decisão da revisão foi registrada.",
+        "arquivar_assunto": "Sua boa prática foi arquivada",
+        "arquivar_mensagem": "A boa prática foi arquivada e deixou de aparecer no catálogo público.",
         "edicao_aprovar_assunto": "Sua solicitação de edição foi aprovada",
         "edicao_aprovar_mensagem": "A edição aprovada foi aplicada à boa prática publicada.",
         "edicao_rejeitar_assunto": "Sua solicitação de edição foi rejeitada",
@@ -74,10 +76,10 @@ TEXTOS = {
         "revisar_pratica": "Abrir revisión de la buena práctica",
         "ver_publicacao": "Ver buena práctica publicada",
         "revisar_edicao": "Abrir revisión de la solicitud de edición",
-        "submissao_assunto": "Hemos recibido su buena práctica",
-        "submissao_mensagem": "La presentación fue recibida y seguirá para análisis.",
-        "revisor_submissao_assunto": "Nueva buena práctica pendiente de revisión",
-        "revisor_submissao_mensagem": "Se envió una nueva buena práctica para análisis.",
+        "submissao_assunto": "Buena práctica publicada",
+        "submissao_mensagem": "Su buena práctica fue publicada correctamente y está disponible en el catálogo público.",
+        "revisor_submissao_assunto": "Nueva buena práctica publicada",
+        "revisor_submissao_mensagem": "Una nueva buena práctica fue publicada automáticamente y está disponible para seguimiento.",
         "edicao_solicitante_assunto": "Hemos recibido su solicitud de edición",
         "edicao_solicitante_mensagem": (
             "La solicitud fue recibida y seguirá para análisis. La versión publicada "
@@ -95,6 +97,8 @@ TEXTOS = {
         "devolver_mensagem": "Revise las orientaciones y ajuste el envío antes de reenviarlo.",
         "rejeitar_assunto": "Su buena práctica fue rechazada",
         "rejeitar_mensagem": "La decisión de la revisión fue registrada.",
+        "arquivar_assunto": "Su buena práctica fue archivada",
+        "arquivar_mensagem": "La buena práctica fue archivada y dejó de aparecer en el catálogo público.",
         "edicao_aprovar_assunto": "Su solicitud de edición fue aprobada",
         "edicao_aprovar_mensagem": "La edición aprobada fue aplicada a la buena práctica publicada.",
         "edicao_rejeitar_assunto": "Su solicitud de edición fue rechazada",
@@ -113,10 +117,10 @@ TEXTOS = {
         "revisar_pratica": "Open good practice review",
         "ver_publicacao": "View published good practice",
         "revisar_edicao": "Open edit request review",
-        "submissao_assunto": "We received your good practice",
-        "submissao_mensagem": "The submission was received and will proceed to review.",
-        "revisor_submissao_assunto": "New good practice awaiting review",
-        "revisor_submissao_mensagem": "A new good practice was submitted for review.",
+        "submissao_assunto": "Good practice published",
+        "submissao_mensagem": "Your good practice was published successfully and is available in the public catalog.",
+        "revisor_submissao_assunto": "New good practice published",
+        "revisor_submissao_mensagem": "A new good practice was published automatically and is available for follow-up.",
         "edicao_solicitante_assunto": "We received your edit request",
         "edicao_solicitante_mensagem": (
             "The request was received and will proceed to review. The published "
@@ -134,6 +138,8 @@ TEXTOS = {
         "devolver_mensagem": "Review the guidance and update the submission before resubmitting.",
         "rejeitar_assunto": "Your good practice was rejected",
         "rejeitar_mensagem": "The review decision was recorded.",
+        "arquivar_assunto": "Your good practice was archived",
+        "arquivar_mensagem": "The good practice was archived and removed from the public catalog.",
         "edicao_aprovar_assunto": "Your edit request was approved",
         "edicao_aprovar_mensagem": "The approved edit was applied to the published good practice.",
         "edicao_rejeitar_assunto": "Your edit request was rejected",
@@ -149,6 +155,7 @@ STATUS_EXPERIENCIA = {
         "aprovado": "Aprovado",
         "publicado": "Publicado",
         "rejeitado": "Rejeitado",
+        "arquivado": "Arquivado",
     },
     "es": {
         "rascunho": "Borrador",
@@ -157,6 +164,7 @@ STATUS_EXPERIENCIA = {
         "aprovado": "Aprobado",
         "publicado": "Publicado",
         "rejeitado": "Rechazado",
+        "arquivado": "Archivado",
     },
     "en": {
         "rascunho": "Draft",
@@ -165,6 +173,7 @@ STATUS_EXPERIENCIA = {
         "aprovado": "Approved",
         "publicado": "Published",
         "rejeitado": "Rejected",
+        "arquivado": "Archived",
     },
 }
 

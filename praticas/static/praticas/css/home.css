@@ -587,6 +587,15 @@
     stroke-width: 3px;
 }
 
+.home-design .home-map-country.is-member:focus,
+.home-design .home-map-country.is-member:focus-visible,
+.home-design .home-map-microterritory-control:focus,
+.home-design .home-map-microterritory-control:focus-visible {
+    outline: none !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+}
+
 .home-design .home-map-country.is-selected:focus-visible,
 .home-design .home-map-country.is-coordinated:focus-visible {
     stroke: var(--purple-soft);

@@ -300,7 +300,7 @@ class RotasPublicasTests(TestCase):
         self.assertEqual(response.status_code, 302)
         experiencia.refresh_from_db()
         self.assertEqual(experiencia.titulo, "Boa pratica ajustada")
-        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.PUBLICADO)
 
     def test_catalogo_preserva_apenas_acoes_previstas_no_prototipo(self):
         response = self.client.get(reverse("catalogo_experiencias"))

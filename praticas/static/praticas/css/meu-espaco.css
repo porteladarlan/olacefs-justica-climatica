@@ -317,6 +317,11 @@
     background: #e7efe7;
 }
 
+.status-badge.status-arquivado {
+    color: #58636f;
+    background: #eef0f3;
+}
+
 .status-badge.status-rejeitado,
 .status-badge.status-rejeitada {
     color: #8f1f1f;

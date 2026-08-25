@@ -18,6 +18,8 @@
                                 {% if LANGUAGE_CODE == 'en' %}Needs adjustments / corrections{% elif LANGUAGE_CODE == 'es' %}Necesita ajustes / correcciones{% else %}Necessita de ajustes / corre&ccedil;&otilde;es{% endif %}
                             {% elif experiencia.status_publicacao == 'rascunho' %}
                                 {% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
+                            {% elif experiencia.status_publicacao == 'arquivado' %}
+                                {% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}
                             {% else %}
                                 {% if LANGUAGE_CODE == 'en' %}Status pending{% elif LANGUAGE_CODE == 'es' %}Estado pendiente{% else %}Status pendente{% endif %}
                             {% endif %}
@@ -35,11 +37,7 @@
                     {% endif %}
                 </div>
                 <div class="submission-item-action">
-                    {% if experiencia.status_publicacao == 'publicado' %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'solicitar_edicao_publicada' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Request edit{% elif LANGUAGE_CODE == 'es' %}Solicitar edici&oacute;n{% else %}Solicitar edi&ccedil;&atilde;o{% endif %}</a>
-                    {% else %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit / resubmit{% elif LANGUAGE_CODE == 'es' %}Editar / reenviar{% else %}Editar / reenviar{% endif %}</a>
-                    {% endif %}
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit{% elif LANGUAGE_CODE == 'es' %}Editar{% else %}Editar{% endif %}</a>
                 </div>
             </article>
         </li>

@@ -178,19 +178,13 @@ class NotificacoesFluxoEditorialTests(TestCase):
         )
 
         autor = self.mensagem_para("autora@example.org")
-        self.assertEqual(autor.subject, "Recebemos sua boa prática")
-        self.assertIn("Enviado", autor.body)
+        self.assertEqual(autor.subject, "Boa prática publicada")
+        self.assertIn("Publicado", autor.body)
         self.assertIn("https://testserver/meus-envios/", autor.body)
-        self.assertIn("seguirá para análise", autor.body)
-
+        self.assertIn("foi publicada com sucesso", autor.body)
         revisor = self.mensagem_para("revisor@example.org")
         self.assertIn(experiencia.titulo, revisor.body)
-        self.assertIn(self.efs.nome, revisor.body)
-        self.assertIn(self.pais.nome, revisor.body)
-        self.assertIn("Ana Silva", revisor.body)
-        self.assertIn(
-            f"https://testserver/painel-revisao/{experiencia.pk}/", revisor.body
-        )
+        self.assertIn("publicada automaticamente", revisor.body)
         for mensagem in mail.outbox:
             self.assertNotIn(self.senha, mensagem.body)
             self.assertNotIn("token", mensagem.body.lower())
@@ -219,7 +213,7 @@ class NotificacoesFluxoEditorialTests(TestCase):
             )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 2)
 
     def test_aprovacao_notifica_autor_com_acompanhamento_e_link_publico(self):
         experiencia = self.criar_experiencia(
@@ -304,7 +298,7 @@ class NotificacoesFluxoEditorialTests(TestCase):
                 {"acao": "publicar", "comentario_revisor": "Sem alteração."},
             )
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(mail.outbox), 0)
 
     def test_solicitacao_edicao_notifica_solicitante_e_revisores(self):
@@ -323,20 +317,9 @@ class NotificacoesFluxoEditorialTests(TestCase):
                 dados,
                 secure=True,
             )
-        proposta = PropostaEdicaoExperiencia.objects.get(experiencia=experiencia)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 2)
-        solicitante = self.mensagem_para("autora@example.org")
-        self.assertEqual(solicitante.subject, "Recebemos sua solicitação de edição")
-        self.assertIn("https://testserver/status-envio/", solicitante.body)
-        self.assertNotIn(["contato-da-pratica@example.org"], [item.to for item in mail.outbox])
-        revisor = self.mensagem_para("revisor@example.org")
-        self.assertIn("autora@example.org", revisor.body)
-        self.assertIn(
-            f"https://testserver/painel-revisao-edicoes/{proposta.pk}/",
-            revisor.body,
-        )
+        self.assertRedirects(response, reverse("editar_boa_pratica", args=[experiencia.pk]))
+        self.assertFalse(PropostaEdicaoExperiencia.objects.filter(experiencia=experiencia).exists())
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_solicitante_autorizado_recebe_confirmacao_e_decisao_no_lugar_do_autor(self):
         solicitante = get_user_model().objects.create_user(
@@ -359,35 +342,9 @@ class NotificacoesFluxoEditorialTests(TestCase):
                 secure=True,
             )
 
-        proposta = PropostaEdicaoExperiencia.objects.get(experiencia=experiencia)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(proposta.email_contato, solicitante.email)
-        confirmacoes = [
-            mensagem
-            for mensagem in mail.outbox
-            if "solicitação de edição" in mensagem.subject.lower()
-            and "recebemos" in mensagem.subject.lower()
-        ]
-        self.assertEqual([mensagem.to for mensagem in confirmacoes], [[solicitante.email]])
-        self.assertNotIn([self.autor.email], [mensagem.to for mensagem in mail.outbox])
-
-        status = self.client.get(reverse("status_envio"))
-        self.assertContains(status, experiencia.titulo)
-
-        mail.outbox.clear()
-        self.client.force_login(self.revisor)
-        with self.captureOnCommitCallbacks(execute=True):
-            decisao = self.client.post(
-                reverse("revisar_edicao_publicada", args=[proposta.pk]),
-                {
-                    "acao": "rejeitar",
-                    "comentario_revisor": "Decisão comunicada ao solicitante.",
-                },
-            )
-
-        self.assertEqual(decisao.status_code, 302)
-        self.assertEqual([mensagem.to for mensagem in mail.outbox], [[solicitante.email]])
-        self.assertNotIn([self.autor.email], [mensagem.to for mensagem in mail.outbox])
+        self.assertRedirects(response, reverse("editar_boa_pratica", args=[experiencia.pk]))
+        self.assertFalse(PropostaEdicaoExperiencia.objects.filter(experiencia=experiencia).exists())
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_decisao_de_proposta_antiga_com_email_invalido_usa_email_do_autor(self):
         experiencia = self.criar_experiencia(
@@ -469,7 +426,7 @@ class NotificacoesFluxoEditorialTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         experiencia = Experiencia.objects.get(titulo="Boa prática notificada")
-        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.PUBLICADO)
         experiencia_revisada.refresh_from_db()
         self.assertEqual(resposta_revisao.status_code, 302)
         self.assertEqual(
@@ -479,9 +436,9 @@ class NotificacoesFluxoEditorialTests(TestCase):
 
     def test_submissao_e_urls_sao_equivalentes_em_pt_es_en(self):
         casos = (
-            ("pt-br", "/adicionar-boa-pratica/", "Recebemos sua boa prática", "/meus-envios/"),
-            ("es", "/es/adicionar-boa-pratica/", "Hemos recibido su buena práctica", "/es/meus-envios/"),
-            ("en", "/en/adicionar-boa-pratica/", "We received your good practice", "/en/meus-envios/"),
+            ("pt-br", "/adicionar-boa-pratica/", "Boa prática publicada", "/meus-envios/"),
+            ("es", "/es/adicionar-boa-pratica/", "Buena práctica publicada", "/es/meus-envios/"),
+            ("en", "/en/adicionar-boa-pratica/", "Good practice published", "/en/meus-envios/"),
         )
         for indice, (idioma, caminho, assunto, caminho_envios) in enumerate(casos):
             with self.subTest(idioma=idioma):
@@ -508,31 +465,23 @@ class NotificacoesFluxoEditorialTests(TestCase):
             (
                 "pt-br",
                 "Sua boa prática foi rejeitada",
-                "Recebemos sua solicitação de edição",
                 "/meus-envios/",
-                "/status-envio/",
             ),
             (
                 "es",
                 "Su buena práctica fue rechazada",
-                "Hemos recibido su solicitud de edición",
                 "/es/meus-envios/",
-                "/es/status-envio/",
             ),
             (
                 "en",
                 "Your good practice was rejected",
-                "We received your edit request",
                 "/en/meus-envios/",
-                "/en/status-envio/",
             ),
         )
         for indice, (
             idioma,
             assunto_rejeicao,
-            assunto_edicao,
             caminho_envios,
-            caminho_status,
         ) in enumerate(casos):
             with self.subTest(idioma=idioma):
                 mail.outbox.clear()
@@ -563,14 +512,13 @@ class NotificacoesFluxoEditorialTests(TestCase):
                     f"Edição idioma {indice}", Experiencia.StatusPublicacao.PUBLICADO
                 )
                 self.client.force_login(self.autor)
-                dados = self.dados_formulario(titulo=f"Edição proposta {indice}")
                 with translation.override(idioma):
-                    url_edicao = reverse(
-                        "solicitar_edicao_publicada", args=[experiencia_edicao.pk]
+                    response = self.client.post(
+                        reverse("solicitar_edicao_publicada", args=[experiencia_edicao.pk]),
+                        {},
+                        secure=True,
                     )
-                    with self.captureOnCommitCallbacks(execute=True):
-                        response = self.client.post(url_edicao, dados, secure=True)
-                self.assertEqual(response.status_code, 302)
-                mensagem = self.mensagem_para(self.autor.email)
-                self.assertEqual(mensagem.subject, assunto_edicao)
-                self.assertIn(f"https://testserver{caminho_status}", mensagem.body)
+                    destino = reverse("editar_boa_pratica", args=[experiencia_edicao.pk])
+                self.assertRedirects(response, destino)
+                self.assertFalse(PropostaEdicaoExperiencia.objects.filter(experiencia=experiencia_edicao).exists())
+                self.assertEqual(len(mail.outbox), 0)

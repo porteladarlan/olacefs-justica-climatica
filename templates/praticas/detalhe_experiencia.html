@@ -63,19 +63,19 @@
                 </h2>
                 <div id="collapseJustica" class="accordion-collapse collapse show" aria-labelledby="headingJustica" data-bs-parent="#detalheAccordion">
                     <div class="accordion-body">
-                        <div class="mb-3">
+                        {% if experiencia.problema_climatico_exibicao %}<div class="mb-3">
                             <h3 class="h6 section-title">
                                 {% if LANGUAGE_CODE == 'en' %}What climate problem does the experience address?{% elif LANGUAGE_CODE == 'es' %}&iquest;Qu&eacute; problema clim&aacute;tico aborda la experiencia?{% else %}Que problema clim&aacute;tico a experi&ecirc;ncia aborda?{% endif %}
                             </h3>
                             <p class="section-subtitle mb-0">{{ experiencia.problema_climatico_exibicao|default:"-" }}</p>
-                        </div>
+                        </div>{% endif %}
 
-                        <div class="mb-3">
+                        {% if experiencia.riscos_climaticos_exibicao %}<div class="mb-3">
                             <h3 class="h6 section-title">
                                 {% if LANGUAGE_CODE == 'en' %}Identified climate risks{% elif LANGUAGE_CODE == 'es' %}Riesgos clim&aacute;ticos identificados{% else %}Riscos clim&aacute;ticos identificados{% endif %}
                             </h3>
                             <p class="section-subtitle mb-0">{{ experiencia.riscos_climaticos_exibicao|default:"-" }}</p>
-                        </div>
+                        </div>{% endif %}
 
                         <div class="mb-3">
                             <h3 class="h6 section-title">
@@ -84,7 +84,7 @@
                             <p class="section-subtitle mb-0">{{ experiencia.enfoque_justica_climatica_exibicao|default:"-" }}</p>
                         </div>
 
-                        <div class="mb-0">
+                        {% if experiencia.dimensoes_consideradas.exists %}<div class="mb-0">
                             <h3 class="h6 section-title">
                                 {% if LANGUAGE_CODE == 'en' %}Dimensions considered{% elif LANGUAGE_CODE == 'es' %}Dimensiones consideradas{% else %}Dimens&otilde;es consideradas{% endif %}
                             </h3>
@@ -95,7 +95,7 @@
                                     <span class="text-muted">-</span>
                                 {% endfor %}
                             </div>
-                        </div>
+                        </div>{% endif %}
                     </div>
                 </div>
             </div>

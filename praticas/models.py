@@ -282,6 +282,7 @@ class Experiencia(models.Model):
         EM_REVISAO = "em_revisao", "Em revisao"
         APROVADO = "aprovado", "Aprovado"
         PUBLICADO = "publicado", "Publicado"
+        ARQUIVADO = "arquivado", "Arquivado"
         REJEITADO = "rejeitado", "Rejeitado"
 
     class TipoAuditoria(models.TextChoices):

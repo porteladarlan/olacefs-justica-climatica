@@ -199,7 +199,7 @@ class SegurancaFaseTests(TestCase):
             reverse("solicitar_edicao_publicada", args=[self.publicada.pk])
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse("editar_boa_pratica", args=[self.publicada.pk]))
 
     def test_status_anonimo_com_email_conhecido_exige_login(self):
         response = self.client.get(
@@ -241,22 +241,22 @@ class SegurancaFaseTests(TestCase):
             (
                 "/en",
                 "linked to your authenticated account",
-                "Request edit",
-                "Edit / resubmit",
+                "Edit",
+                "Edit",
                 "Review:",
             ),
             (
                 "/es",
                 "vinculados a su cuenta autenticada",
-                "Solicitar edición",
-                "Editar / reenviar",
+                "Editar",
+                "Editar",
                 "Revisión:",
             ),
             (
                 "",
                 "vinculados à sua conta autenticada",
-                "Solicitar edição",
-                "Editar / reenviar",
+                "Editar",
+                "Editar",
                 "Revisão:",
             ),
         )
@@ -271,9 +271,9 @@ class SegurancaFaseTests(TestCase):
                     self.assertEqual(response.status_code, 200)
                     conteudo_visivel = unescape(response.content.decode())
                     self.assertIn(texto_conta, conteudo_visivel)
-                    self.assertIn(solicitar, conteudo_visivel)
                     self.assertIn(editar, conteudo_visivel)
-                    self.assertIn(revisao, conteudo_visivel)
+                    if "status-envio" not in caminho:
+                        self.assertIn(revisao, conteudo_visivel)
 
     def test_paginas_autenticadas_nao_indicam_vinculo_por_email(self):
         self.client.force_login(self.autor)

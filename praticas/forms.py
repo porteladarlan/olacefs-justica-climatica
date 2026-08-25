@@ -798,6 +798,7 @@ class RevisaoExperienciaForm(forms.ModelForm):
             ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
             ("aprovar", texto_idioma("Aprovar", "Aprobar", "Approve")),
             ("publicar", texto_idioma("Publicar", "Publicar", "Publish")),
+            ("arquivar", texto_idioma("Arquivar", "Archivar", "Archive")),
             ("devolver", texto_idioma("Devolver para ajuste", "Devolver para ajustes", "Return for adjustments")),
             ("rejeitar", texto_idioma("Rejeitar", "Rechazar", "Reject")),
         ],
@@ -823,13 +824,19 @@ class RevisaoExperienciaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["acao"].choices = [
+        choices = [
             ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
             ("aprovar", texto_idioma("Aprovar", "Aprobar", "Approve")),
             ("publicar", texto_idioma("Publicar", "Publicar", "Publish")),
+            ("arquivar", texto_idioma("Arquivar", "Archivar", "Archive")),
             ("devolver", texto_idioma("Devolver para ajuste", "Devolver para ajustes", "Return for adjustments")),
             ("rejeitar", texto_idioma("Rejeitar", "Rechazar", "Reject")),
         ]
+        if self.instance.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
+            choices = [("arquivar", texto_idioma("Arquivar", "Archivar", "Archive"))]
+        elif self.instance.status_publicacao == Experiencia.StatusPublicacao.ARQUIVADO:
+            choices = [("publicar", texto_idioma("Restaurar / Publicar", "Restaurar / Publicar", "Restore / Publish"))]
+        self.fields["acao"].choices = choices
         self.fields["acao"].label = texto_idioma("Decisão da revisão", "Decisión de la revisión", "Review decision")
         self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")
 

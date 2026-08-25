@@ -348,7 +348,7 @@ class PacoteDesignNegocialTests(TestCase):
         )
         self.assertEqual(resposta.status_code, 302)
         experiencia.refresh_from_db()
-        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.PUBLICADO)
         self.assertEqual(
             list(experiencia.perguntas_auditoria.values_list("texto", flat=True)),
             ["Terceira revisada", "Primeira revisada"],

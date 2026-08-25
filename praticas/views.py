@@ -391,6 +391,8 @@ STATUS_VISIVEIS_REVISAO = [
     Experiencia.StatusPublicacao.ENVIADO,
     Experiencia.StatusPublicacao.EM_REVISAO,
     Experiencia.StatusPublicacao.APROVADO,
+    Experiencia.StatusPublicacao.PUBLICADO,
+    Experiencia.StatusPublicacao.ARQUIVADO,
     Experiencia.StatusPublicacao.REJEITADO,
 ]
 
@@ -1351,16 +1353,16 @@ def adicionar_boa_pratica(request):
                 if acao == "rascunho":
                     experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
                     mensagem = texto_idioma(
-                        "Rascunho salvo com sucesso. Ele ainda não foi enviado para revisão.",
-                        "Borrador guardado correctamente. Todavía no se ha enviado para revisión.",
-                        "Draft saved successfully. It has not yet been submitted for review.",
+                        "Rascunho salvo com sucesso. Ele ainda não foi publicado.",
+                        "Borrador guardado correctamente. Todavía no se ha publicado.",
+                        "Draft saved successfully. It has not yet been published.",
                     )
                 else:
-                    experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
                     mensagem = texto_idioma(
-                        "Boa prática enviada com sucesso. Ela ficará pendente até a revisão.",
-                        "Buena práctica enviada correctamente. Permanecerá pendiente hasta la revisión.",
-                        "Good practice submitted successfully. It will remain pending until review.",
+                        "Boa prática publicada com sucesso.",
+                        "Buena práctica publicada correctamente.",
+                        "Good practice published successfully.",
                     )
                 experiencia.save()
                 form.save_m2m()
@@ -1368,7 +1370,7 @@ def adicionar_boa_pratica(request):
                     experiencia, form.perguntas_auditoria_limpas
                 )
                 salvar_anexos_submissao(experiencia, anexos)
-                if experiencia.status_publicacao == Experiencia.StatusPublicacao.ENVIADO:
+                if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
                     agendar_notificacoes_nova_submissao(request, experiencia)
 
             messages.success(request, mensagem)
@@ -1504,9 +1506,6 @@ def editar_boa_pratica(request, pk):
         )
         return redirect("meus_envios")
 
-    if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
-        return redirect("solicitar_edicao_publicada", pk=experiencia.pk)
-
     status_anterior = experiencia.status_publicacao
     acao = request.POST.get("acao_envio", "enviar")
     obrigatorio_para_envio = acao != "rascunho"
@@ -1539,7 +1538,21 @@ def editar_boa_pratica(request, pk):
                 experiencia = form.save(commit=False)
                 if request.user.is_authenticated and not experiencia.autor_id:
                     experiencia.autor = request.user
-                if acao == "rascunho":
+                if status_anterior == Experiencia.StatusPublicacao.PUBLICADO:
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
+                    mensagem = texto_idioma(
+                        "Alterações publicadas com sucesso.",
+                        "Cambios publicados correctamente.",
+                        "Changes published successfully.",
+                    )
+                elif status_anterior == Experiencia.StatusPublicacao.ARQUIVADO:
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.ARQUIVADO
+                    mensagem = texto_idioma(
+                        "Alterações salvas. A boa prática continua arquivada.",
+                        "Cambios guardados. La buena práctica permanece archivada.",
+                        "Changes saved. The good practice remains archived.",
+                    )
+                elif acao == "rascunho":
                     experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
                     mensagem = texto_idioma(
                         "Alterações salvas como rascunho.",
@@ -1547,11 +1560,11 @@ def editar_boa_pratica(request, pk):
                         "Changes saved as draft.",
                     )
                 else:
-                    experiencia.status_publicacao = Experiencia.StatusPublicacao.ENVIADO
+                    experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
                     mensagem = texto_idioma(
-                        "Boa prática reenviada para revisão.",
-                        "Buena práctica reenviada para revisión.",
-                        "Good practice resubmitted for review.",
+                        "Boa prática publicada com sucesso.",
+                        "Buena práctica publicada correctamente.",
+                        "Good practice published successfully.",
                     )
                 experiencia.save()
                 form.save_m2m()
@@ -1560,8 +1573,11 @@ def editar_boa_pratica(request, pk):
                 )
                 salvar_anexos_submissao(experiencia, anexos)
                 if (
-                    status_anterior != Experiencia.StatusPublicacao.ENVIADO
-                    and experiencia.status_publicacao == Experiencia.StatusPublicacao.ENVIADO
+                    status_anterior not in {
+                        Experiencia.StatusPublicacao.PUBLICADO,
+                        Experiencia.StatusPublicacao.ARQUIVADO,
+                    }
+                    and experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO
                 ):
                     agendar_notificacoes_nova_submissao(request, experiencia)
 
@@ -1627,49 +1643,7 @@ def solicitar_edicao_publicada(request, pk):
         )
         return redirect("meus_envios")
 
-    if request.method == "POST":
-        form = PropostaEdicaoPublicadaForm(
-            request.POST,
-            instance=experiencia,
-            obrigatorio_para_envio=True,
-        )
-        if form.is_valid():
-            email_solicitante = primeiro_email_valido(
-                request.user.email,
-                experiencia.email_contato,
-            )
-            with transaction.atomic():
-                proposta = PropostaEdicaoExperiencia.objects.create(
-                    experiencia=experiencia,
-                    email_contato=email_solicitante,
-                    comentario_autor=form.cleaned_data.get("comentario_autor", ""),
-                    dados_json=dados_proposta_from_form(form),
-                    status=PropostaEdicaoExperiencia.Status.PENDENTE,
-                )
-                agendar_notificacoes_solicitacao_edicao(
-                    request, proposta, proposta.email_contato
-                )
-            messages.success(
-                request,
-                texto_idioma(
-                    "Proposta de edição enviada para revisão. A versão publicada permanecerá ativa até aprovação.",
-                    "Propuesta de edición enviada para revisión. La versión publicada permanecerá activa hasta su aprobación.",
-                    "Edit proposal submitted for review. The published version will remain active until approval.",
-                ),
-            )
-            return redirect("status_envio")
-    else:
-        form = PropostaEdicaoPublicadaForm(instance=experiencia)
-
-    return render(
-        request,
-        "praticas/solicitar_edicao_publicada.html",
-        {
-            "form": form,
-            "experiencia": experiencia,
-            "perguntas_auditoria": form.perguntas_auditoria_valores,
-        },
-    )
+    return redirect("editar_boa_pratica", pk=experiencia.pk)
 
 
 
@@ -1941,6 +1915,8 @@ def painel_revisao(request):
         "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
         "em_revisao": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.EM_REVISAO).count(),
         "aprovado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.APROVADO).count(),
+        "publicado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.PUBLICADO).count(),
+        "arquivado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ARQUIVADO).count(),
         "rejeitado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.REJEITADO).count(),
         "edicoes_pendentes": PropostaEdicaoExperiencia.objects.filter(status=PropostaEdicaoExperiencia.Status.PENDENTE).count(),
     }
@@ -2012,6 +1988,13 @@ def revisar_experiencia(request, pk):
                     "Experiencia rechazada.",
                     "Experience rejected.",
                 )
+            elif acao == "arquivar":
+                experiencia.status_publicacao = Experiencia.StatusPublicacao.ARQUIVADO
+                mensagem = texto_idioma(
+                    "Experiência arquivada.",
+                    "Experiencia archivada.",
+                    "Experience archived.",
+                )
             else:
                 mensagem = texto_idioma(
                     "Revisão registrada.",
@@ -2023,7 +2006,7 @@ def revisar_experiencia(request, pk):
                 experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
                 if (
                     experiencia.status_publicacao != status_anterior
-                    and acao in {"aprovar", "publicar", "devolver", "rejeitar"}
+                    and acao in {"aprovar", "publicar", "devolver", "rejeitar", "arquivar"}
                 ):
                     agendar_notificacao_status_experiencia(
                         request, experiencia, acao
