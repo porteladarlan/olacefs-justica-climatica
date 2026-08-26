@@ -215,76 +215,58 @@ class NotificacoesFluxoEditorialTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 2)
 
-    def test_aprovacao_notifica_autor_com_acompanhamento_e_link_publico(self):
+    def test_rota_legada_nao_aprova_nem_notifica(self):
         experiencia = self.criar_experiencia(
             "Prática aprovada", Experiencia.StatusPublicacao.ENVIADO
         )
         self.client.force_login(self.revisor)
 
-        with self.captureOnCommitCallbacks(execute=True):
-            response = self.client.post(
-                reverse("revisar_experiencia", args=[experiencia.pk]),
-                {"acao": "aprovar", "comentario_revisor": "Aprovada."},
-                secure=True,
-            )
+        response = self.client.post(
+            reverse("revisar_experiencia", args=[experiencia.pk]),
+            {"acao": "aprovar", "comentario_revisor": "Aprovada."},
+            secure=True,
+        )
         experiencia.refresh_from_db()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.PUBLICADO)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Sua boa prática foi aprovada e publicada")
-        self.assertIn("https://testserver/meus-envios/", mail.outbox[0].body)
-        self.assertIn(
-            f"https://testserver/experiencias/{experiencia.pk}/", mail.outbox[0].body
-        )
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
+        self.assertEqual(len(mail.outbox), 0)
 
-    def test_publicacao_notifica_autor_com_url_publica_https(self):
+    def test_rota_legada_nao_publica_nem_notifica(self):
         experiencia = self.criar_experiencia(
             "Prática publicada", Experiencia.StatusPublicacao.APROVADO
         )
         self.client.force_login(self.revisor)
 
-        with self.captureOnCommitCallbacks(execute=True):
-            response = self.client.post(
-                reverse("revisar_experiencia", args=[experiencia.pk]),
-                {"acao": "publicar", "comentario_revisor": "Publicada."},
-                secure=True,
-            )
+        response = self.client.post(
+            reverse("revisar_experiencia", args=[experiencia.pk]),
+            {"acao": "publicar", "comentario_revisor": "Publicada."},
+            secure=True,
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Sua boa prática foi publicada")
-        self.assertIn(
-            f"https://testserver/experiencias/{experiencia.pk}/", mail.outbox[0].body
-        )
+        experiencia.refresh_from_db()
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.APROVADO)
+        self.assertEqual(len(mail.outbox), 0)
 
-    def test_devolucao_e_rejeicao_notificam_autor_com_observacao(self):
-        casos = (
-            ("devolver", Experiencia.StatusPublicacao.RASCUNHO, "devolvida"),
-            ("rejeitar", Experiencia.StatusPublicacao.REJEITADO, "rejeitada"),
-        )
+    def test_decisoes_legadas_nao_alteram_status_nem_notificam(self):
+        casos = ("devolver", "rejeitar")
         self.client.force_login(self.revisor)
-        for indice, (acao, status, trecho_assunto) in enumerate(casos):
+        for indice, acao in enumerate(casos):
             with self.subTest(acao=acao):
                 mail.outbox.clear()
                 experiencia = self.criar_experiencia(
                     f"Decisão {indice}", Experiencia.StatusPublicacao.EM_REVISAO
                 )
-                with self.captureOnCommitCallbacks(execute=True):
-                    response = self.client.post(
-                        reverse("revisar_experiencia", args=[experiencia.pk]),
-                        {
-                            "acao": acao,
-                            "comentario_revisor": "Justificativa institucional.",
-                        },
-                    )
+                response = self.client.post(
+                    reverse("revisar_experiencia", args=[experiencia.pk]),
+                    {"acao": acao, "comentario_revisor": "Justificativa institucional."},
+                )
                 experiencia.refresh_from_db()
 
                 self.assertEqual(response.status_code, 302)
-                self.assertEqual(experiencia.status_publicacao, status)
-                self.assertEqual(len(mail.outbox), 1)
-                self.assertIn(trecho_assunto, mail.outbox[0].subject)
-                self.assertIn("Justificativa institucional.", mail.outbox[0].body)
+                self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.EM_REVISAO)
+                self.assertEqual(len(mail.outbox), 0)
 
     def test_revisao_sem_mudanca_real_de_status_nao_notifica(self):
         experiencia = self.criar_experiencia(
@@ -298,7 +280,7 @@ class NotificacoesFluxoEditorialTests(TestCase):
                 {"acao": "publicar", "comentario_revisor": "Sem alteração."},
             )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 0)
 
     def test_solicitacao_edicao_notifica_solicitante_e_revisores(self):
@@ -431,7 +413,7 @@ class NotificacoesFluxoEditorialTests(TestCase):
         self.assertEqual(resposta_revisao.status_code, 302)
         self.assertEqual(
             experiencia_revisada.status_publicacao,
-            Experiencia.StatusPublicacao.PUBLICADO,
+            Experiencia.StatusPublicacao.ENVIADO,
         )
 
     def test_submissao_e_urls_sao_equivalentes_em_pt_es_en(self):
@@ -504,8 +486,9 @@ class NotificacoesFluxoEditorialTests(TestCase):
                             secure=True,
                         )
                 self.assertEqual(response.status_code, 302)
-                self.assertEqual(mail.outbox[0].subject, assunto_rejeicao)
-                self.assertIn(f"https://testserver{caminho_envios}", mail.outbox[0].body)
+                experiencia.refresh_from_db()
+                self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.EM_REVISAO)
+                self.assertEqual(len(mail.outbox), 0)
 
                 mail.outbox.clear()
                 experiencia_edicao = self.criar_experiencia(

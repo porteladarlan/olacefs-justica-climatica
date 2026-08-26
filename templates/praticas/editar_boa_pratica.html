@@ -233,6 +233,29 @@
         </div>
     </div>
 
+    {% if request.user.is_staff and form.translation_fields %}
+    <div class="col-12">
+        <section class="form-section translation-management" aria-labelledby="translation-management-title">
+            <div class="form-step-header">
+                <span class="step-number">6</span>
+                <div>
+                    <h2 class="h4 section-title" id="translation-management-title">{% if LANGUAGE_CODE == 'en' %}Translations{% elif LANGUAGE_CODE == 'es' %}Traducciones{% else %}Traduções{% endif %}</h2>
+                    <p>{% if LANGUAGE_CODE == 'en' %}Manually review and correct the PT, ES and EN versions. Original language: {{ experiencia.get_idioma_original_display }}.{% elif LANGUAGE_CODE == 'es' %}Revise y corrija manualmente las versiones PT, ES y EN. Idioma original: {{ experiencia.get_idioma_original_display }}.{% else %}Visualize e corrija manualmente as versões PT, ES e EN. Idioma original: {{ experiencia.get_idioma_original_display }}.{% endif %}</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                {% for field in form.translation_fields %}
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+    {% endif %}
+
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
         <a href="{% url 'status_envio' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to status{% elif LANGUAGE_CODE == 'es' %}Volver al estado{% else %}Voltar ao status{% endif %}</a>
         {% if experiencia.status_publicacao == 'publicado' or experiencia.status_publicacao == 'arquivado' %}

@@ -588,9 +588,7 @@
 }
 
 .home-design .home-map-country.is-member:focus,
-.home-design .home-map-country.is-member:focus-visible,
-.home-design .home-map-microterritory-control:focus,
-.home-design .home-map-microterritory-control:focus-visible {
+.home-design .home-map-country.is-member:focus-visible {
     outline: none !important;
     outline-offset: 0 !important;
     box-shadow: none !important;
@@ -600,70 +598,6 @@
 .home-design .home-map-country.is-coordinated:focus-visible {
     stroke: var(--purple-soft);
     stroke-width: 4px;
-}
-
-.home-design .home-map-country.is-microterritory {
-    pointer-events: none;
-}
-
-.home-design .home-map-microterritory-control {
-    cursor: pointer;
-    outline: none;
-}
-
-.home-design .home-map-microterritory-hit {
-    fill: transparent;
-    pointer-events: all;
-    stroke: transparent;
-}
-
-.home-design .home-map-microterritory-marker {
-    fill: #c9ddd6;
-    pointer-events: none;
-    stroke: #fff;
-    stroke-width: 2px;
-    transition: fill .16s ease, stroke .16s ease, stroke-width .16s ease;
-}
-
-.home-design .home-map-microterritory-control[data-palette-index="1"] .home-map-microterritory-marker {
-    fill: #d8cce3;
-}
-
-.home-design .home-map-microterritory-control[data-palette-index="2"] .home-map-microterritory-marker {
-    fill: #eadfc9;
-}
-
-.home-design .home-map-microterritory-control[data-palette-index="3"] .home-map-microterritory-marker {
-    fill: #cbdfe4;
-}
-
-.home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
-    fill: var(--green-dark);
-    stroke: #fff;
-    stroke-width: 2.5px;
-}
-
-.home-design .home-map-microterritory-control.is-selected .home-map-microterritory-marker {
-    fill: var(--purple);
-    stroke: #fff;
-    stroke-width: 2px;
-}
-
-.home-design .home-map-microterritory-control.is-coordinated .home-map-microterritory-marker {
-    fill: var(--purple);
-    stroke: var(--purple-soft);
-    stroke-dasharray: 5 2;
-    stroke-width: 2.5px;
-}
-
-.home-design .home-map-microterritory-control:focus-visible .home-map-microterritory-hit {
-    stroke: var(--purple);
-    stroke-width: 3px;
-}
-
-.home-design .home-map-microterritory-control:focus-visible .home-map-microterritory-marker {
-    stroke: #fff;
-    stroke-width: 3px;
 }
 
 .home-design .home-map-loading,
@@ -1170,29 +1104,6 @@ html.a11y-high-contrast .home-design .home-map-country.is-coordinated {
 html.a11y-high-contrast .home-design .home-map-country.is-member:focus-visible {
     stroke: #fff;
     stroke-width: 4px;
-}
-
-html.a11y-high-contrast .home-design .home-map-microterritory-marker {
-    fill: #642aa6;
-    stroke: #fff;
-}
-
-html.a11y-high-contrast .home-design .home-map-microterritory-control:hover .home-map-microterritory-marker {
-    fill: #642aa6;
-}
-
-html.a11y-high-contrast .home-design .home-map-microterritory-control.is-selected .home-map-microterritory-marker,
-html.a11y-high-contrast .home-design .home-map-microterritory-control.is-coordinated .home-map-microterritory-marker {
-    fill: #24102d;
-    stroke: #fff;
-}
-
-html.a11y-high-contrast .home-design .home-map-microterritory-control.is-selected .home-map-microterritory-marker {
-    stroke-width: 3px;
-}
-
-html.a11y-high-contrast .home-design .home-map-microterritory-control:focus-visible .home-map-microterritory-hit {
-    stroke: #000;
 }
 
 html.a11y-high-contrast .home-design .home-foundation-audit-item {

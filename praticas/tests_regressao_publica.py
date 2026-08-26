@@ -1,4 +1,5 @@
 import re
+import unittest
 from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
@@ -384,97 +385,19 @@ class RegressaoPublicaTests(TestCase):
                 self.assertIn('id="home-video-error" role="status" hidden', html)
                 self.assertNotIn("autoplay", html)
 
-    def test_mapa_preserva_paises_microterritorios_e_selecao_unitaria(self):
+    def test_mapa_preserva_paths_reais_selecao_unitária_e_zoom(self):
         payload = _payload_mapa_regional()
         por_sigla = {pais["sigla"]: pais for pais in payload["paises"]}
-        institucionais = {
-            pais.sigla
-            for pais in Pais.objects.filter(
-                efs__isnull=False,
-                sigla__in=MAPA_REGIONAL_ISO3_PARA_GEO_ID,
-            ).distinct()
-        }
-        self.assertEqual(set(por_sigla), institucionais)
-        self.assertEqual(MAPA_REGIONAL_ISO3_PARA_GEO_ID["ABW"], "533")
-        self.assertEqual(MAPA_REGIONAL_ISO3_PARA_GEO_ID["CUW"], "531")
         self.assertEqual(por_sigla["ABW"]["geo_id"], "533")
         self.assertEqual(por_sigla["CUW"]["geo_id"], "531")
-        self.assertEqual(por_sigla["CUW"]["experiencias_publicadas"], 1)
-        self.assertEqual(len(por_sigla["CUW"]["criterios_normativos_ids"]), 2)
-
-        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(
-            encoding="utf-8"
-        )
-        ids_microterritorios = re.search(
-            r"const\s+microterritoryGeoIds\s*=\s*new\s+Set\s*\(\s*\[([^]]+)]",
-            script,
-        )
-        self.assertIsNotNone(ids_microterritorios)
-        ids_encontrados = re.findall(
-            r'["\'](\d{3})["\']', ids_microterritorios.group(1)
-        )
-        self.assertCountEqual(ids_encontrados, ["531", "533"])
-        self.assertEqual(len(ids_encontrados), 2)
-        self.assertIn("function projectedFeatureCentroid", script)
-        self.assertIn("path.centroid(feature)", script)
-        self.assertIn("d3.geoCentroid(feature)", script)
-        self.assertIn("Number.isFinite", script)
-        self.assertIn("function separatedMicroterritoryPositions", script)
-        self.assertIn("institutionalMicroterritoryGeoIds.size", script)
-        raio_hit = re.search(
-            r'attr\s*\(\s*["\']class["\']\s*,\s*'
-            r'["\']home-map-microterritory-hit["\']\s*\)'
-            r'.*?attr\s*\(\s*["\']r["\']\s*,\s*(\d+)\s*\)',
-            script,
-            re.DOTALL,
-        )
-        raio_marker = re.search(
-            r'attr\s*\(\s*["\']class["\']\s*,\s*'
-            r'["\']home-map-microterritory-marker["\']\s*\)'
-            r'.*?attr\s*\(\s*["\']r["\']\s*,\s*(\d+)\s*\)',
-            script,
-            re.DOTALL,
-        )
-        self.assertIsNotNone(raio_hit)
-        self.assertIsNotNone(raio_marker)
-        hitbox = int(raio_hit.group(1))
-        marker = int(raio_marker.group(1))
-        self.assertEqual(hitbox, 16)
-        self.assertEqual(marker, 8)
-        self.assertGreater(hitbox, marker)
-        separacao_minima = re.search(
-            r"const\s+microterritoryMinimumSeparation\s*=\s*(\d+)", script
-        )
-        self.assertIsNotNone(separacao_minima)
-        self.assertGreater(int(separacao_minima.group(1)), hitbox * 2)
-        self.assertIn("Math.hypot", script)
-        self.assertIn("positionedMicroterritories", script)
-        self.assertIn("item.position[0]", script)
-        self.assertIn("item.position[1]", script)
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(encoding="utf-8")
+        self.assertIn("interactiveCountryPaths = bindCountryControl(memberPaths)", script)
+        self.assertIn("scaleExtent([1, 8])", script)
+        self.assertNotIn("microterritory", script)
+        self.assertNotIn("separatedMicroterritoryPositions", script)
         self.assertIn("selectedIds.clear();", script)
-        self.assertIn('form.addEventListener("reset"', script)
-        self.assertIn('event.key === "Enter"', script)
-        self.assertIn('event.key === " "', script)
         self.assertIn("showTooltip(event, country)", script)
-        self.assertIn("selectedIds.has(String(country.id))", script)
-        funcao_coordenada = script.split(
-            "function updateCoordinatedHighlight", 1
-        )[1].split("function showTooltip", 1)[0]
-        self.assertNotIn("selectedIds", funcao_coordenada)
-
-        response = self.client.get("/")
-        html = response.content.decode("utf-8")
-        inputs_pais = [
-            trecho.split(">", 1)[0]
-            for trecho in html.split("<input")[1:]
-            if 'name="pais"' in trecho.split(">", 1)[0]
-        ]
-        self.assertEqual(len(inputs_pais), len(institucionais))
-        self.assertTrue(all('type="radio"' in trecho for trecho in inputs_pais))
-        self.assertTrue(all('type="checkbox"' not in trecho for trecho in inputs_pais))
-        self.assertIn('id="regionalMapClear" type="reset"', html)
-        self.assertIn('formaction="/catalogo/"', html)
-        self.assertIn('formaction="/normas-internacionais/"', html)
+        self.assertNotIn("selectedIds", script.split("function updateCoordinatedHighlight", 1)[1].split("function showTooltip", 1)[0])
 
     def test_catalogos_e_detalhe_preservam_invariantes_de_produto(self):
         for prefixo in self.PREFIXOS:

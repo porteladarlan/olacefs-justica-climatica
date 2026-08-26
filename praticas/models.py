@@ -38,7 +38,7 @@ def texto_por_idioma(texto_pt, texto_es="", texto_en=""):
         return texto_en
     if idioma.startswith("es") and texto_es:
         return texto_es
-    return texto_pt
+    return texto_pt or texto_es or texto_en
 
 
 def texto_por_idioma_com_fallback_es(texto_es, texto_pt="", texto_en=""):
@@ -454,6 +454,13 @@ class Experiencia(models.Model):
     relevante = models.BooleanField(default=False)
 
     status_publicacao = models.CharField(max_length=30, choices=StatusPublicacao.choices, default=StatusPublicacao.PUBLICADO)
+    idioma_original = models.CharField(
+        max_length=2,
+        choices=(("pt", "Português"), ("es", "Español"), ("en", "English")),
+        blank=True,
+        default="",
+        editable=False,
+    )
     comentario_revisor = models.TextField(blank=True)
 
     criado_em = models.DateTimeField(auto_now_add=True)

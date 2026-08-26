@@ -40,6 +40,11 @@
                         {% if LANGUAGE_CODE == 'en' %}Loading regional map&hellip;{% elif LANGUAGE_CODE == 'es' %}Cargando mapa de la regi&oacute;n&hellip;{% else %}Carregando mapa da regi&atilde;o&hellip;{% endif %}
                     </div>
                 </div>
+                <div class="home-map-zoom-controls" role="group" aria-label="{% if LANGUAGE_CODE == 'en' %}Map zoom controls{% elif LANGUAGE_CODE == 'es' %}Controles de zoom del mapa{% else %}Controles de zoom do mapa{% endif %}">
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="regionalMapZoomIn" aria-label="{% if LANGUAGE_CODE == 'en' %}Zoom in{% elif LANGUAGE_CODE == 'es' %}Acercar{% else %}Aumentar zoom{% endif %}">+</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="regionalMapZoomOut" aria-label="{% if LANGUAGE_CODE == 'en' %}Zoom out{% elif LANGUAGE_CODE == 'es' %}Alejar{% else %}Diminuir zoom{% endif %}">−</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="regionalMapZoomReset" aria-label="{% if LANGUAGE_CODE == 'en' %}Reset map{% elif LANGUAGE_CODE == 'es' %}Restablecer mapa{% else %}Redefinir mapa{% endif %}">{% if LANGUAGE_CODE == 'en' %}Reset{% elif LANGUAGE_CODE == 'es' %}Restablecer{% else %}Redefinir{% endif %}</button>
+                </div>
                 <div class="home-map-tooltip" id="regionalMapTooltip" role="tooltip" hidden></div>
                 <div class="home-map-legend" aria-label="{% if LANGUAGE_CODE == 'en' %}Map legend{% elif LANGUAGE_CODE == 'es' %}Leyenda del mapa{% else %}Legenda do mapa{% endif %}">
                     <span><span class="home-map-dot is-member" aria-hidden="true"></span>{% if LANGUAGE_CODE == 'en' %}OLACEFS member SAI{% elif LANGUAGE_CODE == 'es' %}EFS miembro OLACEFS{% else %}EFS membro OLACEFS{% endif %}</span>

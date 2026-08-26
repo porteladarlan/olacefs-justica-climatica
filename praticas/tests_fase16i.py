@@ -169,7 +169,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
             reverse("excluir_boa_pratica", args=[experiencia.pk]),
         )
 
-    def test_mensagens_editoriais_acompanham_idioma_ativo(self):
+    def test_rota_legada_de_decisao_redireciona_em_todos_os_idiomas(self):
         mensagens = {
             "pt-br": {
                 "aprovar": "Experiência aprovada e publicada no catálogo público.",
@@ -190,7 +190,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
 
         for idioma, mensagens_por_acao in mensagens.items():
-            for acao, mensagem in mensagens_por_acao.items():
+            for acao in mensagens_por_acao:
                 with self.subTest(idioma=idioma, acao=acao):
                     experiencia = self.criar_experiencia(
                         status=Experiencia.StatusPublicacao.ENVIADO
@@ -199,13 +199,15 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
                         url = reverse(
                             "revisar_experiencia", args=[experiencia.pk]
                         )
+                    status_anterior = experiencia.status_publicacao
                     resposta = self.client.post(
                         url,
                         {"acao": acao, "comentario_revisor": "Homologação"},
-                        follow=True,
                     )
-                    self.assertEqual(resposta.status_code, 200)
-                    self.assertContains(resposta, mensagem)
+                    self.assertEqual(resposta.status_code, 302)
+                    self.assertEqual(resposta.url, reverse("editar_boa_pratica", args=[experiencia.pk]))
+                    experiencia.refresh_from_db()
+                    self.assertEqual(experiencia.status_publicacao, status_anterior)
 
     def test_mensagem_de_exclusao_acompanha_idioma_ativo(self):
         mensagens = {
@@ -313,7 +315,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
             urls = [
                 reverse("catalogo_experiencias"),
                 reverse("painel_revisao"),
-                reverse("revisar_experiencia", args=[enviada.pk]),
+                reverse("editar_boa_pratica", args=[enviada.pk]),
                 reverse("detalhe_experiencia", args=[publicada.pk]),
             ]
 
@@ -327,7 +329,6 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.assertIn("Editar buena práctica", conteudos[1])
         self.assertIn("Eliminar buena práctica", conteudos[1])
         self.assertIn("Editar buena práctica", conteudos[2])
-        self.assertIn("Eliminar buena práctica", conteudos[2])
         self.assertIn("Eliminar buena práctica", conteudos[3])
         for conteudo in conteudos:
             self.assertNotIn("buena prática", conteudo)

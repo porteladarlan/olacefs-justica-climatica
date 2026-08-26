@@ -2,19 +2,19 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisión{% else %}Painel de revisão{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Good practice management{% elif LANGUAGE_CODE == 'es' %}Gestión de buenas prácticas{% else %}Gerenciamento de boas práticas{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="mb-4">
-    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Restricted review area{% elif LANGUAGE_CODE == 'es' %}Área restringida de revisión{% else %}Área restrita de revisão{% endif %}</div>
-    <h1 class="page-title mb-2">{% if LANGUAGE_CODE == 'en' %}Good practice review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisión de buenas prácticas{% else %}Painel de revisão de boas práticas{% endif %}</h1>
+    <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Restricted management area{% elif LANGUAGE_CODE == 'es' %}Área restringida de gestión{% else %}Área restrita de gerenciamento{% endif %}</div>
+    <h1 class="page-title mb-2">{% if LANGUAGE_CODE == 'en' %}Good practice management{% elif LANGUAGE_CODE == 'es' %}Gestión de buenas prácticas{% else %}Gerenciamento de boas práticas{% endif %}</h1>
     <p class="section-subtitle mb-0">
         {% if LANGUAGE_CODE == 'en' %}
-            Review submitted practices, request adjustments, approve content and publish validated experiences in the public catalog.
+            Manage good practices and historical records, including editing and deletion.
         {% elif LANGUAGE_CODE == 'es' %}
-            Revise las buenas prácticas enviadas, solicite ajustes, apruebe contenidos y publique experiencias validadas en el catálogo público.
+            Gestione buenas prácticas y registros históricos, incluyendo edición y eliminación.
         {% else %}
-            Revise boas práticas enviadas, solicite ajustes, aprove conteúdos e publique experiências validadas no catálogo público.
+            Gerencie boas práticas e registros históricos, incluindo edição e exclusão.
         {% endif %}
     </p>
 </section>
@@ -53,7 +53,7 @@
     <div class="col-md-6">
         <label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Filter by status{% elif LANGUAGE_CODE == 'es' %}Filtrar por estado{% else %}Filtrar por status{% endif %}</label>
         <select class="form-select" name="status">
-            <option value="">{% if LANGUAGE_CODE == 'en' %}All pending items{% elif LANGUAGE_CODE == 'es' %}Todos los pendientes{% else %}Todos os pendentes{% endif %}</option>
+            <option value="">{% if LANGUAGE_CODE == 'en' %}All records{% elif LANGUAGE_CODE == 'es' %}Todos los registros{% else %}Todos os registros{% endif %}</option>
             {% for valor, rotulo in status_choices %}
                 <option value="{{ valor }}" {% if status_atual == valor %}selected{% endif %}>
                     {% if valor == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}
@@ -98,7 +98,6 @@
             {% endif %}
             <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
             <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}</a>
-            <a href="{% url 'revisar_experiencia' experiencia.pk %}" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %}</a>
         </article>
     </div>
     {% empty %}

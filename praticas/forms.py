@@ -374,6 +374,18 @@ class TipoExperienciaSelect(forms.Select):
 
 
 class ExperienciaSubmissaoForm(forms.ModelForm):
+    CAMPOS_TEXTUAIS_TRADUZIVEIS = (
+        "titulo", "descricao", "problema_climatico",
+        "relacao_adaptacao_mitigacao_gestao_desastres", "riscos_climaticos",
+        "enfoque_justica_climatica", "impactos_diferenciados", "objetivo",
+        "perguntas_chave", "criterios_utilizados", "metodologia",
+        "ferramentas_utilizadas", "fontes_informacao", "resultados",
+        "recomendacoes", "mudancas_ou_impactos", "motivo_boa_pratica",
+        "elementos_replicaveis", "dificuldades", "licoes_aprendidas",
+        "o_que_fariam_diferente", "replicabilidade", "informacoes_adicionais",
+        "necessidades_para_replicacao", "ferramentas_metodologias_uteis",
+        "temas_sugeridos_para_guia", "apoio_requerido_pelas_efs",
+    )
     class Meta:
         model = Experiencia
         fields = [
@@ -433,10 +445,43 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "ano_execucao": forms.NumberInput(attrs={"class": "form-control"}),
         }
 
-    def __init__(self, *args, obrigatorio_para_envio=True, **kwargs):
+    def __init__(self, *args, obrigatorio_para_envio=True, permitir_traducoes=False, **kwargs):
         self.obrigatorio_para_envio = obrigatorio_para_envio
+        self.permitir_traducoes = permitir_traducoes
         super().__init__(*args, **kwargs)
+        self.language_code = idioma_atual()
+        if self.instance.pk and getattr(self.instance, "idioma_original", ""):
+            self.language_code = self.instance.idioma_original
+        if self.instance.pk and self.language_code != "pt":
+            sufixo = "_" + self.language_code
+            for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS:
+                campo_idioma = campo + sufixo
+                if campo in self.fields and hasattr(self.instance, campo_idioma):
+                    self.initial[campo] = getattr(self.instance, campo_idioma) or getattr(self.instance, campo, "")
         aplicar_textos_experiencia(self)
+
+        self.translation_fields = []
+        self.translation_field_map = {}
+        if self.permitir_traducoes and self.instance.pk:
+            for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS:
+                if campo not in self.fields:
+                    continue
+                base_field = self.fields[campo]
+                for idioma, nome_idioma in (("pt", "PT"), ("es", "ES"), ("en", "EN")):
+                    nome = campo if idioma == "pt" else f"{campo}_{idioma}"
+                    if not hasattr(self.instance, nome):
+                        continue
+                    campo_traducao = base_field.__class__(
+                        required=False,
+                        label=f"{base_field.label} ({nome_idioma})",
+                        help_text="",
+                        widget=base_field.widget.__class__(attrs=dict(base_field.widget.attrs)),
+                    )
+                    nome_administrativo = f"traducao_{idioma}__{campo}"
+                    self.fields[nome_administrativo] = campo_traducao
+                    self.initial[nome_administrativo] = getattr(self.instance, nome, "") or ""
+                    self.translation_field_map[nome_administrativo] = nome
+                    self.translation_fields.append(self[nome_administrativo])
 
         tipo_atual = self.instance.tipo_experiencia_id if self.instance.pk else None
         setor_atual = self.instance.setor_id if self.instance.pk else None
@@ -505,6 +550,27 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
         if not self.perguntas_auditoria_valores:
             self.perguntas_auditoria_valores = [""]
         self.perguntas_auditoria_limpas = []
+
+    def save(self, commit=True):
+        valores_originais = {
+            campo: getattr(self.instance, campo, "")
+            for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS
+        }
+        experiencia = super().save(commit=False)
+        if self.language_code != "pt":
+            sufixo = "_" + self.language_code
+            for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS:
+                campo_idioma = campo + sufixo
+                if hasattr(experiencia, campo_idioma):
+                    setattr(experiencia, campo_idioma, self.cleaned_data.get(campo, "") or "")
+                    setattr(experiencia, campo, valores_originais[campo])
+        if self.permitir_traducoes and self.instance.pk:
+            for nome_administrativo, nome_modelo in self.translation_field_map.items():
+                setattr(experiencia, nome_modelo, self.cleaned_data.get(nome_administrativo, "") or "")
+        if commit:
+            experiencia.save()
+            self.save_m2m()
+        return experiencia
 
     def clean(self):
         cleaned_data = super().clean()
@@ -824,19 +890,7 @@ class RevisaoExperienciaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        choices = [
-            ("em_revisao", texto_idioma("Marcar como em revisão", "Marcar como en revisión", "Mark as under review")),
-            ("aprovar", texto_idioma("Aprovar", "Aprobar", "Approve")),
-            ("publicar", texto_idioma("Publicar", "Publicar", "Publish")),
-            ("arquivar", texto_idioma("Arquivar", "Archivar", "Archive")),
-            ("devolver", texto_idioma("Devolver para ajuste", "Devolver para ajustes", "Return for adjustments")),
-            ("rejeitar", texto_idioma("Rejeitar", "Rechazar", "Reject")),
-        ]
-        if self.instance.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
-            choices = [("arquivar", texto_idioma("Arquivar", "Archivar", "Archive"))]
-        elif self.instance.status_publicacao == Experiencia.StatusPublicacao.ARQUIVADO:
-            choices = [("publicar", texto_idioma("Restaurar / Publicar", "Restaurar / Publicar", "Restore / Publish"))]
-        self.fields["acao"].choices = choices
+        self.fields["acao"].choices = []
         self.fields["acao"].label = texto_idioma("Decisão da revisão", "Decisión de la revisión", "Review decision")
         self.fields["comentario_revisor"].label = texto_idioma("Comentário do revisor", "Comentario del revisor", "Reviewer comment")
 

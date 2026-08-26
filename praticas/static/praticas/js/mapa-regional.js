@@ -1,66 +1,6 @@
 const MapaRegionalGeometry = (function () {
     "use strict";
 
-    function projectedFeatureCentroid(feature, path, projection, d3) {
-        const pathCentroid = path.centroid(feature);
-        if (
-            Array.isArray(pathCentroid) &&
-            Number.isFinite(pathCentroid[0]) &&
-            Number.isFinite(pathCentroid[1])
-        ) {
-            return pathCentroid;
-        }
-
-        const geographicCentroid = d3.geoCentroid(feature);
-        const projectedCentroid = projection(geographicCentroid);
-        if (
-            Array.isArray(projectedCentroid) &&
-            Number.isFinite(projectedCentroid[0]) &&
-            Number.isFinite(projectedCentroid[1])
-        ) {
-            return projectedCentroid;
-        }
-
-        return null;
-    }
-
-    function separatedMicroterritoryPositions(
-        features,
-        path,
-        projection,
-        d3,
-        minimumSeparation
-    ) {
-        const positioned = features.map(function (feature) {
-            return {
-                feature: feature,
-                position: projectedFeatureCentroid(feature, path, projection, d3)
-            };
-        });
-        if (positioned.some(function (item) { return item.position === null; })) {
-            throw new Error("Microterritory geometry has no valid projected centroid.");
-        }
-        if (positioned.length === 2) {
-            const deltaX = positioned[1].position[0] - positioned[0].position[0];
-            const deltaY = positioned[1].position[1] - positioned[0].position[1];
-            const distance = Math.hypot(deltaX, deltaY);
-            if (distance < minimumSeparation) {
-                const directionX = distance > 0 ? deltaX / distance : 1;
-                const directionY = distance > 0 ? deltaY / distance : 0;
-                const displacement = (minimumSeparation - distance) / 2;
-                positioned[0].position = [
-                    positioned[0].position[0] - directionX * displacement,
-                    positioned[0].position[1] - directionY * displacement
-                ];
-                positioned[1].position = [
-                    positioned[1].position[0] + directionX * displacement,
-                    positioned[1].position[1] + directionY * displacement
-                ];
-            }
-        }
-        return positioned;
-    }
-
     function pastelPaletteIndex(geoId) {
         const normalizedId = String(geoId || "")
             .split("")
@@ -71,8 +11,6 @@ const MapaRegionalGeometry = (function () {
     }
 
     return {
-        projectedFeatureCentroid: projectedFeatureCentroid,
-        separatedMicroterritoryPositions: separatedMicroterritoryPositions,
         pastelPaletteIndex: pastelPaletteIndex
     };
 })();
@@ -147,13 +85,10 @@ if (typeof module !== "undefined" && module.exports) {
             return [String(audit.id), audit];
         })
     );
-    const microterritoryGeoIds = new Set(["531", "533"]);
-    const microterritoryMinimumSeparation = 34;
     const selectedIds = new Set();
     const coordinatedHighlightedIds = new Set();
     let memberPaths = null;
     let interactiveCountryPaths = null;
-    let microterritoryControls = null;
 
     function selectedCountries() {
         return countries.filter(function (country) {
@@ -208,31 +143,6 @@ if (typeof module !== "undefined" && module.exports) {
                 });
         }
 
-        if (microterritoryControls) {
-            microterritoryControls
-                .classed("is-selected", function (feature) {
-                    const country = countryForFeature(feature);
-                    return country && selectedIds.has(String(country.id));
-                })
-                .classed("is-coordinated", function (feature) {
-                    const country = countryForFeature(feature);
-                    return country && coordinatedHighlightedIds.has(String(country.id));
-                })
-                .attr("aria-pressed", function (feature) {
-                    const country = countryForFeature(feature);
-                    return country && selectedIds.has(String(country.id))
-                        ? "true"
-                        : "false";
-                })
-                .attr("aria-label", function (feature) {
-                    const country = countryForFeature(feature);
-                    return accessibleCountryLabel(
-                        country,
-                        selectedIds.has(String(country.id)),
-                        coordinatedHighlightedIds.has(String(country.id))
-                    );
-                });
-        }
     }
 
     function updateCount(total) {
@@ -377,6 +287,7 @@ if (typeof module !== "undefined" && module.exports) {
     }
 
     function bindCountryControl(selection) {
+        let pointerDownPoint = null;
         return selection
             .attr("role", "button")
             .attr("tabindex", "0")
@@ -387,7 +298,21 @@ if (typeof module !== "undefined" && module.exports) {
             .attr("aria-label", function (feature) {
                 return accessibleCountryLabel(countryForFeature(feature), false, false);
             })
+            .on("pointerdown", function (event) {
+                pointerDownPoint = [event.clientX, event.clientY];
+            })
             .on("click", function (event, feature) {
+                if (pointerDownPoint) {
+                    const distance = Math.hypot(
+                        event.clientX - pointerDownPoint[0],
+                        event.clientY - pointerDownPoint[1]
+                    );
+                    pointerDownPoint = null;
+                    if (distance > 5 || event.defaultPrevented) {
+                        hideTooltip();
+                        return;
+                    }
+                }
                 hideTooltip();
                 toggleCountry(countryForFeature(feature));
             })
@@ -440,7 +365,39 @@ if (typeof module !== "undefined" && module.exports) {
             .attr("aria-label", document.getElementById("home-map-title").textContent.trim());
         svg.append("title").text(document.getElementById("home-map-title").textContent.trim());
 
-        const paths = svg
+        const zoomLayer = svg.append("g").attr("class", "home-map-zoom-layer");
+        const zoomBehavior = window.d3.zoom()
+            .scaleExtent([1, 8])
+            .on("zoom", function (event) {
+                zoomLayer.attr("transform", event.transform);
+            });
+        svg.call(zoomBehavior);
+        svg.on("click.zoom-selection", function (event) {
+            if (event.defaultPrevented) {
+                event.stopImmediatePropagation();
+            }
+        });
+
+        const zoomIn = document.getElementById("regionalMapZoomIn");
+        const zoomOut = document.getElementById("regionalMapZoomOut");
+        const zoomReset = document.getElementById("regionalMapZoomReset");
+        if (zoomIn) {
+            zoomIn.addEventListener("click", function () {
+                svg.transition().duration(180).call(zoomBehavior.scaleBy, 1.6);
+            });
+        }
+        if (zoomOut) {
+            zoomOut.addEventListener("click", function () {
+                svg.transition().duration(180).call(zoomBehavior.scaleBy, 0.625);
+            });
+        }
+        if (zoomReset) {
+            zoomReset.addEventListener("click", function () {
+                svg.transition().duration(180).call(zoomBehavior.transform, window.d3.zoomIdentity);
+            });
+        }
+
+        const paths = zoomLayer
             .append("g")
             .selectAll("path")
             .data(features)
@@ -469,75 +426,7 @@ if (typeof module !== "undefined" && module.exports) {
                 );
             });
 
-        memberPaths
-            .filter(function (feature) {
-                return microterritoryGeoIds.has(
-                    String(feature.id).padStart(3, "0")
-                );
-            })
-            .classed("is-microterritory", true)
-            .attr("aria-hidden", "true")
-            .attr("focusable", "false");
-
-        interactiveCountryPaths = bindCountryControl(
-            memberPaths.filter(function (feature) {
-                return !microterritoryGeoIds.has(
-                    String(feature.id).padStart(3, "0")
-                );
-            })
-        );
-
-        const microterritoryFeatures = features.filter(function (feature) {
-            const geoId = String(feature.id).padStart(3, "0");
-            return microterritoryGeoIds.has(geoId) && countriesByGeoId.has(geoId);
-        });
-        const institutionalMicroterritoryGeoIds = new Set(
-            Array.from(microterritoryGeoIds).filter(function (geoId) {
-                return countriesByGeoId.has(geoId);
-            })
-        );
-        if (microterritoryFeatures.length !== institutionalMicroterritoryGeoIds.size) {
-            throw new Error("Institutional microterritory geometry is unavailable.");
-        }
-        const positionedMicroterritories = MapaRegionalGeometry.separatedMicroterritoryPositions(
-            microterritoryFeatures,
-            path,
-            projection,
-            window.d3,
-            microterritoryMinimumSeparation
-        );
-        microterritoryControls = svg
-            .append("g")
-            .attr("class", "home-map-microterritory-layer")
-            .selectAll("g")
-            .data(positionedMicroterritories)
-            .join("g")
-            .attr("class", "home-map-microterritory-control")
-            .attr("data-palette-index", function (item) {
-                return MapaRegionalGeometry.pastelPaletteIndex(
-                    String(item.feature.id).padStart(3, "0")
-                );
-            })
-            .attr("transform", function (item) {
-                return "translate(" + item.position[0] + "," + item.position[1] + ")";
-            });
-
-        microterritoryControls
-            .append("circle")
-            .attr("class", "home-map-microterritory-hit")
-            .attr("r", 16);
-        microterritoryControls
-            .append("circle")
-            .attr("class", "home-map-microterritory-marker")
-            .attr("r", 8);
-        microterritoryControls
-            .append("title")
-            .text(function (item) {
-                return countryForFeature(item.feature).nome;
-            });
-        bindCountryControl(
-            microterritoryControls.datum(function (item) { return item.feature; })
-        );
+        interactiveCountryPaths = bindCountryControl(memberPaths);
 
         updatePathState();
     }

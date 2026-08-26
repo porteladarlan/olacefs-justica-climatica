@@ -2,6 +2,7 @@ import json
 import math
 import os
 import re
+import unittest
 import shutil
 import subprocess
 from pathlib import Path
@@ -592,164 +593,20 @@ class MapaRegionalTests(TestCase):
         self.assertNotIn("form.submit", funcao)
         self.assertNotIn("window.location", funcao)
 
-    def test_microterritorios_usam_centroides_validos_separados_e_controle_acessivel(self):
-        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(
-            encoding="utf-8"
-        )
-        css = Path(finders.find("praticas/css/home.css")).read_text(
-            encoding="utf-8"
-        )
+    def test_microterritorios_removidos_e_paths_reais_usam_zoom(self):
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(encoding="utf-8")
+        css = Path(finders.find("praticas/css/home.css")).read_text(encoding="utf-8")
+        self.assertNotIn("microterritory", script)
+        self.assertNotIn("microterritory", css)
+        self.assertIn("scaleExtent([1, 8])", script)
 
-        ids_microterritorios = re.search(
-            r"const\s+microterritoryGeoIds\s*=\s*new\s+Set\s*\(\s*\[([^]]+)]",
-            script,
-        )
-        self.assertIsNotNone(ids_microterritorios)
-        ids_encontrados = re.findall(
-            r'["\'](\d{3})["\']', ids_microterritorios.group(1)
-        )
-        self.assertCountEqual(ids_encontrados, ["531", "533"])
-        self.assertEqual(len(ids_encontrados), 2)
-        self.assertIn("function projectedFeatureCentroid", script)
-        self.assertIn("path.centroid(feature)", script)
-        self.assertIn("d3.geoCentroid(feature)", script)
-        self.assertIn("Number.isFinite", script)
-        self.assertIn("function separatedMicroterritoryPositions", script)
-        self.assertIn("microterritoryFeatures.length", script)
-        self.assertIn("institutionalMicroterritoryGeoIds.size", script)
-        raio_hit = re.search(
-            r'attr\("class", "home-map-microterritory-hit"\).*?attr\("r", (\d+)\)',
-            script,
-            re.DOTALL,
-        )
-        raio_marker = re.search(
-            r'attr\("class", "home-map-microterritory-marker"\).*?attr\("r", (\d+)\)',
-            script,
-            re.DOTALL,
-        )
-        self.assertIsNotNone(raio_hit)
-        self.assertIsNotNone(raio_marker)
-        self.assertEqual(int(raio_hit.group(1)), 16)
-        self.assertEqual(int(raio_marker.group(1)), 8)
-        self.assertGreater(int(raio_hit.group(1)), int(raio_marker.group(1)))
-        separacao_minima = re.search(
-            r"const\s+microterritoryMinimumSeparation\s*=\s*(\d+)", script
-        )
-        self.assertIsNotNone(separacao_minima)
-        self.assertGreater(
-            int(separacao_minima.group(1)),
-            int(raio_hit.group(1)) * 2,
-        )
-        self.assertIn("Math.hypot", script)
-        self.assertIn("positionedMicroterritories", script)
-        self.assertIn("item.position[0]", script)
-        self.assertIn("item.position[1]", script)
-        self.assertRegex(
-            script,
-            r"bindCountryControl\s*\(\s*microterritoryControls\.datum",
-        )
-        self.assertIn('.append("title")', script)
-        self.assertIn("countryForFeature(item.feature).nome", script)
-        self.assertIn('attr("aria-label"', script)
-        self.assertIn("accessibleCountryLabel", script)
-        self.assertIn('.on("pointermove"', script)
-        self.assertIn("hideTooltip();", script)
-        self.assertIn("selectedIds.has(String(country.id))", script)
-        self.assertIn('if (country && selectedIds.has(String(country.id)))', script)
-        self.assertIn('event.key === "Enter"', script)
-        self.assertIn('event.key === " "', script)
-        self.assertIn("selectedIds.clear();", script)
-
-        estados_visuais = (
-            ".home-map-microterritory-marker",
-            ".home-map-microterritory-control:hover .home-map-microterritory-marker",
-            ".home-map-microterritory-control.is-selected .home-map-microterritory-marker",
-            ".home-map-microterritory-control.is-coordinated .home-map-microterritory-marker",
-            ".home-map-microterritory-control:focus-visible .home-map-microterritory-hit",
-        )
-        for seletor in estados_visuais:
-            with self.subTest(seletor=seletor):
-                self.assertIn(seletor, css)
-
-    def test_geometria_real_produz_centroides_finitos_e_distintos(self):
-        node = shutil.which("node")
-        if node is None:
-            self.skipTest("Node.js não disponível para validar a geometria do mapa.")
-
+    def test_geometrias_531_e_533_sao_paths_reais(self):
         caminho = Path(finders.find("praticas/data/countries-50m.json"))
         dados = json.loads(caminho.read_text(encoding="utf-8"))
-        geometrias = {
-            str(geometria["id"]).zfill(3): geometria
-            for geometria in dados["objects"]["countries"]["geometries"]
-            if geometria.get("id") is not None
-        }
-        self.assertIn("531", geometrias)
-        self.assertIn("533", geometrias)
+        geometrias = {str(g["id"]).zfill(3): g for g in dados["objects"]["countries"]["geometries"] if g.get("id") is not None}
         for geo_id in ("531", "533"):
+            self.assertIn(geo_id, geometrias)
             self.assertIn(geometrias[geo_id].get("type"), {"Polygon", "MultiPolygon"})
-
-        codigo = r"""
-const fs = require("fs");
-const d3 = require("./praticas/static/praticas/vendor/d3/d3-7.9.0.min.js");
-const topojson = require("./praticas/static/praticas/vendor/topojson/topojson-client-3.1.0.min.js");
-const geometry = require("./praticas/static/praticas/js/mapa-regional.js");
-const topology = JSON.parse(fs.readFileSync(
-    "./praticas/static/praticas/data/countries-50m.json", "utf8"
-));
-const regionalIds = new Set(REGIONAL_IDS);
-const features = topojson.feature(topology, topology.objects.countries).features
-    .filter((feature) => regionalIds.has(String(feature.id).padStart(3, "0")));
-const microterritories = features.filter((feature) =>
-    ["531", "533"].includes(String(feature.id).padStart(3, "0"))
-);
-const projection = d3.geoMercator().fitExtent(
-    [[24, 18], [696, 502]],
-    {type: "FeatureCollection", features: features}
-);
-const path = d3.geoPath(projection);
-const positioned = geometry.separatedMicroterritoryPositions(
-    microterritories, path, projection, d3, 34
-);
-const fallbackPosition = geometry.projectedFeatureCentroid(
-    microterritories[0],
-    {centroid: () => [NaN, NaN]},
-    projection,
-    d3
-);
-process.stdout.write(JSON.stringify({
-    positioned: positioned.map((item) => ({
-        id: String(item.feature.id).padStart(3, "0"),
-        pathCentroid: path.centroid(item.feature),
-        position: item.position
-    })),
-    fallbackPosition: fallbackPosition
-}));
-""".replace("REGIONAL_IDS", json.dumps(list(MAPA_REGIONAL_ISO3_PARA_GEO_ID.values())))
-        resultado = subprocess.run(
-            [node, "-e", codigo],
-            cwd=settings.BASE_DIR,
-            env=os.environ.copy(),
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        self.assertEqual(resultado.returncode, 0, resultado.stderr)
-        calculo = json.loads(resultado.stdout)
-        calculados = calculo["positioned"]
-        self.assertEqual(len(calculados), 2)
-        self.assertCountEqual([item["id"] for item in calculados], ["531", "533"])
-        posicoes = {item["id"]: item["position"] for item in calculados}
-        for posicao in posicoes.values():
-            self.assertTrue(all(math.isfinite(valor) for valor in posicao))
-            self.assertGreaterEqual(posicao[0], 0)
-            self.assertLessEqual(posicao[0], 720)
-            self.assertGreaterEqual(posicao[1], 0)
-            self.assertLessEqual(posicao[1], 520)
-        self.assertNotEqual(posicoes["531"], posicoes["533"])
-        self.assertGreaterEqual(math.dist(posicoes["531"], posicoes["533"]), 34)
-        self.assertTrue(
-            all(math.isfinite(valor) for valor in calculo["fallbackPosition"])
-        )
 
     def test_ids_geograficos_configurados_existem_no_world_atlas_local(self):
         caminho = Path(finders.find("praticas/data/countries-50m.json"))
@@ -788,3 +645,18 @@ process.stdout.write(JSON.stringify({
                 NormaInternacional.objects.count(),
             ),
         )
+
+    def test_aruba_curaçao_usam_paths_reais_e_zoom_sem_marcadores(self):
+        script = Path(finders.find("praticas/js/mapa-regional.js")).read_text(encoding="utf-8")
+        html = self.client.get(reverse("pagina_inicial")).content.decode("utf-8")
+        self.assertIn('id="regionalMapZoomIn"', html)
+        self.assertIn('id="regionalMapZoomOut"', html)
+        self.assertIn('id="regionalMapZoomReset"', html)
+        self.assertIn('attr("class", "home-map-zoom-layer")', script)
+        self.assertIn("scaleExtent([1, 8])", script)
+        self.assertIn('interactiveCountryPaths = bindCountryControl(memberPaths)', script)
+        self.assertNotIn("microterritoryGeoIds", script)
+        self.assertNotIn("home-map-microterritory-marker", script)
+        self.assertNotIn("home-map-microterritory-hit", script)
+        self.assertNotIn("separatedMicroterritoryPositions", script)
+        self.assertEqual(script.count('attr("aria-hidden", "true")'), 1)

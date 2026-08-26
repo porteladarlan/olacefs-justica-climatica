@@ -225,7 +225,7 @@ class RotasPublicasTests(TestCase):
         self.assertIn("autor@example.org", conteudo)
         self.assertIn("2026", conteudo)
 
-    def test_revisor_publica_experiencia(self):
+    def test_rota_legada_nao_publica_experiencia(self):
         usuario = get_user_model().objects.create_user(
             username="revisor2",
             password="teste123",
@@ -233,6 +233,7 @@ class RotasPublicasTests(TestCase):
         )
         self.client.force_login(usuario)
         experiencia = Experiencia.objects.get(titulo="Boa pratica pendente")
+        status_anterior = experiencia.status_publicacao
         response = self.client.post(
             reverse("revisar_experiencia", args=[experiencia.pk]),
             {
@@ -242,10 +243,7 @@ class RotasPublicasTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         experiencia.refresh_from_db()
-        self.assertEqual(
-            experiencia.status_publicacao,
-            Experiencia.StatusPublicacao.PUBLICADO,
-        )
+        self.assertEqual(experiencia.status_publicacao, status_anterior)
 
     def test_status_envio_exibe_registro_do_autor_autenticado(self):
         self.client.force_login(self.autor_pendente)

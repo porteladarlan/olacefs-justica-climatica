@@ -65,57 +65,27 @@ class FluxoRevisaoAprovacaoTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
-        self.assertIn("Good practice review panel", conteudo)
+        self.assertIn("Good practice management", conteudo)
         self.assertIn("Submitted", conteudo)
         self.assertIn("Under review", conteudo)
         self.assertIn("Approved", conteudo)
         self.assertIn("Review published content edits", conteudo)
         self.assertNotIn("Revisar edições de conteúdos publicados", conteudo)
 
-    def test_revisar_experiencia_em_ingles_exibe_decisoes_traduzidas(self):
-        with translation.override("en"):
-            response = self.client.get(f"/en/painel-revisao/{self.experiencia.pk}/")
+    def test_rota_legada_de_revisao_redireciona_para_edicao(self):
+        response = self.client.get(reverse("revisar_experiencia", args=[self.experiencia.pk]))
+        self.assertRedirects(response, reverse("editar_boa_pratica", args=[self.experiencia.pk]))
 
-        self.assertEqual(response.status_code, 200)
-        conteudo = response.content.decode("utf-8")
-        conteudo_normalizado = " ".join(conteudo.split())
-        self.assertIn("Submission review", conteudo)
-        self.assertIn("Submitted content", conteudo)
-        self.assertIn("Methodological inputs", conteudo)
-        self.assertIn("Current status: Submitted", conteudo_normalizado)
-        self.assertIn("Save review decision", conteudo)
-        self.assertIn("Return for adjustments", conteudo)
-        self.assertIn('for="id_acao"', conteudo)
-        self.assertIn('for="id_comentario_revisor"', conteudo)
-        self.assertIn('target="_blank" rel="noopener noreferrer"', conteudo)
-        self.assertNotIn("Devolver para ajuste", conteudo)
-
-    def test_acao_de_edicao_fica_no_conteudo_e_nao_no_title(self):
-        response = self.client.get(
-            reverse("revisar_experiencia", args=[self.experiencia.pk])
-        )
-
-        self.assertEqual(response.status_code, 200)
-        conteudo = response.content.decode("utf-8")
-        titulo = conteudo.split("<title>", 1)[1].split("</title>", 1)[0]
-        self.assertNotIn("<a", titulo)
-        self.assertContains(
-            response,
-            f'href="{reverse("editar_boa_pratica", args=[self.experiencia.pk])}"',
-            count=1,
-        )
-        self.assertContains(response, "Editar boa prática", html=False)
-
-    def test_revisao_pode_devolver_para_ajuste_com_comentario(self):
+    def test_rota_legada_nao_processa_decisao(self):
+        status_anterior = self.experiencia.status_publicacao
         response = self.client.post(
             reverse("revisar_experiencia", args=[self.experiencia.pk]),
-            {"acao": "devolver", "comentario_revisor": "Favor complementar o vínculo com justiça climática."},
+            {"acao": "aprovar", "comentario_revisor": "Não deve ser processado."},
         )
-
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("editar_boa_pratica", args=[self.experiencia.pk]))
         self.experiencia.refresh_from_db()
-        self.assertEqual(self.experiencia.status_publicacao, Experiencia.StatusPublicacao.RASCUNHO)
-        self.assertIn("complementar", self.experiencia.comentario_revisor)
+        self.assertEqual(self.experiencia.status_publicacao, status_anterior)
+        self.assertEqual(self.experiencia.comentario_revisor, "")
 
     def test_painel_edicoes_em_ingles_exibe_textos_traduzidos(self):
         with translation.override("en"):

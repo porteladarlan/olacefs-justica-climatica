@@ -72,26 +72,41 @@ class AjustesPlataforma1206Tests(TestCase):
         ]
 
         publicado_acoes = dict(RevisaoExperienciaForm(instance=publicado).fields["acao"].choices)
-        self.assertEqual(set(publicado_acoes), {"arquivar"})
+        self.assertEqual(set(publicado_acoes), set())
 
         arquivado_acoes = dict(RevisaoExperienciaForm(instance=arquivado).fields["acao"].choices)
-        self.assertEqual(set(arquivado_acoes), {"publicar"})
-        self.assertEqual(arquivado_acoes["publicar"], "Restaurar / Publicar")
+        self.assertEqual(set(arquivado_acoes), set())
 
-        acoes_legadas = {
-            "em_revisao",
-            "aprovar",
-            "publicar",
-            "arquivar",
-            "devolver",
-            "rejeitar",
-        }
         for experiencia in historicos:
             with self.subTest(status=experiencia.status_publicacao):
                 self.assertEqual(
                     {value for value, _label in RevisaoExperienciaForm(instance=experiencia).fields["acao"].choices},
-                    acoes_legadas,
+                    set(),
                 )
+
+    def test_rota_legada_redireciona_todos_os_status_e_nao_altera_status(self):
+        acoes = ("aprovar", "publicar", "arquivar", "devolver", "rejeitar", "em_revisao")
+        status = (
+            Experiencia.StatusPublicacao.ENVIADO,
+            Experiencia.StatusPublicacao.EM_REVISAO,
+            Experiencia.StatusPublicacao.APROVADO,
+            Experiencia.StatusPublicacao.PUBLICADO,
+            Experiencia.StatusPublicacao.ARQUIVADO,
+            Experiencia.StatusPublicacao.REJEITADO,
+        )
+        self.client.force_login(self.revisor)
+        for indice, status_inicial in enumerate(status):
+            with self.subTest(status=status_inicial):
+                experiencia = self.criar_experiencia(f"Legada {indice}", status_inicial, self.autor)
+                for acao in acoes:
+                    response = self.client.post(
+                        reverse("revisar_experiencia", args=[experiencia.pk]),
+                        {"acao": acao, "comentario_revisor": "Ignorado."},
+                    )
+                    self.assertRedirects(response, reverse("editar_boa_pratica", args=[experiencia.pk]))
+                experiencia.refresh_from_db()
+                self.assertEqual(experiencia.status_publicacao, status_inicial)
+                self.assertEqual(experiencia.comentario_revisor, "")
 
     def test_nova_submissao_descreve_publicacao_imediata_nos_tres_idiomas(self):
         self.client.force_login(self.autor)
@@ -135,19 +150,18 @@ class AjustesPlataforma1206Tests(TestCase):
         response = self.client.get(reverse("editar_boa_pratica", args=[experiencia.pk]))
         self.assertEqual(response.status_code, 200)
 
-    def test_aprovacao_publica_no_catalogo_aberto(self):
+    def test_rota_legada_nao_aprova_publicacao_no_catalogo(self):
         experiencia = self.criar_experiencia("Aprovada e publicada", Experiencia.StatusPublicacao.ENVIADO, self.autor)
         self.client.force_login(self.revisor)
         response = self.client.post(
             reverse("revisar_experiencia", args=[experiencia.pk]),
             {"acao": "aprovar", "comentario_revisor": "Aprovada."},
-            follow=True,
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         experiencia.refresh_from_db()
-        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.PUBLICADO)
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ENVIADO)
         public_response = self.client.get(reverse("catalogo_experiencias"))
-        self.assertContains(public_response, "Aprovada e publicada")
+        self.assertNotContains(public_response, "Aprovada e publicada")
 
     def test_autor_edita_arquivada_sem_republica_la(self):
         experiencia = self.criar_experiencia(
@@ -205,16 +219,60 @@ class AjustesPlataforma1206Tests(TestCase):
         self.client.force_login(outro)
         self.assertRedirects(self.client.get(url), reverse("meus_envios"))
 
-    def test_revisor_restaura_arquivada_com_publicar(self):
+    def test_arquivada_pode_ser_editada_sem_fluxo_de_restaure(self):
         experiencia = self.criar_experiencia(
-            "Arquivada restaurável", Experiencia.StatusPublicacao.ARQUIVADO, self.autor
+            "Arquivada gerenciável", Experiencia.StatusPublicacao.ARQUIVADO, self.autor
         )
         self.client.force_login(self.revisor)
+        response = self.client.get(
+            reverse("revisar_experiencia", args=[experiencia.pk]),
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("editar_boa_pratica", args=[experiencia.pk]))
         response = self.client.post(
             reverse("revisar_experiencia", args=[experiencia.pk]),
             {"acao": "publicar", "comentario_revisor": "Restaurada."},
         )
         self.assertEqual(response.status_code, 302)
         experiencia.refresh_from_db()
-        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.PUBLICADO)
-        self.assertContains(self.client.get(reverse("catalogo_experiencias")), "Arquivada restaurável")
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
+        self.assertContains(self.client.get(reverse("editar_boa_pratica", args=[experiencia.pk])), "Arquivada gerenciável")
+
+    def test_exclusao_exige_autenticacao_e_permite_somente_autor_ou_staff(self):
+        propria = self.criar_experiencia("Exclusão do autor", Experiencia.StatusPublicacao.PUBLICADO, self.autor)
+        outra = self.criar_experiencia("Exclusão protegida", Experiencia.StatusPublicacao.PUBLICADO, self.autor)
+        self.assertRedirects(
+            self.client.get(reverse("excluir_boa_pratica", args=[propria.pk])),
+            f'{reverse("login_usuario")}?next={reverse("excluir_boa_pratica", args=[propria.pk])}',
+        )
+        self.assertRedirects(
+            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_exclusao": "sim"}),
+            f'{reverse("login_usuario")}?next={reverse("excluir_boa_pratica", args=[propria.pk])}',
+        )
+        self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
+        self.client.force_login(self.autor)
+
+        confirmacao = self.client.get(reverse("excluir_boa_pratica", args=[propria.pk]))
+        self.assertEqual(confirmacao.status_code, 200)
+        self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
+        self.assertRedirects(
+            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_exclusao": "nao"}),
+            reverse("excluir_boa_pratica", args=[propria.pk]),
+        )
+        self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
+        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_exclusao": "sim"}), reverse("catalogo_experiencias"))
+        self.assertFalse(Experiencia.objects.filter(pk=propria.pk).exists())
+
+        outro = get_user_model().objects.create_user("outro-exclusao", password="senha12345")
+        self.client.force_login(outro)
+        self.assertRedirects(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])), reverse("meus_envios"))
+        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_exclusao": "sim"}), reverse("meus_envios"))
+        self.assertTrue(Experiencia.objects.filter(pk=outra.pk).exists())
+
+        self.client.force_login(self.revisor)
+        self.assertEqual(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])).status_code, 200)
+        self.assertRedirects(
+            self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_exclusao": "sim"}),
+            reverse("catalogo_experiencias"),
+        )
+        self.assertFalse(Experiencia.objects.filter(pk=outra.pk).exists())

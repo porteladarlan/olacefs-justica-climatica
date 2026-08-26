@@ -1,5 +1,6 @@
 ﻿import json
 from smtplib import SMTPException
+import logging
 from urllib.parse import urlencode
 
 from django.core.exceptions import ValidationError
@@ -37,7 +38,6 @@ from .forms import (
     FerramentaSubmissaoForm,
     PropostaEdicaoPublicadaForm,
     ReenviarConfirmacaoForm,
-    RevisaoExperienciaForm,
     RevisaoPropostaEdicaoForm,
     texto_idioma,
 )
@@ -71,10 +71,46 @@ from .seletores_guia_preview import (
     separar_perguntas_por_tipo,
 )
 from .uploads import validar_anexo_upload
+from .services.traducao import traduzir_campos_experiencia
 
 # Configurações padrão para anexos.
 # Mantém compatibilidade com as três posições disponíveis nos formulários.
 ANEXO_LIMITE_POR_EXPERIENCIA = 3
+logger = logging.getLogger(__name__)
+
+
+def idioma_original_interface(request):
+    codigo = (getattr(request, "LANGUAGE_CODE", "") or "").lower()
+    if codigo.startswith("es"):
+        return "es"
+    if codigo.startswith("en"):
+        return "en"
+    return "pt"
+
+
+def tentar_traduzir_experiencia(experiencia, idioma_origem, campos=None):
+    if idioma_origem not in {"pt", "es", "en"}:
+        return False
+    try:
+        traducoes = traduzir_campos_experiencia(
+            experiencia,
+            campos or ExperienciaSubmissaoForm.CAMPOS_TEXTUAIS_TRADUZIVEIS,
+            idioma_origem,
+        )
+        for campo, valor in traducoes.items():
+            setattr(experiencia, campo, valor)
+        if traducoes:
+            experiencia.save(update_fields=list(traducoes) + ["atualizado_em"])
+    except Exception as exc:
+        # Translation is best-effort and must never block publication or edits.
+        logger.warning(
+            "Automatic translation failed for experience %s from %s: %s",
+            experiencia.pk,
+            idioma_origem,
+            exc.__class__.__name__,
+        )
+        return False
+    return True
 
 # ISO 3166-1 alfa-3 usado no cadastro -> identificador numérico do world-atlas.
 # A lista regional segue a referência visual oficial e permite desenhar também
@@ -1345,6 +1381,7 @@ def adicionar_boa_pratica(request):
             with transaction.atomic():
                 experiencia = form.save(commit=False)
                 experiencia.autor = request.user
+                experiencia.idioma_original = idioma_original_interface(request)
                 experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
                 if request.user.is_authenticated and not experiencia.email_contato:
                     experiencia.email_contato = request.user.email
@@ -1372,6 +1409,8 @@ def adicionar_boa_pratica(request):
                 salvar_anexos_submissao(experiencia, anexos)
                 if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
                     agendar_notificacoes_nova_submissao(request, experiencia)
+            if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
+                tentar_traduzir_experiencia(experiencia, experiencia.idioma_original)
 
             messages.success(request, mensagem)
             if acao == "rascunho":
@@ -1516,6 +1555,7 @@ def editar_boa_pratica(request, pk):
             request.FILES,
             instance=experiencia,
             obrigatorio_para_envio=obrigatorio_para_envio,
+            permitir_traducoes=request.user.is_staff,
         )
         ids_remover_solicitados = {
             int(valor)
@@ -1581,11 +1621,25 @@ def editar_boa_pratica(request, pk):
                 ):
                     agendar_notificacoes_nova_submissao(request, experiencia)
 
+            if (
+                not request.user.is_staff
+                and experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO
+                and experiencia.idioma_original
+            ):
+                campos_alterados = [
+                    campo for campo in ExperienciaSubmissaoForm.CAMPOS_TEXTUAIS_TRADUZIVEIS
+                    if campo in form.changed_data
+                ]
+                if campos_alterados:
+                    tentar_traduzir_experiencia(experiencia, experiencia.idioma_original, campos_alterados)
             messages.success(request, mensagem)
             return redirect("painel_revisao") if request.user.is_staff else redirect("status_envio")
         adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
-        form = ExperienciaSubmissaoForm(instance=experiencia)
+        form = ExperienciaSubmissaoForm(
+            instance=experiencia,
+            permitir_traducoes=request.user.is_staff,
+        )
 
     return render(
         request,
@@ -1935,95 +1989,8 @@ def painel_revisao(request):
 
 @staff_member_required
 def revisar_experiencia(request, pk):
-    experiencia = get_object_or_404(
-        Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related(
-            "temas_transversais",
-            "normas_internacionais",
-            "dimensoes_consideradas",
-            "grupos_vulneraveis",
-            "anexos",
-        ),
-        pk=pk,
-    )
-
-    if request.method == "POST":
-        form = RevisaoExperienciaForm(request.POST, instance=experiencia)
-        if form.is_valid():
-            acao = form.cleaned_data["acao"]
-            status_anterior = experiencia.status_publicacao
-            experiencia.comentario_revisor = form.cleaned_data["comentario_revisor"]
-
-            if acao == "em_revisao":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.EM_REVISAO
-                mensagem = texto_idioma(
-                    "Experiência marcada como em revisão.",
-                    "Experiencia marcada como en revisión.",
-                    "Experience marked as under review.",
-                )
-            elif acao == "aprovar":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
-                mensagem = texto_idioma(
-                    "Experiência aprovada e publicada no catálogo público.",
-                    "Experiencia aprobada y publicada en el catálogo público.",
-                    "Experience approved and published in the public catalog.",
-                )
-            elif acao == "publicar":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.PUBLICADO
-                mensagem = texto_idioma(
-                    "Experiência publicada no catálogo público.",
-                    "Experiencia publicada en el catálogo público.",
-                    "Experience published in the public catalog.",
-                )
-            elif acao == "devolver":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.RASCUNHO
-                mensagem = texto_idioma(
-                    "Experiência devolvida para ajustes.",
-                    "Experiencia devuelta para ajustes.",
-                    "Experience returned for adjustments.",
-                )
-            elif acao == "rejeitar":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.REJEITADO
-                mensagem = texto_idioma(
-                    "Experiência rejeitada.",
-                    "Experiencia rechazada.",
-                    "Experience rejected.",
-                )
-            elif acao == "arquivar":
-                experiencia.status_publicacao = Experiencia.StatusPublicacao.ARQUIVADO
-                mensagem = texto_idioma(
-                    "Experiência arquivada.",
-                    "Experiencia archivada.",
-                    "Experience archived.",
-                )
-            else:
-                mensagem = texto_idioma(
-                    "Revisão registrada.",
-                    "Revisión registrada.",
-                    "Review recorded.",
-                )
-
-            with transaction.atomic():
-                experiencia.save(update_fields=["status_publicacao", "comentario_revisor", "atualizado_em"])
-                if (
-                    experiencia.status_publicacao != status_anterior
-                    and acao in {"aprovar", "publicar", "devolver", "rejeitar", "arquivar"}
-                ):
-                    agendar_notificacao_status_experiencia(
-                        request, experiencia, acao
-                    )
-            messages.success(request, mensagem)
-            return redirect("painel_revisao")
-    else:
-        form = RevisaoExperienciaForm(instance=experiencia)
-
-    return render(
-        request,
-        "praticas/revisar_experiencia.html",
-        {
-            "experiencia": experiencia,
-            "form": form,
-        },
-    )
+    experiencia = get_object_or_404(Experiencia, pk=pk)
+    return redirect("editar_boa_pratica", pk=experiencia.pk)
 
 
 @staff_member_required
@@ -2113,7 +2080,7 @@ def revisar_edicao_publicada(request, pk):
     )
 
 
-@staff_member_required
+@login_required(login_url="login_usuario")
 @require_http_methods(["GET", "POST"])
 def excluir_boa_pratica(request, pk):
     experiencia = get_object_or_404(
@@ -2128,6 +2095,17 @@ def excluir_boa_pratica(request, pk):
         require_https=request.is_secure(),
     ):
         proximo = None
+
+    if not request.user.is_staff and experiencia.autor_id != request.user.id:
+        messages.error(
+            request,
+            texto_idioma(
+                "Você não tem permissão para excluir esta boa prática.",
+                "No tiene permiso para eliminar esta buena práctica.",
+                "You do not have permission to delete this good practice.",
+            ),
+        )
+        return redirect("meus_envios")
 
     if request.method == "POST":
         if request.POST.get("confirmar_exclusao") != "sim":
