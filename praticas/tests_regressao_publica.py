@@ -490,7 +490,7 @@ class RegressaoPublicaTests(TestCase):
                 caminho = self._caminho(prefixo, rota)
                 with self.subTest(caminho=caminho, perfil="staff"):
                     self.assertEqual(client_usuario.get(caminho).status_code, 302)
-                    self.assertEqual(client_staff.get(caminho).status_code, 200)
+                    self.assertEqual(client_staff.get(caminho).status_code, 302 if rota == "/painel-revisao-edicoes/" else 200)
 
     def test_links_e_ctas_publicos_nao_apontam_para_destinos_invalidos(self):
         hrefs_por_rota = {}

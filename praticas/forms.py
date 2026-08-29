@@ -13,6 +13,7 @@ from .models import (
     Experiencia,
     Ferramenta,
     NormaInternacional,
+    NormaInternacionalPais,
     SETORES_OFICIAIS_CODIGOS,
     TIPOS_BOA_PRATICA_OFICIAIS,
     PropostaEdicaoExperiencia,
@@ -159,9 +160,9 @@ class RedefinirSenhaForm(SetPasswordForm):
 
 EXPERIENCIA_LABELS = {
     "efs": {
-        "pt": "EFS",
-        "es": "EFS",
-        "en": "SAI",
+        "pt": "Entidade Fiscalizadora",
+        "es": "Entidad Fiscalizadora",
+        "en": "Supreme Audit Institution",
     },
     "pais": {
         "pt": "País",
@@ -189,9 +190,9 @@ EXPERIENCIA_LABELS = {
         "en": "Type of audit",
     },
     "outras_efs_envolvidas": {
-        "pt": "Em caso de auditoria coordenada, liste as demais EFS envolvidas",
-        "es": "En caso de auditoría coordinada, indique las demás EFS involucradas",
-        "en": "For a coordinated audit, list the other SAIs involved",
+        "pt": "Instâncias ou entidades envolvidas",
+        "es": "Instancias o entidades involucradas",
+        "en": "Bodies or entities involved",
     },
     "setor": {
         "pt": "Setor",
@@ -295,6 +296,11 @@ EXPERIENCIA_HELP_TEXTS = {
         "pt": "Não repita o país líder nesta lista.",
         "es": "No repita el país líder en esta lista.",
         "en": "Do not repeat the lead country in this list.",
+    },
+    "outras_efs_envolvidas": {
+        "pt": "Instância OLACEFS ou outros atores que acompanharam a experiência, como BID, IDI, GIZ, entre outros.",
+        "es": "Instancia de OLACEFS u otros actores que acompañaron la experiencia, como BID, IDI, GIZ, entre otros.",
+        "en": "OLACEFS body or other actors that supported or accompanied the experience, such as IDB, IDI, GIZ, among others.",
     },
     "descricao": {
         "pt": "Inclua uma descrição objetiva, suficiente para que outra EFS entenda o que foi feito.",
@@ -459,6 +465,10 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
                 if campo in self.fields and hasattr(self.instance, campo_idioma):
                     self.initial[campo] = getattr(self.instance, campo_idioma) or getattr(self.instance, campo, "")
         aplicar_textos_experiencia(self)
+        campo_ordem = {"pt": "nome", "es": "nome_es", "en": "nome_en"}[idioma_atual()]
+        self.fields["efs"].queryset = self.fields["efs"].queryset.order_by(campo_ordem, "nome")
+        self.fields["pais"].queryset = self.fields["pais"].queryset.order_by(campo_ordem, "nome")
+        self.fields["paises_participantes"].queryset = self.fields["paises_participantes"].queryset.order_by(campo_ordem, "nome")
 
         self.translation_fields = []
         self.translation_field_map = {}
@@ -856,6 +866,33 @@ class NormaInternacionalAdminForm(forms.ModelForm):
         arquivo = self.cleaned_data.get("ficha_tecnica")
         validar_ficha_tecnica_upload(arquivo)
         return arquivo
+
+    def clean(self):
+        cleaned = super().clean()
+        if not self.instance.pk:
+            for field in (
+                "nome", "nome_es", "nome_en", "resumo", "resumo_es", "resumo_en",
+                "natureza_juridica", "natureza_juridica_es", "natureza_juridica_en",
+                "setores_aplicaveis", "setores_aplicaveis_es", "setores_aplicaveis_en",
+                "cobertura_paises", "cobertura_paises_es", "cobertura_paises_en",
+            ):
+                if not cleaned.get(field):
+                    self.add_error(field, "Preencha o conteúdo em português, espanhol e inglês.")
+        return cleaned
+
+
+class NormaInternacionalPaisAdminForm(forms.ModelForm):
+    class Meta:
+        model = NormaInternacionalPais
+        fields = "__all__"
+
+    def clean(self):
+        cleaned = super().clean()
+        if not self.instance.pk:
+            for field in ("status", "status_es", "status_en"):
+                if not cleaned.get(field):
+                    self.add_error(field, "Informe a situação em português, espanhol e inglês.")
+        return cleaned
 
 
 class RevisaoExperienciaForm(forms.ModelForm):

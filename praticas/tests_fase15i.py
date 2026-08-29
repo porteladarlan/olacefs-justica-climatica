@@ -69,7 +69,7 @@ class FluxoRevisaoAprovacaoTests(TestCase):
         self.assertIn("Submitted", conteudo)
         self.assertIn("Under review", conteudo)
         self.assertIn("Approved", conteudo)
-        self.assertIn("Review published content edits", conteudo)
+        self.assertNotIn("Review published content edits", conteudo)
         self.assertNotIn("Revisar edições de conteúdos publicados", conteudo)
 
     def test_rota_legada_de_revisao_redireciona_para_edicao(self):
@@ -91,9 +91,5 @@ class FluxoRevisaoAprovacaoTests(TestCase):
         with translation.override("en"):
             response = self.client.get("/en/painel-revisao-edicoes/")
 
-        self.assertEqual(response.status_code, 200)
-        conteudo = response.content.decode("utf-8")
-        self.assertIn("Edit proposals", conteudo)
-        self.assertIn("The published version remains active", conteudo)
-        self.assertIn("Open proposal", conteudo)
-        self.assertNotIn("Propostas de edição", conteudo)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.endswith("/en/painel-revisao/"))

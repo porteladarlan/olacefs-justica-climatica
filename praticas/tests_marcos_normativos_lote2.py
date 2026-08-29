@@ -313,8 +313,8 @@ class ImportacaoMarcosNormativosLote2Tests(TestCase):
         self.assertEqual(vinculos_primeira, 253)
         self.assertEqual(NormaInternacionalPais.objects.count(), 253)
         self.assertEqual(
-            ids["Acordo de Paris"],
-            NormaInternacional.objects.get(nome="Acordo de Paris").pk,
+            ids["ACORDO DE PARIS"],
+            NormaInternacional.objects.get(nome="ACORDO DE PARIS").pk,
         )
         self.assertTrue(
             NormaInternacional.objects.filter(
@@ -354,5 +354,18 @@ class ImportacaoMarcosNormativosLote2Tests(TestCase):
             with self.subTest(valor=valor):
                 marcos = deepcopy(self._dados())
                 marcos[0]["fonte_oficial_url"] = valor
+                with self.assertRaises(CommandError):
+                    Command()._validar(marcos)
+
+    def test_validacao_de_natureza_juridica_respeita_cada_idioma(self):
+        casos = (
+            ("natureza_juridica_pt", "No vinculante"),
+            ("natureza_juridica_es", "Não vinculante"),
+            ("natureza_juridica_en", "Não-binding"),
+        )
+        for campo, valor in casos:
+            with self.subTest(campo=campo):
+                marcos = deepcopy(self._dados())
+                marcos[0][campo] = valor
                 with self.assertRaises(CommandError):
                     Command()._validar(marcos)

@@ -1106,7 +1106,10 @@ def normas_internacionais(request):
             setor.strip()
             for valor in NormaInternacional.objects.exclude(
                 setores_aplicaveis=""
-            ).values_list("setores_aplicaveis", flat=True)
+            ).values_list("setores_aplicaveis", "setores_aplicaveis_es", "setores_aplicaveis_en")
+            for texto in valor
+            if texto
+            for valor in [texto]
             for setor in valor.split(",")
             if setor.strip()
         },
@@ -1114,9 +1117,11 @@ def normas_internacionais(request):
     )
     naturezas_juridicas = list(
         NormaInternacional.objects.exclude(natureza_juridica="")
-        .values_list("natureza_juridica", flat=True)
-        .distinct()
-        .order_by("natureza_juridica")
+        .values_list("natureza_juridica", "natureza_juridica_es", "natureza_juridica_en")
+    )
+    naturezas_juridicas = sorted(
+        {natureza.strip() for valores in naturezas_juridicas for natureza in valores if natureza.strip()},
+        key=str.casefold,
     )
     paises_selecionados = _objetos_selecionados(
         request, "pais", Pais.objects.all()
@@ -1139,6 +1144,15 @@ def normas_internacionais(request):
             | Q(resumo__icontains=termo)
             | Q(resumo_es__icontains=termo)
             | Q(resumo_en__icontains=termo)
+            | Q(natureza_juridica__icontains=termo)
+            | Q(natureza_juridica_es__icontains=termo)
+            | Q(natureza_juridica_en__icontains=termo)
+            | Q(setores_aplicaveis__icontains=termo)
+            | Q(setores_aplicaveis_es__icontains=termo)
+            | Q(setores_aplicaveis_en__icontains=termo)
+            | Q(cobertura_paises__icontains=termo)
+            | Q(cobertura_paises_es__icontains=termo)
+            | Q(cobertura_paises_en__icontains=termo)
         )
 
     if paises_selecionados:
@@ -1146,9 +1160,17 @@ def normas_internacionais(request):
             paises_status__pais_id__in=[pais.pk for pais in paises_selecionados]
         )
     if setor_selecionado:
-        normas = normas.filter(setores_aplicaveis__icontains=setor_selecionado)
+        normas = normas.filter(
+            Q(setores_aplicaveis__icontains=setor_selecionado)
+            | Q(setores_aplicaveis_es__icontains=setor_selecionado)
+            | Q(setores_aplicaveis_en__icontains=setor_selecionado)
+        )
     if natureza_selecionada:
-        normas = normas.filter(natureza_juridica=natureza_selecionada)
+        normas = normas.filter(
+            Q(natureza_juridica=natureza_selecionada)
+            | Q(natureza_juridica_es=natureza_selecionada)
+            | Q(natureza_juridica_en=natureza_selecionada)
+        )
 
     normas = list(normas.distinct())
     for norma in normas:
@@ -1157,7 +1179,7 @@ def normas_internacionais(request):
         norma.paises_publicos = list(norma.paises_status.all())
         norma.setores_publicos = [
             setor.strip()
-            for setor in norma.setores_aplicaveis.split(",")
+            for setor in norma.setores_aplicaveis_exibicao.split(",")
             if setor.strip()
         ]
 
@@ -1950,6 +1972,7 @@ def status_envio(request):
 @staff_member_required
 def painel_revisao(request):
     status = request.GET.get("status", "")
+    termo = (request.GET.get("q") or "").strip()[:200]
     status_choices_revisao = [
         item for item in Experiencia.StatusPublicacao.choices
         if item[0] in STATUS_VISIVEIS_REVISAO
@@ -1964,6 +1987,20 @@ def painel_revisao(request):
         experiencias = experiencias.filter(status_publicacao=status)
     else:
         status = ""
+    if termo:
+        experiencias = experiencias.filter(
+            Q(titulo__icontains=termo)
+            | Q(titulo_es__icontains=termo)
+            | Q(titulo_en__icontains=termo)
+            | Q(pais__nome__icontains=termo)
+            | Q(pais__nome_es__icontains=termo)
+            | Q(pais__nome_en__icontains=termo)
+            | Q(efs__nome__icontains=termo)
+            | Q(efs__nome_es__icontains=termo)
+            | Q(efs__nome_en__icontains=termo)
+            | Q(email_contato__icontains=termo)
+            | Q(pessoa_responsavel__icontains=termo)
+        )
 
     contadores = {
         "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
@@ -1983,6 +2020,7 @@ def painel_revisao(request):
             "status_atual": status,
             "status_choices": status_choices_revisao,
             "contadores": contadores,
+            "termo_busca": termo,
         },
     )
 
@@ -1995,6 +2033,8 @@ def revisar_experiencia(request, pk):
 
 @staff_member_required
 def painel_revisao_edicoes(request):
+    return redirect("painel_revisao")
+
     status = request.GET.get("status", "")
     propostas = (
         PropostaEdicaoExperiencia.objects.select_related("experiencia", "experiencia__efs", "experiencia__pais")
@@ -2016,6 +2056,8 @@ def painel_revisao_edicoes(request):
 
 @staff_member_required
 def revisar_edicao_publicada(request, pk):
+    return redirect("painel_revisao")
+
     proposta = get_object_or_404(
         PropostaEdicaoExperiencia.objects.select_related("experiencia", "experiencia__efs", "experiencia__pais"),
         pk=pk,
@@ -2118,6 +2160,16 @@ def excluir_boa_pratica(request, pk):
                 ),
             )
             return redirect("excluir_boa_pratica", pk=experiencia.pk)
+
+        if (
+            request.user.is_staff
+            and experiencia.autor_id != request.user.id
+            and experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO
+        ):
+            experiencia.status_publicacao = Experiencia.StatusPublicacao.ARQUIVADO
+            experiencia.save(update_fields=["status_publicacao", "atualizado_em"])
+            messages.success(request, texto_idioma("Boa prática arquivada com sucesso.", "Buena práctica archivada correctamente.", "Good practice archived successfully."))
+            return redirect(proximo or "painel_revisao")
 
         titulo = experiencia.titulo_exibicao
         for anexo in experiencia.anexos.all():

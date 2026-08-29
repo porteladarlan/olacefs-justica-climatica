@@ -130,7 +130,8 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
             {"confirmar_exclusao": "sim"},
         )
         self.assertEqual(resposta.status_code, 302)
-        self.assertFalse(Experiencia.objects.filter(pk=experiencia.pk).exists())
+        experiencia.refresh_from_db()
+        self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
 
     def test_catalogo_exibe_acao_de_exclusao_para_staff(self):
         experiencia = self.criar_experiencia()
@@ -211,9 +212,9 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
 
     def test_mensagem_de_exclusao_acompanha_idioma_ativo(self):
         mensagens = {
-            "pt-br": "Boa prática excluída com sucesso:",
-            "es": "Buena práctica eliminada correctamente:",
-            "en": "Good practice deleted successfully:",
+            "pt-br": "Boa prática arquivada com sucesso.",
+            "es": "Buena práctica archivada correctamente.",
+            "en": "Good practice archived successfully.",
         }
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
 
@@ -231,9 +232,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
                 )
                 self.assertEqual(resposta.status_code, 200)
                 self.assertContains(resposta, mensagem)
-                self.assertFalse(
-                    Experiencia.objects.filter(pk=experiencia.pk).exists()
-                )
+                self.assertTrue(Experiencia.objects.filter(pk=experiencia.pk, status_publicacao=Experiencia.StatusPublicacao.ARQUIVADO).exists())
 
     def test_label_e_ajuda_fontes_de_informacao_acompanham_idioma(self):
         textos = {
@@ -301,8 +300,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
                 )
 
                 resposta = self.client.get(url)
-                self.assertEqual(resposta.status_code, 200)
-                self.assertContains(resposta, rotulo)
+                self.assertRedirects(resposta, reverse("painel_revisao"))
 
     def test_botoes_administrativos_usam_practica_em_espanhol(self):
         publicada = self.criar_experiencia()

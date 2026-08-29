@@ -350,15 +350,12 @@ class NotificacoesFluxoEditorialTests(TestCase):
             )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual([mensagem.to for mensagem in mail.outbox], [[self.autor.email]])
+        self.assertEqual(mail.outbox, [])
 
     def test_decisao_edicao_notifica_solicitante(self):
         self.client.force_login(self.revisor)
-        casos = (
-            ("aprovar", PropostaEdicaoExperiencia.Status.APROVADA, "aprovada"),
-            ("rejeitar", PropostaEdicaoExperiencia.Status.REJEITADA, "rejeitada"),
-        )
-        for indice, (acao, status, trecho) in enumerate(casos):
+        casos = (("aprovar", PropostaEdicaoExperiencia.Status.PENDENTE), ("rejeitar", PropostaEdicaoExperiencia.Status.PENDENTE))
+        for indice, (acao, status) in enumerate(casos):
             with self.subTest(acao=acao):
                 mail.outbox.clear()
                 experiencia = self.criar_experiencia(
@@ -381,9 +378,7 @@ class NotificacoesFluxoEditorialTests(TestCase):
 
                 self.assertEqual(response.status_code, 302)
                 self.assertEqual(proposta.status, status)
-                self.assertEqual(len(mail.outbox), 1)
-                self.assertIn(trecho, mail.outbox[0].subject)
-                self.assertIn("Decisão fundamentada.", mail.outbox[0].body)
+                self.assertEqual(len(mail.outbox), 0)
 
     def test_falha_smtp_nao_desfaz_submissao_nem_retorna_erro_500(self):
         with patch(

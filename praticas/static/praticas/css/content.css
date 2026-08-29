@@ -69,6 +69,16 @@
     line-height: 1.72;
 }
 
+.content-prototype .detail-layout-card p,
+.content-prototype .accordion-body p {
+    white-space: pre-line;
+}
+
+.content-prototype .detail-layout-card .badge-soft {
+    font-size: 0.95rem;
+    padding: 0.42rem 0.78rem;
+}
+
 .content-prototype .metadata-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

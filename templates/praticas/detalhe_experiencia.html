@@ -36,6 +36,14 @@
     </div>
 </section>
 
+<form method="post" action="{% url 'alternar_favorito' experiencia.pk %}" class="mb-4">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="btn btn-outline-primary">
+        {% if experiencia.pk in favoritos_ids %}★ {% if LANGUAGE_CODE == 'en' %}Remove from favorites{% elif LANGUAGE_CODE == 'es' %}Quitar de favoritos{% else %}Remover dos favoritos{% endif %}{% else %}☆ {% if LANGUAGE_CODE == 'en' %}Add to favorites{% elif LANGUAGE_CODE == 'es' %}Agregar a favoritos{% else %}Adicionar aos favoritos{% endif %}{% endif %}
+    </button>
+</form>
+
 {% if request.user.is_staff %}
 <div class="d-flex justify-content-end mb-3">
     <a class="btn btn-outline-danger" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena pr&aacute;ctica{% else %}Excluir boa pr&aacute;tica{% endif %}</a>
@@ -274,17 +282,6 @@
         </section>
         {% endif %}
 
-        <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn btn-outline-primary w-100">
-                {% if experiencia.pk in favoritos_ids %}
-                    ★ {% if LANGUAGE_CODE == 'en' %}Remove from favorites{% elif LANGUAGE_CODE == 'es' %}Quitar de favoritos{% else %}Remover dos favoritos{% endif %}
-                {% else %}
-                    ☆ {% if LANGUAGE_CODE == 'en' %}Add to favorites{% elif LANGUAGE_CODE == 'es' %}Agregar a favoritos{% else %}Adicionar aos favoritos{% endif %}
-                {% endif %}
-            </button>
-        </form>
     </aside>
 </div>
 </div>

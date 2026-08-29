@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .forms import AnexoAdminForm, ExperienciaAdminForm, NormaInternacionalAdminForm
+from .forms import AnexoAdminForm, ExperienciaAdminForm, NormaInternacionalAdminForm, NormaInternacionalPaisAdminForm
 from .models import (
     Anexo,
     AtribuicaoPapelVinculo,
@@ -78,15 +78,17 @@ class TemaTransversalAdmin(admin.ModelAdmin):
 
 class NormaInternacionalPaisInline(admin.TabularInline):
     model = NormaInternacionalPais
+    form = NormaInternacionalPaisAdminForm
     extra = 0
+    fields = ("pais", "status", "status_es", "status_en")
 
 
 @admin.register(NormaInternacional)
 class NormaInternacionalAdmin(admin.ModelAdmin):
     form = NormaInternacionalAdminForm
-    list_display = ("nome", "ano", "natureza_juridica", "url_referencia")
-    list_filter = ("natureza_juridica",)
-    search_fields = ("nome", "nome_es", "nome_en", "resumo", "resumo_es", "resumo_en")
+    list_display = ("nome", "ano", "natureza_juridica_exibicao", "url_referencia")
+    list_filter = ("natureza_juridica", "natureza_juridica_es", "natureza_juridica_en")
+    search_fields = ("nome", "nome_es", "nome_en", "resumo", "resumo_es", "resumo_en", "natureza_juridica", "natureza_juridica_es", "natureza_juridica_en")
     ordering = ("nome",)
     inlines = (NormaInternacionalPaisInline,)
 

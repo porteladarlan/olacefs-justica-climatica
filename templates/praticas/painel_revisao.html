@@ -43,13 +43,11 @@
     <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Pending edits{% elif LANGUAGE_CODE == 'es' %}Ediciones pendientes{% else %}Edições pendentes{% endif %}</div><p class="metric-value">{{ contadores.edicoes_pendentes }}</p></div></div>
 </section>
 
-<div class="mb-4">
-    <a href="{% url 'painel_revisao_edicoes' %}" class="btn btn-outline-primary">
-        {% if LANGUAGE_CODE == 'en' %}Review published content edits{% elif LANGUAGE_CODE == 'es' %}Revisar ediciones de contenidos publicados{% else %}Revisar edições de conteúdos publicados{% endif %}
-    </a>
-</div>
-
 <form method="get" class="filter-panel row g-3 mb-4">
+    <div class="col-md-6">
+        <label class="form-label small fw-semibold text-muted" for="panel-search">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</label>
+        <input id="panel-search" class="form-control" type="search" name="q" value="{{ termo_busca }}" maxlength="200" placeholder="{% if LANGUAGE_CODE == 'en' %}Title, country, institution, e-mail or responsible person{% elif LANGUAGE_CODE == 'es' %}Título, país, entidad, correo o responsable{% else %}Título, país, entidade, e-mail ou responsável{% endif %}">
+    </div>
     <div class="col-md-6">
         <label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Filter by status{% elif LANGUAGE_CODE == 'es' %}Filtrar por estado{% else %}Filtrar por status{% endif %}</label>
         <select class="form-select" name="status">
@@ -97,7 +95,11 @@
                 </div>
             {% endif %}
             <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
-            <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}</a>
+            {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>
+            {% else %}
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}</a>
+            {% endif %}
         </article>
     </div>
     {% empty %}

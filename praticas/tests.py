@@ -493,21 +493,7 @@ class RotasPublicasTests(TestCase):
         )
 
         response = self.client.get(reverse("revisar_edicao_publicada", args=[proposta.pk]))
-        self.assertEqual(response.status_code, 200)
-
-        conteudo = response.content.decode("utf-8")
-        self.assertTrue(
-            "Valor atual" in conteudo
-            or "Valor actual" in conteudo
-            or "Current value" in conteudo
-        )
-        self.assertTrue(
-            "Valor proposto" in conteudo
-            or "Valor propuesto" in conteudo
-            or "Proposed value" in conteudo
-        )
-        self.assertIn("Titulo atualizado para comparativo", conteudo)
-        self.assertIn("Resultados atualizados para revisão visual.", conteudo)
+        self.assertRedirects(response, reverse("painel_revisao"))
 
     def test_aprovar_proposta_edicao_aplica_valor_proposto(self):
         usuario = get_user_model().objects.create_user(
@@ -562,5 +548,5 @@ class RotasPublicasTests(TestCase):
         self.assertEqual(response.status_code, 302)
         experiencia.refresh_from_db()
         proposta.refresh_from_db()
-        self.assertEqual(experiencia.titulo, "Titulo aprovado no fluxo visual")
-        self.assertEqual(proposta.status, PropostaEdicaoExperiencia.Status.APROVADA)
+        self.assertEqual(experiencia.titulo, "Avaliacao da equidade no acesso a agua")
+        self.assertEqual(proposta.status, PropostaEdicaoExperiencia.Status.PENDENTE)

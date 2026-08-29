@@ -126,7 +126,13 @@ class ValidacaoUploadTests(TestCase):
 
     def test_ficha_tecnica_do_admin_aceita_somente_pdf(self):
         form_valido = NormaInternacionalAdminForm(
-            data={"nome": "Norma com ficha PDF"},
+            data={
+                "nome": "Norma com ficha PDF", "nome_es": "Norma PDF", "nome_en": "PDF framework",
+                "resumo": "Resumo", "resumo_es": "Resumen", "resumo_en": "Summary",
+                "natureza_juridica": "Vinculante", "natureza_juridica_es": "Vinculante", "natureza_juridica_en": "Binding",
+                "setores_aplicaveis": "Energia", "setores_aplicaveis_es": "Energía", "setores_aplicaveis_en": "Energy",
+                "cobertura_paises": "Cobertura", "cobertura_paises_es": "Cobertura", "cobertura_paises_en": "Coverage",
+            },
             files={
                 "ficha_tecnica": arquivo_upload(
                     "ficha.PDF", b"%PDF-1.4\n", "application/pdf"
@@ -134,7 +140,13 @@ class ValidacaoUploadTests(TestCase):
             },
         )
         form_invalido = NormaInternacionalAdminForm(
-            data={"nome": "Norma com imagem"},
+            data={
+                "nome": "Norma com imagem", "nome_es": "Norma imagen", "nome_en": "Image framework",
+                "resumo": "Resumo", "resumo_es": "Resumen", "resumo_en": "Summary",
+                "natureza_juridica": "Vinculante", "natureza_juridica_es": "Vinculante", "natureza_juridica_en": "Binding",
+                "setores_aplicaveis": "Energia", "setores_aplicaveis_es": "Energía", "setores_aplicaveis_en": "Energy",
+                "cobertura_paises": "Cobertura", "cobertura_paises_es": "Cobertura", "cobertura_paises_en": "Coverage",
+            },
             files={
                 "ficha_tecnica": arquivo_upload(
                     "ficha.png", b"\x89PNG\r\n\x1a\n", "image/png"

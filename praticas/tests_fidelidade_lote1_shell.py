@@ -158,7 +158,6 @@ class ShellGlobalLote1Tests(TestCase):
             "meus_envios",
             "favoritos_experiencias",
             "painel_revisao",
-            "painel_revisao_edicoes",
             "admin:index",
         ):
             with self.subTest(staff_url_name=url_name):
@@ -235,7 +234,9 @@ class ShellGlobalLote1Tests(TestCase):
         for url_name in ("painel_revisao", "painel_revisao_edicoes"):
             with self.subTest(url_name=url_name):
                 response = self.client.get(reverse(url_name))
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 200 if url_name == "painel_revisao" else 302)
+                if url_name == "painel_revisao_edicoes":
+                    continue
                 self.assertEqual(len(self.current_elements(response)), 1)
                 self.assertIn("header-space-button nav-section-current", self.shell_html(response))
 
@@ -273,7 +274,7 @@ class ShellGlobalLote1Tests(TestCase):
                 self.client.force_login(user)
                 staff_shell = self.shell_html(self.client.get(reverse("pagina_inicial")))
                 self.assertIn(f'href="{reverse("painel_revisao")}"', staff_shell)
-                self.assertIn(f'href="{reverse("painel_revisao_edicoes")}"', staff_shell)
+                self.assertNotIn(f'href="{reverse("painel_revisao_edicoes")}"', staff_shell)
                 self.assertIn(f'href="{reverse("admin:index")}"', staff_shell)
 
     def test_seletor_de_idioma_tem_allowlist_e_opcao_atual(self):
@@ -427,4 +428,4 @@ class ShellGlobalLote1Tests(TestCase):
         self.client.force_login(self.staff)
         for url_name in ("painel_revisao", "painel_revisao_edicoes"):
             with self.subTest(staff=url_name):
-                self.assertEqual(self.client.get(reverse(url_name)).status_code, 200)
+                self.assertEqual(self.client.get(reverse(url_name)).status_code, 200 if url_name == "painel_revisao" else 302)

@@ -2319,7 +2319,6 @@
                             <li><hr class="dropdown-divider"></li>
                             {% if request.user.is_staff or request.user.is_superuser %}
                                 <li><a class="dropdown-item" href="{% url 'painel_revisao' %}"{% if current_url == 'painel_revisao' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Review panel{% elif LANGUAGE_CODE == 'es' %}Panel de revisi&oacute;n{% else %}Painel de revis&atilde;o{% endif %}</a></li>
-                                <li><a class="dropdown-item" href="{% url 'painel_revisao_edicoes' %}"{% if current_url == 'painel_revisao_edicoes' %} aria-current="page"{% endif %}>{% if LANGUAGE_CODE == 'en' %}Published edits{% elif LANGUAGE_CODE == 'es' %}Ediciones publicadas{% else %}Edi&ccedil;&otilde;es publicadas{% endif %}</a></li>
                                 <li><a class="dropdown-item" href="{% url 'admin:index' %}">{% if LANGUAGE_CODE == 'en' %}Django administration{% elif LANGUAGE_CODE == 'es' %}Administraci&oacute;n de Django{% else %}Administra&ccedil;&atilde;o do Django{% endif %}</a></li>
                                 <li><hr class="dropdown-divider"></li>
                             {% endif %}

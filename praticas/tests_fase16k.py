@@ -273,6 +273,6 @@ class AjustesPlataforma1206Tests(TestCase):
         self.assertEqual(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])).status_code, 200)
         self.assertRedirects(
             self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_exclusao": "sim"}),
-            reverse("catalogo_experiencias"),
+            reverse("painel_revisao"),
         )
-        self.assertFalse(Experiencia.objects.filter(pk=outra.pk).exists())
+        self.assertEqual(Experiencia.objects.get(pk=outra.pk).status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)

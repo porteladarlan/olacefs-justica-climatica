@@ -7,13 +7,13 @@
 {% block content %}
 <section class="mb-4">
     <div class="section-kicker">
-        {% if LANGUAGE_CODE == 'en' %}Permanent deletion{% elif LANGUAGE_CODE == 'es' %}Eliminación permanente{% else %}Exclusão permanente{% endif %}
+        {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Administrative archive{% elif LANGUAGE_CODE == 'es' %}Archivo administrativo{% else %}Arquivamento administrativo{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Permanent deletion{% elif LANGUAGE_CODE == 'es' %}Eliminación permanente{% else %}Exclusão permanente{% endif %}{% endif %}
     </div>
     <h1 class="page-title mb-2">
-        {% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}
+        {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}{% endif %}
     </h1>
     <p class="section-subtitle mb-0">
-        {% if LANGUAGE_CODE == 'en' %}
+        {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}This action removes the practice from the public catalog while preserving its record, relationships and history.{% elif LANGUAGE_CODE == 'es' %}Esta acción retira la práctica del catálogo público y conserva el registro, sus relaciones y su historial.{% else %}Esta ação retira a prática do catálogo público e preserva o registro, relacionamentos e histórico.{% endif %}{% elif LANGUAGE_CODE == 'en' %}
             This action permanently removes the record from the platform, including related review data and attachments registered in the system.
         {% elif LANGUAGE_CODE == 'es' %}
             Esta acción elimina permanentemente el registro de la plataforma, incluidos los datos de revisión y anexos registrados en el sistema.
@@ -28,7 +28,7 @@
         <strong>
             {% if LANGUAGE_CODE == 'en' %}Attention:{% elif LANGUAGE_CODE == 'es' %}Atención:{% else %}Atenção:{% endif %}
         </strong>
-        {% if LANGUAGE_CODE == 'en' %}
+        {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}the practice will be archived and remain available in management.{% elif LANGUAGE_CODE == 'es' %}la práctica será archivada y permanecerá disponible en la gestión.{% else %}a prática será arquivada e permanecerá disponível no gerenciamento.{% endif %}{% elif LANGUAGE_CODE == 'en' %}
             deletion cannot be undone through the platform interface.
         {% elif LANGUAGE_CODE == 'es' %}
             la eliminación no se puede deshacer desde la interfaz de la plataforma.
@@ -51,7 +51,7 @@
         <input type="hidden" name="confirmar_exclusao" value="sim">
         <input type="hidden" name="next" value="{{ destino_cancelamento|default:'' }}">
         <button type="submit" class="btn btn-danger">
-            {% if LANGUAGE_CODE == 'en' %}Yes, delete permanently{% elif LANGUAGE_CODE == 'es' %}Sí, eliminar definitivamente{% else %}Sim, excluir definitivamente{% endif %}
+            {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Yes, archive{% elif LANGUAGE_CODE == 'es' %}Sí, archivar{% else %}Sim, arquivar{% endif %}{% elif LANGUAGE_CODE == 'en' %}Yes, delete permanently{% elif LANGUAGE_CODE == 'es' %}Sí, eliminar definitivamente{% else %}Sim, excluir definitivamente{% endif %}
         </button>
         <a href="{% if destino_cancelamento %}{{ destino_cancelamento }}{% else %}{% url 'catalogo_experiencias' %}{% endif %}" class="btn btn-outline-secondary">
             {% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}

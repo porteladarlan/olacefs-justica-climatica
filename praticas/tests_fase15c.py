@@ -131,11 +131,8 @@ class FichaBoaPraticaRetroalimentacaoTests(TestCase):
             conteudo.index("experience-contact"),
         )
         self.assertLess(
+            conteudo.index('<form method="post"'),
             conteudo.index("experience-contact"),
-            conteudo.index(
-                '<form method="post"',
-                conteudo.index("experience-contact"),
-            ),
         )
 
     def test_ficha_publica_usa_pessoa_responsavel_como_fallback_legado(self):

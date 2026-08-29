@@ -171,8 +171,14 @@ class NormaInternacional(models.Model):
     ano = models.PositiveIntegerField(null=True, blank=True)
     ano_texto = models.CharField(max_length=120, blank=True)
     natureza_juridica = models.CharField(max_length=80, blank=True, db_index=True)
+    natureza_juridica_es = models.CharField(max_length=80, blank=True)
+    natureza_juridica_en = models.CharField(max_length=80, blank=True)
     setores_aplicaveis = models.TextField(blank=True)
+    setores_aplicaveis_es = models.TextField(blank=True)
+    setores_aplicaveis_en = models.TextField(blank=True)
+    cobertura_paises = models.TextField(blank=True)
     cobertura_paises_es = models.TextField(blank=True)
+    cobertura_paises_en = models.TextField(blank=True)
     url_referencia = models.URLField(blank=True)
     ficha_tecnica = models.FileField(
         upload_to="marcos_normativos/fichas/", blank=True
@@ -193,8 +199,30 @@ class NormaInternacional(models.Model):
 
     @property
     def resumo_exibicao(self):
-        return texto_por_idioma_com_fallback_es(
-            self.resumo_es, self.resumo, self.resumo_en
+        return texto_por_idioma(self.resumo, self.resumo_es, self.resumo_en)
+
+    @property
+    def natureza_juridica_exibicao(self):
+        return texto_por_idioma(
+            self.natureza_juridica,
+            self.natureza_juridica_es,
+            self.natureza_juridica_en,
+        )
+
+    @property
+    def setores_aplicaveis_exibicao(self):
+        return texto_por_idioma(
+            self.setores_aplicaveis,
+            self.setores_aplicaveis_es,
+            self.setores_aplicaveis_en,
+        )
+
+    @property
+    def cobertura_paises_exibicao(self):
+        return texto_por_idioma(
+            self.cobertura_paises,
+            self.cobertura_paises_es,
+            self.cobertura_paises_en,
         )
 
     @property
@@ -218,6 +246,8 @@ class NormaInternacionalPais(models.Model):
         related_name="normas_internacionais_status",
     )
     status = models.CharField(max_length=300)
+    status_es = models.CharField(max_length=300, blank=True)
+    status_en = models.CharField(max_length=300, blank=True)
 
     class Meta:
         verbose_name = "País/status de marco normativo"
@@ -232,6 +262,10 @@ class NormaInternacionalPais(models.Model):
 
     def __str__(self):
         return f"{self.norma.nome_exibicao} — {self.pais.nome_exibicao}: {self.status}"
+
+    @property
+    def status_exibicao(self):
+        return texto_por_idioma(self.status, self.status_es, self.status_en)
 
 
 class DimensaoJusticaClimatica(models.Model):
