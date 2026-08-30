@@ -2,16 +2,12 @@
 
 Durante a revisão sênior do pacote, foram encontrados artefatos que não deveriam estar versionados dentro de `templates/praticas/`.
 
-## Remover se existirem no repositório real
+## Estado após a Fase 0A
 
-No PowerShell, a partir da raiz do projeto:
-
-```powershell
-Remove-Item templates/praticas/ADMIN_RENDER.md -Force -ErrorAction SilentlyContinue
-Remove-Item templates/praticas/build.sh -Force -ErrorAction SilentlyContinue
-Remove-Item templates/praticas/praticas -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item olacefs-justica-climatica-main -Recurse -Force -ErrorAction SilentlyContinue
-```
+Os artefatos duplicados, deslocados ou operacionais identificados nessa
+revisão foram removidos do repositório na Fase 0A. A cópia canônica dos
+templates funcionais e dos scripts de operação permanece preservada nos
+diretórios principais do projeto.
 
 Depois rode:
 
@@ -22,4 +18,4 @@ python manage.py test
 
 ## Motivo
 
-Esses arquivos são documentação operacional, script ou cópia duplicada de código. Eles não são templates HTML e podem gerar confusão de manutenção, revisão e deploy.
+Esses itens eram documentação operacional, script ou cópia duplicada de código. Eles não eram templates HTML funcionais canônicos e poderiam gerar confusão de manutenção, revisão e deploy.
