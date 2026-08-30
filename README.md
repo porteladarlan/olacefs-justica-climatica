@@ -1,318 +1,210 @@
 # Plataforma Regional de Boas Práticas em Auditoria com Perspectiva de Justiça Climática
 
-Plataforma web trilíngue da OLACEFS/AdaptaInfra para reunir, consultar, submeter e revisar boas práticas de auditoria com perspectiva de justiça climática.
+## Visão geral
 
-A versão atual é uma **versão de validação** preparada para demonstração institucional, teste externo controlado com EFS e planejamento de ambiente de produção futura. Ela não deve ser tratada como produção institucional definitiva sem a implantação de banco persistente, storage de anexos, backup, domínio oficial, governança editorial e hardening final de segurança.
+A plataforma regional da OLACEFS, impulsionada por COMTEMA e CGID com apoio da GIZ no contexto AdaptaInfra, reúne experiências de auditoria e conteúdos relacionados à justiça climática. O sistema organiza consulta pública, contribuição institucional, referências normativas, ferramentas e uma futura Guia de Perguntas em português, espanhol e inglês.
 
-## Mensagem central
+Esta é uma versão de validação para desenvolvimento e teste. Ainda não é a produção institucional definitiva. A publicação oficial depende de governança editorial, infraestrutura persistente, operação, proteção de dados e homologação institucional.
 
-> A Guia orienta; a plataforma demonstra experiências concretas.
+## Escopo e situação atual
 
-## Escopo funcional atual
+O repositório mantém um monólito Django com templates server-side, catálogo público, fluxos autenticados e painéis de curadoria.
 
-A plataforma contempla:
-
-- página inicial institucional;
-- catálogo público de boas práticas;
-- filtros por país, EFS, setor, tipo, tema transversal, dimensão, grupo vulnerável, norma e ano;
-- ficha estruturada da boa prática;
-- recursos técnicos em curadoria;
-- normas internacionais como referências interpretativas;
-- cadastro e login de usuários;
-- formulário de envio de boa prática;
-- salvamento como rascunho e envio para revisão;
-- área “Meus envios”;
-- painel de revisão para staff/revisor;
-- painel de revisão de edições publicadas;
-- favoritos por sessão;
-- comparação de experiências;
-- suporte a português, espanhol e inglês;
-- dados demonstrativos para apresentação;
-- comandos de auditoria e validação da versão.
-
-## Status da versão
-
-Esta base já passou por uma rodada ampla de retroalimentação e consolidação funcional:
-
-| Fase | Entrega principal |
+| Módulo | Estado real |
 |---|---|
-| 15G | Revisão visual das páginas públicas |
-| 15H | Ajustes no formulário de envio |
-| 15I | Revisão/aprovação e edições publicadas |
-| 15J | Conteúdo institucional, recursos técnicos e normas |
-| 15K | Dados demonstrativos para apresentação |
-| 15L | Usabilidade e acessibilidade |
-| 15M | Auditoria trilíngue final |
-| 15N | Autenticação, perfis e permissões |
-| 15O | Validação funcional ponta a ponta |
-| 15P | Materiais de teste externo |
-| 15Q | Documentação técnica de ambiente |
-| 15R | Consolidação da versão de validação |
-| 15S | Entrega final da versão de validação |
-| 16A | Preparação Render/teste externo |
-| 16B | Validação pública do Render |
+| Início | Implementado |
+| Fundamentos | Implementado, com conteúdo trilíngue e abas acessíveis |
+| Mapa regional | Implementado, com dados públicos agregados, seleção por país e alternativa textual |
+| Boas Práticas | Implementado, com catálogo, filtros, ficha, anexos e relações |
+| Contribuição | Implementado, com autenticação, formulário, rascunho e envio |
+| Meu Espaço | Implementado, com login, cadastro, status, rascunhos e favoritos |
+| Marcos Normativos | Implementado, com catálogo, fontes e filtros disponíveis |
+| Ferramentas | Implementado, com catálogo próprio e curadoria |
+| Guia de Perguntas | Fundação estrutural implementada; publicação pública desabilitada por padrão e conteúdo editorial pendente |
+| Recursos Técnicos | Implementado como catálogo curado |
+| Administração/curadoria | Interno, protegido por staff e Django Admin |
+| i18n e acessibilidade | Implementado na interface atual; auditoria completa com tecnologia assistiva permanece pendente |
+| Vídeo e casos audiovisuais | Desabilitado/futuro |
 
-## Stack
+A aplicação não presume que protótipo, dados demonstrativos ou materiais de teste sejam conteúdo institucional homologado.
 
-- Python 3.12+ / 3.13 em testes locais;
+## Stack e ambientes
+
+- Python 3.12/3.13;
 - Django 6.x;
-- Django Templates;
-- Bootstrap via CDN;
-- SQLite em ambiente local;
-- PostgreSQL recomendado para teste robusto/produção;
-- Gunicorn + WhiteNoise para deploy;
-- Render como ambiente atual de teste.
+- templates server-side do Django;
+- PostgreSQL em staging/production institucional;
+- SQLite para desenvolvimento e testes locais;
+- Gunicorn e WhiteNoise;
+- Bootstrap carregado por CDN na configuração atual;
+- Render mantido como ambiente legado/teste;
+- Hetzner AX42-1 como infraestrutura institucional futura, ainda pendente de configuração, operação e homologação.
 
-## Estrutura principal
+## Estrutura canônica
 
-```text
+~~~text
 olacefs-justica-climatica/
-├── config/                         # Configurações Django
-├── praticas/                       # App principal
-│   ├── management/commands/        # Comandos de carga, auditoria e validação
-│   ├── migrations/                 # Migrações do banco
-│   ├── admin.py
-│   ├── forms.py
-│   ├── models.py
-│   ├── tests*.py
-│   ├── urls.py
-│   └── views.py
-├── templates/praticas/             # Templates HTML
-├── static/                         # Arquivos estáticos versionados
-├── docs/                           # Documentação funcional, técnica e release
-├── .github/workflows/              # GitHub Actions
+├── config/                  # settings e URLs do projeto
+├── praticas/                # app, models, forms, views, admin, serviços e testes
+│   ├── management/commands/
+│   ├── migrations/
+│   └── static/
+├── templates/praticas/      # templates HTML funcionais
+├── static/                  # CSS, JavaScript e assets versionados
+├── docs/                    # documentação humana
+├── ops/                     # operação e backups canônicos
+├── .codex/                  # contexto e memória dos agentes
+├── .github/workflows/       # CI
 ├── build.sh
 ├── render.yaml
+├── Procfile
 ├── requirements.txt
+├── runtime.txt
 └── manage.py
-```
+~~~
 
 ## Instalação local
 
-### 1. Clonar repositório
+Use uma cópia do arquivo [.env.example](.env.example). Ele documenta somente variáveis reconhecidas por config/settings.py; não coloque valores reais nele.
 
-```powershell
+### Windows PowerShell
+
+~~~powershell
+git clone <url-do-repositorio>
+Set-Location olacefs-justica-climatica
+
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+
+python manage.py check
+python manage.py runserver
+~~~
+
+Se o PowerShell bloquear a ativação, use diretamente o executável:
+
+~~~powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe manage.py check
+~~~
+
+### Linux/Bash
+
+~~~bash
 git clone <url-do-repositorio>
 cd olacefs-justica-climatica
-```
 
-### 2. Criar e ativar ambiente virtual
+python3.13 -m venv .venv
+source .venv/bin/activate
 
-```powershell
-python -m venv venv
-.env\Scripts\Activate.ps1
-```
+python -m pip install -r requirements.txt
+cp .env.example .env
 
-### 3. Instalar dependências
-
-```powershell
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### 4. Configurar variáveis locais
-
-Para desenvolvimento local simples, as configurações padrão permitem rodar a aplicação. Para simular ambiente mais próximo de teste/produção, defina:
-
-```powershell
-$env:SECRET_KEY="dev-secret-key-local"
-$env:DEBUG="True"
-$env:ALLOWED_HOSTS="127.0.0.1,localhost"
-```
-
-Para produção/teste hospedado, use variáveis reais no provedor e mantenha `DEBUG=False`.
-
-### 5. Aplicar migrações
-
-```powershell
-python manage.py migrate
-```
-
-### 6. Carregar dados demonstrativos
-
-```powershell
-python manage.py carregar_dados_ficticios --limpar-demo
-```
-
-### 7. Criar usuário administrador
-
-```powershell
-python manage.py createsuperuser
-```
-
-### 8. Rodar servidor local
-
-```powershell
+python manage.py check
 python manage.py runserver
-```
+~~~
 
-Acesse:
+Para um ambiente institucional, configure as variáveis no provedor ou no serviço de execução, sem versionar segredos. Staging e production exigem PostgreSQL.
 
-```text
-http://127.0.0.1:8000/
-```
+## Validação
 
-## Rotas principais
+Execute na ordem:
 
-| Rota | Descrição |
-|---|---|
-| `/` | Página inicial |
-| `/catalogo/` | Catálogo de boas práticas |
-| `/experiencias/<id>/` | Ficha da boa prática |
-| `/banco-tecnico/` | Recursos técnicos |
-| `/normas-internacionais/` | Normas internacionais |
-| `/sobre/` | Sobre a plataforma |
-| `/cadastro/` | Cadastro de usuário |
-| `/entrar/` | Login |
-| `/adicionar-boa-pratica/` | Envio de boa prática, exige login |
-| `/meus-envios/` | Envios do usuário autenticado |
-| `/painel-revisao/` | Painel de revisão, exige staff |
-| `/painel-revisao-edicoes/` | Revisão de edições publicadas, exige staff |
-| `/admin/` | Django Admin |
-| `/en/` | Versão em inglês |
-| `/es/` | Versão em espanhol |
-
-## Comandos úteis
-
-### Testes
-
-```powershell
+~~~text
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py collectstatic --noinput
 python manage.py test
-```
+git diff --check
+~~~
 
-### Auditoria trilíngue
+Não execute migrate, cargas ou importadores contra o banco local real sem plano, backup e autorização. Os testes criam banco temporário.
 
-```powershell
-python manage.py auditar_traducoes_trilingues
-```
+## Rotas atuais
 
-### Auditoria de autenticação e perfis
+As rotas abaixo podem receber o prefixo /en/ ou /es/:
 
-```powershell
-python manage.py auditar_autenticacao_perfis
-```
+| Rota | Situação |
+|---|---|
+| / | Início |
+| /catalogo/ | Catálogo público de Boas Práticas |
+| /experiencias/<id>/ | Ficha pública |
+| /comparar/ | Comparação de experiências |
+| /favoritos/ | Favoritos |
+| /banco-tecnico/ | Recursos Técnicos |
+| /normas-internacionais/ | Marcos Normativos |
+| /ferramentas/ | Ferramentas |
+| /sobre/ | Sobre a plataforma |
+| /guia/ | Guia pública quando GUIA_PUBLICO_HABILITADO=True |
+| /guia/preview/ | Prévia interna da Guia |
+| /cadastro/ | Cadastro |
+| /entrar/ | Login |
+| /adicionar-boa-pratica/ | Contribuição autenticada |
+| /editar-boa-pratica/<id>/ | Edição autorizada |
+| /meus-envios/ | Meu Espaço |
+| /status-envio/ | Status do envio |
+| /painel-revisao/ | Curadoria staff |
+| /painel-revisao-edicoes/ | Curadoria de edições |
+| /admin/ | Django Admin |
+| /health/ | Health check |
+| /i18n/ | Seleção de idioma |
 
-### Validação ponta a ponta
+## Segurança implementada
 
-```powershell
-python manage.py validar_fluxo_ponta_a_ponta
-```
+A base atual inclui:
 
-### Checagem técnica de ambiente
+- autorização no backend para áreas autenticadas e staff;
+- controle de acesso por objeto para experiências;
+- proteção CSRF e cookies HTTP-only;
+- DEBUG=False como padrão;
+- ALLOWED_HOSTS e CSRF_TRUSTED_ORIGINS configuráveis;
+- validação de uploads por extensão, MIME informado, assinatura e tamanho;
+- limite de anexos por experiência;
+- redirecionamento seguro;
+- catálogo público restrito a conteúdo publicado;
+- separação entre dados públicos e campos internos;
+- migrations versionadas e testes de regressão.
 
-```powershell
-python manage.py checar_prontidao_ambiente
-```
+## Pendências de segurança e operação
 
-### Validação de release
+Antes da produção institucional ainda são necessários:
 
-```powershell
-python manage.py validar_release_validacao
-```
+- autenticação e rate limiting mais robustos;
+- autorização institucional usuário–EFS;
+- aviso de privacidade, base legal, retenção e canal de direitos;
+- antivírus, quarentena e análise avançada de uploads;
+- CSP e hardening complementar de headers;
+- storage persistente para mídia;
+- PostgreSQL institucional provisionado;
+- backups e restauração testados;
+- logs centralizados e monitoramento;
+- hardening operacional do Hetzner;
+- domínio oficial, TLS e HSTS validados;
+- homologação com tecnologia assistiva e zoom;
+- governança editorial, licença e autorização de assets.
 
-### Entrega final
+## Render e Hetzner
 
-```powershell
-python manage.py validar_entrega_final
-```
+O Render permanece documentado para validação e teste externo legado. Seus arquivos de build podem executar instalação, coleta de estáticos e migration conforme a configuração do ambiente, mas isso não representa produção institucional.
 
-### Preparação Render/teste externo
-
-```powershell
-python manage.py preparar_checklist_render
-```
-
-### Auditoria da URL pública do Render
-
-```powershell
-python manage.py auditar_render_publico --url https://olacefs-justica-climatica.onrender.com/
-```
-
-Se houver cold start no Render gratuito:
-
-```powershell
-python manage.py auditar_render_publico --url https://olacefs-justica-climatica.onrender.com/ --timeout 90 --tentativas 5
-```
-
-## Deploy no Render
-
-Arquivos relacionados:
-
-- `render.yaml`;
-- `build.sh`;
-- `Procfile`;
-- `DEPLOY_RENDER.md`;
-- `ADMIN_RENDER.md`;
-- `docs/render/`.
-
-Comandos executados no build atual:
-
-```bash
-pip install -r requirements.txt
-python manage.py collectstatic --no-input
-python manage.py migrate
-```
-
-O deploy não carrega dados demonstrativos, não aplica retroalimentação e não cria administrador. Essas operações permanecem disponíveis somente para execução manual, consciente e autorizada. O Render é mantido como ambiente legado/teste, sem definir a infraestrutura institucional futura. Ambientes de staging e produção usam PostgreSQL e as variáveis explícitas descritas na Fase 2F.
-
-Para ambiente de teste externo, recomenda-se revisar `docs/render/checklist_render_teste_externo.md`.
-
-## Segurança: estado atual e limites
-
-A base possui controles importantes:
-
-- `DEBUG=False` por padrão;
-- `ALLOWED_HOSTS` configurável por ambiente;
-- `CSRF_TRUSTED_ORIGINS` configurável;
-- cookies seguros quando `DEBUG=False`;
-- validação de upload por extensão e tamanho;
-- limite de 3 anexos por experiência;
-- painéis de revisão protegidos por `staff_member_required`;
-- ações de favoritos via POST;
-- auditorias automatizadas de autenticação/perfis e fluxo ponta a ponta.
-
-Pontos que ainda exigem atenção antes de produção real:
-
-- substituir edição baseada apenas em e-mail/link por autenticação/autorização mais forte;
-- validar vínculo institucional da pessoa usuária com uma EFS;
-- migrar para banco persistente;
-- configurar storage persistente para anexos;
-- revisar política de privacidade/termos de uso;
-- definir governança editorial formal;
-- habilitar HSTS/SSL redirect apenas após domínio HTTPS definitivo;
-- usar antivírus ou serviço de varredura para anexos em produção;
-- remover artefatos de desenvolvimento indevidos, se aparecerem em `templates/` ou em diretórios duplicados.
+A futura operação no Hetzner requer configuração deliberada de PostgreSQL, storage, backups, TLS, observabilidade, usuários de serviço, firewall e procedimento de rollback. Nenhuma dessas etapas é executada por este repositório automaticamente.
 
 ## Dados demonstrativos
 
-Os dados gerados por `carregar_dados_ficticios` são apenas para validação e apresentação. Eles não constituem conteúdo oficial da OLACEFS ou das EFS.
+carregar_dados_ficticios produz dados locais para validação e apresentação. Esses registros não são conteúdo oficial da OLACEFS ou das EFS e não devem ser carregados em ambiente institucional sem autorização explícita.
 
-```powershell
-python manage.py carregar_dados_ficticios --limpar-demo
-```
+## Documentação
 
-## Teste externo
+- [Índice da documentação](docs/README.md);
+- [Índice operacional dos agentes](.codex/00_PROJECT_INDEX.md);
+- [Contexto do projeto](.codex/docs/PROJECT_CONTEXT.md);
+- [Arquitetura](.codex/docs/ARCHITECTURE.md);
+- [Segurança SSDLC](.codex/docs/SECURITY_SSDLC.md);
+- [Proteção de dados](.codex/docs/DATA_PROTECTION.md);
+- [Estratégia de testes](.codex/docs/TEST_STRATEGY.md).
 
-Materiais de apoio:
+## Governança e licença
 
-- `docs/teste_externo/roteiro_teste_externo.md`;
-- `docs/teste_externo/checklist_teste_externo.md`;
-- `docs/teste_externo/perguntas_feedback_teste_externo.md`;
-- `docs/teste_externo/preparacao_ambiente_teste_externo.md`;
-- `docs/teste_externo/mensagem_envio_link_teste.md`.
-
-## Checklist antes de enviar link externo
-
-```powershell
-python manage.py test
-python manage.py auditar_traducoes_trilingues
-python manage.py auditar_autenticacao_perfis
-python manage.py validar_fluxo_ponta_a_ponta
-python manage.py checar_prontidao_ambiente
-python manage.py validar_entrega_final
-python manage.py auditar_render_publico --url https://olacefs-justica-climatica.onrender.com/
-```
-
-## Licença e governança
-
-Definir conforme orientação institucional da OLACEFS/GIZ antes de publicação ampla ou produção oficial.
+Governança editorial, licença, termos de uso e política de privacidade permanecem pendentes de definição e aprovação institucional.

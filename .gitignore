@@ -49,3 +49,15 @@ media/private/
 # Pacote local de instalação
 kit-codex/
 kit-codex-*.zip
+
+# Artefatos locais de auditoria, migração e evidência
+complete_diff*.txt
+diff_*_FINAL.txt
+diff_FINAL_*.txt
+pacote_*_FINAL.diff
+pacote_*_APROVACAO.diff
+falhas_*.txt
+inventario_*_FINAL.txt
+novos_arquivos*_FINAL.txt
+*.backup-antes-migrations-*
+dados_publicos_hetzner*.json

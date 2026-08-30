@@ -2,6 +2,17 @@
 
 ## Não lançado — 2026-08-01
 
+- Integradas notificações editoriais trilíngues para submissão, revisão, publicação e edição de boas práticas, enviadas após commit e sem bloquear o fluxo em falhas SMTP.
+
+- Alinhada a estrutura semântica dos Fundamentos em PT/ES/EN e criada suíte rápida de invariantes públicos.
+
+- Estruturado o Lote 2 de Marcos Normativos com 34 registros extraídos das fichas negociais, natureza jurídica, introdução em espanhol, cobertura própria por país/status, fontes seguras e carga idempotente.
+
+### Fase 0A — saneamento seguro e documentação
+
+- Removidos artefatos duplicados/deslocados do worktree; corrigido o contrato de variáveis do `.env.example`; adicionados padrões específicos ao `.gitignore`; reconstruído o README e criado o índice documental.
+- Nenhum código funcional, model, migration, banco ou comportamento da plataforma foi alterado. Baseline e validação final aprovados com 596 testes, 0 falhas, 0 erros e 0 testes ignorados.
+
 - Implementada e encerrada a Fase 2D.1 com oito models próprios e versionados do Guia, proteção de versões publicadas, administração de curadoria, ledger ampliado e migration estrutural `0013_fase2d1_fundacao_guia`, sem carga das 407 perguntas ou das 224 ocorrências de referências; foram aprovados 21 testes direcionados, 278 testes na regressão completa e o ciclo `0012 → 0013 → 0012 → 0013` em SQLite temporário, preservando integralmente o banco real.
 
 - Registradas as decisões GUIA-02, GUIA-03, GUIA-04 e GUIA-07 para a futura fundação estrutural do Guia, sem código, migration ou carga de dados.

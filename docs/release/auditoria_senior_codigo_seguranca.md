@@ -44,15 +44,13 @@ O README ainda descrevia o projeto como “MVP local” e não refletia as fases
 
 Foram identificados arquivos que não deveriam estar em `templates/praticas/`:
 
-- `templates/praticas/ADMIN_RENDER.md`;
-- `templates/praticas/build.sh`;
-- `templates/praticas/praticas/management/commands/criar_admin_render.py`.
-
-Também apareceu um diretório duplicado `olacefs-justica-climatica-main/` dentro do pacote analisado. Se isso existir no repositório real, deve ser removido.
+- Os artefatos operacionais e a cópia duplicada identificados nessa auditoria
+  foram removidos do worktree na Fase 0A; os caminhos canônicos permanecem
+  preservados.
 
 **Severidade:** média.  
 **Risco:** confusão de manutenção, exposição acidental de documentação operacional, ruído em deploy e revisão.  
-**Ação recomendada:** remover do repositório.
+**Ação realizada:** saneamento controlado na Fase 0A.
 
 ### Achado 3 — SECRET_KEY de fallback
 

@@ -28,3 +28,6 @@
 - a fonte atual do Guia comprova hierarquia, 407 perguntas e 224 ocorrências de referências, mas ainda não contém os códigos estáveis aprovados em GUIA-03; nenhuma importação deve ocorrer até existir fonte institucional controlada com esses códigos;
 - perguntas, taxonomias e referências do Guia permanecem somente em espanhol; traduções PT/EN, correções editoriais, UX pública e reconciliação normativa dependem de decisões posteriores e não podem ser inferidas;
 - referências do Guia permanecem no nível de subárea por decisão GUIA-07; criar relação por pergunta, deduplicar conceitualmente ou vincular automaticamente a `NormaInternacional` produziria precisão não sustentada pela fonte.
+- a documentação histórica permanece fragmentada; a organização física completa dos documentos está pendente para a Fase 0B.
+- autenticação reforçada e rate limiting continuam pendentes, assim como autorização institucional usuário–EFS.
+- antivírus/quarentena de uploads, CSP, storage persistente, logs centralizados e hardening operacional do Hetzner continuam pendentes.
