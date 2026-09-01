@@ -9,6 +9,10 @@ from django.urls import reverse
 from django.utils import translation
 
 
+def _svg_bytes_canonicos(conteudo):
+    return conteudo.replace(b"\r\n", b"\n")
+
+
 class HomePrimeiraEvolucaoTests(TestCase):
     def setUp(self):
         translation.activate("pt-br")
@@ -135,9 +139,28 @@ class HomePrimeiraEvolucaoTests(TestCase):
             with self.subTest(caminho=caminho):
                 arquivo = Path(finders.find(caminho))
                 self.assertEqual(
-                    hashlib.sha256(arquivo.read_bytes()).hexdigest().upper(),
+                    hashlib.sha256(_svg_bytes_canonicos(arquivo.read_bytes())).hexdigest().upper(),
                     hash_esperado,
                 )
+
+    def test_normalizacao_canonica_preserva_diferencas_reais_e_bytes_especiais(self):
+        conteudo_lf = b"<?xml version=\"1.0\"?>\n<svg>linha</svg>\n"
+        conteudo_crlf = conteudo_lf.replace(b"\n", b"\r\n")
+        conteudo_alterado = b"<?xml version=\"1.0\"?>\n<svg>alterada</svg>\n"
+        conteudo_com_bare_cr = b"<svg>linha\rfinal</svg>"
+        conteudo_com_bom = b"\xef\xbb\xbf<svg>linha</svg>"
+
+        self.assertEqual(_svg_bytes_canonicos(conteudo_lf), _svg_bytes_canonicos(conteudo_crlf))
+        self.assertEqual(
+            hashlib.sha256(_svg_bytes_canonicos(conteudo_lf)).digest(),
+            hashlib.sha256(_svg_bytes_canonicos(conteudo_crlf)).digest(),
+        )
+        self.assertNotEqual(
+            hashlib.sha256(_svg_bytes_canonicos(conteudo_lf)).digest(),
+            hashlib.sha256(_svg_bytes_canonicos(conteudo_alterado)).digest(),
+        )
+        self.assertEqual(_svg_bytes_canonicos(conteudo_com_bare_cr), conteudo_com_bare_cr)
+        self.assertEqual(_svg_bytes_canonicos(conteudo_com_bom), conteudo_com_bom)
 
     def test_fundamentos_preservam_hierarquia_de_titulos(self):
         response = self.client.get(reverse("pagina_inicial"))
