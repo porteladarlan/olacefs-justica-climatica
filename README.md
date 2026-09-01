@@ -28,6 +28,10 @@ O repositório mantém um monólito Django com templates server-side, catálogo 
 
 A aplicação não presume que protótipo, dados demonstrativos ou materiais de teste sejam conteúdo institucional homologado.
 
+### Idioma original e traduções das Boas Práticas
+
+O idioma original é determinado pela rota/requisição localizada: português grava nos campos canônicos, espanhol nos campos com sufixo `_es` e inglês nos campos com sufixo `_en`. A tradução automática, quando habilitada por endpoint, preenche somente campos vazios; nunca substitui o original nem traduções manuais não vazias. Falhas do provedor não bloqueiam a publicação, e nenhuma chamada externa ocorre sem endpoint configurado.
+
 ## Stack e ambientes
 
 - Python 3.12/3.13;

@@ -2,6 +2,8 @@
 
 ## Não lançado — 2026-08-01
 
+- RN-1B passou a registrar explicitamente o idioma original das submissões localizadas e a preencher traduções apenas em campos vazios, sem substituir conteúdo manual.
+
 - Integradas notificações editoriais trilíngues para submissão, revisão, publicação e edição de boas práticas, enviadas após commit e sem bloquear o fluxo em falhas SMTP.
 
 - Alinhada a estrutura semântica dos Fundamentos em PT/ES/EN e criada suíte rápida de invariantes públicos.

@@ -190,16 +190,20 @@ class NotificacoesFluxoEditorialTests(TestCase):
             self.assertNotIn("token", mensagem.body.lower())
 
     def test_notificacao_permanece_pendente_ate_commit(self):
-        with self.captureOnCommitCallbacks(execute=False) as callbacks:
-            response = self.client.post(
-                reverse("adicionar_boa_pratica"), self.dados_formulario()
-            )
-            self.assertEqual(len(mail.outbox), 0)
+        with patch("praticas.views.tentar_traduzir_experiencia") as traduzir:
+            with self.captureOnCommitCallbacks(execute=False) as callbacks:
+                response = self.client.post(
+                    reverse("adicionar_boa_pratica"), self.dados_formulario()
+                )
+                self.assertEqual(len(mail.outbox), 0)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(callbacks), 1)
-        callbacks[0]()
-        self.assertEqual(len(mail.outbox), 2)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(len(callbacks), 2)
+            for callback in callbacks:
+                callback()
+
+            self.assertEqual(len(mail.outbox), 2)
+            traduzir.assert_called_once()
 
     def test_editar_sem_transicao_para_enviado_nao_duplica_notificacao(self):
         experiencia = self.criar_experiencia(

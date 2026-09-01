@@ -22,13 +22,25 @@ from .models import (
 from .uploads import validar_anexo_upload, validar_ficha_tecnica_upload
 
 
-def idioma_atual():
-    idioma = (get_language() or "pt-br").lower()
-    if idioma.startswith("en"):
-        return "en"
-    if idioma.startswith("es"):
+IDIOMAS_SUPORTADOS = ("pt", "es", "en")
+
+
+def normalizar_idioma(codigo):
+    codigo = str(codigo or "").strip().lower()
+    if codigo in {"pt", "pt-br"}:
+        return "pt"
+    if codigo == "es" or codigo.startswith("es-"):
         return "es"
-    return "pt"
+    if codigo == "en" or codigo.startswith("en-"):
+        return "en"
+    return None
+
+
+def idioma_atual():
+    idioma = normalizar_idioma(get_language() or "pt-br")
+    if idioma is None:
+        raise ValueError("Unsupported interface language")
+    return idioma
 
 
 def texto_idioma(pt, es=None, en=None):
@@ -360,8 +372,8 @@ EXPERIENCIA_HELP_TEXTS = {
 }
 
 
-def aplicar_textos_experiencia(form):
-    idioma = idioma_atual()
+def aplicar_textos_experiencia(form, idioma=None):
+    idioma = idioma or idioma_atual()
     for campo, traducoes in EXPERIENCIA_LABELS.items():
         if campo in form.fields:
             form.fields[campo].label = traducoes[idioma]
@@ -451,21 +463,32 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
             "ano_execucao": forms.NumberInput(attrs={"class": "form-control"}),
         }
 
-    def __init__(self, *args, obrigatorio_para_envio=True, permitir_traducoes=False, **kwargs):
+    def __init__(self, *args, obrigatorio_para_envio=True, permitir_traducoes=False, idioma=None, **kwargs):
         self.obrigatorio_para_envio = obrigatorio_para_envio
         self.permitir_traducoes = permitir_traducoes
+        self.interface_language_code = normalizar_idioma(idioma) if idioma is not None else idioma_atual()
+        if self.interface_language_code is None:
+            raise ValueError("Unsupported interface language")
         super().__init__(*args, **kwargs)
-        self.language_code = idioma_atual()
+        self.language_code = self.interface_language_code
         if self.instance.pk and getattr(self.instance, "idioma_original", ""):
-            self.language_code = self.instance.idioma_original
+            self.language_code = normalizar_idioma(self.instance.idioma_original)
+            if self.language_code is None:
+                raise ValueError("Unsupported original language")
+        elif self.instance.pk:
+            self.language_code = "pt"
+        self._valores_originais = {
+            campo: getattr(self.instance, campo, "")
+            for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS
+        }
         if self.instance.pk and self.language_code != "pt":
             sufixo = "_" + self.language_code
             for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS:
                 campo_idioma = campo + sufixo
                 if campo in self.fields and hasattr(self.instance, campo_idioma):
                     self.initial[campo] = getattr(self.instance, campo_idioma) or getattr(self.instance, campo, "")
-        aplicar_textos_experiencia(self)
-        campo_ordem = {"pt": "nome", "es": "nome_es", "en": "nome_en"}[idioma_atual()]
+        aplicar_textos_experiencia(self, self.interface_language_code)
+        campo_ordem = {"pt": "nome", "es": "nome_es", "en": "nome_en"}[self.interface_language_code]
         self.fields["efs"].queryset = self.fields["efs"].queryset.order_by(campo_ordem, "nome")
         self.fields["pais"].queryset = self.fields["pais"].queryset.order_by(campo_ordem, "nome")
         self.fields["paises_participantes"].queryset = self.fields["paises_participantes"].queryset.order_by(campo_ordem, "nome")
@@ -562,10 +585,6 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
         self.perguntas_auditoria_limpas = []
 
     def save(self, commit=True):
-        valores_originais = {
-            campo: getattr(self.instance, campo, "")
-            for campo in self.CAMPOS_TEXTUAIS_TRADUZIVEIS
-        }
         experiencia = super().save(commit=False)
         if self.language_code != "pt":
             sufixo = "_" + self.language_code
@@ -573,7 +592,7 @@ class ExperienciaSubmissaoForm(forms.ModelForm):
                 campo_idioma = campo + sufixo
                 if hasattr(experiencia, campo_idioma):
                     setattr(experiencia, campo_idioma, self.cleaned_data.get(campo, "") or "")
-                    setattr(experiencia, campo, valores_originais[campo])
+                    setattr(experiencia, campo, self._valores_originais[campo])
         if self.permitir_traducoes and self.instance.pk:
             for nome_administrativo, nome_modelo in self.translation_field_map.items():
                 setattr(experiencia, nome_modelo, self.cleaned_data.get(nome_administrativo, "") or "")

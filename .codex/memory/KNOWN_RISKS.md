@@ -1,5 +1,7 @@
 # Riscos
 
+- A RN-1B registra o idioma original de novas submissões e preserva traduções existentes; a tradução automática continua opcional, fail-open e dependente de provider externo configurado por ambiente. Quando o original é editado, traduções não vazias são preservadas e podem ficar desatualizadas; diferenciar tradução humana/automática e governar o provedor permanecem pendências da RN-1G.
+
 - protótipo confundido com backend;
 - modelo insuficiente;
 - credenciais versionadas;

@@ -14,12 +14,13 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Max, Prefetch, Q
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
@@ -40,6 +41,7 @@ from .forms import (
     ReenviarConfirmacaoForm,
     RevisaoPropostaEdicaoForm,
     texto_idioma,
+    normalizar_idioma,
 )
 from .tokens import confirmacao_email_token
 from .models import (
@@ -80,27 +82,60 @@ logger = logging.getLogger(__name__)
 
 
 def idioma_original_interface(request):
-    codigo = (getattr(request, "LANGUAGE_CODE", "") or "").lower()
-    if codigo.startswith("es"):
-        return "es"
-    if codigo.startswith("en"):
-        return "en"
-    return "pt"
+    idioma = normalizar_idioma(getattr(request, "LANGUAGE_CODE", ""))
+    if idioma == "pt":
+        caminho = (getattr(request, "path_info", "") or "").lower()
+        if caminho.startswith("/es/"):
+            return "es"
+        if caminho.startswith("/en/"):
+            return "en"
+    return idioma
 
 
 def tentar_traduzir_experiencia(experiencia, idioma_origem, campos=None):
     if idioma_origem not in {"pt", "es", "en"}:
         return False
     try:
+        campos_solicitados = (
+            ExperienciaSubmissaoForm.CAMPOS_TEXTUAIS_TRADUZIVEIS
+            if campos is None
+            else campos
+        )
+        if not campos_solicitados:
+            return True
         traducoes = traduzir_campos_experiencia(
             experiencia,
-            campos or ExperienciaSubmissaoForm.CAMPOS_TEXTUAIS_TRADUZIVEIS,
+            campos_solicitados,
             idioma_origem,
         )
+        campos_base = set(
+            ExperienciaSubmissaoForm.CAMPOS_TEXTUAIS_TRADUZIVEIS
+            if campos is None
+            else campos
+        )
+        if not campos_base:
+            return True
+        campos_destino = {
+            base if idioma == "pt" else f"{base}_{idioma}"
+            for base in campos_base
+            for idioma in ("pt", "es", "en")
+        }
+        sufixo_origem = {"pt": "", "es": "_es", "en": "_en"}[idioma_origem]
+        campos_origem = {
+            base if idioma_origem == "pt" else f"{base}{sufixo_origem}"
+            for base in campos_base
+        }
+        atualizacoes = {}
         for campo, valor in traducoes.items():
-            setattr(experiencia, campo, valor)
-        if traducoes:
-            experiencia.save(update_fields=list(traducoes) + ["atualizado_em"])
+            if campo not in campos_destino or campo in campos_origem or getattr(experiencia, campo, ""):
+                continue
+            if not isinstance(valor, str) or not valor:
+                continue
+            if Experiencia.objects.filter(pk=experiencia.pk, **{campo: ""}).update(
+                **{campo: valor, "atualizado_em": timezone.now()}
+            ):
+                setattr(experiencia, campo, valor)
+                atualizacoes[campo] = valor
     except Exception as exc:
         # Translation is best-effort and must never block publication or edits.
         logger.warning(
@@ -1392,18 +1427,23 @@ def adicionar_boa_pratica(request):
         )
 
     if request.method == "POST":
+        idioma = idioma_original_interface(request)
+        if idioma is None:
+            return render(request, "praticas/adicionar_boa_pratica.html", status=400)
         form = ExperienciaSubmissaoForm(
             request.POST,
             request.FILES,
             obrigatorio_para_envio=obrigatorio_para_envio,
+            idioma=idioma,
         )
         anexos, erros_anexos = validar_anexos_request(request)
 
         if form.is_valid() and not erros_anexos:
             with transaction.atomic():
+                form.instance.idioma_original = idioma
                 experiencia = form.save(commit=False)
                 experiencia.autor = request.user
-                experiencia.idioma_original = idioma_original_interface(request)
+                experiencia.idioma_original = idioma
                 experiencia.status_iniciativa = Experiencia.StatusIniciativa.CONCLUIDA
                 if request.user.is_authenticated and not experiencia.email_contato:
                     experiencia.email_contato = request.user.email
@@ -1432,7 +1472,9 @@ def adicionar_boa_pratica(request):
                 if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
                     agendar_notificacoes_nova_submissao(request, experiencia)
             if experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO:
-                tentar_traduzir_experiencia(experiencia, experiencia.idioma_original)
+                transaction.on_commit(
+                    lambda: tentar_traduzir_experiencia(experiencia, experiencia.idioma_original)
+                )
 
             messages.success(request, mensagem)
             if acao == "rascunho":
@@ -1441,11 +1483,15 @@ def adicionar_boa_pratica(request):
 
         adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
+        idioma = idioma_original_interface(request)
+        if idioma is None:
+            return HttpResponseBadRequest("Unsupported interface language.")
         form = ExperienciaSubmissaoForm(
             initial={
                 "email_contato": request.user.email,
                 "pessoa_responsavel": request.user.get_full_name() or request.user.username,
-            }
+            },
+            idioma=idioma,
         )
 
     return render(
@@ -1572,12 +1618,16 @@ def editar_boa_pratica(request, pk):
     obrigatorio_para_envio = acao != "rascunho"
 
     if request.method == "POST":
+        idioma = idioma_original_interface(request)
+        if idioma is None:
+            return redirect("meus_envios")
         form = ExperienciaSubmissaoForm(
             request.POST,
             request.FILES,
             instance=experiencia,
             obrigatorio_para_envio=obrigatorio_para_envio,
             permitir_traducoes=request.user.is_staff,
+            idioma=idioma,
         )
         ids_remover_solicitados = {
             int(valor)
@@ -1653,14 +1703,22 @@ def editar_boa_pratica(request, pk):
                     if campo in form.changed_data
                 ]
                 if campos_alterados:
-                    tentar_traduzir_experiencia(experiencia, experiencia.idioma_original, campos_alterados)
+                    transaction.on_commit(
+                        lambda: tentar_traduzir_experiencia(
+                            experiencia, experiencia.idioma_original, campos_alterados
+                        )
+                    )
             messages.success(request, mensagem)
             return redirect("painel_revisao") if request.user.is_staff else redirect("status_envio")
         adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
+        idioma = idioma_original_interface(request)
+        if idioma is None:
+            return HttpResponseBadRequest("Unsupported interface language.")
         form = ExperienciaSubmissaoForm(
             instance=experiencia,
             permitir_traducoes=request.user.is_staff,
+            idioma=idioma,
         )
 
     return render(
