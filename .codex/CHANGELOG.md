@@ -1,5 +1,11 @@
 # Changelog da base Codex
 
+## Hotfix — filtros trilíngues de Marcos Normativos — 2026-09-02
+
+- Filtros de setor e natureza jurídica passaram a usar chaves canônicas e
+  rótulos do idioma atual, com compatibilidade para valores localizados legados
+  e sem leitura do JSON operacional por requisição.
+
 ## Não lançado — 2026-08-01
 
 - Integradas notificações editoriais trilíngues para submissão, revisão, publicação e edição de boas práticas, enviadas após commit e sem bloquear o fluxo em falhas SMTP.

@@ -41,12 +41,12 @@
 
             <select name="setor" data-auto-submit aria-label="{% if LANGUAGE_CODE == 'en' %}Filter by sector{% elif LANGUAGE_CODE == 'es' %}Filtrar por sector{% else %}Filtrar por setor{% endif %}"{% if not setores %} disabled{% endif %}>
                 <option value="">{% if LANGUAGE_CODE == 'en' %}All sectors{% elif LANGUAGE_CODE == 'es' %}Todos los sectores{% else %}Todos os setores{% endif %}</option>
-                {% for setor in setores %}<option value="{{ setor }}"{% if setor == setor_selecionado %} selected{% endif %}>{{ setor }}</option>{% endfor %}
+                {% for setor in setores %}<option value="{{ setor.value }}"{% if setor.value == setor_selecionado %} selected{% endif %}>{{ setor.label }}</option>{% endfor %}
             </select>
 
             <select name="natureza" data-auto-submit aria-label="{% if LANGUAGE_CODE == 'en' %}Legal nature{% elif LANGUAGE_CODE == 'es' %}Naturaleza jur&iacute;dica{% else %}Natureza jur&iacute;dica{% endif %}"{% if not naturezas_juridicas %} disabled{% endif %}>
                 <option value="">{% if LANGUAGE_CODE == 'en' %}All legal natures{% elif LANGUAGE_CODE == 'es' %}Toda naturaleza jur&iacute;dica{% else %}Toda natureza jur&iacute;dica{% endif %}</option>
-                {% for natureza in naturezas_juridicas %}<option value="{{ natureza }}"{% if natureza == natureza_selecionada %} selected{% endif %}>{{ natureza }}</option>{% endfor %}
+                {% for natureza in naturezas_juridicas %}<option value="{{ natureza.value }}"{% if natureza.value == natureza_selecionada %} selected{% endif %}>{{ natureza.label }}</option>{% endfor %}
             </select>
 
             <a class="library-clear" href="{% url 'normas_internacionais' %}">{% if LANGUAGE_CODE == 'en' %}Clear filters{% elif LANGUAGE_CODE == 'es' %}Limpiar filtros{% else %}Limpar filtros{% endif %}</a>

@@ -28,6 +28,18 @@ O repositório mantém um monólito Django com templates server-side, catálogo 
 
 A aplicação não presume que protótipo, dados demonstrativos ou materiais de teste sejam conteúdo institucional homologado.
 
+### Contrato dos filtros de Marcos Normativos
+
+Os filtros públicos mantêm os parâmetros `setor` e `natureza`, enquanto seus
+valores usam chaves canônicas estáveis e labels localizados em PT, ES e EN.
+Setores usam as chaves estáveis do catálogo
+operacional (`agua_energia`, `infraestrutura`, `biodiversidade_ecossistemas`,
+`saude`, `alimentacao_agricultura`, `industria_extrativa`,
+`gestao_riscos_desastres`, `genero_direitos_humanos` e `pobreza_desigualdade`);
+`binding` e `non_binding` identificam a natureza jurídica. Rótulos localizados
+continuam aceitos para compatibilidade, mas cada idioma exibe e consulta apenas
+seus próprios campos traduzidos.
+
 ## Stack e ambientes
 
 - Python 3.12/3.13;
