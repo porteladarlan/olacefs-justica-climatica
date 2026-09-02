@@ -51,7 +51,7 @@ def traduzir_texto(texto, idioma_origem, idioma_destino):
 
 def traduzir_campos_experiencia(experiencia, campos, idioma_origem):
     """Translate only supplied free-text fields, preserving the source fields."""
-    if idioma_origem not in {"pt", "es", "en"}:
+    if idioma_origem not in {"pt", "es", "en"} or not campos:
         return {}
     traducoes = {}
     fontes = {}
@@ -70,5 +70,7 @@ def traduzir_campos_experiencia(experiencia, campos, idioma_origem):
             continue
         for campo, valor in resultado.items():
             campo_destino = campo if destino == "pt" else f"{campo}_{destino}"
+            if getattr(experiencia, campo_destino, ""):
+                continue
             traducoes[campo_destino] = valor
     return traducoes
