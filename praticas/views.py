@@ -81,6 +81,75 @@ ANEXO_LIMITE_POR_EXPERIENCIA = 3
 logger = logging.getLogger(__name__)
 
 
+# Contrato público dos filtros: chaves estáveis, rótulos congelados e nenhum
+# acesso ao JSON operacional durante uma requisição.
+MARCOS_SETOR_FILTROS = (
+    ("agua_energia", ("Água e Energia", "Agua y Energía", "Water and Energy")),
+    ("infraestrutura", ("Infraestrutura", "Infraestructura", "Infrastructure")),
+    (
+        "biodiversidade_ecossistemas",
+        ("Biodiversidade e Ecossistemas", "Biodiversidad y Ecosistemas", "Biodiversity and Ecosystems"),
+    ),
+    ("saude", ("Saúde", "Salud", "Health")),
+    (
+        "alimentacao_agricultura",
+        ("Alimentação e Agricultura", "Alimentación y Agricultura", "Food and Agriculture"),
+    ),
+    ("industria_extrativa", ("Indústria Extrativa", "Industria Extractiva", "Extractive Industry")),
+    (
+        "gestao_riscos_desastres",
+        ("Gestão de Riscos e Desastres", "Gestión de Riesgo y Desastres", "Disaster Risk Management"),
+    ),
+    (
+        "genero_direitos_humanos",
+        ("Gênero e direitos humanos", "Género y derechos humanos", "Gender and human rights"),
+    ),
+    ("pobreza_desigualdade", ("Pobreza e desigualdade", "Pobreza y desigualdad", "Poverty and inequality")),
+)
+MARCOS_NATUREZA_FILTROS = (
+    ("binding", ("Vinculante", "Vinculante", "Binding")),
+    ("non_binding", ("Não vinculante", "No vinculante", "Non-binding")),
+)
+MARCOS_FILTRO_IDIOMA = {
+    "pt": {"setor": "setores_aplicaveis", "natureza": "natureza_juridica"},
+    "es": {"setor": "setores_aplicaveis_es", "natureza": "natureza_juridica_es"},
+    "en": {"setor": "setores_aplicaveis_en", "natureza": "natureza_juridica_en"},
+}
+
+
+def _idioma_filtro(request):
+    codigo = (getattr(request, "LANGUAGE_CODE", "") or "").lower().split("-")[0]
+    return codigo if codigo in MARCOS_FILTRO_IDIOMA else "pt"
+
+
+def _chave_filtro(valor, opcoes):
+    normalizado = (valor or "").strip()
+    if not normalizado or len(normalizado) > 160:
+        return ""
+    comparaveis = {chave: (chave, *rotulos) for chave, rotulos in opcoes}
+    dobrados = {
+        texto.casefold().strip(): chave
+        for chave, valores in comparaveis.items()
+        for texto in valores
+    }
+    return dobrados.get(normalizado.casefold(), "")
+
+
+def _opcoes_filtro_normas(campo, opcoes, indice_rotulo):
+    presentes = set()
+    for valor in NormaInternacional.objects.values_list(campo, flat=True):
+        for item in (valor or "").split(","):
+            item = item.strip()
+            if item:
+                presentes.add(item.casefold())
+    resultado = []
+    for chave, rotulos in opcoes:
+        rotulo = rotulos[indice_rotulo]
+        if rotulo.casefold() in presentes:
+            resultado.append({"value": chave, "label": rotulo})
+    return sorted(resultado, key=lambda item: item["label"].casefold())
+
+
 def idioma_original_interface(request):
     idioma = normalizar_idioma(getattr(request, "LANGUAGE_CODE", ""))
     if idioma == "pt":
@@ -1133,39 +1202,25 @@ def detalhe_experiencia(request, pk):
 
 def normas_internacionais(request):
     termo = (request.GET.get("q") or "").strip()[:200]
+    idioma = _idioma_filtro(request)
+    campos_idioma = MARCOS_FILTRO_IDIOMA[idioma]
     paises = Pais.objects.filter(
         normas_internacionais_status__isnull=False
     ).distinct()
-    setores = sorted(
-        {
-            setor.strip()
-            for valor in NormaInternacional.objects.exclude(
-                setores_aplicaveis=""
-            ).values_list("setores_aplicaveis", "setores_aplicaveis_es", "setores_aplicaveis_en")
-            for texto in valor
-            if texto
-            for valor in [texto]
-            for setor in valor.split(",")
-            if setor.strip()
-        },
-        key=str.casefold,
+    setores = _opcoes_filtro_normas(
+        campos_idioma["setor"], MARCOS_SETOR_FILTROS, {"pt": 0, "es": 1, "en": 2}[idioma]
     )
-    naturezas_juridicas = list(
-        NormaInternacional.objects.exclude(natureza_juridica="")
-        .values_list("natureza_juridica", "natureza_juridica_es", "natureza_juridica_en")
-    )
-    naturezas_juridicas = sorted(
-        {natureza.strip() for valores in naturezas_juridicas for natureza in valores if natureza.strip()},
-        key=str.casefold,
+    naturezas_juridicas = _opcoes_filtro_normas(
+        campos_idioma["natureza"], MARCOS_NATUREZA_FILTROS, {"pt": 0, "es": 1, "en": 2}[idioma]
     )
     paises_selecionados = _objetos_selecionados(
         request, "pais", Pais.objects.all()
     )
-    setor_selecionado = (request.GET.get("setor") or "").strip()[:160]
-    if setor_selecionado not in setores:
+    setor_selecionado = _chave_filtro(request.GET.get("setor"), MARCOS_SETOR_FILTROS)
+    if setor_selecionado not in {item["value"] for item in setores}:
         setor_selecionado = ""
-    natureza_selecionada = (request.GET.get("natureza") or "").strip()[:80]
-    if natureza_selecionada not in naturezas_juridicas:
+    natureza_selecionada = _chave_filtro(request.GET.get("natureza"), MARCOS_NATUREZA_FILTROS)
+    if natureza_selecionada not in {item["value"] for item in naturezas_juridicas}:
         natureza_selecionada = ""
 
     normas = NormaInternacional.objects.prefetch_related(
@@ -1195,19 +1250,26 @@ def normas_internacionais(request):
             paises_status__pais_id__in=[pais.pk for pais in paises_selecionados]
         )
     if setor_selecionado:
-        normas = normas.filter(
-            Q(setores_aplicaveis__icontains=setor_selecionado)
-            | Q(setores_aplicaveis_es__icontains=setor_selecionado)
-            | Q(setores_aplicaveis_en__icontains=setor_selecionado)
-        )
+        indice = {"pt": 0, "es": 1, "en": 2}[idioma]
+        rotulo_setor = dict(MARCOS_SETOR_FILTROS)[setor_selecionado][indice]
+        normas = normas.filter(**{f"{campos_idioma['setor']}__icontains": rotulo_setor})
     if natureza_selecionada:
-        normas = normas.filter(
-            Q(natureza_juridica=natureza_selecionada)
-            | Q(natureza_juridica_es=natureza_selecionada)
-            | Q(natureza_juridica_en=natureza_selecionada)
-        )
+        indice = {"pt": 0, "es": 1, "en": 2}[idioma]
+        rotulo_natureza = dict(MARCOS_NATUREZA_FILTROS)[natureza_selecionada][indice]
+        normas = normas.filter(**{campos_idioma["natureza"]: rotulo_natureza})
 
     normas = list(normas.distinct())
+    if setor_selecionado:
+        indice = {"pt": 0, "es": 1, "en": 2}[idioma]
+        rotulo_setor = dict(MARCOS_SETOR_FILTROS)[setor_selecionado][indice].casefold()
+        normas = [
+            norma
+            for norma in normas
+            if any(
+                item.strip().casefold() == rotulo_setor
+                for item in (getattr(norma, campos_idioma["setor"]) or "").split(",")
+            )
+        ]
     for norma in normas:
         norma.url_publica = _url_http_segura(norma.url_referencia)
         norma.ficha_publica = _url_ficha_tecnica_segura(norma)
@@ -1238,9 +1300,11 @@ def normas_internacionais(request):
         ("natureza", natureza_selecionada),
     ):
         if valor:
+            opcoes = MARCOS_SETOR_FILTROS if chave == "setor" else MARCOS_NATUREZA_FILTROS
+            indice = {"pt": 0, "es": 1, "en": 2}[idioma]
             chips.append(
                 {
-                    "rotulo": valor,
+                    "rotulo": dict(opcoes)[valor][indice],
                     "url_remover": _url_sem_valor_filtro(request, chave),
                 }
             )

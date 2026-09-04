@@ -32,6 +32,18 @@ A aplicação não presume que protótipo, dados demonstrativos ou materiais de 
 
 O idioma original é determinado pela rota/requisição localizada: português grava nos campos canônicos, espanhol nos campos com sufixo `_es` e inglês nos campos com sufixo `_en`. A tradução automática, quando habilitada por endpoint, preenche somente campos vazios; nunca substitui o original nem traduções manuais não vazias. Falhas do provedor não bloqueiam a publicação, e nenhuma chamada externa ocorre sem endpoint configurado.
 
+### Contrato dos filtros de Marcos Normativos
+
+Os filtros públicos mantêm os parâmetros `setor` e `natureza`, enquanto seus
+valores usam chaves canônicas estáveis e labels localizados em PT, ES e EN.
+Setores usam as chaves estáveis do catálogo
+operacional (`agua_energia`, `infraestrutura`, `biodiversidade_ecossistemas`,
+`saude`, `alimentacao_agricultura`, `industria_extrativa`,
+`gestao_riscos_desastres`, `genero_direitos_humanos` e `pobreza_desigualdade`);
+`binding` e `non_binding` identificam a natureza jurídica. Rótulos localizados
+continuam aceitos para compatibilidade, mas cada idioma exibe e consulta apenas
+seus próprios campos traduzidos.
+
 ## Stack e ambientes
 
 - Python 3.12/3.13;

@@ -172,6 +172,8 @@ class RegressaoPublicaTests(TestCase):
             ano=2024,
             ano_texto="2024",
             natureza_juridica="Vinculante",
+            natureza_juridica_es="Vinculante",
+            natureza_juridica_en="Binding",
             setores_aplicaveis="Energía",
             url_referencia="https://example.org/fonte",
             ficha_tecnica_url="https://example.org/ficha",
@@ -181,7 +183,9 @@ class RegressaoPublicaTests(TestCase):
             nome_es="Marco sin enlaces",
             nome_en="Framework without links",
             resumo_es="Segunda descripción institucional.",
-            natureza_juridica="No vinculante",
+            natureza_juridica="Não vinculante",
+            natureza_juridica_es="No vinculante",
+            natureza_juridica_en="Non-binding",
             setores_aplicaveis="Energía",
         )
         NormaInternacionalPais.objects.create(
@@ -441,11 +445,11 @@ class RegressaoPublicaTests(TestCase):
                 self.assertNotIn("download=", html_normas)
                 normas_filtradas = self.client.get(
                     self._caminho(prefixo, "/normas-internacionais/"),
-                    {"natureza": "Vinculante"},
+                    {"natureza": "binding"},
                 )
                 self.assertEqual(normas_filtradas.status_code, 200)
                 self.assertEqual(normas_filtradas.context["total_resultados"], 1)
-                self.assertContains(normas_filtradas, 'value="Vinculante" selected')
+                self.assertContains(normas_filtradas, 'value="binding" selected')
 
                 _, inventario_ferramentas = self._inventario(
                     self._caminho(prefixo, "/ferramentas/")
