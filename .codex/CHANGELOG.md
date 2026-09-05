@@ -1,5 +1,12 @@
 # Changelog da base Codex
 
+## NEG-1A — painel de gestão simplificado — 2026-09-04
+
+- O painel passou a exibir somente os indicadores Publicado e Arquivado.
+- Estados internos, históricos, rota e permissões legadas foram preservados;
+  o acesso às edições de conteúdos publicados deixou de ser apresentado na
+  interface. O buscador aberto permanece para fase posterior.
+
 ## Hotfix — filtros trilíngues de Marcos Normativos — 2026-09-02
 
 - Filtros de setor e natureza jurídica passaram a usar chaves canônicas e

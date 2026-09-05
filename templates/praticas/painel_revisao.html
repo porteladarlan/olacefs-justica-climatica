@@ -19,28 +19,9 @@
     </p>
 </section>
 
-<section class="status-help-grid mb-4">
-    <article class="status-help-card">
-        <span class="status-pill status-enviado">{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}</span>
-        <p class="section-subtitle small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Waiting for technical review.{% elif LANGUAGE_CODE == 'es' %}En espera de revisión técnica.{% else %}Aguardando revisão técnica.{% endif %}</p>
-    </article>
-    <article class="status-help-card">
-        <span class="status-pill status-em_revisao">{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</span>
-        <p class="section-subtitle small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Being checked by the review team.{% elif LANGUAGE_CODE == 'es' %}En análisis por el equipo revisor.{% else %}Em análise pela equipe revisora.{% endif %}</p>
-    </article>
-    <article class="status-help-card">
-        <span class="status-pill status-aprovado">{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}</span>
-        <p class="section-subtitle small mb-0 mt-2">{% if LANGUAGE_CODE == 'en' %}Validated but not necessarily public yet.{% elif LANGUAGE_CODE == 'es' %}Validado, pero no necesariamente público todavía.{% else %}Validado, mas ainda não necessariamente público.{% endif %}</p>
-    </article>
-</section>
-
-<section class="row g-3 mb-4">
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}</div><p class="metric-value">{{ contadores.enviado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}</div><p class="metric-value">{{ contadores.em_revisao }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}</div><p class="metric-value">{{ contadores.aprovado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}</div><p class="metric-value">{{ contadores.publicado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}</div><p class="metric-value">{{ contadores.arquivado }}</p></div></div>
-    <div class="col-md"><div class="metric-card"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Pending edits{% elif LANGUAGE_CODE == 'es' %}Ediciones pendientes{% else %}Edições pendentes{% endif %}</div><p class="metric-value">{{ contadores.edicoes_pendentes }}</p></div></div>
+<section class="row g-3 mb-4" data-testid="panel-status-metrics">
+    <div class="col-md"><div class="metric-card" data-status-metric="publicado"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}</div><p class="metric-value">{{ contadores.publicado }}</p></div></div>
+    <div class="col-md"><div class="metric-card" data-status-metric="arquivado"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}</div><p class="metric-value">{{ contadores.arquivado }}</p></div></div>
 </section>
 
 <form method="get" class="filter-panel row g-3 mb-4">

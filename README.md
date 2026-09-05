@@ -32,6 +32,12 @@ A aplicação não presume que protótipo, dados demonstrativos ou materiais de 
 
 O idioma original é determinado pela rota/requisição localizada: português grava nos campos canônicos, espanhol nos campos com sufixo `_es` e inglês nos campos com sufixo `_en`. A tradução automática, quando habilitada por endpoint, preenche somente campos vazios; nunca substitui o original nem traduções manuais não vazias. Falhas do provedor não bloqueiam a publicação, e nenhuma chamada externa ocorre sem endpoint configurado.
 
+O painel restrito de gestão de boas práticas exibe visualmente apenas os
+indicadores Publicado e Arquivado. Os estados internos, registros históricos,
+rota e permissões legadas permanecem preservados; o acesso às edições de
+conteúdos publicados não é apresentado na interface. O buscador aberto será
+tratado em fase posterior.
+
 ### Contrato dos filtros de Marcos Normativos
 
 Os filtros públicos mantêm os parâmetros `setor` e `natureza`, enquanto seus
