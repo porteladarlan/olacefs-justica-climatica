@@ -2094,7 +2094,7 @@ def status_envio(request):
 @staff_member_required
 def painel_revisao(request):
     status = request.GET.get("status", "")
-    termo = (request.GET.get("q") or "").strip()[:200]
+    termo = (request.GET.get("q") or "").replace("\x00", "").strip()[:200]
     status_choices_revisao = [
         item for item in Experiencia.StatusPublicacao.choices
         if item[0] in STATUS_VISIVEIS_REVISAO

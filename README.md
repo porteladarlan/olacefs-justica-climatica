@@ -35,8 +35,11 @@ O idioma original é determinado pela rota/requisição localizada: português g
 O painel restrito de gestão de boas práticas exibe visualmente apenas os
 indicadores Publicado e Arquivado. Os estados internos, registros históricos,
 rota e permissões legadas permanecem preservados; o acesso às edições de
-conteúdos publicados não é apresentado na interface. O buscador aberto será
-tratado em fase posterior.
+conteúdos publicados não é apresentado na interface. A busca geral localiza
+boas práticas por título, país, EFS, e-mail e pessoa responsável, cobrindo os
+campos textuais em PT, ES e EN. O filtro visual de status não faz mais parte da
+interface, mas o parâmetro legado continua sendo aceito internamente para
+preservar URLs existentes.
 
 ### Contrato dos filtros de Marcos Normativos
 

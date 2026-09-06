@@ -15,6 +15,10 @@
 
 ## Não lançado — 2026-08-01
 
+- Adicionada busca geral trilíngue no painel por título, país, EFS, e-mail e
+  pessoa responsável, com remoção do seletor visual de status e preservação
+  dos históricos, permissões e compatibilidade do painel.
+
 - RN-1B passou a registrar explicitamente o idioma original das submissões localizadas e a preencher traduções apenas em campos vazios, sem substituir conteúdo manual.
 
 - Integradas notificações editoriais trilíngues para submissão, revisão, publicação e edição de boas práticas, enviadas após commit e sem bloquear o fluxo em falhas SMTP.

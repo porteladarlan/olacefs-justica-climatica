@@ -24,32 +24,15 @@
     <div class="col-md"><div class="metric-card" data-status-metric="arquivado"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}</div><p class="metric-value">{{ contadores.arquivado }}</p></div></div>
 </section>
 
-<form method="get" class="filter-panel row g-3 mb-4">
-    <div class="col-md-6">
-        <label class="form-label small fw-semibold text-muted" for="panel-search">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</label>
-        <input id="panel-search" class="form-control" type="search" name="q" value="{{ termo_busca }}" maxlength="200" placeholder="{% if LANGUAGE_CODE == 'en' %}Title, country, institution, e-mail or responsible person{% elif LANGUAGE_CODE == 'es' %}Título, país, entidad, correo o responsable{% else %}Título, país, entidade, e-mail ou responsável{% endif %}">
+<form method="get" class="filter-panel row g-3 mb-4" data-testid="panel-open-search">
+    <div class="col-md-8">
+        <label class="form-label small fw-semibold text-muted" for="panel-search">{% if LANGUAGE_CODE == 'en' %}General search{% elif LANGUAGE_CODE == 'es' %}Búsqueda general{% else %}Busca geral{% endif %}</label>
+        <input id="panel-search" class="form-control" type="search" name="q" value="{{ termo_busca }}" maxlength="200" placeholder="{% if LANGUAGE_CODE == 'en' %}Good practice name, country, SAI, e-mail or responsible person{% elif LANGUAGE_CODE == 'es' %}Nombre de la buena práctica, país, EFS, correo o responsable{% else %}Nome da boa prática, país, EFS, e-mail ou responsável{% endif %}">
     </div>
-    <div class="col-md-6">
-        <label class="form-label small fw-semibold text-muted">{% if LANGUAGE_CODE == 'en' %}Filter by status{% elif LANGUAGE_CODE == 'es' %}Filtrar por estado{% else %}Filtrar por status{% endif %}</label>
-        <select class="form-select" name="status">
-            <option value="">{% if LANGUAGE_CODE == 'en' %}All records{% elif LANGUAGE_CODE == 'es' %}Todos los registros{% else %}Todos os registros{% endif %}</option>
-            {% for valor, rotulo in status_choices %}
-                <option value="{{ valor }}" {% if status_atual == valor %}selected{% endif %}>
-                    {% if valor == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}
-                    {% elif valor == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
-                    {% elif valor == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}
-                    {% elif valor == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}
-                    {% elif valor == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}
-                    {% elif valor == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}
-                    {% else %}{{ rotulo }}{% endif %}
-                </option>
-            {% endfor %}
-        </select>
+    <div class="col-md-2 d-grid align-self-end">
+        <button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</button>
     </div>
-    <div class="col-md-3 d-grid align-self-end">
-        <button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Filter{% elif LANGUAGE_CODE == 'es' %}Filtrar{% else %}Filtrar{% endif %}</button>
-    </div>
-    <div class="col-md-3 d-grid align-self-end">
+    <div class="col-md-2 d-grid align-self-end">
         <a class="btn btn-outline-secondary" href="{% url 'painel_revisao' %}">{% if LANGUAGE_CODE == 'en' %}Clear{% elif LANGUAGE_CODE == 'es' %}Limpiar{% else %}Limpar{% endif %}</a>
     </div>
 </form>
@@ -85,7 +68,7 @@
     </div>
     {% empty %}
     <div class="col-12">
-        <div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No submissions found for the selected filter.{% elif LANGUAGE_CODE == 'es' %}No se encontraron envíos para el filtro seleccionado.{% else %}Nenhum envio encontrado para o filtro selecionado.{% endif %}</p></div>
+        <div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No good practices were found for the search provided.{% elif LANGUAGE_CODE == 'es' %}No se encontraron buenas prácticas para la búsqueda informada.{% else %}Nenhuma boa prática encontrada para a busca informada.{% endif %}</p></div>
     </div>
     {% endfor %}
 </div>
