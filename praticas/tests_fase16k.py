@@ -246,7 +246,7 @@ class AjustesPlataforma1206Tests(TestCase):
             f'{reverse("login_usuario")}?next={reverse("excluir_boa_pratica", args=[propria.pk])}',
         )
         self.assertRedirects(
-            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_exclusao": "sim"}),
+            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "sim"}),
             f'{reverse("login_usuario")}?next={reverse("excluir_boa_pratica", args=[propria.pk])}',
         )
         self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
@@ -256,23 +256,23 @@ class AjustesPlataforma1206Tests(TestCase):
         self.assertEqual(confirmacao.status_code, 200)
         self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
         self.assertRedirects(
-            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_exclusao": "nao"}),
-            reverse("excluir_boa_pratica", args=[propria.pk]),
+            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "nao"}),
+            reverse("arquivar_boa_pratica", args=[propria.pk]),
         )
         self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
-        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_exclusao": "sim"}), reverse("catalogo_experiencias"))
-        self.assertFalse(Experiencia.objects.filter(pk=propria.pk).exists())
+        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "sim"}), reverse("meus_envios"))
+        self.assertEqual(Experiencia.objects.get(pk=propria.pk).status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
 
         outro = get_user_model().objects.create_user("outro-exclusao", password="senha12345")
         self.client.force_login(outro)
         self.assertRedirects(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])), reverse("meus_envios"))
-        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_exclusao": "sim"}), reverse("meus_envios"))
+        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_arquivamento": "sim"}), reverse("meus_envios"))
         self.assertTrue(Experiencia.objects.filter(pk=outra.pk).exists())
 
         self.client.force_login(self.revisor)
         self.assertEqual(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])).status_code, 200)
         self.assertRedirects(
-            self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_exclusao": "sim"}),
+            self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_arquivamento": "sim"}),
             reverse("painel_revisao"),
         )
         self.assertEqual(Experiencia.objects.get(pk=outra.pk).status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)

@@ -36,4 +36,4 @@ Temas: quilombolas, crianças, direitos humanos, gênero, idosos, LGBTQI+, mulhe
 
 ## Curadoria
 
-Decisões têm responsável, data e justificativa. Publicação e alterações devem ser rastreáveis. Exclusão física é excepcional.
+Decisões têm responsável, data e justificativa. Publicação e alterações devem ser rastreáveis. A interface não permite exclusão física de boas práticas: a ação padrão é o arquivamento lógico, preservando registro, anexos, relacionamentos e histórico. Favoritos continuam usando POST/CSRF; o arquivamento exige autorização do autor ou de staff, e a rota antiga permanece somente por compatibilidade.

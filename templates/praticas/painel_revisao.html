@@ -60,9 +60,9 @@
             {% endif %}
             <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
             {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}
-                <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>
             {% else %}
-                <a class="btn btn-outline-danger btn-sm" href="{% url 'excluir_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Delete good practice{% elif LANGUAGE_CODE == 'es' %}Eliminar buena práctica{% else %}Excluir boa prática{% endif %}</a>
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>
             {% endif %}
         </article>
     </div>

@@ -2340,7 +2340,7 @@ def revisar_edicao_publicada(request, pk):
 
 @login_required(login_url="login_usuario")
 @require_http_methods(["GET", "POST"])
-def excluir_boa_pratica(request, pk):
+def arquivar_boa_pratica(request, pk):
     experiencia = get_object_or_404(
         Experiencia.objects.select_related("efs", "pais", "tipo_experiencia", "setor").prefetch_related("anexos"),
         pk=pk,
@@ -2358,55 +2358,43 @@ def excluir_boa_pratica(request, pk):
         messages.error(
             request,
             texto_idioma(
-                "Você não tem permissão para excluir esta boa prática.",
-                "No tiene permiso para eliminar esta buena práctica.",
-                "You do not have permission to delete this good practice.",
+                "Você não tem permissão para arquivar esta boa prática.",
+                "No tiene permiso para archivar esta buena práctica.",
+                "You do not have permission to archive this good practice.",
             ),
         )
         return redirect("meus_envios")
 
     if request.method == "POST":
-        if request.POST.get("confirmar_exclusao") != "sim":
+        if request.POST.get("confirmar_arquivamento") != "sim":
             messages.error(
                 request,
                 texto_idioma(
-                    "Confirmação de exclusão inválida.",
-                    "Confirmación de eliminación no válida.",
-                    "Invalid deletion confirmation.",
+                    "Confirmação de arquivamento inválida.",
+                    "Confirmación de archivo no válida.",
+                    "Invalid archive confirmation.",
                 ),
             )
-            return redirect("excluir_boa_pratica", pk=experiencia.pk)
+            return redirect("arquivar_boa_pratica", pk=experiencia.pk)
 
-        if (
-            request.user.is_staff
-            and experiencia.autor_id != request.user.id
-            and experiencia.status_publicacao == Experiencia.StatusPublicacao.PUBLICADO
-        ):
+        if experiencia.status_publicacao != Experiencia.StatusPublicacao.ARQUIVADO:
             experiencia.status_publicacao = Experiencia.StatusPublicacao.ARQUIVADO
             experiencia.save(update_fields=["status_publicacao", "atualizado_em"])
-            messages.success(request, texto_idioma("Boa prática arquivada com sucesso.", "Buena práctica archivada correctamente.", "Good practice archived successfully."))
-            return redirect(proximo or "painel_revisao")
-
-        titulo = experiencia.titulo_exibicao
-        for anexo in experiencia.anexos.all():
-            if anexo.arquivo:
-                anexo.arquivo.delete(save=False)
-        experiencia.delete()
         messages.success(
             request,
             texto_idioma(
-                f"Boa prática excluída com sucesso: {titulo}",
-                f"Buena práctica eliminada correctamente: {titulo}",
-                f"Good practice deleted successfully: {titulo}",
+                "Boa prática arquivada com sucesso.",
+                "Buena práctica archivada correctamente.",
+                "Good practice archived successfully.",
             ),
         )
-        if proximo:
-            return redirect(proximo)
-        return redirect("catalogo_experiencias")
+        destino_padrao = "painel_revisao" if request.user.is_staff else "meus_envios"
+        ficha = reverse("detalhe_experiencia", args=[experiencia.pk])
+        return redirect(proximo if proximo and proximo != ficha else destino_padrao)
 
     return render(
         request,
-        "praticas/excluir_boa_pratica.html",
+        "praticas/arquivar_boa_pratica.html",
         {
             "experiencia": experiencia,
             "destino_cancelamento": proximo,
