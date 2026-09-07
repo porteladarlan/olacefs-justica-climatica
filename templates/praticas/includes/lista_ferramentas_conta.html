@@ -1,26 +1,39 @@
 {% if ferramentas_enviadas %}
-<div class="workspace-list">
+<ul class="submission-list">
     {% for ferramenta in ferramentas_enviadas %}
-    <article class="workspace-card">
-        <div>
-            <h3>{{ ferramenta.titulo_exibicao }}</h3>
-            <p>{{ ferramenta.setor.nome_exibicao }}{% if ferramenta.ano %} · {{ ferramenta.ano }}{% endif %}{% if ferramenta.pais_ou_instancia %} · {{ ferramenta.pais_ou_instancia }}{% endif %}</p>
-        </div>
-        <span class="badge-soft">
-            {% if ferramenta.situacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
-            {% elif ferramenta.situacao == 'enviada' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviada{% else %}Enviada{% endif %}
-            {% elif ferramenta.situacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
-            {% elif ferramenta.situacao == 'aprovada' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobada{% else %}Aprovada{% endif %}
-            {% elif ferramenta.situacao == 'publicada' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicada{% else %}Publicada{% endif %}
-            {% elif ferramenta.situacao == 'rejeitada' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazada{% else %}Rejeitada{% endif %}
-            {% else %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivada{% else %}Arquivada{% endif %}{% endif %}
-        </span>
-        {% if ferramenta.situacao == 'rascunho' %}
-        <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_ferramenta' ferramenta.pk %}">{% if LANGUAGE_CODE == 'en' %}Continue editing{% elif LANGUAGE_CODE == 'es' %}Continuar editando{% else %}Continuar editando{% endif %}</a>
-        {% endif %}
-    </article>
+        <li>
+            <article class="submission-item">
+                <div class="submission-item-main">
+                    <div class="submission-item-meta">
+                        <span class="status-badge status-{{ ferramenta.situacao }}">
+                            <span class="status-dot" aria-hidden="true"></span>
+                            {% if ferramenta.situacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
+                            {% elif ferramenta.situacao == 'enviada' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviada{% else %}Enviada{% endif %}
+                            {% elif ferramenta.situacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
+                            {% elif ferramenta.situacao == 'aprovada' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobada{% else %}Aprovada{% endif %}
+                            {% elif ferramenta.situacao == 'publicada' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicada{% else %}Publicada{% endif %}
+                            {% elif ferramenta.situacao == 'rejeitada' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazada{% else %}Rejeitada{% endif %}
+                            {% else %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivada{% else %}Arquivada{% endif %}{% endif %}
+                        </span>
+                        {% if ferramenta.setor %}<span>{{ ferramenta.setor.nome_exibicao }}</span>{% endif %}
+                        {% if ferramenta.ano %}<span>{{ ferramenta.ano }}</span>{% elif ferramenta.periodo %}<span>{{ ferramenta.periodo }}</span>{% endif %}
+                    </div>
+                    <h3>{{ ferramenta.titulo_exibicao }}</h3>
+                    {% if ferramenta.descricao_exibicao %}<p>{{ ferramenta.descricao_exibicao|truncatechars:260 }}</p>{% endif %}
+                    {% if ferramenta.responsavel or ferramenta.pais_ou_instancia %}<p>{{ ferramenta.responsavel|default:ferramenta.pais_ou_instancia }}</p>{% endif %}
+                </div>
+                <div class="submission-item-action">
+                    {% if request.user.is_staff %}
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_ferramenta' ferramenta.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Edit{% elif LANGUAGE_CODE == 'es' %}Editar{% else %}Editar{% endif %}</a>
+                        {% if ferramenta.situacao != 'arquivada' %}<a class="btn btn-sm btn-outline-danger" href="{% url 'arquivar_ferramenta' ferramenta.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive{% elif LANGUAGE_CODE == 'es' %}Archivar{% else %}Arquivar{% endif %}</a>{% endif %}
+                    {% elif ferramenta.situacao == 'rascunho' %}
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_ferramenta' ferramenta.pk %}">{% if LANGUAGE_CODE == 'en' %}Continue editing{% elif LANGUAGE_CODE == 'es' %}Continuar editando{% else %}Continuar editando{% endif %}</a>
+                    {% endif %}
+                </div>
+            </article>
+        </li>
     {% endfor %}
-</div>
+</ul>
 {% else %}
-<p>{% if LANGUAGE_CODE == 'en' %}No tool submission yet.{% elif LANGUAGE_CODE == 'es' %}Aún no hay envíos de herramientas.{% else %}Ainda não há envio de ferramenta.{% endif %}</p>
+<p class="account-empty account-empty--compact">{% if LANGUAGE_CODE == 'en' %}No tools are registered yet.{% elif LANGUAGE_CODE == 'es' %}Aún no hay herramientas registradas.{% else %}Ainda não há ferramentas registradas.{% endif %}</p>
 {% endif %}

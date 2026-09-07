@@ -41,6 +41,13 @@ campos textuais em PT, ES e EN. O filtro visual de status não faz mais parte da
 interface, mas o parâmetro legado continua sendo aceito internamente para
 preservar URLs existentes.
 
+Administradores também gerenciam ferramentas no painel interno: podem editar
+ferramentas em qualquer situação editorial sem mudar seu estado e arquivá-las
+logicamente. O arquivamento remove a ferramenta do catálogo público, preserva
+registro, autoria, traduções, lote, código, relações e conteúdo, e não executa
+hard delete. Essas ações ficam restritas a usuários staff; usuários comuns
+mantêm apenas o fluxo de edição de seus próprios rascunhos.
+
 ### Contrato dos filtros de Marcos Normativos
 
 Os filtros públicos mantêm os parâmetros `setor` e `natureza`, enquanto seus

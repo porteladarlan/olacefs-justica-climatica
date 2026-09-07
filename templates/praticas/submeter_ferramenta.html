@@ -2,16 +2,16 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if edicao %}{% if LANGUAGE_CODE == 'en' %}Edit tool draft{% elif LANGUAGE_CODE == 'es' %}Editar borrador de herramienta{% else %}Editar rascunho de ferramenta{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Submit tool{% elif LANGUAGE_CODE == 'es' %}Enviar herramienta{% else %}Enviar ferramenta{% endif %}{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if administrativa %}{% if LANGUAGE_CODE == 'en' %}Edit tool{% elif LANGUAGE_CODE == 'es' %}Editar herramienta{% else %}Editar ferramenta{% endif %}{% elif edicao %}{% if LANGUAGE_CODE == 'en' %}Edit tool draft{% elif LANGUAGE_CODE == 'es' %}Editar borrador de herramienta{% else %}Editar rascunho de ferramenta{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Submit tool{% elif LANGUAGE_CODE == 'es' %}Enviar herramienta{% else %}Enviar ferramenta{% endif %}{% endif %} | Plataforma Regional{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/envio-pratica.css' %}">{% endblock %}
 
 {% block content %}
 <div class="submission-page">
-    <nav class="prototype-breadcrumb"><a href="{% if edicao %}{% url 'meus_envios' %}{% else %}{% url 'adicionar_boa_pratica' %}{% endif %}">&larr; {% if edicao %}{% if LANGUAGE_CODE == 'en' %}Back to my submissions{% elif LANGUAGE_CODE == 'es' %}Volver a mis envíos{% else %}Voltar aos meus envios{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Change content type{% elif LANGUAGE_CODE == 'es' %}Cambiar tipo de contenido{% else %}Alterar tipo de conteúdo{% endif %}{% endif %}</a></nav>
+    <nav class="prototype-breadcrumb"><a href="{% if administrativa %}{{ destino_cancelamento }}{% elif edicao %}{% url 'meus_envios' %}{% else %}{% url 'adicionar_boa_pratica' %}{% endif %}">&larr; {% if administrativa %}{% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de revisión{% else %}Voltar ao painel de revisão{% endif %}{% elif edicao %}{% if LANGUAGE_CODE == 'en' %}Back to my submissions{% elif LANGUAGE_CODE == 'es' %}Volver a mis envíos{% else %}Voltar aos meus envios{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Change content type{% elif LANGUAGE_CODE == 'es' %}Cambiar tipo de contenido{% else %}Alterar tipo de conteúdo{% endif %}{% endif %}</a></nav>
     <header class="submission-heading">
         <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Tool{% elif LANGUAGE_CODE == 'es' %}Herramienta{% else %}Ferramenta{% endif %}</div>
-        <h1>{% if edicao %}{% if LANGUAGE_CODE == 'en' %}Continue editing the tool{% elif LANGUAGE_CODE == 'es' %}Continuar editando la herramienta{% else %}Continuar editando a ferramenta{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Submit a tool{% elif LANGUAGE_CODE == 'es' %}Enviar una herramienta{% else %}Enviar uma ferramenta{% endif %}{% endif %}</h1>
-        <p>{% if LANGUAGE_CODE == 'en' %}Save a partial draft or submit the complete tool for editorial review. It will not be published automatically.{% elif LANGUAGE_CODE == 'es' %}Guarde un borrador parcial o envíe la herramienta completa para revisión editorial. No se publicará automáticamente.{% else %}Salve um rascunho parcial ou envie a ferramenta completa para revisão editorial. Ela não será publicada automaticamente.{% endif %}</p>
+        <h1>{% if administrativa %}{% if LANGUAGE_CODE == 'en' %}Edit tool{% elif LANGUAGE_CODE == 'es' %}Editar herramienta{% else %}Editar ferramenta{% endif %}{% elif edicao %}{% if LANGUAGE_CODE == 'en' %}Continue editing the tool{% elif LANGUAGE_CODE == 'es' %}Continuar editando la herramienta{% else %}Continuar editando a ferramenta{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Submit a tool{% elif LANGUAGE_CODE == 'es' %}Enviar una herramienta{% else %}Enviar uma ferramenta{% endif %}{% endif %}</h1>
+        <p>{% if administrativa %}{% if LANGUAGE_CODE == 'en' %}Edit the tool while preserving its current editorial status.{% elif LANGUAGE_CODE == 'es' %}Edite la herramienta preservando su estado editorial actual.{% else %}Edite a ferramenta preservando sua situação editorial atual.{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Save a partial draft or submit the complete tool for editorial review. It will not be published automatically.{% elif LANGUAGE_CODE == 'es' %}Guarde un borrador parcial o envíe la herramienta completa para revisión editorial. No se publicará automáticamente.{% else %}Salve um rascunho parcial ou envie a ferramenta completa para revisão editorial. Ela não será publicada automaticamente.{% endif %}{% endif %}</p>
     </header>
     <form method="post" class="submission-form">
         {% csrf_token %}
@@ -28,9 +28,11 @@
             {% endfor %}
         </div></div>
         <div class="submission-actions">
-            <a class="btn btn-outline-secondary" href="{% if edicao %}{% url 'meus_envios' %}{% else %}{% url 'adicionar_boa_pratica' %}{% endif %}">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
+            <input type="hidden" name="next" value="{{ destino_cancelamento }}">
+            <a class="btn btn-outline-secondary" href="{% if administrativa %}{{ destino_cancelamento }}{% elif edicao %}{% url 'meus_envios' %}{% else %}{% url 'adicionar_boa_pratica' %}{% endif %}">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
+            {% if administrativa %}<button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Save changes{% elif LANGUAGE_CODE == 'es' %}Guardar cambios{% else %}Salvar alterações{% endif %}</button>{% else %}
             <button class="btn btn-outline-primary" type="submit" name="acao_envio" value="rascunho">{% if LANGUAGE_CODE == 'en' %}Save draft{% elif LANGUAGE_CODE == 'es' %}Guardar borrador{% else %}Salvar rascunho{% endif %}</button>
-            <button class="btn btn-primary" type="submit" name="acao_envio" value="enviar">{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</button>
+            <button class="btn btn-primary" type="submit" name="acao_envio" value="enviar">{% if LANGUAGE_CODE == 'en' %}Submit for review{% elif LANGUAGE_CODE == 'es' %}Enviar para revisión{% else %}Enviar para revisão{% endif %}</button>{% endif %}
         </div>
     </form>
 </div>

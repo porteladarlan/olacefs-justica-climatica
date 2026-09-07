@@ -486,6 +486,7 @@ class PacoteDesignNegocialTests(TestCase):
         outra = Ferramenta.objects.get(codigo="privada-outra")
         bloqueada = self.client.get(reverse("editar_ferramenta", args=[outra.pk]))
         self.assertRedirects(bloqueada, reverse("meus_envios"), fetch_redirect_response=False)
+        propria = Ferramenta.objects.get(codigo="privada-propria")
 
         staff = get_user_model().objects.create_user(
             username="staff-ferramentas",
@@ -497,10 +498,45 @@ class PacoteDesignNegocialTests(TestCase):
             self.client.get(reverse("editar_ferramenta", args=[outra.pk])).status_code,
             200,
         )
+        original = {
+            "pk": outra.pk,
+            "codigo": outra.codigo,
+            "ordem": outra.ordem,
+            "autor_id": outra.autor_id,
+            "lote_origem_id": outra.lote_origem_id,
+            "titulo": outra.titulo,
+            "titulo_en": outra.titulo_en,
+        }
         outra.situacao = Ferramenta.Situacao.PUBLICADA
         outra.save(update_fields=["situacao"])
         publicada = self.client.get(reverse("editar_ferramenta", args=[outra.pk]))
-        self.assertRedirects(publicada, reverse("meus_envios"), fetch_redirect_response=False)
+        self.assertEqual(publicada.status_code, 200)
+        atualizada = self.client.post(
+            reverse("editar_ferramenta", args=[outra.pk]),
+            {"nome": "Ferramenta publicada atualizada"},
+        )
+        self.assertRedirects(atualizada, reverse("painel_revisao"))
+        outra.refresh_from_db()
+        self.assertEqual(outra.pk, original["pk"])
+        self.assertEqual(outra.codigo, original["codigo"])
+        self.assertEqual(outra.ordem, original["ordem"])
+        self.assertEqual(outra.autor_id, original["autor_id"])
+        self.assertEqual(outra.lote_origem_id, original["lote_origem_id"])
+        self.assertEqual(outra.titulo, original["titulo"])
+        self.assertEqual(outra.titulo_en, original["titulo_en"])
+        self.assertEqual(outra.situacao, Ferramenta.Situacao.PUBLICADA)
+
+        propria.situacao = Ferramenta.Situacao.PUBLICADA
+        propria.save(update_fields=["situacao"])
+        self.client.force_login(self.usuario)
+        self.assertEqual(
+            self.client.get(reverse("editar_ferramenta", args=[propria.pk])).status_code,
+            302,
+        )
+        self.assertEqual(
+            self.client.get(reverse("editar_ferramenta", args=[outra.pk])).status_code,
+            302,
+        )
 
     def test_aliases_inequivocos_de_setor_migram_relacoes_sem_apagar_ambiguos(self):
         alias = Setor.objects.create(

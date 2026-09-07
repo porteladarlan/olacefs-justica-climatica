@@ -300,6 +300,7 @@
 }
 
 .status-badge.status-enviado,
+.status-badge.status-enviada,
 .status-badge.status-pendente {
     color: #806018;
     background: #fdf3e0;
@@ -312,7 +313,8 @@
 
 .status-badge.status-aprovado,
 .status-badge.status-aprovada,
-.status-badge.status-publicado {
+.status-badge.status-publicado,
+.status-badge.status-publicada {
     color: #2f6a3f;
     background: #e7efe7;
 }
@@ -322,10 +324,20 @@
     background: #eef0f3;
 }
 
+.status-badge.status-arquivada {
+    color: #58636f;
+    background: #eef0f3;
+}
+
 .status-badge.status-rejeitado,
 .status-badge.status-rejeitada {
     color: #8f1f1f;
     background: #fdecec;
+}
+
+.status-badge.status-rascunho {
+    color: #58636f;
+    background: #eef0f3;
 }
 
 .review-comment {

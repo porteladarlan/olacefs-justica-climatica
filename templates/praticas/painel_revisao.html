@@ -72,4 +72,8 @@
     </div>
     {% endfor %}
 </div>
+<section class="workspace-section" aria-labelledby="tool-management-list-title" data-testid="panel-tools">
+    <h2 id="tool-management-list-title">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</h2>
+    {% include 'praticas/includes/lista_ferramentas_conta.html' %}
+</section>
 {% endblock %}

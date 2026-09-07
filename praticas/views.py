@@ -1417,6 +1417,46 @@ def salvar_ferramenta_submetida(form, usuario, situacao, ferramenta=None):
     return ferramenta
 
 
+def salvar_ferramenta_administrada(form, ferramenta, post_data):
+    dados = form.cleaned_data
+    campos_alterados = []
+    campo_titulo, campo_descricao = {
+        Ferramenta.IdiomaSubmissao.PORTUGUES: ("titulo", "descricao"),
+        Ferramenta.IdiomaSubmissao.ESPANHOL: ("titulo_es", "descricao_es"),
+        Ferramenta.IdiomaSubmissao.INGLES: ("titulo_en", "descricao_en"),
+    }[ferramenta.idioma_submissao]
+
+    if "nome" in post_data:
+        setattr(ferramenta, campo_titulo, dados.get("nome", ""))
+        campos_alterados.append(campo_titulo)
+    if "descricao" in post_data:
+        setattr(ferramenta, campo_descricao, dados.get("descricao", ""))
+        campos_alterados.append(campo_descricao)
+
+    mapeamento = {
+        "ano": "ano",
+        "pais_ou_instancia": "pais_ou_instancia",
+        "setor": "setor",
+        "link_acesso": "url",
+    }
+    for campo_formulario, campo_modelo in mapeamento.items():
+        if campo_formulario not in post_data:
+            continue
+        valor = dados.get(campo_formulario)
+        setattr(ferramenta, campo_modelo, valor)
+        campos_alterados.append(campo_modelo)
+        if campo_formulario == "pais_ou_instancia":
+            ferramenta.responsavel = valor
+            campos_alterados.append("responsavel")
+        if campo_formulario == "ano":
+            ferramenta.periodo = str(valor or "")
+            campos_alterados.append("periodo")
+
+    if campos_alterados:
+        ferramenta.save(update_fields=sorted(set(campos_alterados + ["atualizado_em"])))
+    return ferramenta
+
+
 @login_required(login_url="login_usuario")
 def adicionar_boa_pratica(request):
     tipo_compartilhamento = (
@@ -1573,6 +1613,7 @@ def adicionar_boa_pratica(request):
 def editar_ferramenta(request, pk):
     ferramenta = get_object_or_404(Ferramenta.objects.select_related("setor"), pk=pk)
     pertence_ao_usuario = ferramenta.autor_id == request.user.id
+    administrativa = request.user.is_staff
     if not request.user.is_staff and not pertence_ao_usuario:
         messages.error(
             request,
@@ -1583,7 +1624,7 @@ def editar_ferramenta(request, pk):
             ),
         )
         return redirect("meus_envios")
-    if ferramenta.situacao == Ferramenta.Situacao.PUBLICADA:
+    if not administrativa and ferramenta.situacao == Ferramenta.Situacao.PUBLICADA:
         messages.error(
             request,
             texto_idioma(
@@ -1604,39 +1645,49 @@ def editar_ferramenta(request, pk):
         )
         return redirect("meus_envios")
 
+    proximo = obter_destino_seguro(request, padrao="painel_revisao") if administrativa else "meus_envios"
     acao = request.POST.get("acao_envio", "rascunho")
     obrigatorio_para_envio = acao != "rascunho"
     if request.method == "POST":
         form = FerramentaSubmissaoForm(
             request.POST,
-            obrigatorio_para_envio=obrigatorio_para_envio,
+            obrigatorio_para_envio=False if administrativa else obrigatorio_para_envio,
         )
         form.language_code = ferramenta.idioma_submissao
         if form.is_valid():
             with transaction.atomic():
-                salvar_ferramenta_submetida(
-                    form,
-                    ferramenta.autor or request.user,
-                    Ferramenta.Situacao.RASCUNHO
-                    if acao == "rascunho"
-                    else Ferramenta.Situacao.ENVIADA,
-                    ferramenta=ferramenta,
-                )
+                if administrativa:
+                    salvar_ferramenta_administrada(form, ferramenta, request.POST)
+                else:
+                    salvar_ferramenta_submetida(
+                        form,
+                        ferramenta.autor or request.user,
+                        Ferramenta.Situacao.RASCUNHO
+                        if acao == "rascunho"
+                        else Ferramenta.Situacao.ENVIADA,
+                        ferramenta=ferramenta,
+                    )
             messages.success(
                 request,
                 texto_idioma(
-                    "Rascunho da ferramenta atualizado."
+                    "Alterações da ferramenta salvas."
+                    if administrativa
+                    else "Rascunho da ferramenta atualizado."
                     if acao == "rascunho"
                     else "Ferramenta enviada para revisão.",
-                    "Borrador de la herramienta actualizado."
+                    "Cambios de la herramienta guardados."
+                    if administrativa
+                    else "Borrador de la herramienta actualizado."
                     if acao == "rascunho"
                     else "Herramienta enviada para revisión.",
-                    "Tool draft updated."
+                    "Tool changes saved."
+                    if administrativa
+                    else "Tool draft updated."
                     if acao == "rascunho"
                     else "Tool submitted for review.",
                 ),
             )
-            return redirect("meus_envios")
+            return redirect(proximo)
     else:
         form = FerramentaSubmissaoForm(
             initial=dados_iniciais_ferramenta(ferramenta),
@@ -1650,8 +1701,45 @@ def editar_ferramenta(request, pk):
             "form": form,
             "ferramenta": ferramenta,
             "edicao": True,
+            "administrativa": administrativa,
+            "destino_cancelamento": proximo,
             "tipo_compartilhamento": "ferramenta",
         },
+    )
+
+
+@staff_member_required
+@require_http_methods(["GET", "POST"])
+def arquivar_ferramenta(request, pk):
+    ferramenta = get_object_or_404(Ferramenta, pk=pk)
+    proximo = obter_destino_seguro(request, padrao="painel_revisao")
+    if request.method == "POST":
+        if request.POST.get("confirmar_arquivamento") != "sim":
+            messages.error(
+                request,
+                texto_idioma(
+                    "Confirmação de arquivamento inválida.",
+                    "La confirmación de archivo no es válida.",
+                    "Invalid archive confirmation.",
+                ),
+            )
+            return redirect("arquivar_ferramenta", pk=ferramenta.pk)
+        if ferramenta.situacao != Ferramenta.Situacao.ARQUIVADA:
+            ferramenta.situacao = Ferramenta.Situacao.ARQUIVADA
+            ferramenta.save(update_fields=["situacao", "atualizado_em"])
+        messages.success(
+            request,
+            texto_idioma(
+                "Ferramenta arquivada com sucesso.",
+                "Herramienta archivada correctamente.",
+                "Tool archived successfully.",
+            ),
+        )
+        return redirect(proximo)
+    return render(
+        request,
+        "praticas/arquivar_ferramenta.html",
+        {"ferramenta": ferramenta, "destino_cancelamento": proximo},
     )
 
 
@@ -2123,6 +2211,11 @@ def painel_revisao(request):
             | Q(email_contato__icontains=termo)
             | Q(pessoa_responsavel__icontains=termo)
         )
+    ferramentas = (
+        Ferramenta.objects.all()
+        .select_related("setor", "autor", "lote_origem")
+        .order_by("-atualizado_em", "-pk")
+    )
 
     contadores = {
         "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
@@ -2143,6 +2236,7 @@ def painel_revisao(request):
             "status_choices": status_choices_revisao,
             "contadores": contadores,
             "termo_busca": termo,
+            "ferramentas_enviadas": ferramentas,
         },
     )
 
