@@ -1,5 +1,11 @@
 # Changelog da base Codex
 
+## NEG-4A — favoritos e arquivamento seguro de boas práticas — 2026-09-07
+
+- A ação de favoritos permanece protegida por POST/CSRF e o fluxo de exclusão
+  foi substituído por arquivamento lógico, preservando dados, anexos,
+  relacionamentos e histórico, com permissões para autor e staff.
+
 ## NEG-1A — painel de gestão simplificado — 2026-09-04
 
 - O painel passou a exibir somente os indicadores Publicado e Arquivado.

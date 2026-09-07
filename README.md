@@ -227,6 +227,8 @@ A futura operação no Hetzner requer configuração deliberada de PostgreSQL, s
 
 carregar_dados_ficticios produz dados locais para validação e apresentação. Esses registros não são conteúdo oficial da OLACEFS ou das EFS e não devem ser carregados em ambiente institucional sem autorização explícita.
 
+Favoritos de boas práticas continuam sendo alternados por POST com CSRF. A ação administrativa de exclusão foi substituída por arquivamento lógico: o registro, anexos, relacionamentos e histórico são preservados, com autorização para o autor da prática ou para staff. A rota antiga permanece somente por compatibilidade.
+
 ## Documentação
 
 - [Índice da documentação](docs/README.md);

@@ -83,7 +83,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
 
         resposta = self.client.post(
             reverse("excluir_boa_pratica", args=[experiencia.pk]),
-            {"confirmar_exclusao": "sim"},
+            {"confirmar_arquivamento": "sim"},
         )
         self.assertIn(resposta.status_code, [302, 403])
         self.assertTrue(Experiencia.objects.filter(pk=experiencia.pk).exists())
@@ -94,7 +94,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         resposta = self.client.get(reverse("excluir_boa_pratica", args=[experiencia.pk]))
         self.assertEqual(resposta.status_code, 200)
         self.assertContains(resposta, "Boa prática para exclusão")
-        self.assertContains(resposta, "confirmar_exclusao")
+        self.assertContains(resposta, "confirmar_arquivamento")
         self.assertContains(resposta, "csrfmiddlewaretoken")
         self.assertTrue(Experiencia.objects.filter(pk=experiencia.pk).exists())
 
@@ -127,7 +127,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
         resposta = self.client.post(
             reverse("excluir_boa_pratica", args=[experiencia.pk]),
-            {"confirmar_exclusao": "sim"},
+            {"confirmar_arquivamento": "sim"},
         )
         self.assertEqual(resposta.status_code, 302)
         experiencia.refresh_from_db()
@@ -138,9 +138,9 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
         resposta = self.client.get(reverse("catalogo_experiencias"))
         self.assertEqual(resposta.status_code, 200)
-        self.assertContains(resposta, reverse("excluir_boa_pratica", args=[experiencia.pk]))
+        self.assertContains(resposta, reverse("arquivar_boa_pratica", args=[experiencia.pk]))
         self.assertIn(
-            "Excluir boa prática",
+            "Arquivar boa prática",
             html.unescape(resposta.content.decode("utf-8")),
         )
 
@@ -153,7 +153,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.assertEqual(resposta.status_code, 200)
         self.assertNotContains(
             resposta,
-            reverse("excluir_boa_pratica", args=[experiencia.pk]),
+            reverse("arquivar_boa_pratica", args=[experiencia.pk]),
         )
 
     def test_painel_de_revisao_exibe_acao_de_exclusao(self):
@@ -167,7 +167,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.assertEqual(resposta.status_code, 200)
         self.assertContains(
             resposta,
-            reverse("excluir_boa_pratica", args=[experiencia.pk]),
+            reverse("arquivar_boa_pratica", args=[experiencia.pk]),
         )
 
     def test_rota_legada_de_decisao_redireciona_em_todos_os_idiomas(self):
@@ -227,7 +227,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
                     )
                 resposta = self.client.post(
                     url,
-                    {"confirmar_exclusao": "sim"},
+                    {"confirmar_arquivamento": "sim"},
                     follow=True,
                 )
                 self.assertEqual(resposta.status_code, 200)
@@ -323,10 +323,10 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
             self.assertEqual(resposta.status_code, 200)
             conteudos.append(html.unescape(resposta.content.decode("utf-8")))
 
-        self.assertIn("Eliminar buena práctica", conteudos[0])
+        self.assertIn("Archivar buena práctica", conteudos[0])
         self.assertIn("Editar buena práctica", conteudos[1])
-        self.assertIn("Eliminar buena práctica", conteudos[1])
+        self.assertIn("Archivar buena práctica", conteudos[1])
         self.assertIn("Editar buena práctica", conteudos[2])
-        self.assertIn("Eliminar buena práctica", conteudos[3])
+        self.assertIn("Archivar buena práctica", conteudos[3])
         for conteudo in conteudos:
             self.assertNotIn("buena prática", conteudo)
