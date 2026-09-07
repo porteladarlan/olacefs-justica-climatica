@@ -15,6 +15,11 @@
 
 ## Não lançado — 2026-08-01
 
+- O painel interno passou a listar ferramentas em todos os estados, com
+  cartões compactos, edição administrativa que preserva a situação editorial
+  e arquivamento lógico exclusivo para staff, sem exclusão física e sem
+  alterar o catálogo público além da retirada de ferramentas arquivadas.
+
 - Adicionada busca geral trilíngue no painel por título, país, EFS, e-mail e
   pessoa responsável, com remoção do seletor visual de status e preservação
   dos históricos, permissões e compatibilidade do painel.

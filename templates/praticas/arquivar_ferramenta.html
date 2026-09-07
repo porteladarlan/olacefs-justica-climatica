@@ -1,0 +1,25 @@
+{% extends 'praticas/base.html' %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Archive tool{% elif LANGUAGE_CODE == 'es' %}Archivar herramienta{% else %}Arquivar ferramenta{% endif %} | Plataforma Regional{% endblock %}
+
+{% block content %}
+<div class="account-page account-page--narrow">
+    <nav class="prototype-breadcrumb"><a href="{% url 'painel_revisao' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de revisión{% else %}Voltar ao painel de revisão{% endif %}</a></nav>
+    <header class="account-heading">
+        <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Tool management{% elif LANGUAGE_CODE == 'es' %}Gestión de herramientas{% else %}Gestão de ferramentas{% endif %}</div>
+        <h1>{% if LANGUAGE_CODE == 'en' %}Archive tool{% elif LANGUAGE_CODE == 'es' %}Archivar herramienta{% else %}Arquivar ferramenta{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' %}The tool will leave the public catalogue, but its record and data will be preserved. This action does not physically delete the content.{% elif LANGUAGE_CODE == 'es' %}La herramienta dejará de aparecer en el catálogo público, pero su registro y sus datos se conservarán. Esta acción no elimina físicamente el contenido.{% else %}A ferramenta deixará de aparecer no catálogo público, mas seu registro e seus dados serão preservados. Esta ação não exclui fisicamente o conteúdo.{% endif %}</p>
+    </header>
+    <div class="submission-item mb-4">
+        <div class="submission-item-main"><h3>{{ ferramenta.titulo_exibicao }}</h3><p>{{ ferramenta.descricao_exibicao|truncatechars:260 }}</p></div>
+    </div>
+    <form method="post" class="account-actions">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ destino_cancelamento }}">
+        <a class="btn btn-outline-secondary" href="{{ destino_cancelamento }}">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
+        <button class="btn btn-danger" type="submit" name="confirmar_arquivamento" value="sim">{% if LANGUAGE_CODE == 'en' %}Archive tool{% elif LANGUAGE_CODE == 'es' %}Archivar herramienta{% else %}Arquivar ferramenta{% endif %}</button>
+    </form>
+</div>
+{% endblock %}
