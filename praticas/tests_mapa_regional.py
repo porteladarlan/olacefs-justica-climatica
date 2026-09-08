@@ -379,19 +379,40 @@ class MapaRegionalTests(TestCase):
         self.assertIn("selectedIds.clear();", script)
         self.assertNotIn("countryCheckboxes", script)
 
-    def test_nomenclatura_publica_de_entidades_associadas_e_trilingue(self):
+    def test_nomenclatura_publica_de_entidades_fiscalizadoras_e_trilingue(self):
         casos = (
-            ("/", "Entidades associadas", "Entidades associadas ao pa&iacute;s selecionado"),
-            ("/es/", "Entidades asociadas", "Entidades asociadas al pa&iacute;s seleccionado"),
-            ("/en/", "Associated entities", "Entities associated with the selected country"),
+            ("/", "Entidades Fiscalizadoras", "Entidades fiscalizadoras do pa&iacute;s selecionado", "Selecione um pa&iacute;s para consultar suas entidades fiscalizadoras e registros dispon&iacute;veis.", "Experi&ecirc;ncias registradas no pa&iacute;s"),
+            ("/es/", "Entidades Fiscalizadoras", "Entidades fiscalizadoras del pa&iacute;s seleccionado", "Selecciona un pa&iacute;s para consultar sus entidades fiscalizadoras y registros disponibles.", "Experiencias registradas en el pa&iacute;s"),
+            ("/en/", "Audit institutions", "Audit institutions in the selected country", "Select one country to view its audit institutions and available records.", "Experiences registered in the country"),
         )
 
-        for caminho, titulo, aria_label in casos:
+        for caminho, titulo, aria_label, vazio, experiencias in casos:
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
+                html = response.content.decode("utf-8")
+                painel = html.split('<aside class="home-map-panel"', 1)[1].split("</aside>", 1)[0]
                 self.assertEqual(response.status_code, 200)
-                self.assertContains(response, titulo, html=False)
-                self.assertContains(response, f'aria-label="{aria_label}"', html=False)
+                self.assertIn(titulo, painel)
+                self.assertIn(f'aria-label="{aria_label}"', painel)
+                self.assertIn(vazio, painel)
+                self.assertEqual(painel.count(experiencias), 2)
+                self.assertNotIn("Entidades associadas", painel)
+                self.assertNotIn("Entidades asociadas", painel)
+                self.assertNotIn("Associated entities", painel)
+
+    def test_mapa_home_preserva_estrutura_get_e_selecao_individual(self):
+        response = self.client.get("/")
+        html = response.content.decode("utf-8")
+        painel = html.split('<aside class="home-map-panel"', 1)[1].split("</aside>", 1)[0]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id="regionalMapForm" method="get"', painel)
+        self.assertIn('formaction="/catalogo/"', painel)
+        self.assertIn('formaction="/normas-internacionais/"', painel)
+        self.assertIn('id="regionalMapEfs"', painel)
+        self.assertIn('id="regionalMapExperiences"', painel)
+        self.assertIn('id="regionalMapNorms"', painel)
+        self.assertNotIn('type="checkbox"', painel)
 
     def test_select_coordenado_permanece_independente_responsivo_e_sem_dados_ficticios(self):
         response, payload = self._payload()
