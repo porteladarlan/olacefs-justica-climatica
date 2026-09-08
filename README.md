@@ -236,6 +236,13 @@ Favoritos de boas práticas continuam sendo alternados por POST com CSRF. A aç�
 - O vídeo apresenta a história da Plataforma de Justiça Climática, sem subtítulo redundante.
 - Português, espanhol e inglês permanecem suportados.
 
+## Contrato atual do envio de ferramentas
+
+- A interface utiliza “Responsável” nos três idiomas.
+- O campo técnico permanece `pais_ou_instancia`.
+- O mesmo valor continua alimentando `Ferramenta.pais_ou_instancia` e `Ferramenta.responsavel`.
+- Nenhuma alteração de schema foi necessária.
+
 ## Documentação
 
 - [Índice da documentação](docs/README.md);
