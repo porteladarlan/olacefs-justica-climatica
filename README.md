@@ -229,6 +229,13 @@ carregar_dados_ficticios produz dados locais para validação e apresentação. 
 
 Favoritos de boas práticas continuam sendo alternados por POST com CSRF. A ação administrativa de exclusão foi substituída por arquivamento lógico: o registro, anexos, relacionamentos e histórico são preservados, com autorização para o autor da prática ou para staff. A rota antiga permanece somente por compatibilidade.
 
+## Contrato atual da Home
+
+- O painel do mapa usa “Entidades Fiscalizadoras”.
+- A quantidade e o botão usam “Experiências registradas no país”.
+- O vídeo apresenta a história da Plataforma de Justiça Climática, sem subtítulo redundante.
+- Português, espanhol e inglês permanecem suportados.
+
 ## Documentação
 
 - [Índice da documentação](docs/README.md);

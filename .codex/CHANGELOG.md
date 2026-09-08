@@ -1,5 +1,10 @@
 # Changelog da base Codex
 
+## NEG-5A — textos da Home, mapa regional e teaser — 2026-09-07
+
+- Atualizada a nomenclatura trilíngue para entidades fiscalizadoras e para experiências registradas no país.
+- Atualizado o título do vídeo para apresentar a história da plataforma e removido o subtítulo redundante, preservando estrutura e acessibilidade.
+
 ## NEG-4A — favoritos e arquivamento seguro de boas práticas — 2026-09-07
 
 - A ação de favoritos permanece protegida por POST/CSRF e o fluxo de exclusão

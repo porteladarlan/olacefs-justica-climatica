@@ -632,9 +632,9 @@ class HomePrimeiraEvolucaoTests(TestCase):
 
     def test_mapa_funcional_e_video_oficial_trilingue(self):
         casos = [
-            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Teaser da Plataforma de Justi&ccedil;a Clim&aacute;tica"),
-            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Teaser de la Plataforma de Justicia Clim&aacute;tica"),
-            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Climate Justice Platform Teaser"),
+            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Conhe&ccedil;a a hist&oacute;ria por tr&aacute;s da Plataforma de Justi&ccedil;a Clim&aacute;tica"),
+            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Conoce la historia detr&aacute;s de la Plataforma de Justicia Clim&aacute;tica"),
+            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Discover the story behind the Climate Justice Platform"),
         ]
 
         for caminho, mapa, estado_funcional, video in casos:
@@ -644,6 +644,22 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertContains(response, mapa, html=False)
                 self.assertContains(response, estado_funcional)
                 self.assertContains(response, video, html=False)
+                bloco = response.content.decode("utf-8").split('<section class="home-video', 1)[1].split(
+                    "</section>", 1
+                )[0]
+                self.assertIn('id="home-video-title"', bloco)
+                self.assertIn('aria-labelledby="home-video-title"', bloco)
+                self.assertNotIn("presentaci", bloco)
+                self.assertNotIn("apresenta&ccedil;&atilde;o oficial", bloco)
+                self.assertNotIn("official introduction", bloco)
+                self.assertNotIn("<p>", bloco)
+                self.assertIn(
+                    '<source src="/media/videos/teaser-plataforma-jc.mp4" type="video/mp4">',
+                    bloco,
+                )
+                self.assertIn('preload="metadata"', bloco)
+                self.assertIn("playsinline", bloco)
+                self.assertNotIn("autoplay", bloco)
                 self.assertNotContains(response, "Etapa futura")
                 self.assertNotContains(response, "Future stage")
                 self.assertContains(response, f'formaction="{reverse("catalogo_experiencias")}"')

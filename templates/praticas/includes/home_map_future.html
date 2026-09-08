@@ -87,7 +87,7 @@
                     </p>
                 </div>
                 <p class="home-map-empty" id="regionalMapEmpty">
-                    {% if LANGUAGE_CODE == 'en' %}Select one country to view its associated entities and available records.{% elif LANGUAGE_CODE == 'es' %}Selecciona un pa&iacute;s para consultar sus entidades asociadas y registros disponibles.{% else %}Selecione um pa&iacute;s para consultar suas entidades associadas e registros dispon&iacute;veis.{% endif %}
+                    {% if LANGUAGE_CODE == 'en' %}Select one country to view its audit institutions and available records.{% elif LANGUAGE_CODE == 'es' %}Selecciona un pa&iacute;s para consultar sus entidades fiscalizadoras y registros disponibles.{% else %}Selecione um pa&iacute;s para consultar suas entidades fiscalizadoras e registros dispon&iacute;veis.{% endif %}
                 </p>
 
                 <form class="home-map-form" id="regionalMapForm" method="get" action="{% url 'catalogo_experiencias' %}">
@@ -96,16 +96,16 @@
                         <div class="home-map-chips" id="regionalMapChips"></div>
                         <div class="home-map-summary">
                             <section aria-labelledby="regional-map-efs-title">
-                                <h4 id="regional-map-efs-title">{% if LANGUAGE_CODE == 'en' %}Associated entities{% elif LANGUAGE_CODE == 'es' %}Entidades asociadas{% else %}Entidades associadas{% endif %}</h4>
+                                <h4 id="regional-map-efs-title">{% if LANGUAGE_CODE == 'en' %}Audit institutions{% elif LANGUAGE_CODE == 'es' %}Entidades Fiscalizadoras{% else %}Entidades Fiscalizadoras{% endif %}</h4>
                                 <ul
                                     id="regionalMapEfs"
                                     tabindex="0"
-                                    aria-label="{% if LANGUAGE_CODE == 'en' %}Entities associated with the selected country{% elif LANGUAGE_CODE == 'es' %}Entidades asociadas al pa&iacute;s seleccionado{% else %}Entidades associadas ao pa&iacute;s selecionado{% endif %}"
+                                    aria-label="{% if LANGUAGE_CODE == 'en' %}Audit institutions in the selected country{% elif LANGUAGE_CODE == 'es' %}Entidades fiscalizadoras del pa&iacute;s seleccionado{% else %}Entidades fiscalizadoras do pa&iacute;s selecionado{% endif %}"
                                 ></ul>
                             </section>
                             <dl class="home-map-stats">
                                 <div>
-                                    <dt>{% if LANGUAGE_CODE == 'en' %}Experiences registered by associated entities{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas por las entidades asociadas{% else %}Experi&ecirc;ncias registradas pelas entidades associadas{% endif %}</dt>
+                                    <dt>{% if LANGUAGE_CODE == 'en' %}Experiences registered in the country{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas en el pa&iacute;s{% else %}Experi&ecirc;ncias registradas no pa&iacute;s{% endif %}</dt>
                                     <dd id="regionalMapExperiences">0</dd>
                                 </div>
                                 <div>
@@ -149,7 +149,7 @@
 
                     <div class="home-map-actions">
                         <button class="btn btn-primary" type="submit" formaction="{% url 'catalogo_experiencias' %}">
-                            {% if LANGUAGE_CODE == 'en' %}Experiences registered by associated entities{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas por las entidades asociadas{% else %}Experi&ecirc;ncias registradas pelas entidades associadas{% endif %}
+                            {% if LANGUAGE_CODE == 'en' %}Experiences registered in the country{% elif LANGUAGE_CODE == 'es' %}Experiencias registradas en el pa&iacute;s{% else %}Experi&ecirc;ncias registradas no pa&iacute;s{% endif %}
                         </button>
                         <button class="btn btn-outline-primary" type="submit" formaction="{% url 'normas_internacionais' %}">
                             {% if LANGUAGE_CODE == 'en' %}Applicable normative criteria{% elif LANGUAGE_CODE == 'es' %}Criterios normativos aplicables{% else %}Crit&eacute;rios normativos aplic&aacute;veis{% endif %}
