@@ -762,9 +762,9 @@ class FerramentaSubmissaoForm(forms.Form):
             "setor": ("Setor", "Sector", "Sector"),
             "link_acesso": ("Link de acesso", "Enlace de acceso", "Access link"),
             "pais_ou_instancia": (
-                "País ou Instância",
-                "País o Instancia",
-                "Country or Body",
+                "Responsável",
+                "Responsable",
+                "Responsible party",
             ),
         }
         for nome, (pt, es, en) in textos.items():
@@ -774,9 +774,9 @@ class FerramentaSubmissaoForm(forms.Form):
             if not obrigatorio_para_envio:
                 self.fields[nome].required = False
         self.fields["pais_ou_instancia"].help_text = texto_idioma(
-            "Instância OLACEFS pode ser uma comissão, grupo de trabalho ou outra instância da organização relacionada à iniciativa.",
-            "Una instancia de la OLACEFS puede ser una comisión, un grupo de trabajo u otra instancia de la organización relacionada con la iniciativa.",
-            "An OLACEFS body may be a commission, working group or another organizational body related to the initiative.",
+            "Atores responsáveis pelo desenvolvimento da ferramenta. Ex: TCU-Brasil, CGR-Paraguay, COMTEMA - OLACEFS, IDI, GIZ.",
+            "Actores responsables del desarrollo de la herramienta. Ej.: TCU-Brasil, CGR-Paraguay, COMTEMA - OLACEFS, IDI, GIZ.",
+            "Actors responsible for developing the tool. E.g.: TCU-Brasil, CGR-Paraguay, COMTEMA - OLACEFS, IDI, GIZ.",
         )
 
     def clean(self):

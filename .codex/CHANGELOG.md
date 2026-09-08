@@ -1,5 +1,10 @@
 # Changelog da base Codex
 
+## NEG-6A — responsável no envio de ferramentas — 2026-09-08
+
+- Atualizado visualmente “País ou Instância” para “Responsável”, com texto explicativo trilíngue.
+- Preservados o campo técnico `pais_ou_instancia`, a persistência sincronizada e o schema, sem migration.
+
 ## NEG-5A — textos da Home, mapa regional e teaser — 2026-09-07
 
 - Atualizada a nomenclatura trilíngue para entidades fiscalizadoras e para experiências registradas no país.

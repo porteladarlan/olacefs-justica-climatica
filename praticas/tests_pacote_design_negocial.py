@@ -142,7 +142,7 @@ class PacoteDesignNegocialTests(TestCase):
         self.assertContains(boa_pratica, 'value="boa_pratica"')
         self.assertContains(boa_pratica, "Tipo de boa prática")
         self.assertContains(ferramenta, 'value="ferramenta"')
-        self.assertContains(ferramenta, "País ou Instância")
+        self.assertContains(ferramenta, "Responsável")
         self.assertNotContains(ferramenta, "Tipo de ferramenta")
         self.assertEqual(invalido.status_code, 400)
 
