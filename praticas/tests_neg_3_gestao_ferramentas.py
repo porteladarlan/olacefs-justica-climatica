@@ -61,6 +61,10 @@ class FerramentaPainelParser(HTMLParser):
 
 
 class GestaoFerramentasNeg3Tests(TestCase):
+    def setUp(self):
+        translation.activate("pt-br")
+        self.addCleanup(translation.deactivate)
+
     @classmethod
     def setUpTestData(cls):
         User = get_user_model()
@@ -160,7 +164,7 @@ class GestaoFerramentasNeg3Tests(TestCase):
         self.assertContains(response, reverse("editar_ferramenta", args=[publicada.pk]))
         self.assertContains(response, reverse("arquivar_ferramenta", args=[publicada.pk]))
         self.assertContains(response, reverse("editar_ferramenta", args=[arquivada.pk]))
-        self.assertNotContains(response, f"{reverse('arquivar_ferramenta', args=[arquivada.pk])}?next")
+        self.assertContains(response, f"{reverse('arquivar_ferramenta', args=[arquivada.pk])}?next")
         self.assertNotContains(response, "Excluir ferramenta")
 
     def test_painel_preserva_busca_neg2_e_lista_de_boas_praticas(self):
@@ -264,7 +268,7 @@ class GestaoFerramentasNeg3Tests(TestCase):
         antes = self.snapshot(ferramenta)
         total = Ferramenta.objects.count()
         self.login_staff()
-        response = self.client.post(reverse("arquivar_ferramenta", args=[ferramenta.pk]), {"confirmar_arquivamento": "sim"})
+        response = self.client.post(reverse("arquivar_ferramenta", args=[ferramenta.pk]), {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
         self.assertRedirects(response, reverse("painel_revisao"))
         ferramenta.refresh_from_db()
         depois = self.snapshot(ferramenta)
@@ -276,8 +280,8 @@ class GestaoFerramentasNeg3Tests(TestCase):
         ferramenta = self.criar_ferramenta(codigo="neg3-idempotente")
         self.login_staff()
         url = reverse("arquivar_ferramenta", args=[ferramenta.pk])
-        self.client.post(url, {"confirmar_arquivamento": "sim"})
-        self.client.post(url, {"confirmar_arquivamento": "sim"})
+        self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
+        self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
         self.assertEqual(Ferramenta.objects.get(pk=ferramenta.pk).situacao, Ferramenta.Situacao.ARQUIVADA)
         with translation.override("pt-br"):
             self.assertNotContains(self.client.get(reverse("ferramentas")), "neg3-idempotente")
@@ -297,11 +301,11 @@ class GestaoFerramentasNeg3Tests(TestCase):
         ferramenta = self.criar_ferramenta(codigo="neg3-next")
         self.login_staff()
         url = reverse("arquivar_ferramenta", args=[ferramenta.pk])
-        response = self.client.post(url, {"confirmar_arquivamento": "sim", "next": "https://evil.example/"})
+        response = self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar", "next": "https://evil.example/"})
         self.assertRedirects(response, reverse("painel_revisao"))
         ferramenta.situacao = Ferramenta.Situacao.PUBLICADA
         ferramenta.save(update_fields=["situacao"])
-        response = self.client.post(url, {"confirmar_arquivamento": "sim", "next": reverse("meus_envios")})
+        response = self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar", "next": reverse("meus_envios")})
         self.assertRedirects(response, reverse("meus_envios"))
 
     def test_arquivamento_aceita_somente_get_e_post_e_nao_chama_delete(self):

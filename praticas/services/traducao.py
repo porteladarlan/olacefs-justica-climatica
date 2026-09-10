@@ -74,3 +74,31 @@ def traduzir_campos_experiencia(experiencia, campos, idioma_origem):
                 continue
             traducoes[campo_destino] = valor
     return traducoes
+
+
+def traduzir_campos_ferramenta(ferramenta, idioma_origem):
+    """Return missing PT/ES/EN tool fields without changing the source fields."""
+    campos = {"titulo": "titulo", "descricao": "descricao"}
+    sufixos = {"pt": "", "es": "_es", "en": "_en"}
+    if idioma_origem not in sufixos:
+        return {}
+    origem_sufixo = sufixos[idioma_origem]
+    fontes = {}
+    for base, chave in campos.items():
+        valor = getattr(ferramenta, f"{base}{origem_sufixo}", "") or ""
+        if valor:
+            fontes[chave] = valor
+    traducoes = {}
+    for destino, destino_sufixo in sufixos.items():
+        if destino == idioma_origem:
+            continue
+        try:
+            resultado = _traduzir_lote(fontes, idioma_origem, destino)
+        except Exception as exc:
+            logger.warning("Automatic tool translation unavailable for target %s: %s", destino, exc.__class__.__name__)
+            continue
+        for base, valor in resultado.items():
+            campo = f"{base}{destino_sufixo}"
+            if base in campos and isinstance(valor, str) and valor and not getattr(ferramenta, campo, ""):
+                traducoes[campo] = valor
+    return traducoes

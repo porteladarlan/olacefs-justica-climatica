@@ -38,7 +38,7 @@
                 </div>
                 <div class="submission-item-action">
                     <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit{% elif LANGUAGE_CODE == 'es' %}Editar{% else %}Editar{% endif %}</a>
-                    {% if experiencia.status_publicacao != 'arquivado' %}<a class="btn btn-sm btn-outline-danger" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive{% elif LANGUAGE_CODE == 'es' %}Archivar{% else %}Arquivar{% endif %}</a>{% endif %}
+                    {% if experiencia.status_publicacao == 'arquivado' %}<a class="btn btn-sm btn-outline-success" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Restore{% elif LANGUAGE_CODE == 'es' %}Restaurar{% else %}Recuperar{% endif %}</a>{% elif experiencia.status_publicacao == 'publicado' %}<a class="btn btn-sm btn-outline-danger" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive{% elif LANGUAGE_CODE == 'es' %}Archivar{% else %}Arquivar{% endif %}</a>{% endif %}
                 </div>
             </article>
         </li>

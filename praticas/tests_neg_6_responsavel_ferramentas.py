@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import translation
 from django.utils.translation import override
 
 from .forms import FerramentaSubmissaoForm
@@ -23,6 +24,8 @@ class Neg6ResponsavelFerramentasTests(TestCase):
         )
 
     def setUp(self):
+        translation.activate("pt-br")
+        self.addCleanup(translation.deactivate)
         self.client.force_login(self.usuario)
 
     def _formulario_html(self, caminho="/adicionar-boa-pratica/?tipo=ferramenta"):
@@ -59,7 +62,7 @@ class Neg6ResponsavelFerramentasTests(TestCase):
             ),
             (
                 "en",
-                "Responsible party",
+                "Responsible",
                 "Actors responsible for developing the tool. E.g.: TCU-Brasil, CGR-Paraguay, COMTEMA - OLACEFS, IDI, GIZ.",
                 "Country or Body",
             ),
@@ -91,7 +94,7 @@ class Neg6ResponsavelFerramentasTests(TestCase):
         casos = (
             ("/adicionar-boa-pratica/", "pt", "Responsável PT"),
             ("/es/adicionar-boa-pratica/", "es", "Responsable ES"),
-            ("/en/adicionar-boa-pratica/", "en", "Responsible party EN"),
+            ("/en/adicionar-boa-pratica/", "en", "Responsible EN"),
         )
         experiencias_antes = Experiencia.objects.count()
 
@@ -115,7 +118,7 @@ class Neg6ResponsavelFerramentasTests(TestCase):
                 self.assertEqual(ferramenta.pais_ou_instancia, valor)
                 self.assertEqual(ferramenta.responsavel, valor)
                 self.assertEqual(ferramenta.idioma_submissao, idioma)
-                self.assertNotEqual(ferramenta.situacao, Ferramenta.Situacao.PUBLICADA)
+                self.assertEqual(ferramenta.situacao, Ferramenta.Situacao.PUBLICADA)
 
         self.assertEqual(Experiencia.objects.count(), experiencias_antes)
 

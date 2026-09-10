@@ -2,22 +2,25 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Good practice management{% elif LANGUAGE_CODE == 'es' %}Gestión de buenas prácticas{% else %}Gerenciamento de boas práticas{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}Submission management{% elif LANGUAGE_CODE == 'es' %}Gestión de envíos{% else %}Gerenciamento de submissões{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Restricted management area{% elif LANGUAGE_CODE == 'es' %}Área restringida de gestión{% else %}Área restrita de gerenciamento{% endif %}</div>
-    <h1 class="page-title mb-2">{% if LANGUAGE_CODE == 'en' %}Good practice management{% elif LANGUAGE_CODE == 'es' %}Gestión de buenas prácticas{% else %}Gerenciamento de boas práticas{% endif %}</h1>
+    <h1 class="page-title mb-2">{% if LANGUAGE_CODE == 'en' %}Submission management{% elif LANGUAGE_CODE == 'es' %}Gestión de envíos{% else %}Gerenciamento de submissões{% endif %}</h1>
     <p class="section-subtitle mb-0">
         {% if LANGUAGE_CODE == 'en' %}
-            Manage good practices and historical records, including editing and deletion.
+            Manage submissions, including editing and archiving.
         {% elif LANGUAGE_CODE == 'es' %}
-            Gestione buenas prácticas y registros históricos, incluyendo edición y eliminación.
+            Gestione envíos, incluyendo edición y archivo.
         {% else %}
-            Gerencie boas práticas e registros históricos, incluindo edição e exclusão.
+            Gerencie submissões, incluindo edição e arquivamento.
         {% endif %}
     </p>
 </section>
+
+<h2 class="h4 mb-3">{% if LANGUAGE_CODE == 'en' %}General submission search{% elif LANGUAGE_CODE == 'es' %}Búsqueda general de envíos{% else %}Busca geral de submissões{% endif %}</h2>
+<p class="section-subtitle">{% if LANGUAGE_CODE == 'en' %}Search good practices and tools in one place.{% elif LANGUAGE_CODE == 'es' %}Busque buenas prácticas y herramientas en un solo lugar.{% else %}Pesquise boas práticas e ferramentas em um só lugar.{% endif %}</p>
 
 <section class="row g-3 mb-4" data-testid="panel-status-metrics">
     <div class="col-md"><div class="metric-card" data-status-metric="publicado"><div class="metric-label">{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}</div><p class="metric-value">{{ contadores.publicado }}</p></div></div>
@@ -27,7 +30,7 @@
 <form method="get" class="filter-panel row g-3 mb-4" data-testid="panel-open-search">
     <div class="col-md-8">
         <label class="form-label small fw-semibold text-muted" for="panel-search">{% if LANGUAGE_CODE == 'en' %}General search{% elif LANGUAGE_CODE == 'es' %}Búsqueda general{% else %}Busca geral{% endif %}</label>
-        <input id="panel-search" class="form-control" type="search" name="q" value="{{ termo_busca }}" maxlength="200" placeholder="{% if LANGUAGE_CODE == 'en' %}Good practice name, country, SAI, e-mail or responsible person{% elif LANGUAGE_CODE == 'es' %}Nombre de la buena práctica, país, EFS, correo o responsable{% else %}Nome da boa prática, país, EFS, e-mail ou responsável{% endif %}">
+        <input id="panel-search" class="form-control" type="search" name="q" value="{{ termo_busca }}" maxlength="200" placeholder="{% if LANGUAGE_CODE == 'en' %}Good practices or tools: name, country, SAI, e-mail or responsible person{% elif LANGUAGE_CODE == 'es' %}Buenas prácticas o herramientas: nombre, país, EFS, correo o responsable{% else %}Boas práticas ou ferramentas: nome, país, EFS, e-mail ou responsável{% endif %}">
     </div>
     <div class="col-md-2 d-grid align-self-end">
         <button class="btn btn-primary" type="submit">{% if LANGUAGE_CODE == 'en' %}Search{% elif LANGUAGE_CODE == 'es' %}Buscar{% else %}Buscar{% endif %}</button>
@@ -37,12 +40,14 @@
     </div>
 </form>
 
-<div class="row g-3">
+<section aria-labelledby="good-practices-list-title" data-testid="panel-good-practices">
+    <h2 id="good-practices-list-title" class="h4 mb-3">{% if LANGUAGE_CODE == 'en' %}Good practices{% elif LANGUAGE_CODE == 'es' %}Buenas prácticas{% else %}Boas práticas{% endif %}</h2>
+<ul class="submission-list">
     {% for experiencia in experiencias %}
-    <div class="col-lg-6">
-        <article class="catalog-card h-100">
+    <li>
+        <article class="submission-item">
             <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="status-pill status-{{ experiencia.status_publicacao }}">{{ experiencia.get_status_publicacao_display }}</span>
+                <span class="status-pill status-{{ experiencia.status_publicacao }}">{% if experiencia.status_publicacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}{% elif experiencia.status_publicacao == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}{% elif experiencia.status_publicacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}{% elif experiencia.status_publicacao == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}{% elif experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}{% elif experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}{% elif experiencia.status_publicacao == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}{% endif %}</span>
                 <span class="badge-soft">{{ experiencia.atualizado_em|date:"d/m/Y H:i" }}</span>
             </div>
             <h2 class="h4 section-title">{{ experiencia.titulo_exibicao }}</h2>
@@ -59,19 +64,14 @@
                 </div>
             {% endif %}
             <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
-            {% if request.user.is_staff and experiencia.autor_id != request.user.id and experiencia.status_publicacao == 'publicado' %}
-                <a class="btn btn-outline-danger btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>
-            {% else %}
-                <a class="btn btn-outline-danger btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>
-            {% endif %}
+            {% if experiencia.status_publicacao == 'arquivado' %}<a class="btn btn-outline-success btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Restore{% elif LANGUAGE_CODE == 'es' %}Restaurar{% else %}Recuperar{% endif %}</a>{% elif experiencia.status_publicacao == 'publicado' %}<a class="btn btn-outline-danger btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>{% endif %}
         </article>
-    </div>
+    </li>
     {% empty %}
-    <div class="col-12">
-        <div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No good practices were found for the search provided.{% elif LANGUAGE_CODE == 'es' %}No se encontraron buenas prácticas para la búsqueda informada.{% else %}Nenhuma boa prática encontrada para a busca informada.{% endif %}</p></div>
-    </div>
+    <li><div class="feature-card"><p class="section-subtitle mb-0">{% if LANGUAGE_CODE == 'en' %}No good practices were found for the search provided.{% elif LANGUAGE_CODE == 'es' %}No se encontraron buenas prácticas para la búsqueda informada.{% else %}Nenhuma boa prática encontrada para a busca informada.{% endif %}</p></div></li>
     {% endfor %}
-</div>
+</ul>
+</section>
 <section class="workspace-section" aria-labelledby="tool-management-list-title" data-testid="panel-tools">
     <h2 id="tool-management-list-title">{% if LANGUAGE_CODE == 'en' %}Tools{% elif LANGUAGE_CODE == 'es' %}Herramientas{% else %}Ferramentas{% endif %}</h2>
     {% include 'praticas/includes/lista_ferramentas_conta.html' %}

@@ -764,7 +764,7 @@ class FerramentaSubmissaoForm(forms.Form):
             "pais_ou_instancia": (
                 "Responsável",
                 "Responsable",
-                "Responsible party",
+                "Responsible",
             ),
         }
         for nome, (pt, es, en) in textos.items():

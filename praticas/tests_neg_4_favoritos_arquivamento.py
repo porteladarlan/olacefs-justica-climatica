@@ -181,12 +181,16 @@ class FavoritosArquivamentoNeg4Tests(TestCase):
                 experiencia.refresh_from_db()
                 self.assertEqual(self.snapshot(experiencia), antes)
                 self.assertRedirects(self.client.post(url, {}), reverse("arquivar_boa_pratica", args=[experiencia.pk]))
-                self.client.post(url, {"confirmar_arquivamento": "sim"})
+                self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
                 experiencia.refresh_from_db()
                 self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
                 pk = experiencia.pk
-                self.client.post(url, {"confirmar_arquivamento": "sim"})
+                atualizado_em = experiencia.atualizado_em
+                self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
+                experiencia.refresh_from_db()
                 self.assertTrue(Experiencia.objects.filter(pk=pk).exists())
+                self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
+                self.assertEqual(experiencia.atualizado_em, atualizado_em)
 
     def test_arquivamento_autorizacao_autor_staff_anonimo_e_nao_autor(self):
         propria = self.criar_experiencia(titulo="Própria")
@@ -197,6 +201,13 @@ class FavoritosArquivamentoNeg4Tests(TestCase):
         self.assertRedirects(self.client.get(url), reverse("meus_envios"))
         self.client.force_login(self.autor)
         self.assertEqual(self.client.get(url).status_code, 200)
+        response = self.client.post(
+            url,
+            {"confirmar_arquivamento": "sim", "acao_status": "arquivar"},
+        )
+        self.assertRedirects(response, reverse("meus_envios"))
+        propria.refresh_from_db()
+        self.assertEqual(propria.status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
         self.assertRedirects(self.client.get(reverse("arquivar_boa_pratica", args=[alheia.pk])), reverse("meus_envios"))
         self.login_staff()
         self.assertEqual(self.client.get(reverse("arquivar_boa_pratica", args=[alheia.pk])).status_code, 200)
@@ -208,7 +219,7 @@ class FavoritosArquivamentoNeg4Tests(TestCase):
         self.assertEqual(self.client.put(url).status_code, 405)
         self.assertEqual(self.client.patch(url).status_code, 405)
         self.assertEqual(self.client.delete(url).status_code, 405)
-        self.assertRedirects(self.client.post(url, {"confirmar_arquivamento": "sim", "next": "//evil.example/"}), reverse("painel_revisao"))
+        self.assertRedirects(self.client.post(url, {"confirmar_arquivamento": "sim", "acao_status": "arquivar", "next": "//evil.example/"}), reverse("painel_revisao"))
         experiencia.refresh_from_db()
         self.assertEqual(experiencia.status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
 
@@ -242,7 +253,7 @@ class FavoritosArquivamentoNeg4Tests(TestCase):
             "grupos": set(experiencia.grupos_vulneraveis.values_list("pk", flat=True)),
         }
         self.login_staff()
-        self.client.post(reverse("arquivar_boa_pratica", args=[experiencia.pk]), {"confirmar_arquivamento": "sim"})
+        self.client.post(reverse("arquivar_boa_pratica", args=[experiencia.pk]), {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
         experiencia.refresh_from_db()
         self.assertEqual(Experiencia.objects.count(), 1)
         self.assertEqual({k: v for k, v in self.snapshot(experiencia).items() if k not in {"status_publicacao", "atualizado_em"}}, {k: v for k, v in antes.items() if k not in {"status_publicacao", "atualizado_em"}})
@@ -258,7 +269,7 @@ class FavoritosArquivamentoNeg4Tests(TestCase):
         experiencia = self.criar_experiencia(titulo="Sai das consultas")
         self.client.post(reverse("alternar_favorito", args=[experiencia.pk]), {})
         self.login_staff()
-        self.client.post(reverse("arquivar_boa_pratica", args=[experiencia.pk]), {"confirmar_arquivamento": "sim"})
+        self.client.post(reverse("arquivar_boa_pratica", args=[experiencia.pk]), {"confirmar_arquivamento": "sim", "acao_status": "arquivar"})
         self.assertNotContains(self.client.get(reverse("catalogo_experiencias")), "Sai das consultas")
         self.assertNotContains(self.client.get(reverse("pagina_inicial")), "Sai das consultas")
         self.assertNotContains(self.client.get(reverse("comparar_experiencias"), {"experiencias": [experiencia.pk]}), "Sai das consultas")
@@ -272,7 +283,8 @@ class FavoritosArquivamentoNeg4Tests(TestCase):
         response = self.client.get(reverse("meus_envios"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Permanece interna")
-        self.assertNotContains(response, reverse("arquivar_boa_pratica", args=[experiencia.pk]))
+        self.assertContains(response, reverse("arquivar_boa_pratica", args=[experiencia.pk]))
+        self.assertContains(response, "Recuperar")
 
     def test_interface_nao_exibe_textos_de_exclusao_nas_acoes_ativas(self):
         experiencia = self.criar_experiencia()

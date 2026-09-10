@@ -36,9 +36,9 @@
             {{ experiencias|length }}
             {% if LANGUAGE_CODE == 'en' %}selected experience(s){% elif LANGUAGE_CODE == 'es' %}experiencia(s) seleccionada(s){% else %}experi&ecirc;ncia(s) selecionada(s){% endif %}
         </div>
-        <a class="btn btn-outline-primary" href="{% url 'comparar_experiencias' %}{% for experiencia in experiencias|slice:':3' %}{% if forloop.first %}?{% else %}&{% endif %}experiencias={{ experiencia.id }}{% endfor %}">
-            {% if LANGUAGE_CODE == 'en' %}Compare first three{% elif LANGUAGE_CODE == 'es' %}Comparar las tres primeras{% else %}Comparar as tr&ecirc;s primeiras{% endif %}
-        </a>
+        <button class="btn btn-outline-primary" type="submit" name="comparar_submit" value="1" form="favoritos-comparacao">
+            {% if LANGUAGE_CODE == 'en' %}Compare selected practices{% elif LANGUAGE_CODE == 'es' %}Comparar las prácticas seleccionadas{% else %}Comparar as práticas selecionadas{% endif %}
+        </button>
     </div>
 
     <div class="row g-3">
@@ -57,6 +57,7 @@
                     <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }}
                 </div>
                 <div class="d-flex flex-wrap gap-2">
+                    <label class="btn btn-outline-primary"><input form="favoritos-comparacao" type="checkbox" name="comparar" value="{{ experiencia.pk }}" class="me-1" {% if experiencia.pk in ids_comparacao %}checked{% endif %}> {% if LANGUAGE_CODE == 'en' %}Select for comparison{% elif LANGUAGE_CODE == 'es' %}Seleccionar para comparar{% else %}Selecionar para comparar{% endif %}</label>
                     <form method="post" action="{% url 'alternar_favorito' experiencia.pk %}" class="d-inline">
                         {% csrf_token %}
                         <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -96,6 +97,31 @@
     <a href="{% url 'catalogo_experiencias' %}" class="btn btn-primary">
         {% if LANGUAGE_CODE == 'en' %}Open catalog{% elif LANGUAGE_CODE == 'es' %}Abrir cat&aacute;logo{% else %}Abrir cat&aacute;logo{% endif %}
     </a>
+</section>
+{% endif %}
+
+<form id="favoritos-comparacao" method="get" action="{% url 'favoritos_experiencias' %}#quadro-comparativo"></form>
+
+{% if comparacao_invalida %}<div class="alert alert-warning" role="alert">{% if LANGUAGE_CODE == 'en' %}Select two or three published practices from your favorites.{% elif LANGUAGE_CODE == 'es' %}Seleccione dos o tres prácticas publicadas entre sus favoritos.{% else %}Selecione duas ou três práticas publicadas entre seus favoritos.{% endif %}</div>{% endif %}
+{% if experiencias_comparacao %}
+<section class="detail-section" id="quadro-comparativo" tabindex="-1" aria-labelledby="titulo-comparativo">
+    <h2 id="titulo-comparativo" class="section-title h4">{% if LANGUAGE_CODE == 'en' %}Comparison{% elif LANGUAGE_CODE == 'es' %}Comparación{% else %}Comparação{% endif %}</h2>
+    <div class="table-responsive"><table class="table table-bordered align-middle"><thead><tr><th></th>{% for item in experiencias_comparacao %}<th>{{ item.titulo_exibicao }}</th>{% endfor %}</tr></thead><tbody>
+        <tr><th>EFS</th>{% for item in experiencias_comparacao %}<td>{{ item.efs.nome_exibicao }}{% if item.efs.sigla %} ({{ item.efs.sigla }}){% endif %}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.pais.nome_exibicao }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Type{% elif LANGUAGE_CODE == 'es' %}Tipo{% else %}Tipo{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.tipo_experiencia.nome_exibicao }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Sector{% elif LANGUAGE_CODE == 'es' %}Sector{% else %}Setor{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.setor.nome_exibicao }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Year{% elif LANGUAGE_CODE == 'es' %}Año{% else %}Ano{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.ano_execucao }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Cross-cutting themes{% elif LANGUAGE_CODE == 'es' %}Temas transversales{% else %}Temas transversais{% endif %}</th>{% for item in experiencias_comparacao %}<td>{% for tema in item.temas_transversais.all %}{{ tema.nome_exibicao }}{% if not forloop.last %}; {% endif %}{% empty %}-{% endfor %}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Climate justice approach{% elif LANGUAGE_CODE == 'es' %}Enfoque de justicia climática{% else %}Enfoque de justiça climática{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.enfoque_justica_climatica_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Audit questions{% elif LANGUAGE_CODE == 'es' %}Preguntas de auditoría{% else %}Perguntas de auditoria{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.perguntas_chave_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Criteria{% elif LANGUAGE_CODE == 'es' %}Criterios{% else %}Critérios{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.criterios_utilizados_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Methodologies and instruments{% elif LANGUAGE_CODE == 'es' %}Metodologías e instrumentos{% else %}Metodologias e instrumentos{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.ferramentas_utilizadas_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Results{% elif LANGUAGE_CODE == 'es' %}Resultados{% else %}Resultados{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.resultados_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Additional information{% elif LANGUAGE_CODE == 'es' %}Información adicional{% else %}Informações adicionais{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.informacoes_adicionais_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}Replicability{% elif LANGUAGE_CODE == 'es' %}Replicabilidad{% else %}Replicabilidade{% endif %}</th>{% for item in experiencias_comparacao %}<td>{{ item.replicabilidade_exibicao|default:"-" }}</td>{% endfor %}</tr>
+        <tr><th>{% if LANGUAGE_CODE == 'en' %}International standards{% elif LANGUAGE_CODE == 'es' %}Normas internacionales{% else %}Normas internacionais{% endif %}</th>{% for item in experiencias_comparacao %}<td>{% for norma in item.normas_internacionais.all %}{{ norma.nome_exibicao }}{% if not forloop.last %}; {% endif %}{% empty %}-{% endfor %}</td>{% endfor %}</tr>
+    </tbody></table></div>
 </section>
 {% endif %}
 {% endblock %}

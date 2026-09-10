@@ -25,7 +25,7 @@
                 <div class="submission-item-action">
                     {% if request.user.is_staff %}
                         <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_ferramenta' ferramenta.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Edit{% elif LANGUAGE_CODE == 'es' %}Editar{% else %}Editar{% endif %}</a>
-                        {% if ferramenta.situacao != 'arquivada' %}<a class="btn btn-sm btn-outline-danger" href="{% url 'arquivar_ferramenta' ferramenta.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive{% elif LANGUAGE_CODE == 'es' %}Archivar{% else %}Arquivar{% endif %}</a>{% endif %}
+                        <a class="btn btn-sm {% if ferramenta.situacao == 'publicada' %}btn-outline-danger{% else %}btn-outline-success{% endif %}" href="{% url 'arquivar_ferramenta' ferramenta.pk %}?next={{ request.get_full_path|urlencode }}">{% if ferramenta.situacao == 'arquivada' %}{% if LANGUAGE_CODE == 'en' %}Restore / Publish{% elif LANGUAGE_CODE == 'es' %}Restaurar / Publicar{% else %}Recuperar / Publicar{% endif %}{% elif ferramenta.situacao == 'publicada' %}{% if LANGUAGE_CODE == 'en' %}Archive{% elif LANGUAGE_CODE == 'es' %}Archivar{% else %}Arquivar{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Publish{% elif LANGUAGE_CODE == 'es' %}Publicar{% else %}Publicar{% endif %}{% endif %}</a>
                     {% elif ferramenta.situacao == 'rascunho' %}
                         <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_ferramenta' ferramenta.pk %}">{% if LANGUAGE_CODE == 'en' %}Continue editing{% elif LANGUAGE_CODE == 'es' %}Continuar editando{% else %}Continuar editando{% endif %}</a>
                     {% endif %}

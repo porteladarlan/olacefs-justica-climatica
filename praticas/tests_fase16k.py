@@ -50,12 +50,12 @@ class AjustesPlataforma1206Tests(TestCase):
         response = self.client.get(reverse("meus_envios"))
         self.assertContains(response, "Rascunho visível")
 
-    def test_rascunho_nao_aparece_no_painel_revisao(self):
+    def test_rascunho_aparece_no_painel_revisao_com_status_localizado(self):
         self.criar_experiencia("Rascunho privado", Experiencia.StatusPublicacao.RASCUNHO, self.autor)
         self.criar_experiencia("Enviada ao revisor", Experiencia.StatusPublicacao.ENVIADO, self.autor)
         self.client.force_login(self.revisor)
         response = self.client.get(reverse("painel_revisao"))
-        self.assertNotContains(response, "Rascunho privado")
+        self.assertContains(response, "Rascunho privado")
         self.assertContains(response, "Enviada ao revisor")
 
     def test_acoes_de_revisao_respeitam_status_da_experiencia(self):
@@ -246,7 +246,7 @@ class AjustesPlataforma1206Tests(TestCase):
             f'{reverse("login_usuario")}?next={reverse("excluir_boa_pratica", args=[propria.pk])}',
         )
         self.assertRedirects(
-            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "sim"}),
+            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "sim", "acao_status": "arquivar"}),
             f'{reverse("login_usuario")}?next={reverse("excluir_boa_pratica", args=[propria.pk])}',
         )
         self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
@@ -254,25 +254,35 @@ class AjustesPlataforma1206Tests(TestCase):
 
         confirmacao = self.client.get(reverse("excluir_boa_pratica", args=[propria.pk]))
         self.assertEqual(confirmacao.status_code, 200)
+        self.assertContains(confirmacao, "Arquivar")
         self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
         self.assertRedirects(
-            self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "nao"}),
+            self.client.post(
+                reverse("excluir_boa_pratica", args=[propria.pk]),
+                {"confirmar_arquivamento": "nao"},
+            ),
             reverse("arquivar_boa_pratica", args=[propria.pk]),
         )
         self.assertTrue(Experiencia.objects.filter(pk=propria.pk).exists())
-        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[propria.pk]), {"confirmar_arquivamento": "sim"}), reverse("meus_envios"))
+        self.assertRedirects(
+            self.client.post(
+                reverse("excluir_boa_pratica", args=[propria.pk]),
+                {"confirmar_arquivamento": "sim", "acao_status": "arquivar"},
+            ),
+            reverse("meus_envios"),
+        )
         self.assertEqual(Experiencia.objects.get(pk=propria.pk).status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)
 
         outro = get_user_model().objects.create_user("outro-exclusao", password="senha12345")
         self.client.force_login(outro)
         self.assertRedirects(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])), reverse("meus_envios"))
-        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_arquivamento": "sim"}), reverse("meus_envios"))
+        self.assertRedirects(self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_arquivamento": "sim", "acao_status": "arquivar"}), reverse("meus_envios"))
         self.assertTrue(Experiencia.objects.filter(pk=outra.pk).exists())
 
         self.client.force_login(self.revisor)
         self.assertEqual(self.client.get(reverse("excluir_boa_pratica", args=[outra.pk])).status_code, 200)
         self.assertRedirects(
-            self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_arquivamento": "sim"}),
+            self.client.post(reverse("excluir_boa_pratica", args=[outra.pk]), {"confirmar_arquivamento": "sim", "acao_status": "arquivar"}),
             reverse("painel_revisao"),
         )
         self.assertEqual(Experiencia.objects.get(pk=outra.pk).status_publicacao, Experiencia.StatusPublicacao.ARQUIVADO)

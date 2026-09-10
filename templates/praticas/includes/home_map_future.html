@@ -25,6 +25,7 @@
             <p class="section-subtitle" id="home-map-description">
                 {% if LANGUAGE_CODE == 'en' %}Select one country on the map. Selecting another replaces the current selection.{% elif LANGUAGE_CODE == 'es' %}Selecciona un pa&iacute;s en el mapa. Al elegir otro, se reemplaza la selecci&oacute;n actual.{% else %}Selecione um pa&iacute;s no mapa. Ao escolher outro, a sele&ccedil;&atilde;o atual ser&aacute; substitu&iacute;da.{% endif %}
             </p>
+            <p class="accessible-info" id="home-map-keyboard-help">{% if LANGUAGE_CODE == 'en' %}Use Tab to reach countries; press Enter or Space to select. A new selection replaces the previous one.{% elif LANGUAGE_CODE == 'es' %}Usa Tab para llegar a los pa&iacute;ses; presiona Enter o Espacio para seleccionar. Una nueva selecci&oacute;n reemplaza la anterior.{% else %}Use Tab para chegar aos pa&iacute;ses; pressione Enter ou Espa&ccedil;o para selecionar. Uma nova sele&ccedil;&atilde;o substitui a anterior.{% endif %}</p>
         </header>
 
         <div class="home-map-layout">
@@ -34,7 +35,7 @@
                     id="regionalMap"
                     role="group"
                     aria-labelledby="home-map-title"
-                    aria-describedby="home-map-description"
+                    aria-describedby="home-map-description home-map-keyboard-help"
                 >
                     <div class="home-map-loading" id="regionalMapLoading" role="status">
                         {% if LANGUAGE_CODE == 'en' %}Loading regional map&hellip;{% elif LANGUAGE_CODE == 'es' %}Cargando mapa de la regi&oacute;n&hellip;{% else %}Carregando mapa da regi&atilde;o&hellip;{% endif %}
@@ -100,7 +101,7 @@
                                 <ul
                                     id="regionalMapEfs"
                                     tabindex="0"
-                                    aria-label="{% if LANGUAGE_CODE == 'en' %}Audit institutions in the selected country{% elif LANGUAGE_CODE == 'es' %}Entidades fiscalizadoras del pa&iacute;s seleccionado{% else %}Entidades fiscalizadoras do pa&iacute;s selecionado{% endif %}"
+                                    aria-label="{% if LANGUAGE_CODE == 'en' %}Audit institutions in the selected country{% elif LANGUAGE_CODE == 'es' %}Entidades fiscalizadoras del pa&iacute;s seleccionado{% else %}Entidades fiscalizadoras do país selecionado{% endif %}"
                                 ></ul>
                             </section>
                             <dl class="home-map-stats">

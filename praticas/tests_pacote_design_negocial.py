@@ -1,6 +1,7 @@
 import importlib
 from html.parser import HTMLParser
 from pathlib import Path
+from unittest.mock import patch
 
 from django.apps import apps
 from django.contrib import admin
@@ -146,20 +147,28 @@ class PacoteDesignNegocialTests(TestCase):
         self.assertNotContains(ferramenta, "Tipo de ferramenta")
         self.assertEqual(invalido.status_code, 400)
 
-    def test_ferramenta_e_criada_no_modelo_correto_e_nao_publicada(self):
-        resposta = self.client.post(
-            reverse("adicionar_boa_pratica"),
-            {
-                "tipo_compartilhamento": "ferramenta",
-                "acao_envio": "enviar",
-                "nome": "Matriz de auditoria",
-                "ano": "2026",
-                "descricao": "Instrumento de apoio às EFS.",
-                "setor": str(self.setor.pk),
-                "link_acesso": "https://example.org/matriz",
-                "pais_ou_instancia": "Comissão da OLACEFS",
+    def test_ferramenta_e_criada_no_modelo_correto_e_publicada(self):
+        with patch(
+            "praticas.services.traducao._traduzir_lote",
+            side_effect=lambda campos, origem, destino: {
+                "titulo": f"Matriz {destino}",
+                "descricao": f"Descrição {destino}",
             },
-        )
+        ):
+            with self.captureOnCommitCallbacks(execute=True):
+                resposta = self.client.post(
+                    reverse("adicionar_boa_pratica"),
+                    {
+                        "tipo_compartilhamento": "ferramenta",
+                        "acao_envio": "enviar",
+                        "nome": "Matriz de auditoria",
+                        "ano": "2026",
+                        "descricao": "Instrumento de apoio às EFS.",
+                        "setor": str(self.setor.pk),
+                        "link_acesso": "https://example.org/matriz",
+                        "pais_ou_instancia": "Comissão da OLACEFS",
+                    },
+                )
         self.assertRedirects(
             resposta,
             f"{reverse('confirmacao_envio')}?tipo=ferramenta",
@@ -168,13 +177,14 @@ class PacoteDesignNegocialTests(TestCase):
         self.assertEqual(Experiencia.objects.count(), 0)
         ferramenta = Ferramenta.objects.get()
         self.assertEqual(ferramenta.autor, self.usuario)
-        self.assertEqual(ferramenta.situacao, Ferramenta.Situacao.ENVIADA)
+        self.assertEqual(ferramenta.situacao, Ferramenta.Situacao.PUBLICADA)
         self.assertEqual(ferramenta.idioma_submissao, Ferramenta.IdiomaSubmissao.PORTUGUES)
         self.assertEqual(ferramenta.titulo, "Matriz de auditoria")
-        self.assertEqual(ferramenta.titulo_es, "")
+        self.assertEqual(ferramenta.titulo_es, "Matriz es")
+        self.assertEqual(ferramenta.titulo_en, "Matriz en")
+        self.assertEqual(ferramenta.descricao_es, "Descrição es")
+        self.assertEqual(ferramenta.descricao_en, "Descrição en")
         self.assertEqual(ferramenta.pais_ou_instancia, "Comissão da OLACEFS")
-        self.assertNotEqual(ferramenta.situacao, Ferramenta.Situacao.PUBLICADA)
-
         rascunho_parcial = self.client.post(
             reverse("adicionar_boa_pratica"),
             {
@@ -209,36 +219,55 @@ class PacoteDesignNegocialTests(TestCase):
         )
         self.assertRedirects(retomada, reverse("meus_envios"), fetch_redirect_response=False)
         rascunho.refresh_from_db()
-        self.assertEqual(rascunho.situacao, Ferramenta.Situacao.ENVIADA)
+        self.assertEqual(rascunho.situacao, Ferramenta.Situacao.PUBLICADA)
         self.assertEqual(rascunho.titulo, "Rascunho concluído")
 
     def test_ferramenta_preserva_idioma_real_sem_falsas_traducoes(self):
-        casos = (
-            ("/adicionar-boa-pratica/", "PT", "pt", "titulo"),
-            ("/es/adicionar-boa-pratica/", "ES", "es", "titulo_es"),
-            ("/en/adicionar-boa-pratica/", "EN", "en", "titulo_en"),
-        )
-        for caminho, sufixo, idioma, campo_titulo in casos:
-            with self.subTest(idioma=idioma):
+        with patch(
+            "praticas.services.traducao._traduzir_lote",
+            side_effect=lambda campos, origem, destino: {
+                "titulo": f"Título traduzido {destino}",
+                "descricao": f"Descrição traduzida {destino}",
+            },
+        ):
+            with self.captureOnCommitCallbacks(execute=True):
                 resposta = self.client.post(
-                    caminho,
+                    "/adicionar-boa-pratica/",
                     {
                         "tipo_compartilhamento": "ferramenta",
                         "acao_envio": "enviar",
-                        "nome": f"Ferramenta {sufixo}",
+                        "nome": "Título original PT",
                         "ano": "2026",
-                        "descricao": f"Descrição {sufixo}",
+                        "descricao": "Descrição original PT",
                         "setor": str(self.setor.pk),
-                        "link_acesso": f"https://example.org/{idioma}",
+                        "link_acesso": "https://example.org/idioma-real",
                         "pais_ou_instancia": "OLACEFS",
                     },
                 )
-                self.assertEqual(resposta.status_code, 302)
-                ferramenta = Ferramenta.objects.get(url=f"https://example.org/{idioma}")
-                self.assertEqual(ferramenta.idioma_submissao, idioma)
-                for campo in ("titulo", "titulo_es", "titulo_en"):
-                    esperado = f"Ferramenta {sufixo}" if campo == campo_titulo else ""
-                    self.assertEqual(getattr(ferramenta, campo), esperado)
+        self.assertEqual(resposta.status_code, 302)
+        ferramenta = Ferramenta.objects.get(url="https://example.org/idioma-real")
+        self.assertEqual(ferramenta.idioma_submissao, "pt")
+        self.assertEqual(ferramenta.titulo, "Título original PT")
+        self.assertEqual(ferramenta.descricao, "Descrição original PT")
+        self.assertEqual(ferramenta.titulo_es, "Título traduzido es")
+        self.assertEqual(ferramenta.descricao_es, "Descrição traduzida es")
+        self.assertEqual(ferramenta.titulo_en, "Título traduzido en")
+        self.assertEqual(ferramenta.descricao_en, "Descrição traduzida en")
+
+        ferramenta.titulo_es = "Tradução curada"
+        ferramenta.descricao_es = ""
+        ferramenta.save(update_fields=["titulo_es", "descricao_es"])
+        with patch(
+            "praticas.services.traducao._traduzir_lote",
+            return_value={"titulo": "Tentativa de sobrescrita", "descricao": "Nova tradução"},
+        ):
+            from praticas.views import tentar_traduzir_ferramenta
+
+            resultado = tentar_traduzir_ferramenta(ferramenta, "pt")
+        ferramenta.refresh_from_db()
+        self.assertTrue(resultado)
+        self.assertEqual(ferramenta.titulo_es, "Tradução curada")
+        self.assertEqual(ferramenta.descricao_es, "Nova tradução")
 
     def test_migration_remove_copia_falsa_sem_alterar_conteudo_importado(self):
         enviada = Ferramenta.objects.create(
@@ -466,6 +495,13 @@ class PacoteDesignNegocialTests(TestCase):
             codigo="privada-outra",
             titulo_es="Ferramenta de outra autora",
             descricao_es="Privada",
+            descricao="Private tool",
+            descricao_en="Private tool",
+            idioma_submissao=Ferramenta.IdiomaSubmissao.ESPANHOL,
+            responsavel="EFS",
+            pais_ou_instancia="EFS",
+            ano=2026,
+            periodo="2026",
             setor=self.setor,
             url="https://example.org/outra",
             ordem=1,
@@ -475,6 +511,13 @@ class PacoteDesignNegocialTests(TestCase):
             codigo="privada-propria",
             titulo_es="Minha ferramenta",
             descricao_es="Própria",
+            descricao="Own tool",
+            descricao_en="Own tool",
+            idioma_submissao=Ferramenta.IdiomaSubmissao.ESPANHOL,
+            responsavel="EFS",
+            pais_ou_instancia="EFS",
+            ano=2026,
+            periodo="2026",
             setor=self.setor,
             url="https://example.org/propria",
             ordem=2,

@@ -54,6 +54,7 @@ from .models import (
     Ferramenta,
     GrupoVulneravel,
     NormaInternacional,
+    NormaInternacionalPais,
     Pais,
     PerguntaAuditoria,
     PropostaEdicaoExperiencia,
@@ -73,7 +74,7 @@ from .seletores_guia_preview import (
     separar_perguntas_por_tipo,
 )
 from .uploads import validar_anexo_upload
-from .services.traducao import traduzir_campos_experiencia
+from .services.traducao import traduzir_campos_experiencia, traduzir_campos_ferramenta
 
 # Configurações padrão para anexos.
 # Mantém compatibilidade com as três posições disponíveis nos formulários.
@@ -216,6 +217,23 @@ def tentar_traduzir_experiencia(experiencia, idioma_origem, campos=None):
         return False
     return True
 
+
+def tentar_traduzir_ferramenta(ferramenta, idioma_origem):
+    if idioma_origem not in {"pt", "es", "en"}:
+        return False
+    try:
+        traducoes = traduzir_campos_ferramenta(ferramenta, idioma_origem)
+        if not traducoes:
+            return True
+        for campo, valor in traducoes.items():
+            Ferramenta.objects.filter(pk=ferramenta.pk, **{campo: ""}).update(
+                **{campo: valor, "atualizado_em": timezone.now()}
+            )
+        return True
+    except Exception as exc:
+        logger.warning("Automatic tool translation unavailable: %s", exc.__class__.__name__)
+        return False
+
 # ISO 3166-1 alfa-3 usado no cadastro -> identificador numérico do world-atlas.
 # A lista regional segue a referência visual oficial e permite desenhar também
 # territórios sem correspondência institucional no banco.
@@ -300,10 +318,7 @@ def _payload_mapa_regional():
                 distinct=True,
             ),
             criterios_normativos=Count(
-                "experiencias__normas_internacionais",
-                filter=Q(
-                    experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
-                ),
+                "normas_internacionais_status__norma",
                 distinct=True,
             ),
         )
@@ -315,14 +330,10 @@ def _payload_mapa_regional():
     paises = list(paises)
     criterios_ids_por_pais = {pais.pk: [] for pais in paises}
     pares_criterios = (
-        Experiencia.objects.filter(
-            status_publicacao=Experiencia.StatusPublicacao.PUBLICADO,
-            pais_id__in=criterios_ids_por_pais.keys(),
-            normas_internacionais__isnull=False,
-        )
-        .values_list("pais_id", "normas_internacionais__id")
+        NormaInternacionalPais.objects.filter(pais_id__in=criterios_ids_por_pais.keys())
+        .values_list("pais_id", "norma_id")
         .distinct()
-        .order_by("pais_id", "normas_internacionais__id")
+        .order_by("pais_id", "norma_id")
     )
     for pais_id, norma_id in pares_criterios:
         criterios_ids_por_pais[pais_id].append(norma_id)
@@ -528,6 +539,7 @@ def _contexto_perguntas(perguntas):
 
 
 STATUS_VISIVEIS_REVISAO = [
+    Experiencia.StatusPublicacao.RASCUNHO,
     Experiencia.StatusPublicacao.ENVIADO,
     Experiencia.StatusPublicacao.EM_REVISAO,
     Experiencia.StatusPublicacao.APROVADO,
@@ -891,8 +903,53 @@ def alternar_favorito(request, pk):
     return redirect(obter_destino_seguro(request, padrao="catalogo_experiencias"))
 
 
+def _ids_comparacao_seguros(valores):
+    ids = []
+    invalido = False
+    for valor in valores:
+        if (
+            not isinstance(valor, str)
+            or not valor
+            or len(valor) > 19
+            or not valor.isascii()
+            or not valor.isdecimal()
+        ):
+            invalido = True
+            continue
+        try:
+            identificador = int(valor)
+        except (TypeError, ValueError, OverflowError):
+            invalido = True
+            continue
+        if identificador <= 0 or identificador > 9223372036854775807 or identificador in ids:
+            invalido = True
+            continue
+        ids.append(identificador)
+    return ids, invalido
+
+
 def favoritos_experiencias(request):
     ids = favoritos_ids(request)
+    ids_comparacao_brutos = request.GET.getlist("comparar")
+    comparacao_solicitada = "comparar_submit" in request.GET or bool(ids_comparacao_brutos)
+    ids_comparacao, ids_malformados = _ids_comparacao_seguros(ids_comparacao_brutos)
+    comparacao_invalida = (
+        ids_malformados
+        or (comparacao_solicitada and not 2 <= len(ids_comparacao) <= 3)
+    )
+    experiencias_comparacao = Experiencia.objects.none()
+    if not comparacao_invalida and len(ids_comparacao) >= 2:
+        experiencias_comparacao = (
+            experiencias_publicas()
+            .filter(pk__in=set(ids_comparacao) & set(ids))
+            .select_related("efs", "pais", "tipo_experiencia", "setor")
+            .prefetch_related("temas_transversais", "normas_internacionais")
+            .order_by("pk")
+        )
+        if experiencias_comparacao.count() != len(ids_comparacao):
+            comparacao_invalida = True
+    if comparacao_invalida:
+        experiencias_comparacao = Experiencia.objects.none()
     experiencias = (
         experiencias_publicas()
         .filter(id__in=ids)
@@ -909,6 +966,9 @@ def favoritos_experiencias(request):
     contexto = {
         "experiencias": experiencias,
         "favoritos_ids": ids,
+        "ids_comparacao": ids_comparacao,
+        "experiencias_comparacao": experiencias_comparacao,
+        "comparacao_invalida": comparacao_invalida,
     }
     return render(request, "praticas/favoritos_experiencias.html", contexto)
 
@@ -1457,6 +1517,18 @@ def salvar_ferramenta_administrada(form, ferramenta, post_data):
     return ferramenta
 
 
+def validar_ferramenta_para_publicacao(ferramenta):
+    estado_anterior = ferramenta.situacao
+    try:
+        ferramenta.situacao = Ferramenta.Situacao.PUBLICADA
+        ferramenta.full_clean()
+    except ValidationError as exc:
+        return exc
+    finally:
+        ferramenta.situacao = estado_anterior
+    return None
+
+
 @login_required(login_url="login_usuario")
 def adicionar_boa_pratica(request):
     tipo_compartilhamento = (
@@ -1498,25 +1570,31 @@ def adicionar_boa_pratica(request):
             form.language_code = getattr(request, "LANGUAGE_CODE", "pt-br")
             if form.is_valid():
                 with transaction.atomic():
-                    salvar_ferramenta_submetida(
+                    ferramenta = salvar_ferramenta_submetida(
                         form,
                         request.user,
                         Ferramenta.Situacao.RASCUNHO
                         if acao == "rascunho"
-                        else Ferramenta.Situacao.ENVIADA,
+                        else Ferramenta.Situacao.PUBLICADA,
                     )
+                    if acao != "rascunho":
+                        transaction.on_commit(
+                            lambda: tentar_traduzir_ferramenta(
+                                ferramenta, ferramenta.idioma_submissao
+                            )
+                        )
                 messages.success(
                     request,
                     texto_idioma(
                         "Ferramenta salva como rascunho."
                         if acao == "rascunho"
-                        else "Ferramenta enviada para revisão.",
+                        else "Ferramenta publicada com sucesso.",
                         "Herramienta guardada como borrador."
                         if acao == "rascunho"
-                        else "Herramienta enviada para revisión.",
+                        else "Herramienta publicada correctamente.",
                         "Tool saved as a draft."
                         if acao == "rascunho"
-                        else "Tool submitted for review.",
+                        else "Tool published successfully.",
                     ),
                 )
                 if acao == "rascunho":
@@ -1624,16 +1702,6 @@ def editar_ferramenta(request, pk):
             ),
         )
         return redirect("meus_envios")
-    if not administrativa and ferramenta.situacao == Ferramenta.Situacao.PUBLICADA:
-        messages.error(
-            request,
-            texto_idioma(
-                "Ferramentas publicadas não podem ser alteradas por este fluxo.",
-                "Las herramientas publicadas no pueden modificarse mediante este flujo.",
-                "Published tools cannot be changed through this workflow.",
-            ),
-        )
-        return redirect("meus_envios")
     if not request.user.is_staff and ferramenta.situacao != Ferramenta.Situacao.RASCUNHO:
         messages.error(
             request,
@@ -1646,12 +1714,25 @@ def editar_ferramenta(request, pk):
         return redirect("meus_envios")
 
     proximo = obter_destino_seguro(request, padrao="painel_revisao") if administrativa else "meus_envios"
+    publicada = ferramenta.situacao == Ferramenta.Situacao.PUBLICADA
     acao = request.POST.get("acao_envio", "rascunho")
     obrigatorio_para_envio = acao != "rascunho"
     if request.method == "POST":
+        dados_post = request.POST.copy()
+        if ferramenta.situacao == Ferramenta.Situacao.PUBLICADA:
+            dados_atuais = dados_iniciais_ferramenta(ferramenta)
+            dados_post.setdefault("nome", dados_atuais["nome"])
+            dados_post.setdefault("ano", dados_atuais["ano"])
+            dados_post.setdefault("descricao", dados_atuais["descricao"])
+            dados_post.setdefault("setor", dados_atuais["setor"])
+            dados_post.setdefault("link_acesso", dados_atuais["link_acesso"])
+            dados_post.setdefault("pais_ou_instancia", dados_atuais["pais_ou_instancia"])
         form = FerramentaSubmissaoForm(
-            request.POST,
-            obrigatorio_para_envio=False if administrativa else obrigatorio_para_envio,
+            dados_post,
+            obrigatorio_para_envio=(
+                ferramenta.situacao == Ferramenta.Situacao.PUBLICADA
+                or (not administrativa and obrigatorio_para_envio)
+            ),
         )
         form.language_code = ferramenta.idioma_submissao
         if form.is_valid():
@@ -1662,10 +1743,22 @@ def editar_ferramenta(request, pk):
                     salvar_ferramenta_submetida(
                         form,
                         ferramenta.autor or request.user,
-                        Ferramenta.Situacao.RASCUNHO
+                        ferramenta.situacao
+                        if ferramenta.situacao == Ferramenta.Situacao.PUBLICADA
+                        else Ferramenta.Situacao.RASCUNHO
                         if acao == "rascunho"
-                        else Ferramenta.Situacao.ENVIADA,
+                        else Ferramenta.Situacao.PUBLICADA,
                         ferramenta=ferramenta,
+                    )
+                if (
+                    not administrativa
+                    and ferramenta.situacao == Ferramenta.Situacao.PUBLICADA
+                    and any(campo in form.changed_data for campo in ("nome", "descricao"))
+                ):
+                    transaction.on_commit(
+                        lambda: tentar_traduzir_ferramenta(
+                            ferramenta, ferramenta.idioma_submissao
+                        )
                     )
             messages.success(
                 request,
@@ -1674,17 +1767,17 @@ def editar_ferramenta(request, pk):
                     if administrativa
                     else "Rascunho da ferramenta atualizado."
                     if acao == "rascunho"
-                    else "Ferramenta enviada para revisão.",
+                    else "Ferramenta publicada com sucesso.",
                     "Cambios de la herramienta guardados."
                     if administrativa
                     else "Borrador de la herramienta actualizado."
                     if acao == "rascunho"
-                    else "Herramienta enviada para revisión.",
+                    else "Herramienta publicada correctamente.",
                     "Tool changes saved."
                     if administrativa
                     else "Tool draft updated."
                     if acao == "rascunho"
-                    else "Tool submitted for review.",
+                    else "Tool published successfully.",
                 ),
             )
             return redirect(proximo)
@@ -1702,6 +1795,7 @@ def editar_ferramenta(request, pk):
             "ferramenta": ferramenta,
             "edicao": True,
             "administrativa": administrativa,
+            "ferramenta_publicada": publicada,
             "destino_cancelamento": proximo,
             "tipo_compartilhamento": "ferramenta",
         },
@@ -1724,22 +1818,137 @@ def arquivar_ferramenta(request, pk):
                 ),
             )
             return redirect("arquivar_ferramenta", pk=ferramenta.pk)
-        if ferramenta.situacao != Ferramenta.Situacao.ARQUIVADA:
+        acao_status = request.POST.get("acao_status")
+        estados_legados = {
+            Ferramenta.Situacao.ENVIADA,
+            Ferramenta.Situacao.EM_REVISAO,
+            Ferramenta.Situacao.APROVADA,
+            Ferramenta.Situacao.REJEITADA,
+            Ferramenta.Situacao.RASCUNHO,
+        }
+        situacao_original = ferramenta.situacao
+        if acao_status not in {"arquivar", "recuperar", "publicar"}:
+            messages.error(
+                request,
+                texto_idioma(
+                    "Ação de status inválida.",
+                    "La acción de estado no es válida.",
+                    "Invalid status action.",
+                ),
+            )
+            return redirect(proximo)
+        if acao_status == "recuperar" and situacao_original == Ferramenta.Situacao.ARQUIVADA:
+            erro_validacao = validar_ferramenta_para_publicacao(ferramenta)
+            if erro_validacao:
+                messages.error(
+                    request,
+                    texto_idioma(
+                        "A ferramenta está incompleta e não pode ser publicada. Preencha todos os campos obrigatórios.",
+                        "La herramienta está incompleta y no puede publicarse. Complete todos los campos obligatorios.",
+                        "The tool is incomplete and cannot be published. Complete all required fields.",
+                    ),
+                )
+                return render(
+                    request,
+                    "praticas/arquivar_ferramenta.html",
+                    {
+                        "ferramenta": ferramenta,
+                        "destino_cancelamento": proximo,
+                        "acao_status": "recuperar",
+                        "publicacao_valida": False,
+                    },
+                    status=400,
+                )
+            ferramenta.situacao = Ferramenta.Situacao.PUBLICADA
+        elif acao_status == "publicar" and situacao_original in estados_legados:
+            erro_validacao = validar_ferramenta_para_publicacao(ferramenta)
+            if erro_validacao:
+                messages.error(
+                    request,
+                    texto_idioma(
+                        "A ferramenta está incompleta e não pode ser publicada. Preencha todos os campos obrigatórios.",
+                        "La herramienta está incompleta y no puede publicarse. Complete todos los campos obligatorios.",
+                        "The tool is incomplete and cannot be published. Complete all required fields.",
+                    ),
+                )
+                return render(
+                    request,
+                    "praticas/arquivar_ferramenta.html",
+                    {
+                        "ferramenta": ferramenta,
+                        "destino_cancelamento": proximo,
+                        "acao_status": "publicar",
+                        "publicacao_valida": False,
+                    },
+                    status=400,
+                )
+            ferramenta.situacao = Ferramenta.Situacao.PUBLICADA
+        elif acao_status == "arquivar" and situacao_original == Ferramenta.Situacao.PUBLICADA:
             ferramenta.situacao = Ferramenta.Situacao.ARQUIVADA
+        else:
+            messages.error(
+                request,
+                texto_idioma(
+                    "Ação de status incompatível com a situação atual.",
+                    "La acción de estado no corresponde a la situación actual.",
+                    "Status action is incompatible with the current state.",
+                ),
+            )
+            return redirect(proximo)
+        with transaction.atomic():
             ferramenta.save(update_fields=["situacao", "atualizado_em"])
+            if ferramenta.situacao == Ferramenta.Situacao.PUBLICADA:
+                transaction.on_commit(
+                    lambda ferramenta=ferramenta, idioma=ferramenta.idioma_submissao: tentar_traduzir_ferramenta(
+                        ferramenta, idioma
+                    )
+                )
         messages.success(
             request,
             texto_idioma(
-                "Ferramenta arquivada com sucesso.",
-                "Herramienta archivada correctamente.",
-                "Tool archived successfully.",
+                "Ferramenta recuperada e publicada com sucesso."
+                if acao_status == "recuperar"
+                else "Ferramenta publicada com sucesso."
+                if acao_status == "publicar"
+                else "Ferramenta arquivada com sucesso.",
+                "Herramienta restaurada y publicada correctamente."
+                if acao_status == "recuperar"
+                else "Herramienta publicada correctamente."
+                if acao_status == "publicar"
+                else "Herramienta archivada correctamente.",
+                "Tool restored and published successfully."
+                if acao_status == "recuperar"
+                else "Tool published successfully."
+                if acao_status == "publicar"
+                else "Tool archived successfully.",
             ),
         )
         return redirect(proximo)
+    publicacao_valida = True
+    if ferramenta.situacao in {
+        Ferramenta.Situacao.RASCUNHO,
+        Ferramenta.Situacao.ENVIADA,
+        Ferramenta.Situacao.EM_REVISAO,
+        Ferramenta.Situacao.APROVADA,
+        Ferramenta.Situacao.REJEITADA,
+        Ferramenta.Situacao.ARQUIVADA,
+    }:
+        publicacao_valida = validar_ferramenta_para_publicacao(ferramenta) is None
     return render(
         request,
         "praticas/arquivar_ferramenta.html",
-        {"ferramenta": ferramenta, "destino_cancelamento": proximo},
+         {
+             "ferramenta": ferramenta,
+             "destino_cancelamento": proximo,
+             "acao_status": (
+                 "recuperar"
+                 if ferramenta.situacao == Ferramenta.Situacao.ARQUIVADA
+                 else "arquivar"
+                 if ferramenta.situacao == Ferramenta.Situacao.PUBLICADA
+                 else "publicar"
+             ),
+             "publicacao_valida": publicacao_valida,
+         },
     )
 
 
@@ -2216,13 +2425,33 @@ def painel_revisao(request):
         .select_related("setor", "autor", "lote_origem")
         .order_by("-atualizado_em", "-pk")
     )
+    if termo:
+        ferramentas = ferramentas.filter(
+            Q(titulo__icontains=termo)
+            | Q(titulo_es__icontains=termo)
+            | Q(titulo_en__icontains=termo)
+            | Q(descricao__icontains=termo)
+            | Q(descricao_es__icontains=termo)
+            | Q(descricao_en__icontains=termo)
+            | Q(responsavel__icontains=termo)
+            | Q(pais_ou_instancia__icontains=termo)
+            | Q(codigo__icontains=termo)
+            | Q(autor__username__icontains=termo)
+            | Q(autor__email__icontains=termo)
+            | Q(setor__nome__icontains=termo)
+            | Q(setor__nome_es__icontains=termo)
+            | Q(setor__nome_en__icontains=termo)
+            | Q(ano__icontains=termo)
+        )
 
     contadores = {
         "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
         "em_revisao": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.EM_REVISAO).count(),
         "aprovado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.APROVADO).count(),
-        "publicado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.PUBLICADO).count(),
-        "arquivado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ARQUIVADO).count(),
+        "publicado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.PUBLICADO).count()
+        + Ferramenta.objects.filter(situacao=Ferramenta.Situacao.PUBLICADA).count(),
+        "arquivado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ARQUIVADO).count()
+        + Ferramenta.objects.filter(situacao=Ferramenta.Situacao.ARQUIVADA).count(),
         "rejeitado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.REJEITADO).count(),
         "edicoes_pendentes": PropostaEdicaoExperiencia.objects.filter(status=PropostaEdicaoExperiencia.Status.PENDENTE).count(),
     }
@@ -2365,6 +2594,12 @@ def arquivar_boa_pratica(request, pk):
         )
         return redirect("meus_envios")
 
+    if experiencia.status_publicacao not in {
+        Experiencia.StatusPublicacao.PUBLICADO,
+        Experiencia.StatusPublicacao.ARQUIVADO,
+    }:
+        return redirect("painel_revisao" if request.user.is_staff else "meus_envios")
+
     if request.method == "POST":
         if request.POST.get("confirmar_arquivamento") != "sim":
             messages.error(
@@ -2377,15 +2612,42 @@ def arquivar_boa_pratica(request, pk):
             )
             return redirect("arquivar_boa_pratica", pk=experiencia.pk)
 
-        if experiencia.status_publicacao != Experiencia.StatusPublicacao.ARQUIVADO:
-            experiencia.status_publicacao = Experiencia.StatusPublicacao.ARQUIVADO
-            experiencia.save(update_fields=["status_publicacao", "atualizado_em"])
-        messages.success(
-            request,
-            texto_idioma(
+        acao_status = request.POST.get("acao_status")
+        estado_atual = experiencia.status_publicacao
+        transicoes = {
+            (Experiencia.StatusPublicacao.PUBLICADO, "arquivar"): Experiencia.StatusPublicacao.ARQUIVADO,
+            (Experiencia.StatusPublicacao.ARQUIVADO, "recuperar"): Experiencia.StatusPublicacao.PUBLICADO,
+        }
+        novo_status = transicoes.get((estado_atual, acao_status))
+        if novo_status is None:
+            messages.error(
+                request,
+                texto_idioma(
+                    "Ação de status inválida para esta boa prática.",
+                    "La acción de estado no es válida para esta buena práctica.",
+                    "Status action is invalid for this good practice.",
+                ),
+            )
+            return redirect(proximo or ("painel_revisao" if request.user.is_staff else "meus_envios"))
+        experiencia.status_publicacao = novo_status
+        experiencia.save(update_fields=["status_publicacao", "atualizado_em"])
+        mensagens_status = (
+            (
+                "Boa prática recuperada e publicada com sucesso.",
+                "Buena práctica restaurada y publicada correctamente.",
+                "Good practice restored and published successfully.",
+            )
+            if acao_status == "recuperar"
+            else (
                 "Boa prática arquivada com sucesso.",
                 "Buena práctica archivada correctamente.",
                 "Good practice archived successfully.",
+            )
+        )
+        messages.success(
+            request,
+            texto_idioma(
+                *mensagens_status,
             ),
         )
         destino_padrao = "painel_revisao" if request.user.is_staff else "meus_envios"
@@ -2468,6 +2730,10 @@ def ferramentas(request):
             | Q(setor__nome__icontains=termo)
             | Q(setor__nome_es__icontains=termo)
             | Q(setor__nome_en__icontains=termo)
+            | Q(codigo__icontains=termo)
+            | Q(autor__username__icontains=termo)
+            | Q(autor__email__icontains=termo)
+            | Q(ano__icontains=termo)
         )
 
     recursos = list(recursos.distinct())
