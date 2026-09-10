@@ -1,5 +1,22 @@
 # Changelog da base Codex
 
+## NEG-7C — Fechamento das pendências da auditoria
+
+- endurecida a comparação de favoritos, as transições de ferramentas e a validação de recuperação;
+- traduções ausentes de ferramentas são agendadas após publicações, preservando conteúdo curado;
+- associado o auxílio de teclado ao mapa regional com referência ARIA única.
+
+## NEG-7B — correções pós-homologação — 2026-09-09
+
+- Ferramentas publicadas passam a preservar o idioma original, preencher
+  traduções ausentes de forma best-effort e exigir campos completos em toda
+  edição ou publicação.
+- A comparação de favoritos ganhou normas internacionais, validação explícita
+  da seleção e foco acessível no quadro comparativo; o mapa recebeu orientação
+  trilíngue de teclado.
+- A confirmação de boas práticas passou a informar publicação imediata no
+  catálogo, sem texto de revisão ou aprovação.
+
 ## NEG-6A — responsável no envio de ferramentas — 2026-09-08
 
 - Atualizado visualmente “País ou Instância” para “Responsável”, com texto explicativo trilíngue.
@@ -127,3 +144,8 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 # 2026-08-11 — Fase 2I: gate de prontidão para homologação
 
 - Atualizado o diagnóstico por ambiente para separar falhas críticas, avisos de HTTPS/HSTS e dependências institucionais, com propagação testada pelo gate consolidado.
+## 2026-09-09 — NEG-7D: correções pós-auditoria
+
+- Tornado o arquivamento de boas práticas estritamente orientado por ação e estado, com mensagens localizadas e sem escrita em rejeições.
+- Localizados os status do painel nos três idiomas e removidas ações de status inoperantes para estados históricos.
+- Reforçados testes de publicação, recuperação, comparação de favoritos, mapa acessível e preservação de traduções.

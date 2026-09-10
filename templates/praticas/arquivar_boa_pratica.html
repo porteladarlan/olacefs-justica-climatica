@@ -2,21 +2,21 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Restore good practice{% elif LANGUAGE_CODE == 'es' %}Restaurar buena práctica{% else %}Recuperar boa prática{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
 <section class="mb-4">
     <div class="section-kicker">{% if LANGUAGE_CODE == 'en' %}Administrative archive{% elif LANGUAGE_CODE == 'es' %}Archivo administrativo{% else %}Arquivamento administrativo{% endif %}</div>
-    <h1 class="page-title mb-2">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</h1>
+    <h1 class="page-title mb-2">{% if experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Restore good practice{% elif LANGUAGE_CODE == 'es' %}Restaurar buena práctica{% else %}Recuperar boa prática{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}{% endif %}</h1>
     <p class="section-subtitle mb-0">
-        {% if LANGUAGE_CODE == 'en' %}This action removes the practice from the public catalog while preserving its record, attachments, relationships and history.{% elif LANGUAGE_CODE == 'es' %}Esta acción retira la práctica del catálogo público y conserva el registro, los anexos, las relaciones y el historial.{% else %}Esta ação retira a prática do catálogo público, mas preserva o registro, os anexos, os relacionamentos e o histórico.{% endif %}
+        {% if experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}This action restores the good practice to the public catalog while preserving its record, attachments, relationships and history.{% elif LANGUAGE_CODE == 'es' %}Esta acción restaura la buena práctica en el catálogo público y conserva el registro, los anexos, las relaciones y el historial.{% else %}Esta ação recupera a boa prática para o catálogo público e preserva o registro, os anexos, os relacionamentos e o histórico.{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}This action archives the good practice from the public catalog while preserving its record, attachments, relationships and history.{% elif LANGUAGE_CODE == 'es' %}Esta acción archiva la buena práctica del catálogo público y conserva el registro, los anexos, las relaciones y el historial.{% else %}Esta ação arquiva a boa prática do catálogo público e preserva o registro, os anexos, os relacionamentos e o histórico.{% endif %}{% endif %}
     </p>
 </section>
 
 <section class="detail-section mb-4">
-    <div class="alert alert-warning mb-4">
+    <div class="alert {% if experiencia.status_publicacao == 'arquivado' %}alert-success{% else %}alert-warning{% endif %} mb-4">
         <strong>{% if LANGUAGE_CODE == 'en' %}Attention:{% elif LANGUAGE_CODE == 'es' %}Atención:{% else %}Atenção:{% endif %}</strong>
-        {% if LANGUAGE_CODE == 'en' %}the practice will remain available in management and in your submissions.{% elif LANGUAGE_CODE == 'es' %}la práctica permanecerá disponible en la gestión y en sus envíos.{% else %}a prática permanecerá disponível no gerenciamento e em seus envios.{% endif %}
+        {% if experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}the good practice will become public again and remain available in management and in your submissions.{% elif LANGUAGE_CODE == 'es' %}la buena práctica volverá a ser pública y permanecerá disponible en la gestión y en sus envíos.{% else %}a boa prática voltará a ser pública e permanecerá disponível no gerenciamento e em seus envios.{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}the good practice will remain available in management and in your submissions.{% elif LANGUAGE_CODE == 'es' %}la buena práctica permanecerá disponible en la gestión y en sus envíos.{% else %}a boa prática permanecerá disponível no gerenciamento e em seus envios.{% endif %}{% endif %}
     </div>
 
     <h2 class="section-title h4 mb-2">{{ experiencia.titulo_exibicao }}</h2>
@@ -25,14 +25,15 @@
     <div class="text-muted small mb-4">
         <strong>EFS:</strong> {{ experiencia.efs.nome_exibicao }} &bull;
         <strong>{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}:</strong> {{ experiencia.pais.nome_exibicao }} &bull;
-        <strong>{% if LANGUAGE_CODE == 'en' %}Status{% elif LANGUAGE_CODE == 'es' %}Estado{% else %}Situação{% endif %}:</strong> {{ experiencia.get_status_publicacao_display }}
+        <strong>{% if LANGUAGE_CODE == 'en' %}Status{% elif LANGUAGE_CODE == 'es' %}Estado{% else %}Situação{% endif %}:</strong> {% if experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}{% elif experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}{% endif %}
     </div>
 
     <form method="post" class="d-flex flex-column flex-sm-row gap-2">
         {% csrf_token %}
         <input type="hidden" name="confirmar_arquivamento" value="sim">
+        <input type="hidden" name="acao_status" value="{% if experiencia.status_publicacao == 'arquivado' %}recuperar{% else %}arquivar{% endif %}">
         <input type="hidden" name="next" value="{{ destino_cancelamento|default:'' }}">
-        <button type="submit" class="btn btn-danger">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</button>
+        <button type="submit" class="btn {% if experiencia.status_publicacao == 'arquivado' %}btn-success{% else %}btn-danger{% endif %}">{% if experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Restore / Publish{% elif LANGUAGE_CODE == 'es' %}Restaurar / Publicar{% else %}Recuperar / Publicar{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}{% endif %}</button>
         <a href="{% if destino_cancelamento %}{{ destino_cancelamento }}{% else %}{% url 'meus_envios' %}{% endif %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Cancel{% elif LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancelar{% endif %}</a>
     </form>
 </section>

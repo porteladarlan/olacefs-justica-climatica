@@ -14,14 +14,18 @@ from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import finders
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import override
+from django.utils.translation import activate, deactivate, override
 
 from .forms import ExperienciaSubmissaoForm
-from .models import EFS, Experiencia, NormaInternacional, Pais, Setor, TipoExperiencia
+from .models import EFS, Experiencia, NormaInternacional, NormaInternacionalPais, Pais, Setor, TipoExperiencia
 from .views import MAPA_REGIONAL_ISO3_PARA_GEO_ID, _payload_mapa_regional
 
 
 class MapaRegionalTests(TestCase):
+    def setUp(self):
+        activate("pt-br")
+        self.addCleanup(deactivate)
+
     @classmethod
     def setUpTestData(cls):
         cls.autor = get_user_model().objects.create_user(
@@ -99,6 +103,8 @@ class MapaRegionalTests(TestCase):
             nome_es="Marco vinculado solo a borrador",
             nome_en="Draft-only framework",
         )
+        NormaInternacionalPais.objects.create(norma=cls.norma_publica, pais=cls.brasil, status="Aplicável")
+        NormaInternacionalPais.objects.create(norma=cls.norma_publica, pais=cls.argentina, status="Aplicable")
         cls.publicada_brasil = cls._criar_experiencia(
             "Experiência pública brasileira",
             cls.efs_brasil,
@@ -381,7 +387,7 @@ class MapaRegionalTests(TestCase):
 
     def test_nomenclatura_publica_de_entidades_fiscalizadoras_e_trilingue(self):
         casos = (
-            ("/", "Entidades Fiscalizadoras", "Entidades fiscalizadoras do pa&iacute;s selecionado", "Selecione um pa&iacute;s para consultar suas entidades fiscalizadoras e registros dispon&iacute;veis.", "Experi&ecirc;ncias registradas no pa&iacute;s"),
+            ("/", "Entidades Fiscalizadoras", "Entidades fiscalizadoras do país selecionado", "Selecione um pa&iacute;s para consultar suas entidades fiscalizadoras e registros dispon&iacute;veis.", "Experi&ecirc;ncias registradas no pa&iacute;s"),
             ("/es/", "Entidades Fiscalizadoras", "Entidades fiscalizadoras del pa&iacute;s seleccionado", "Selecciona un pa&iacute;s para consultar sus entidades fiscalizadoras y registros disponibles.", "Experiencias registradas en el pa&iacute;s"),
             ("/en/", "Audit institutions", "Audit institutions in the selected country", "Select one country to view its audit institutions and available records.", "Experiences registered in the country"),
         )

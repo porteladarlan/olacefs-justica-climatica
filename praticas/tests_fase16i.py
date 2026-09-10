@@ -83,7 +83,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
 
         resposta = self.client.post(
             reverse("excluir_boa_pratica", args=[experiencia.pk]),
-            {"confirmar_arquivamento": "sim"},
+            {"confirmar_arquivamento": "sim", "acao_status": "arquivar"},
         )
         self.assertIn(resposta.status_code, [302, 403])
         self.assertTrue(Experiencia.objects.filter(pk=experiencia.pk).exists())
@@ -127,7 +127,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         self.client.login(username="admin_fase16i", password="SenhaForte123!")
         resposta = self.client.post(
             reverse("excluir_boa_pratica", args=[experiencia.pk]),
-            {"confirmar_arquivamento": "sim"},
+            {"confirmar_arquivamento": "sim", "acao_status": "arquivar"},
         )
         self.assertEqual(resposta.status_code, 302)
         experiencia.refresh_from_db()
@@ -156,7 +156,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
             reverse("arquivar_boa_pratica", args=[experiencia.pk]),
         )
 
-    def test_painel_de_revisao_exibe_acao_de_exclusao(self):
+    def test_painel_de_revisao_oculta_acao_de_status_para_historico(self):
         experiencia = self.criar_experiencia(
             status=Experiencia.StatusPublicacao.ENVIADO
         )
@@ -165,7 +165,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
         resposta = self.client.get(reverse("painel_revisao"))
 
         self.assertEqual(resposta.status_code, 200)
-        self.assertContains(
+        self.assertNotContains(
             resposta,
             reverse("arquivar_boa_pratica", args=[experiencia.pk]),
         )
@@ -227,7 +227,7 @@ class ExclusaoAdminBoaPraticaTests(TestCase):
                     )
                 resposta = self.client.post(
                     url,
-                    {"confirmar_arquivamento": "sim"},
+                    {"confirmar_arquivamento": "sim", "acao_status": "arquivar"},
                     follow=True,
                 )
                 self.assertEqual(resposta.status_code, 200)

@@ -79,7 +79,7 @@ class FluxoSubmissaoRevisaoAutorTests(TestCase):
         resposta = self.client.get(reverse("meus_envios"))
         self.assertContains(resposta, "Rascunho visível ao autor")
 
-    def test_rascunho_nao_aparece_para_revisor_no_painel(self):
+    def test_rascunho_aparece_para_revisor_no_painel_com_status_localizado(self):
         Experiencia.objects.create(
             autor=self.autor,
             titulo="Rascunho privado 16J",
@@ -112,8 +112,8 @@ class FluxoSubmissaoRevisaoAutorTests(TestCase):
         resposta = self.client.get(reverse("painel_revisao"))
         self.assertEqual(resposta.status_code, 200)
         self.assertContains(resposta, "Enviado para revisão 16J")
-        self.assertNotContains(resposta, "Rascunho privado 16J")
-        self.assertNotContains(resposta, "Rascunho")
+        self.assertContains(resposta, "Rascunho privado 16J")
+        self.assertContains(resposta, "Rascunho")
 
     def test_outro_usuario_nao_acessa_edicao_do_envio_do_autor(self):
         experiencia = Experiencia.objects.create(

@@ -119,7 +119,7 @@ class FluxoRevisaoAprovacaoTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
-        self.assertIn("Good practice management", conteudo)
+        self.assertIn("Submission management", conteudo)
         self.assertIn('data-status-metric="publicado"', conteudo)
         self.assertIn('class="status-pill status-enviado"', conteudo)
         self.assertNotIn("Review published content edits", conteudo)
@@ -205,21 +205,21 @@ class FluxoRevisaoAprovacaoTests(TestCase):
             (
                 "/painel-revisao/",
                 "Busca geral",
-                "Nome da boa prática, país, EFS, e-mail ou responsável",
+                "Boas práticas ou ferramentas: nome, país, EFS, e-mail ou responsável",
                 "Buscar",
                 "Limpar",
             ),
             (
                 "/es/painel-revisao/",
                 "Búsqueda general",
-                "Nombre de la buena práctica, país, EFS, correo o responsable",
+                "Buenas prácticas o herramientas: nombre, país, EFS, correo o responsable",
                 "Buscar",
                 "Limpiar",
             ),
             (
                 "/en/painel-revisao/",
                 "General search",
-                "Good practice name, country, SAI, e-mail or responsible person",
+                "Good practices or tools: name, country, SAI, e-mail or responsible person",
                 "Search",
                 "Clear",
             ),
