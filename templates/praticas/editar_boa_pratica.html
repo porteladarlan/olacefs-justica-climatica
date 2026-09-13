@@ -257,7 +257,7 @@
     {% endif %}
 
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'status_envio' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to status{% elif LANGUAGE_CODE == 'es' %}Volver al estado{% else %}Voltar ao status{% endif %}</a>
+        <a href="{% if request.user.is_staff %}{% url 'painel_revisao' %}{% else %}{% url 'meus_envios' %}{% endif %}" class="btn btn-outline-secondary">{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}Back to submission management{% elif LANGUAGE_CODE == 'es' %}Volver a la gesti&oacute;n de env&iacute;os{% else %}Voltar ao gerenciamento de submiss&otilde;es{% endif %}{% elif LANGUAGE_CODE == 'en' %}Back to my submissions{% elif LANGUAGE_CODE == 'es' %}Volver a mis env&iacute;os{% else %}Voltar aos meus envios{% endif %}</a>
         {% if experiencia.status_publicacao == 'publicado' or experiencia.status_publicacao == 'arquivado' %}
             <button type="submit" name="acao_envio" value="enviar" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Save changes{% elif LANGUAGE_CODE == 'es' %}Guardar cambios{% else %}Salvar altera&ccedil;&otilde;es{% endif %}</button>
         {% else %}

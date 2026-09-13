@@ -565,10 +565,8 @@ def queryset_meus_envios(usuario):
     if not usuario or not usuario.is_authenticated:
         return Experiencia.objects.none()
 
-    queryset = Experiencia.objects.all() if usuario.is_staff else Experiencia.objects.filter(autor=usuario)
-
     return (
-        queryset
+        Experiencia.objects.filter(autor=usuario)
         .select_related("efs", "pais", "tipo_experiencia", "setor")
         .order_by("-atualizado_em")
     )
@@ -848,12 +846,16 @@ def logout_usuario(request):
 @login_required(login_url="login_usuario")
 def meus_envios(request):
     experiencias = queryset_meus_envios(request.user)
-    ferramentas = Ferramenta.objects.all() if request.user.is_staff else Ferramenta.objects.filter(autor=request.user)
-    ferramentas = ferramentas.select_related("setor").order_by("-atualizado_em")
-    propostas = PropostaEdicaoExperiencia.objects.select_related("experiencia")
-    if not request.user.is_staff:
-        propostas = propostas.filter(experiencia__autor=request.user)
-    propostas = propostas.order_by("-atualizado_em")
+    ferramentas = (
+        Ferramenta.objects.filter(autor=request.user)
+        .select_related("setor")
+        .order_by("-atualizado_em")
+    )
+    propostas = (
+        PropostaEdicaoExperiencia.objects.filter(experiencia__autor=request.user)
+        .select_related("experiencia")
+        .order_by("-atualizado_em")
+    )
     return render(
         request,
         "praticas/meus_envios.html",
@@ -1287,7 +1289,7 @@ def normas_internacionais(request):
         "paises_status__pais"
     )
     if termo:
-        normas = normas.filter(
+        filtro_termo = (
             Q(nome__icontains=termo)
             | Q(nome_es__icontains=termo)
             | Q(nome_en__icontains=termo)
@@ -1303,7 +1305,13 @@ def normas_internacionais(request):
             | Q(cobertura_paises__icontains=termo)
             | Q(cobertura_paises_es__icontains=termo)
             | Q(cobertura_paises_en__icontains=termo)
+            | Q(ano_texto__icontains=termo)
         )
+        if termo.isascii() and termo.isdecimal():
+            ano_pesquisado = int(termo)
+            if 0 < ano_pesquisado <= 2_147_483_647:
+                filtro_termo |= Q(ano=ano_pesquisado)
+        normas = normas.filter(filtro_termo)
 
     if paises_selecionados:
         normas = normas.filter(
@@ -2070,7 +2078,7 @@ def editar_boa_pratica(request, pk):
                         )
                     )
             messages.success(request, mensagem)
-            return redirect("painel_revisao") if request.user.is_staff else redirect("status_envio")
+            return redirect("painel_revisao") if request.user.is_staff else redirect("meus_envios")
         adicionar_erros_anexos_ao_formulario(form, erros_anexos)
     else:
         idioma = idioma_original_interface(request)
@@ -2369,23 +2377,8 @@ def confirmacao_envio(request):
 
 @login_required(login_url="login_usuario")
 def status_envio(request):
-    experiencias = queryset_meus_envios(request.user)
-    ferramentas = Ferramenta.objects.all() if request.user.is_staff else Ferramenta.objects.filter(autor=request.user)
-    ferramentas = ferramentas.select_related("setor").order_by("-atualizado_em")
-    propostas = PropostaEdicaoExperiencia.objects.select_related("experiencia")
-    if not request.user.is_staff:
-        propostas = propostas.filter(experiencia__autor=request.user)
-    propostas = propostas.order_by("-atualizado_em")
-
-    return render(
-        request,
-        "praticas/status_envio.html",
-        {
-            "experiencias": experiencias,
-            "ferramentas_enviadas": ferramentas,
-            "propostas": propostas,
-        },
-    )
+    destino = "painel_revisao" if request.user.is_staff else "meus_envios"
+    return redirect(destino)
 
 
 @staff_member_required

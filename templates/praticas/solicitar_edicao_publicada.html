@@ -56,7 +56,7 @@
     </div>
 
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-end">
-        <a href="{% url 'status_envio' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back{% elif LANGUAGE_CODE == 'es' %}Volver{% else %}Voltar{% endif %}</a>
+        <a href="{% url 'meus_envios' %}" class="btn btn-outline-secondary">{% if LANGUAGE_CODE == 'en' %}Back to my submissions{% elif LANGUAGE_CODE == 'es' %}Volver a mis env&iacute;os{% else %}Voltar aos meus envios{% endif %}</a>
         <button type="submit" class="btn btn-primary">{% if LANGUAGE_CODE == 'en' %}Submit edit request{% elif LANGUAGE_CODE == 'es' %}Enviar solicitud de edici&oacute;n{% else %}Enviar solicita&ccedil;&atilde;o de edi&ccedil;&atilde;o{% endif %}</button>
     </div>
 </form>

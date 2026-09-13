@@ -5,7 +5,7 @@
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Review submission{% elif LANGUAGE_CODE == 'es' %}Revisar envío{% else %}Revisar envio{% endif %} | {{ experiencia.titulo_exibicao }}{% endblock %}
 
 {% block content %}
-<a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de revisión{% else %}Voltar ao painel de revisão{% endif %}</a>
+<a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to submission management{% elif LANGUAGE_CODE == 'es' %}Volver a la gestión de envíos{% else %}Voltar ao gerenciamento de submissões{% endif %}</a>
 
 <section class="page-hero mb-4">
     <div class="hero-content">

@@ -86,14 +86,39 @@ class FidelidadeMeuEspacoTests(TestCase):
             ),
         )
         for prefixo, estado_vazio, cta in casos:
-            for nome in ("meus_envios", "status_envio"):
-                with self.subTest(prefixo=prefixo, nome=nome):
-                    response = self.client.get(self._localized_url(prefixo, nome))
-                    self.assertEqual(response.status_code, 200)
-                    self.assertContains(response, estado_vazio)
-                    self.assertContains(response, cta)
-                    self.assertNotContains(response, "vinculados ao e-mail")
-                    self.assertNotContains(response, "linked to the e-mail")
+            with self.subTest(prefixo=prefixo):
+                response = self.client.get(self._localized_url(prefixo, "meus_envios"))
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, estado_vazio)
+                self.assertContains(response, cta)
+                self.assertNotContains(response, "vinculados ao e-mail")
+                self.assertNotContains(response, "linked to the e-mail")
+
+    def test_status_legado_redireciona_conforme_o_perfil_e_idioma(self):
+        self.client.force_login(self.usuario)
+        for prefixo in ("", "/es", "/en"):
+            with self.subTest(prefixo=prefixo, perfil="autor"):
+                response = self.client.get(self._localized_url(prefixo, "status_envio"))
+                self.assertRedirects(
+                    response,
+                    self._localized_url(prefixo, "meus_envios"),
+                    fetch_redirect_response=False,
+                )
+
+        staff = get_user_model().objects.create_user(
+            username="staff-fidelidade-espaco",
+            password="SenhaForte123!",
+            is_staff=True,
+        )
+        self.client.force_login(staff)
+        for prefixo in ("", "/es", "/en"):
+            with self.subTest(prefixo=prefixo, perfil="staff"):
+                response = self.client.get(self._localized_url(prefixo, "status_envio"))
+                self.assertRedirects(
+                    response,
+                    self._localized_url(prefixo, "painel_revisao"),
+                    fetch_redirect_response=False,
+                )
 
     def test_formulario_de_envio_preserva_contratos_reais(self):
         self.client.force_login(self.usuario)

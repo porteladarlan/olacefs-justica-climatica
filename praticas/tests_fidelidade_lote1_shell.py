@@ -147,10 +147,10 @@ class ShellGlobalLote1Tests(TestCase):
             "ferramentas",
             "login_usuario",
             "registrar_usuario",
-            "status_envio",
         ):
             with self.subTest(url_name=url_name):
                 self.assertIn(f'href="{reverse(url_name)}"', shell)
+        self.assertNotIn(f'href="{reverse("status_envio")}"', shell)
 
         self.client.force_login(self.staff)
         staff_shell = self.shell_html(self.client.get(reverse("pagina_inicial")))
@@ -216,14 +216,18 @@ class ShellGlobalLote1Tests(TestCase):
 
     def test_meu_espaco_ativo_em_rotas_autenticadas_relacionadas(self):
         self.client.force_login(self.usuario)
-        for url_name in ("meus_envios", "status_envio"):
-            with self.subTest(url_name=url_name):
-                response = self.client.get(reverse(url_name))
-                self.assertEqual(response.status_code, 200)
-                current = self.current_elements(response)
-                self.assertEqual(len(current), 1)
-                self.assertEqual(current[0][1]["href"], reverse(url_name))
-                self.assertIn("header-space-button nav-section-current", self.shell_html(response))
+        response = self.client.get(reverse("meus_envios"))
+        self.assertEqual(response.status_code, 200)
+        current = self.current_elements(response)
+        self.assertEqual(len(current), 1)
+        self.assertEqual(current[0][1]["href"], reverse("meus_envios"))
+        self.assertIn("header-space-button nav-section-current", self.shell_html(response))
+
+        self.assertRedirects(
+            self.client.get(reverse("status_envio")),
+            reverse("meus_envios"),
+            fetch_redirect_response=False,
+        )
 
         response = self.client.get(reverse("adicionar_boa_pratica"))
         self.assertEqual(response.status_code, 200)
@@ -257,7 +261,7 @@ class ShellGlobalLote1Tests(TestCase):
         self.assertIn("&lt;img", shell)
         self.assertNotIn('<img src=x onerror="alert(1)">', shell)
         self.assertIn(f'href="{reverse("meus_envios")}"', shell)
-        self.assertIn(f'href="{reverse("status_envio")}"', shell)
+        self.assertNotIn(f'href="{reverse("status_envio")}"', shell)
         self.assertIn(f'href="{reverse("favoritos_experiencias")}"', shell)
         self.assertIn(f'href="{reverse("logout_usuario")}"', shell)
         self.assertNotIn(f'href="{reverse("login_usuario")}"', shell)
@@ -276,6 +280,20 @@ class ShellGlobalLote1Tests(TestCase):
                 self.assertIn(f'href="{reverse("painel_revisao")}"', staff_shell)
                 self.assertNotIn(f'href="{reverse("painel_revisao_edicoes")}"', staff_shell)
                 self.assertIn(f'href="{reverse("admin:index")}"', staff_shell)
+
+    def test_gerenciamento_de_submissoes_usa_rotulo_trilingue_no_menu_staff(self):
+        self.client.force_login(self.staff)
+        for caminho, rotulo in (
+            ("/", "Gerenciamento de submissões"),
+            ("/es/", "Gestión de envíos"),
+            ("/en/", "Submission management"),
+        ):
+            with self.subTest(caminho=caminho):
+                shell = unescape(self.shell_html(self.client.get(caminho)))
+                self.assertIn(rotulo, shell)
+                self.assertNotIn("Painel de revisão", shell)
+                self.assertNotIn("Panel de revisión", shell)
+                self.assertNotIn("Review panel", shell)
 
     def test_seletor_de_idioma_tem_allowlist_e_opcao_atual(self):
         for path, selected_value, label in (

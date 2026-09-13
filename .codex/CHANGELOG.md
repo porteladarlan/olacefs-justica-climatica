@@ -149,3 +149,12 @@ Base criada com contexto, delta do protótipo, infraestrutura Hetzner, SSDLC/BSI
 - Tornado o arquivamento de boas práticas estritamente orientado por ação e estado, com mensagens localizadas e sem escrita em rejeições.
 - Localizados os status do painel nos três idiomas e removidas ações de status inoperantes para estados históricos.
 - Reforçados testes de publicação, recuperação, comparação de favoritos, mapa acessível e preservação de traduções.
+
+## 2026-09-13 — NEG-7 pós-deploy: consolidação do Meu Espaço
+
+- Consolidada a consulta do autor em `Meus envios`; a rota legada `status-envio` permanece autenticada e redireciona o autor para `Meus envios` e staff para `Gerenciamento de submissões`.
+- Removida do menu a opção duplicada `Status dos envios` e padronizado o nome administrativo em PT, ES e EN.
+- `Meus envios` passou a exibir somente registros do próprio autor, inclusive quando o usuário também possui perfil staff; a visão global continua exclusiva do gerenciamento.
+- Links internos e notificações passaram a apontar diretamente para os destinos consolidados.
+- A pesquisa de Marcos Normativos passou a considerar o campo numérico `ano` e o campo textual `ano_texto`, sem migration.
+- Adicionada cobertura de regressão para busca anual, isolamento por autoria, compatibilidade da rota antiga e nomenclatura trilíngue.

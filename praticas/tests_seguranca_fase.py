@@ -210,28 +210,46 @@ class SegurancaFaseTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("login_usuario"), response.url)
 
-    def test_status_ignora_email_e_exibe_somente_objetos_do_usuario(self):
+    def test_status_legado_ignora_email_e_redireciona_para_meus_envios(self):
         self.client.force_login(self.outro)
         response = self.client.get(
             reverse("status_envio"),
             {"email_contato": self.rascunho.email_contato},
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(
+            response,
+            reverse("meus_envios"),
+            fetch_redirect_response=False,
+        )
+        self.assertNotIn("email_contato", response.url)
+        response = self.client.get(reverse("meus_envios"))
         self.assertContains(response, self.envio_outro.titulo)
         self.assertNotContains(response, self.rascunho.titulo)
         self.assertNotContains(response, self.publicada.titulo)
         self.assertNotContains(response, "Ajuste protegido do autor.")
 
-    def test_status_do_autor_e_staff_respeita_permissoes(self):
+    def test_status_legado_redireciona_autor_e_staff_para_areas_corretas(self):
         self.client.force_login(self.autor)
         response_autor = self.client.get(reverse("status_envio"))
+        self.assertRedirects(
+            response_autor,
+            reverse("meus_envios"),
+            fetch_redirect_response=False,
+        )
+        response_autor = self.client.get(reverse("meus_envios"))
         self.assertContains(response_autor, self.rascunho.titulo)
         self.assertContains(response_autor, self.publicada.titulo)
         self.assertNotContains(response_autor, self.envio_outro.titulo)
 
         self.client.force_login(self.staff)
         response_staff = self.client.get(reverse("status_envio"))
+        self.assertRedirects(
+            response_staff,
+            reverse("painel_revisao"),
+            fetch_redirect_response=False,
+        )
+        response_staff = self.client.get(reverse("painel_revisao"))
         self.assertContains(response_staff, self.rascunho.titulo)
         self.assertContains(response_staff, self.envio_outro.titulo)
 
@@ -264,16 +282,13 @@ class SegurancaFaseTests(TestCase):
         for prefixo, texto_conta, solicitar, editar, revisao in cenarios:
             idioma = "pt" if not prefixo else prefixo.removeprefix("/")
             caminho_meus_envios = f"{prefixo}/meus-envios/" if prefixo else "/meus-envios/"
-            caminho_status = f"{prefixo}/status-envio/" if prefixo else "/status-envio/"
-            for caminho in (caminho_meus_envios, caminho_status):
-                with self.subTest(idioma=idioma, caminho=caminho):
-                    response = self.client.get(caminho)
-                    self.assertEqual(response.status_code, 200)
-                    conteudo_visivel = unescape(response.content.decode())
-                    self.assertIn(texto_conta, conteudo_visivel)
-                    self.assertIn(editar, conteudo_visivel)
-                    if "status-envio" not in caminho:
-                        self.assertIn(revisao, conteudo_visivel)
+            with self.subTest(idioma=idioma, caminho=caminho_meus_envios):
+                response = self.client.get(caminho_meus_envios)
+                self.assertEqual(response.status_code, 200)
+                conteudo_visivel = unescape(response.content.decode())
+                self.assertIn(texto_conta, conteudo_visivel)
+                self.assertIn(editar, conteudo_visivel)
+                self.assertIn(revisao, conteudo_visivel)
 
     def test_paginas_autenticadas_nao_indicam_vinculo_por_email(self):
         self.client.force_login(self.autor)
@@ -288,11 +303,8 @@ class SegurancaFaseTests(TestCase):
 
         for caminho in (
             "/meus-envios/",
-            "/status-envio/",
             "/es/meus-envios/",
-            "/es/status-envio/",
             "/en/meus-envios/",
-            "/en/status-envio/",
         ):
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
@@ -314,24 +326,36 @@ class SegurancaFaseTests(TestCase):
         )
 
         for prefixo, texto in cenarios:
-            for rota in ("meus-envios", "status-envio"):
-                caminho = f"{prefixo}/{rota}/" if prefixo else f"/{rota}/"
-                with self.subTest(caminho=caminho):
-                    response = self.client.get(caminho)
-                    self.assertEqual(response.status_code, 200)
-                    self.assertContains(response, texto)
-
-    def test_meus_envios_e_status_mantem_isolamento_entre_autores(self):
-        self.client.force_login(self.outro)
-
-        for caminho in ("/meus-envios/", "/status-envio/"):
+            caminho = f"{prefixo}/meus-envios/" if prefixo else "/meus-envios/"
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
-                self.assertContains(response, self.envio_outro.titulo)
-                self.assertNotContains(response, self.rascunho.titulo)
-                self.assertNotContains(response, self.publicada.titulo)
-                self.assertNotContains(response, self.proposta_autor.comentario_revisor)
+                self.assertContains(response, texto)
+
+    def test_meus_envios_mantem_isolamento_entre_autores(self):
+        self.client.force_login(self.outro)
+
+        response = self.client.get("/meus-envios/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.envio_outro.titulo)
+        self.assertNotContains(response, self.rascunho.titulo)
+        self.assertNotContains(response, self.publicada.titulo)
+        self.assertNotContains(response, self.proposta_autor.comentario_revisor)
+
+    def test_meus_envios_do_staff_nao_duplica_o_gerenciamento_global(self):
+        envio_staff = self.criar_experiencia(
+            autor=self.staff,
+            titulo="Envio particular do revisor",
+            status=Experiencia.StatusPublicacao.RASCUNHO,
+        )
+        self.client.force_login(self.staff)
+
+        response = self.client.get(reverse("meus_envios"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, envio_staff.titulo)
+        self.assertNotContains(response, self.rascunho.titulo)
+        self.assertNotContains(response, self.envio_outro.titulo)
 
     def test_auditoria_trilingue_autentica_paginas_restritas(self):
         saida = StringIO()
@@ -348,10 +372,8 @@ class SegurancaFaseTests(TestCase):
             "/es/cadastro/",
             "/en/adicionar-boa-pratica/",
             "/en/meus-envios/",
-            "/en/status-envio/",
             "/es/adicionar-boa-pratica/",
             "/es/meus-envios/",
-            "/es/status-envio/",
         ):
             with self.subTest(caminho=caminho):
                 self.assertIn(f"{caminho} -> ", conteudo)

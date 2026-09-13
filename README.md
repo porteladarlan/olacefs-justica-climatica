@@ -176,8 +176,8 @@ As rotas abaixo podem receber o prefixo /en/ ou /es/:
 | /adicionar-boa-pratica/ | Contribuição autenticada |
 | /editar-boa-pratica/<id>/ | Edição autorizada |
 | /meus-envios/ | Meu Espaço |
-| /status-envio/ | Status do envio |
-| /painel-revisao/ | Curadoria staff |
+| /status-envio/ | Compatibilidade: redireciona para Meus envios ou Gerenciamento de submissões |
+| /painel-revisao/ | Gerenciamento de submissões para staff |
 | /painel-revisao-edicoes/ | Curadoria de edições |
 | /admin/ | Django Admin |
 | /health/ | Health check |

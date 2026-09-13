@@ -477,7 +477,7 @@ class RegressaoPublicaTests(TestCase):
                 self.assertEqual(preview.status_code, 302)
 
     def test_autenticacao_e_perfis_preservam_protecao_trilingue(self):
-        protegidas_usuario = ("/adicionar-boa-pratica/", "/meus-envios/", "/status-envio/")
+        protegidas_usuario = ("/adicionar-boa-pratica/", "/meus-envios/")
         protegidas_staff = ("/painel-revisao/", "/painel-revisao-edicoes/")
         client_usuario = self.client_class()
         client_usuario.force_login(self.usuario)
@@ -490,6 +490,13 @@ class RegressaoPublicaTests(TestCase):
                 with self.subTest(caminho=caminho, perfil="usuario"):
                     self.assertEqual(self.client.get(caminho).status_code, 302)
                     self.assertEqual(client_usuario.get(caminho).status_code, 200)
+            caminho_status = self._caminho(prefixo, "/status-envio/")
+            caminho_meus_envios = self._caminho(prefixo, "/meus-envios/")
+            with self.subTest(caminho=caminho_status, perfil="usuario", legado=True):
+                self.assertEqual(self.client.get(caminho_status).status_code, 302)
+                response = client_usuario.get(caminho_status)
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.url, caminho_meus_envios)
             for rota in protegidas_staff:
                 caminho = self._caminho(prefixo, rota)
                 with self.subTest(caminho=caminho, perfil="staff"):

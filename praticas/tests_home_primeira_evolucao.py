@@ -45,7 +45,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertIsNone(re.search(r'class="[^"]*\bnav-link-pending\b', html))
         self.assertContains(response, f'href="{reverse("login_usuario")}"')
         self.assertContains(response, f'href="{reverse("registrar_usuario")}"')
-        self.assertContains(response, f'href="{reverse("status_envio")}"')
+        self.assertNotContains(response, f'href="{reverse("status_envio")}"')
         self.assertContains(response, 'id="languageSwitcher"')
         self.assertContains(response, 'id="highContrastToggle"')
         self.assertNotIn('id="buscaGlobal"', html)
