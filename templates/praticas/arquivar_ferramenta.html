@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="account-page account-page--narrow">
-    <nav class="prototype-breadcrumb"><a href="{% url 'painel_revisao' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Back to review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de revisión{% else %}Voltar ao painel de revisão{% endif %}</a></nav>
+    <nav class="prototype-breadcrumb"><a href="{% url 'painel_revisao' %}">&larr; {% if LANGUAGE_CODE == 'en' %}Back to submission management{% elif LANGUAGE_CODE == 'es' %}Volver a la gestión de envíos{% else %}Voltar ao gerenciamento de submissões{% endif %}</a></nav>
     <header class="account-heading">
         <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}Tool management{% elif LANGUAGE_CODE == 'es' %}Gestión de herramientas{% else %}Gestão de ferramentas{% endif %}</div>
         <h1>{% if acao_status == 'recuperar' %}{% if LANGUAGE_CODE == 'en' %}Restore tool{% elif LANGUAGE_CODE == 'es' %}Restaurar herramienta{% else %}Recuperar ferramenta{% endif %}{% elif acao_status == 'publicar' %}{% if LANGUAGE_CODE == 'en' %}Publish tool{% elif LANGUAGE_CODE == 'es' %}Publicar herramienta{% else %}Publicar ferramenta{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Archive tool{% elif LANGUAGE_CODE == 'es' %}Archivar herramienta{% else %}Arquivar ferramenta{% endif %}{% endif %}</h1>

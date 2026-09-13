@@ -5,7 +5,7 @@
 {% block title %}{% if LANGUAGE_CODE == 'en' %}Review published edit{% elif LANGUAGE_CODE == 'es' %}Revisar edici&oacute;n publicada{% else %}Revisar edi&ccedil;&atilde;o publicada{% endif %} | Plataforma Regional{% endblock %}
 
 {% block content %}
-<a href="{% url 'painel_revisao_edicoes' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to edit review panel{% elif LANGUAGE_CODE == 'es' %}Volver al panel de ediciones{% else %}Voltar ao painel de edi&ccedil;&otilde;es{% endif %}</a>
+<a href="{% url 'painel_revisao' %}" class="btn btn-link ps-0 text-decoration-none mb-3">&larr; {% if LANGUAGE_CODE == 'en' %}Back to submission management{% elif LANGUAGE_CODE == 'es' %}Volver a la gesti&oacute;n de env&iacute;os{% else %}Voltar ao gerenciamento de submiss&otilde;es{% endif %}</a>
 
 <section class="page-hero mb-4">
     <div class="hero-content">

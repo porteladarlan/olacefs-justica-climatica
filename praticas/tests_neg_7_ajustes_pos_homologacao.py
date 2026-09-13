@@ -444,7 +444,7 @@ class Neg7AjustesPosHomologacaoTests(TestCase):
     def test_proprietario_nao_enxerga_edicao_de_ferramenta_publicada(self):
         ferramenta = self.ferramenta(autor=self.autor)
         self.client.force_login(self.autor)
-        response = self.client.get(reverse("status_envio"))
+        response = self.client.get(reverse("meus_envios"))
         self.assertNotContains(response, reverse("editar_ferramenta", args=[ferramenta.pk]))
 
     def test_comparacao_invalida_nao_renderiza_resultado_parcial(self):

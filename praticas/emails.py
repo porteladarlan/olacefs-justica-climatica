@@ -458,7 +458,7 @@ def _notificar_solicitacao_edicao(
             [
                 {
                     "rotulo": textos["meus_envios"],
-                    "url": _url(request, idioma_codigo, "status_envio"),
+                    "url": _url(request, idioma_codigo, "meus_envios"),
                 }
             ],
         )
@@ -548,7 +548,7 @@ def _notificar_decisao_edicao(request, proposta_id, acao, idioma, idioma_codigo)
             [
                 {
                     "rotulo": textos["meus_envios"],
-                    "url": _url(request, idioma_codigo, "status_envio"),
+                    "url": _url(request, idioma_codigo, "meus_envios"),
                 }
             ],
         )

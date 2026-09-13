@@ -13,11 +13,11 @@ class Command(BaseCommand):
         "Início",
         "Meu espaço",
         "Meus envios",
-        "Status do envio",
         "Favoritos",
         "Sair",
         "Gestão",
         "Painel de revisão",
+        "Gerenciamento de submissões",
         "Edições publicadas",
         "Buscar",
         "Enviar boa prática",
@@ -75,7 +75,6 @@ class Command(BaseCommand):
         "/sobre/",
         "/adicionar-boa-pratica/",
         "/meus-envios/",
-        "/status-envio/",
         "/favoritos/",
         "/painel-revisao/",
         "/painel-revisao-edicoes/",
@@ -85,7 +84,6 @@ class Command(BaseCommand):
     URLS_AUTENTICADAS = {
         "/adicionar-boa-pratica/",
         "/meus-envios/",
-        "/status-envio/",
     }
 
     def add_arguments(self, parser):

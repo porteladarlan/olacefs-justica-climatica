@@ -149,6 +149,36 @@ class MarcosNormativosLote2Tests(TestCase):
         self.assertContains(response, self.vinculante.nome)
         self.assertNotContains(response, self.nao_vinculante.nome)
 
+    def test_busca_por_ano_numerico_funciona_nos_tres_idiomas(self):
+        for caminho in (
+            "/normas-internacionais/",
+            "/es/normas-internacionais/",
+            "/en/normas-internacionais/",
+        ):
+            with self.subTest(caminho=caminho):
+                response = self.client.get(caminho, {"q": "2018"})
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.context["total_resultados"], 1)
+                self.assertEqual(
+                    {norma.pk for norma in response.context["normas"]},
+                    {self.vinculante.pk},
+                )
+
+    def test_busca_por_ano_textual_aceita_intervalo_e_rejeita_numeros_nao_ascii(self):
+        self.nao_vinculante.ano_texto = "2019–2020"
+        self.nao_vinculante.save(update_fields=["ano_texto"])
+
+        response = self.client.get(reverse("normas_internacionais"), {"q": "2020"})
+        self.assertEqual(response.context["total_resultados"], 1)
+        self.assertContains(response, self.nao_vinculante.nome)
+        self.assertNotContains(response, self.vinculante.nome)
+
+        for termo in ("２０１８", "9" * 200):
+            with self.subTest(termo=termo):
+                response = self.client.get(reverse("normas_internacionais"), {"q": termo})
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.context["total_resultados"], 0)
+
     def test_filtros_exibem_apenas_opcoes_canonicas_localizadas(self):
         casos = (
             ("/normas-internacionais/", 0),
@@ -270,7 +300,7 @@ class MarcosNormativosLote2Tests(TestCase):
         response = self.client.get(
             reverse("normas_internacionais"),
             {
-                "q": "Marco vinculante",
+                "q": "2018",
                 "pais": self.brasil.pk,
                 "setor": "agua_energia",
                 "natureza": "binding",
@@ -283,7 +313,7 @@ class MarcosNormativosLote2Tests(TestCase):
         self.assertContains(response, "Água e Energia")
         self.assertNotIn("agua_energia", {chip["rotulo"] for chip in response.context["chips_filtros"]})
         self.assertContains(response, "Vinculante")
-        self.assertContains(response, "q=Marco+vinculante")
+        self.assertContains(response, "q=2018")
         self.assertContains(response, f"pais={self.brasil.pk}")
 
     def test_entradas_invalidas_nao_alteram_opcoes_nem_geram_erro(self):

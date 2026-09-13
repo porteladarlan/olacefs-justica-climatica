@@ -43,7 +43,7 @@ Esta matriz consolida a aderência do MVP ao questionário funcional respondido 
 | Download público dos anexos | Anexos vinculados à ficha pública | Implementado |
 | Títulos autoexplicativos para anexos | Orientação textual no formulário | Implementado |
 | Portal de conhecimento vivo | Estrutura visual, catálogo, normas, banco técnico, comparação e submissão contínua | Implementado |
-| Navegação enxuta e intuitiva | Header com grupos “Meu espaço” e “Gestão” | Implementado |
+| Navegação enxuta e intuitiva | Header com `Meus envios` para o autor e `Gerenciamento de submissões` para staff; a rota antiga de status é mantida somente como redirecionamento compatível | Implementado |
 | PT/ES/EN | Estrutura trilíngue nas principais telas e dados demonstrativos | Implementado no MVP |
 | Acessibilidade básica | Skip link, foco visual, aria-labels, aria-live e redução de movimento | Implementado |
 | Dados demonstrativos executivos | 6 EFS/países, experiências institucionais, normas, temas e banco técnico | Implementado |
@@ -54,3 +54,11 @@ Esta matriz consolida a aderência do MVP ao questionário funcional respondido 
 - A validação de vínculo real com EFS ainda é declaratória no MVP. Em produção, recomenda-se validação por domínio institucional, aprovação manual ou integração com cadastro oficial.
 - A moderação de conteúdo proibido é feita por orientação e revisão humana. Em produção, pode-se incluir termo formal de responsabilidade e trilha de auditoria mais robusta.
 - Os placeholders de logos devem ser substituídos pelos arquivos oficiais de OLACEFS, COMTEMA, CGID e GIZ.
+
+## NEG-7 pós-deploy — consolidação da navegação — 2026-09-13
+
+- `Meus envios` é a única tela de acompanhamento dos conteúdos do próprio autor.
+- `Gerenciamento de submissões` é a tela global, restrita a staff/revisor.
+- `/status-envio/` foi preservada para links antigos: redireciona conforme o perfil autenticado e não aceita e-mail em query string como autorização.
+- Marcos Normativos agora atende integralmente ao placeholder “nome, tema ou ano”, pesquisando tanto ano numérico quanto descrições textuais de período.
+- Nenhuma migration ou alteração de dados foi necessária.

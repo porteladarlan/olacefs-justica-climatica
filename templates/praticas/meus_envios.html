@@ -2,7 +2,7 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}Platform submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os de la plataforma{% else %}Envios da plataforma{% endif %}{% elif LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %} | Plataforma Regional{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %} | Plataforma Regional{% endblock %}
 
 {% block extra_css %}<link rel="stylesheet" href="{% static 'praticas/css/meu-espaco.css' %}">{% endblock %}
 
@@ -14,9 +14,9 @@
 
     <div class="workspace-heading-row">
         <header class="account-heading">
-            <div class="eyebrow">{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}Review area{% elif LANGUAGE_CODE == 'es' %}&Aacute;rea de revisi&oacute;n{% else %}&Aacute;rea de revis&atilde;o{% endif %}{% elif LANGUAGE_CODE == 'en' %}My space{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}</div>
-            <h1>{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}Platform submissions{% elif LANGUAGE_CODE == 'es' %}Env&iacute;os de la plataforma{% else %}Envios da plataforma{% endif %}{% elif LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}</h1>
-            <p>{% if request.user.is_staff %}{% if LANGUAGE_CODE == 'en' %}As a review team member, you can view all submissions and edit requests.{% elif LANGUAGE_CODE == 'es' %}Como integrante del equipo de revisi&oacute;n, puede ver todos los env&iacute;os y solicitudes de edici&oacute;n.{% else %}Como integrante da equipe de revis&atilde;o, voc&ecirc; visualiza todos os envios e solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o.{% endif %}{% elif LANGUAGE_CODE == 'en' %}Track drafts, submissions, review comments and edit requests linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Acompa&ntilde;e borradores, env&iacute;os, comentarios de revisi&oacute;n y solicitudes de edici&oacute;n vinculados a su cuenta autenticada.{% else %}Acompanhe rascunhos, envios, coment&aacute;rios de revis&atilde;o e solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o vinculados &agrave; sua conta autenticada.{% endif %}</p>
+            <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}My space{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}</div>
+            <h1>{% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}</h1>
+            <p>{% if LANGUAGE_CODE == 'en' %}Track drafts, submissions, review comments and edit requests linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Acompa&ntilde;e borradores, env&iacute;os, comentarios de revisi&oacute;n y solicitudes de edici&oacute;n vinculados a su cuenta autenticada.{% else %}Acompanhe rascunhos, envios, coment&aacute;rios de revis&atilde;o e solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o vinculados &agrave; sua conta autenticada.{% endif %}</p>
         </header>
         <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-primary workspace-primary-action">{% if LANGUAGE_CODE == 'en' %}Submit new practice{% elif LANGUAGE_CODE == 'es' %}Enviar nueva pr&aacute;ctica{% else %}Enviar nova pr&aacute;tica{% endif %}</a>
     </div>

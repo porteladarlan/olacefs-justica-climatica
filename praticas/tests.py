@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
 from .models import (
     Anexo,
@@ -20,6 +21,10 @@ from .models import (
 
 
 class RotasPublicasTests(TestCase):
+    def setUp(self):
+        translation.activate("pt-br")
+        self.addCleanup(translation.deactivate)
+
     @classmethod
     def setUpTestData(cls):
         cls.autor_pendente = get_user_model().objects.create_user(
@@ -197,11 +202,7 @@ class RotasPublicasTests(TestCase):
         norma = NormaInternacional.objects.get(nome="Acordo de Paris")
         response = self.client.get(reverse("catalogo_experiencias"), {"norma": norma.id})
         self.assertEqual(response.status_code, 200)
-        conteudo = response.content.decode("utf-8")
-        self.assertTrue(
-            "TCU" in conteudo or "Federal Court of Accounts" in conteudo,
-            conteudo,
-        )
+        self.assertContains(response, "Avaliacao da equidade no acesso a agua")
 
     def test_painel_revisao_exige_login_staff(self):
         response = self.client.get(reverse("painel_revisao"))
@@ -248,6 +249,12 @@ class RotasPublicasTests(TestCase):
     def test_status_envio_exibe_registro_do_autor_autenticado(self):
         self.client.force_login(self.autor_pendente)
         response = self.client.get(reverse("status_envio"))
+        self.assertRedirects(
+            response,
+            reverse("meus_envios"),
+            fetch_redirect_response=False,
+        )
+        response = self.client.get(reverse("meus_envios"))
         self.assertEqual(response.status_code, 200)
         conteudo = response.content.decode("utf-8")
         self.assertTrue(
@@ -349,7 +356,7 @@ class RotasPublicasTests(TestCase):
 
         response = self.client.get(reverse("favoritos_experiencias"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Assessment of equity in access to water")
+        self.assertContains(response, "Avaliacao da equidade no acesso a agua")
 
 
     def test_cadastro_usuario_retorna_200(self):
