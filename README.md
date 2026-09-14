@@ -198,16 +198,23 @@ A base atual inclui:
 - catálogo público restrito a conteúdo publicado;
 - separação entre dados públicos e campos internos;
 - migrations versionadas e testes de regressão.
+- encerramento de sessão exclusivamente por POST com CSRF;
+- expiração de sessão em oito horas, renovada por atividade e encerrada ao fechar o navegador;
+- validade padrão de 24 horas para tokens de redefinição de senha;
+- CSP defensiva aplicada para objetos, base, formulários e enquadramento;
+- CSP restritiva em modo de relatório para orientar a remoção de scripts e estilos inline;
+- auditoria de dependências e análise estática no CI;
+- GitHub Actions fixadas por SHA e atualização semanal via Dependabot.
 
 ## Pendências de segurança e operação
 
 Antes da produção institucional ainda são necessários:
 
-- autenticação e rate limiting mais robustos;
+- rate limiting distribuído no proxy ou em armazenamento compartilhado;
 - autorização institucional usuário–EFS;
 - aviso de privacidade, base legal, retenção e canal de direitos;
 - antivírus, quarentena e análise avançada de uploads;
-- CSP e hardening complementar de headers;
+- remoção gradual das exceções identificadas pela CSP em modo de relatório;
 - storage persistente para mídia;
 - PostgreSQL institucional provisionado;
 - backups e restauração testados;
