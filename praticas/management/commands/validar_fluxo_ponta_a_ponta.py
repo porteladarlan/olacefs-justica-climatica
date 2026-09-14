@@ -31,12 +31,12 @@ class Command(BaseCommand):
         alertas = []
 
         self.stdout.write(self.style.MIGRATE_HEADING("Validação funcional ponta a ponta"))
-        self.stdout.write("Fluxo esperado: público consulta -> usuário autentica -> envia -> revisor acessa -> publicação aparece no catálogo.")
+        self.stdout.write("Fluxo esperado: público consulta -> usuário autentica -> salva rascunho ou publica diretamente -> staff gerencia -> publicação aparece no catálogo.")
         self.stdout.write("")
 
         alertas.extend(self.validar_fluxo_publico())
         alertas.extend(self.validar_fluxo_autor())
-        alertas.extend(self.validar_fluxo_revisor())
+        alertas.extend(self.validar_fluxo_gestao())
         alertas.extend(self.validar_catalogo_publico())
 
         self.stdout.write("")
@@ -146,11 +146,11 @@ class Command(BaseCommand):
 
         return alertas
 
-    def validar_fluxo_revisor(self):
+    def validar_fluxo_gestao(self):
         alertas = []
 
         self.stdout.write("")
-        self.stdout.write(self.style.MIGRATE_LABEL("3. Fluxo de revisão: usuário comum bloqueado e staff autorizado"))
+        self.stdout.write(self.style.MIGRATE_LABEL("3. Gerenciamento de submissões: usuário comum bloqueado e staff autorizado"))
 
         usuario_comum, senha_comum = self.criar_usuario(
             "validacao_ponta_a_ponta_comum",
@@ -167,7 +167,7 @@ class Command(BaseCommand):
                 if response.status_code in [302, 403]:
                     self.stdout.write(self.style.SUCCESS(f"  USER {caminho} -> {response.status_code}"))
                 else:
-                    alerta = f"Usuário comum acessou área de revisão indevidamente: {caminho} -> {response.status_code}"
+                    alerta = f"Usuário comum acessou gerenciamento indevidamente: {caminho} -> {response.status_code}"
                     alertas.append(alerta)
                     self.stdout.write(self.style.WARNING(f"  USER {caminho} -> {response.status_code}"))
 
@@ -180,13 +180,19 @@ class Command(BaseCommand):
         client_staff.login(username=usuario_staff.username, password=senha_staff)
 
         for prefixo in self.IDIOMAS:
-            for url in ["/painel-revisao/", "/painel-revisao-edicoes/"]:
+            for url, status_esperado in [("/painel-revisao/", 200), ("/painel-revisao-edicoes/", 302)]:
                 caminho = self.caminho(prefixo, url)
                 response = self.get(client_staff, caminho)
-                if response.status_code == 200:
-                    self.stdout.write(self.style.SUCCESS(f"  STAFF {caminho} -> 200"))
+                redirecionamento_legado_valido = (
+                    status_esperado == 302
+                    and response.status_code == 302
+                    and response.url == self.caminho(prefixo, "/painel-revisao/")
+                )
+                if response.status_code == status_esperado and (status_esperado == 200 or redirecionamento_legado_valido):
+                    sufixo = " (compatibilidade)" if status_esperado == 302 else ""
+                    self.stdout.write(self.style.SUCCESS(f"  STAFF {caminho} -> {status_esperado}{sufixo}"))
                 else:
-                    alerta = f"Staff/revisor não acessou área de revisão: {caminho} -> {response.status_code}"
+                    alerta = f"Staff recebeu resposta inesperada no gerenciamento: {caminho} -> {response.status_code}"
                     alertas.append(alerta)
                     self.stdout.write(self.style.WARNING(f"  STAFF {caminho} -> {response.status_code}"))
 

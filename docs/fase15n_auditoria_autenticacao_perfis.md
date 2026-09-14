@@ -34,6 +34,6 @@ Nem todo alerta é necessariamente erro. O objetivo é mapear o comportamento re
 Após rodar o comando, revise especialmente:
 
 - se usuário anônimo é redirecionado corretamente para login;
-- se usuário comum não acessa painel de revisão;
-- se staff/revisor acessa painéis internos;
+- se usuário comum não acessa o gerenciamento global;
+- se staff acessa o gerenciamento consolidado e a rota legada redireciona corretamente;
 - se rotas EN/ES seguem o mesmo comportamento das rotas PT.

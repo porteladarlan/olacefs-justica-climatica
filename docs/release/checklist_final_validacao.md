@@ -44,6 +44,7 @@ Validar em PT/ES/EN:
 - [ ] Anônimo é redirecionado ao tentar enviar boa prática.
 - [ ] Usuário autenticado acessa formulário.
 - [ ] Usuário acessa Meus Envios.
-- [ ] Usuário comum não acessa painel de revisão.
-- [ ] Staff/revisor acessa painel de revisão.
+- [ ] Usuário comum não acessa o gerenciamento global.
+- [ ] Staff acessa o gerenciamento de submissões.
+- [ ] A rota legada de edições redireciona para o gerenciamento consolidado.
 - [ ] Catálogo público carrega em PT/ES/EN.

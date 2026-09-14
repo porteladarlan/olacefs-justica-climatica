@@ -67,7 +67,7 @@ Validar:
 - [ ] `/adicionar-boa-pratica/`
 - [ ] `/meus-envios/`
 - [ ] `/painel-revisao/`
-- [ ] `/painel-revisao-edicoes/`
+- [ ] `/painel-revisao-edicoes/` redireciona para `/painel-revisao/` quando acessada por staff
 - [ ] `/en/`
 - [ ] `/es/`
 

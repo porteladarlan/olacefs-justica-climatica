@@ -4,24 +4,16 @@
             <article class="submission-item">
                 <div class="submission-item-main">
                     <div class="submission-item-meta">
-                        <span class="status-badge status-{{ experiencia.status_publicacao }}">
+                        <span class="status-badge {% if experiencia.status_publicacao == 'publicado' or experiencia.status_publicacao == 'rascunho' or experiencia.status_publicacao == 'arquivado' %}status-{{ experiencia.status_publicacao }}{% else %}status-historico{% endif %}">
                             <span class="status-dot" aria-hidden="true"></span>
                             {% if experiencia.status_publicacao == 'publicado' %}
                                 {% if LANGUAGE_CODE == 'en' %}Published on the platform{% elif LANGUAGE_CODE == 'es' %}Publicado en la plataforma{% else %}Publicado na plataforma{% endif %}
-                            {% elif experiencia.status_publicacao == 'enviado' %}
-                                {% if LANGUAGE_CODE == 'en' %}Awaiting technical review{% elif LANGUAGE_CODE == 'es' %}En espera de revisi&oacute;n t&eacute;cnica{% else %}Aguardando revis&atilde;o t&eacute;cnica{% endif %}
-                            {% elif experiencia.status_publicacao == 'em_revisao' %}
-                                {% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisi&oacute;n{% else %}Em revis&atilde;o{% endif %}
-                            {% elif experiencia.status_publicacao == 'aprovado' %}
-                                {% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}
-                            {% elif experiencia.status_publicacao == 'rejeitado' %}
-                                {% if LANGUAGE_CODE == 'en' %}Needs adjustments / corrections{% elif LANGUAGE_CODE == 'es' %}Necesita ajustes / correcciones{% else %}Necessita de ajustes / corre&ccedil;&otilde;es{% endif %}
                             {% elif experiencia.status_publicacao == 'rascunho' %}
                                 {% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
                             {% elif experiencia.status_publicacao == 'arquivado' %}
                                 {% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}
                             {% else %}
-                                {% if LANGUAGE_CODE == 'en' %}Status pending{% elif LANGUAGE_CODE == 'es' %}Estado pendiente{% else %}Status pendente{% endif %}
+                                {% if LANGUAGE_CODE == 'en' %}Historical record{% else %}Registro histórico{% endif %}
                             {% endif %}
                         </span>
                         <span>{{ experiencia.tipo_experiencia.nome_exibicao }}</span>
@@ -29,12 +21,6 @@
                     </div>
                     <h3>{{ experiencia.titulo_exibicao }}</h3>
                     {% if experiencia.descricao_exibicao %}<p>{{ experiencia.descricao_exibicao|truncatechars:260 }}</p>{% endif %}
-                    {% if experiencia.comentario_revisor %}
-                        <div class="review-comment">
-                            <strong>{% if LANGUAGE_CODE == 'en' %}Review:{% elif LANGUAGE_CODE == 'es' %}Revisi&oacute;n:{% else %}Revis&atilde;o:{% endif %}</strong>
-                            {{ experiencia.comentario_revisor }}
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="submission-item-action">
                     <a class="btn btn-sm btn-outline-primary" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit{% elif LANGUAGE_CODE == 'es' %}Editar{% else %}Editar{% endif %}</a>

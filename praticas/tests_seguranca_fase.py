@@ -279,7 +279,7 @@ class SegurancaFaseTests(TestCase):
             ),
         )
 
-        for prefixo, texto_conta, solicitar, editar, revisao in cenarios:
+        for prefixo, texto_conta, solicitar, editar, revisao_legada in cenarios:
             idioma = "pt" if not prefixo else prefixo.removeprefix("/")
             caminho_meus_envios = f"{prefixo}/meus-envios/" if prefixo else "/meus-envios/"
             with self.subTest(idioma=idioma, caminho=caminho_meus_envios):
@@ -288,7 +288,7 @@ class SegurancaFaseTests(TestCase):
                 conteudo_visivel = unescape(response.content.decode())
                 self.assertIn(texto_conta, conteudo_visivel)
                 self.assertIn(editar, conteudo_visivel)
-                self.assertIn(revisao, conteudo_visivel)
+                self.assertNotIn(revisao_legada, conteudo_visivel)
 
     def test_paginas_autenticadas_nao_indicam_vinculo_por_email(self):
         self.client.force_login(self.autor)

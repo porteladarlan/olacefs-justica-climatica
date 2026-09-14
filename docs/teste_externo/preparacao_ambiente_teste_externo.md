@@ -44,7 +44,8 @@ Testar manualmente:
 - `/adicionar-boa-pratica/`
 - `/meus-envios/`
 - `/painel-revisao/`
-- `/painel-revisao-edicoes/`
+
+Como verificação de compatibilidade, `/painel-revisao-edicoes/` deve redirecionar para `/painel-revisao/` quando acessada por staff.
 
 Também testar:
 
@@ -59,13 +60,13 @@ Preparar pelo menos:
    - testa cadastro/login;
    - envia boa prática;
    - salva rascunho;
-   - envia para revisão.
+   - publica diretamente.
 
-2. Usuário staff/revisor:
-   - acessa painel de revisão;
-   - revisa submissões;
-   - solicita ajustes;
-   - aprova/publica.
+2. Usuário staff:
+   - acessa o gerenciamento de submissões;
+   - pesquisa boas práticas e ferramentas;
+   - edita conteúdos;
+   - arquiva e recupera conteúdos.
 
 ## Passo 6 — Limitações atuais a comunicar
 

@@ -121,7 +121,9 @@ class FluxoRevisaoAprovacaoTests(TestCase):
         conteudo = response.content.decode("utf-8")
         self.assertIn("Submission management", conteudo)
         self.assertIn('data-status-metric="publicado"', conteudo)
-        self.assertIn('class="status-pill status-enviado"', conteudo)
+        self.assertIn('class="status-pill status-historico"', conteudo)
+        self.assertIn("Historical record", conteudo)
+        self.assertNotIn("Submitted", conteudo)
         self.assertNotIn("Review published content edits", conteudo)
         self.assertNotIn("Revisar edições de conteúdos publicados", conteudo)
 
@@ -245,11 +247,14 @@ class FluxoRevisaoAprovacaoTests(TestCase):
                 self.assertIn(limpar, parser.links)
 
     def test_painel_mantem_status_historico_nos_cards_e_metricas_publicas(self):
-        response = self.client.get(reverse("painel_revisao"))
+        with translation.override("pt-br"):
+            response = self.client.get(reverse("painel_revisao"))
         conteudo = response.content.decode("utf-8")
         self.assertIn('data-status-metric="publicado"', conteudo)
         self.assertIn('data-status-metric="arquivado"', conteudo)
-        self.assertIn('class="status-pill status-enviado"', conteudo)
+        self.assertIn('class="status-pill status-historico"', conteudo)
+        self.assertIn("Registro histórico", conteudo)
+        self.assertNotIn(">Enviado<", conteudo)
 
     def assert_busca_campo_exclusivo(self, indice_termo):
         pratica_alvo, pratica_controle, termos = self.criar_praticas_para_busca()
@@ -497,7 +502,7 @@ class FluxoRevisaoAprovacaoTests(TestCase):
         resposta_anonimo = anonimo.get(reverse("painel_revisao_edicoes"))
         self.assertEqual(resposta_anonimo.status_code, 302)
         partes_anonimo = urlsplit(resposta_anonimo.url)
-        self.assertEqual(partes_anonimo.path, "/admin/login/")
+        self.assertEqual(partes_anonimo.path, reverse("admin:login"))
         self.assertEqual(parse_qs(partes_anonimo.query).get("next"), [reverse("painel_revisao_edicoes")])
 
         nao_staff = get_user_model().objects.create_user(
@@ -508,7 +513,7 @@ class FluxoRevisaoAprovacaoTests(TestCase):
         resposta_nao_staff = cliente_nao_staff.get(reverse("painel_revisao_edicoes"))
         self.assertEqual(resposta_nao_staff.status_code, 302)
         partes_nao_staff = urlsplit(resposta_nao_staff.url)
-        self.assertEqual(partes_nao_staff.path, "/admin/login/")
+        self.assertEqual(partes_nao_staff.path, reverse("admin:login"))
         self.assertEqual(parse_qs(partes_nao_staff.query).get("next"), [reverse("painel_revisao_edicoes")])
 
     def test_rota_de_edicoes_legada_e_busca_do_painel_permanecem_disponiveis(self):

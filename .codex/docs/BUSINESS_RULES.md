@@ -8,11 +8,11 @@
 - usuário pertence a uma EFS;
 - permissões são validadas no backend.
 
-## Workflow proposto
+## Fluxo editorial vigente
 
-`RASCUNHO -> ENVIADA -> EM_REVISAO -> AJUSTES_SOLICITADOS -> APROVADA -> PUBLICADA`, com alternativas `REJEITADA` e `ARQUIVADA`.
+`RASCUNHO -> PUBLICADA -> ARQUIVADA`, com recuperação de `ARQUIVADA` para `PUBLICADA`.
 
-Mapear para estados existentes antes de criar novos.
+O usuário autenticado pode salvar rascunho ou publicar diretamente, sem etapa de revisão ou aprovação. Estados editoriais antigos continuam preservados no banco e nas buscas como histórico, mas a interface os apresenta apenas como `Registro histórico`. Solicitações de edição e comentários de revisão legados não são exibidos.
 
 ## Campos da prática
 
@@ -34,6 +34,6 @@ Tipos: conformidade, desempenho/gestão, financeira, coordenada, estudo/diagnós
 
 Temas: quilombolas, crianças, direitos humanos, gênero, idosos, LGBTQI+, mulheres, populações vulneráveis, povos indígenas e outro.
 
-## Curadoria
+## Governança e rastreabilidade
 
 Decisões têm responsável, data e justificativa. Publicação e alterações devem ser rastreáveis. A interface não permite exclusão física de boas práticas: a ação padrão é o arquivamento lógico, preservando registro, anexos, relacionamentos e histórico. Favoritos continuam usando POST/CSRF; o arquivamento exige autorização do autor ou de staff, e a rota antiga permanece somente por compatibilidade.

@@ -53,7 +53,7 @@
             <div class="tools-empty">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4l-3 3-3-3 3-3Z"/></svg>
                 <h2>{% if LANGUAGE_CODE == 'en' %}The tools catalog is being prepared.{% elif LANGUAGE_CODE == 'es' %}El cat&aacute;logo de herramientas est&aacute; en preparaci&oacute;n.{% else %}O cat&aacute;logo de ferramentas est&aacute; em prepara&ccedil;&atilde;o.{% endif %}</h2>
-                <p>{% if LANGUAGE_CODE == 'en' %}Content will be published after institutional curation is complete.{% elif LANGUAGE_CODE == 'es' %}Los contenidos se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.{% else %}Os conte&uacute;dos ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.{% endif %}</p>
+                <p>{% if LANGUAGE_CODE == 'en' %}Authenticated users can publish a complete tool directly from My space.{% elif LANGUAGE_CODE == 'es' %}Los usuarios autenticados pueden publicar una herramienta completa directamente desde Mi espacio.{% else %}Usuários autenticados podem publicar uma ferramenta completa diretamente pelo Meu espaço.{% endif %}</p>
             </div>
         {% elif recursos %}
             {% for recurso in recursos %}

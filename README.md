@@ -8,7 +8,7 @@ Esta é uma versão de validação para desenvolvimento e teste. Ainda não é a
 
 ## Escopo e situação atual
 
-O repositório mantém um monólito Django com templates server-side, catálogo público, fluxos autenticados e painéis de curadoria.
+O repositório mantém um monólito Django com templates server-side, catálogo público, fluxos autenticados e gerenciamento de submissões.
 
 | Módulo | Estado real |
 |---|---|
@@ -16,13 +16,13 @@ O repositório mantém um monólito Django com templates server-side, catálogo 
 | Fundamentos | Implementado, com conteúdo trilíngue e abas acessíveis |
 | Mapa regional | Implementado, com dados públicos agregados, seleção por país e alternativa textual |
 | Boas Práticas | Implementado, com catálogo, filtros, ficha, anexos e relações |
-| Contribuição | Implementado, com autenticação, formulário, rascunho e envio |
-| Meu Espaço | Implementado, com login, cadastro, status, rascunhos e favoritos |
+| Contribuição | Implementado, com autenticação, formulário, rascunho e publicação direta |
+| Meu Espaço | Implementado, com login, cadastro, conteúdos próprios, rascunhos e favoritos |
 | Marcos Normativos | Implementado, com catálogo, fontes e filtros disponíveis |
-| Ferramentas | Implementado, com catálogo próprio e curadoria |
+| Ferramentas | Implementado, com catálogo próprio, rascunho, publicação direta, arquivamento e recuperação |
 | Guia de Perguntas | Fundação estrutural implementada; publicação pública desabilitada por padrão e conteúdo editorial pendente |
 | Recursos Técnicos | Implementado como catálogo curado |
-| Administração/curadoria | Interno, protegido por staff e Django Admin |
+| Gerenciamento | Interno, protegido por staff e Django Admin, sem etapas de revisão ou aprovação |
 | i18n e acessibilidade | Implementado na interface atual; auditoria completa com tecnologia assistiva permanece pendente |
 | Vídeo e casos audiovisuais | Desabilitado/futuro |
 
@@ -178,7 +178,7 @@ As rotas abaixo podem receber o prefixo /en/ ou /es/:
 | /meus-envios/ | Meu Espaço |
 | /status-envio/ | Compatibilidade: redireciona para Meus envios ou Gerenciamento de submissões |
 | /painel-revisao/ | Gerenciamento de submissões para staff |
-| /painel-revisao-edicoes/ | Curadoria de edições |
+| /painel-revisao-edicoes/ | Redirecionamento compatível para o gerenciamento de submissões |
 | /admin/ | Django Admin |
 | /health/ | Health check |
 | /i18n/ | Seleção de idioma |

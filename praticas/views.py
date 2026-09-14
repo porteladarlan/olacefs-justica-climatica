@@ -25,7 +25,6 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from .emails import (
-    agendar_notificacao_decisao_edicao,
     agendar_notificacao_status_experiencia,
     agendar_notificacoes_nova_submissao,
     agendar_notificacoes_solicitacao_edicao,
@@ -39,7 +38,6 @@ from .forms import (
     FerramentaSubmissaoForm,
     PropostaEdicaoPublicadaForm,
     ReenviarConfirmacaoForm,
-    RevisaoPropostaEdicaoForm,
     texto_idioma,
     normalizar_idioma,
 )
@@ -57,7 +55,6 @@ from .models import (
     NormaInternacionalPais,
     Pais,
     PerguntaAuditoria,
-    PropostaEdicaoExperiencia,
     SETORES_OFICIAIS_CODIGOS,
     Setor,
     TemaTransversal,
@@ -851,18 +848,12 @@ def meus_envios(request):
         .select_related("setor")
         .order_by("-atualizado_em")
     )
-    propostas = (
-        PropostaEdicaoExperiencia.objects.filter(experiencia__autor=request.user)
-        .select_related("experiencia")
-        .order_by("-atualizado_em")
-    )
     return render(
         request,
         "praticas/meus_envios.html",
         {
             "experiencias": experiencias,
             "ferramentas_enviadas": ferramentas,
-            "propostas": propostas,
         },
     )
 
@@ -2385,10 +2376,6 @@ def status_envio(request):
 def painel_revisao(request):
     status = request.GET.get("status", "")
     termo = (request.GET.get("q") or "").replace("\x00", "").strip()[:200]
-    status_choices_revisao = [
-        item for item in Experiencia.StatusPublicacao.choices
-        if item[0] in STATUS_VISIVEIS_REVISAO
-    ]
     experiencias = (
         Experiencia.objects.filter(status_publicacao__in=STATUS_VISIVEIS_REVISAO)
         .select_related("efs", "pais", "tipo_experiencia", "setor")
@@ -2438,15 +2425,10 @@ def painel_revisao(request):
         )
 
     contadores = {
-        "enviado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ENVIADO).count(),
-        "em_revisao": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.EM_REVISAO).count(),
-        "aprovado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.APROVADO).count(),
         "publicado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.PUBLICADO).count()
         + Ferramenta.objects.filter(situacao=Ferramenta.Situacao.PUBLICADA).count(),
         "arquivado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.ARQUIVADO).count()
         + Ferramenta.objects.filter(situacao=Ferramenta.Situacao.ARQUIVADA).count(),
-        "rejeitado": Experiencia.objects.filter(status_publicacao=Experiencia.StatusPublicacao.REJEITADO).count(),
-        "edicoes_pendentes": PropostaEdicaoExperiencia.objects.filter(status=PropostaEdicaoExperiencia.Status.PENDENTE).count(),
     }
 
     return render(
@@ -2455,7 +2437,6 @@ def painel_revisao(request):
         {
             "experiencias": experiencias,
             "status_atual": status,
-            "status_choices": status_choices_revisao,
             "contadores": contadores,
             "termo_busca": termo,
             "ferramentas_enviadas": ferramentas,
@@ -2473,91 +2454,10 @@ def revisar_experiencia(request, pk):
 def painel_revisao_edicoes(request):
     return redirect("painel_revisao")
 
-    status = request.GET.get("status", "")
-    propostas = (
-        PropostaEdicaoExperiencia.objects.select_related("experiencia", "experiencia__efs", "experiencia__pais")
-        .order_by("-atualizado_em")
-    )
-    if status:
-        propostas = propostas.filter(status=status)
-
-    return render(
-        request,
-        "praticas/painel_revisao_edicoes.html",
-        {
-            "propostas": propostas,
-            "status_atual": status,
-            "status_choices": PropostaEdicaoExperiencia.Status.choices,
-        },
-    )
-
 
 @staff_member_required
 def revisar_edicao_publicada(request, pk):
     return redirect("painel_revisao")
-
-    proposta = get_object_or_404(
-        PropostaEdicaoExperiencia.objects.select_related("experiencia", "experiencia__efs", "experiencia__pais"),
-        pk=pk,
-    )
-
-    if request.method == "POST":
-        form = RevisaoPropostaEdicaoForm(request.POST, instance=proposta)
-        if form.is_valid():
-            acao = form.cleaned_data["acao"]
-            status_anterior = proposta.status
-            proposta.comentario_revisor = form.cleaned_data["comentario_revisor"]
-
-            with transaction.atomic():
-                if acao == "em_revisao":
-                    proposta.status = PropostaEdicaoExperiencia.Status.EM_REVISAO
-                    mensagem = texto_idioma(
-                        "Proposta marcada como em revisão.",
-                        "Propuesta marcada como en revisión.",
-                        "Proposal marked as under review.",
-                    )
-                elif acao == "aprovar":
-                    aplicar_proposta_edicao(proposta)
-                    proposta.status = PropostaEdicaoExperiencia.Status.APROVADA
-                    mensagem = texto_idioma(
-                        "Proposta aprovada e aplicada à experiência publicada.",
-                        "Propuesta aprobada y aplicada a la experiencia publicada.",
-                        "Proposal approved and applied to the published experience.",
-                    )
-                elif acao == "rejeitar":
-                    proposta.status = PropostaEdicaoExperiencia.Status.REJEITADA
-                    mensagem = texto_idioma(
-                        "Proposta de edição rejeitada.",
-                        "Propuesta de edición rechazada.",
-                        "Edit proposal rejected.",
-                    )
-                else:
-                    mensagem = texto_idioma(
-                        "Revisão registrada.",
-                        "Revisión registrada.",
-                        "Review recorded.",
-                    )
-
-                proposta.save(update_fields=["status", "comentario_revisor", "atualizado_em"])
-                if (
-                    proposta.status != status_anterior
-                    and acao in {"aprovar", "rejeitar"}
-                ):
-                    agendar_notificacao_decisao_edicao(request, proposta, acao)
-            messages.success(request, mensagem)
-            return redirect("painel_revisao_edicoes")
-    else:
-        form = RevisaoPropostaEdicaoForm(instance=proposta)
-
-    return render(
-        request,
-        "praticas/revisar_edicao_publicada.html",
-        {
-            "proposta": proposta,
-            "form": form,
-            "comparativo": montar_comparativo_proposta_edicao(proposta),
-        },
-    )
 
 
 @login_required(login_url="login_usuario")

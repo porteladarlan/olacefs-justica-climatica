@@ -340,6 +340,11 @@
     background: #eef0f3;
 }
 
+.status-badge.status-historico {
+    color: #58636f;
+    background: #eef0f3;
+}
+
 .review-comment {
     margin-top: 10px;
     border-left: 3px solid var(--purple-soft);

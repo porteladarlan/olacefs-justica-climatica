@@ -15,10 +15,10 @@ Apresentar o MVP como um portal regional vivo de boas práticas em auditoria com
 3. Ficha estruturada: perguntas, critérios, ferramentas, resultados, replicabilidade e normas.
 4. Comparação: seleção de até três experiências e análise lado a lado.
 5. Favoritos: curadoria rápida de experiências relevantes.
-6. Submissão: cadastro, envio, rascunho e confirmação.
-7. Revisão: painel de revisão, aprovação, devolução e publicação.
-8. Edição publicada: proposta de edição e comparativo “valor atual x valor proposto”.
-9. Anexos: PDF, Word, Excel, links externos e títulos autoexplicativos.
+6. Submissão: cadastro, rascunho, publicação direta e confirmação.
+7. Meu espaço: conteúdos próprios, edição, arquivamento e recuperação.
+8. Gerenciamento: busca global de boas práticas e ferramentas, edição e arquivamento por staff.
+9. Anexos: PDF, JPG, PNG, links externos e títulos autoexplicativos.
 10. Encerramento: “A Guia orienta; a plataforma demonstra”.
 
 ## Mensagem-chave

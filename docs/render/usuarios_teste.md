@@ -9,28 +9,28 @@ Uso:
 - acessar a plataforma;
 - enviar boa prática;
 - salvar rascunho;
-- enviar para revisão;
+- publicar diretamente;
 - consultar Meus Envios.
 
 Permissões esperadas:
 
-- não deve acessar painel de revisão;
+- não deve acessar o gerenciamento global de submissões;
 - deve acessar formulário de envio;
 - deve acessar Meus Envios.
 
-### 2. Usuário staff / pessoa revisora
+### 2. Usuário staff
 
 Uso:
 
-- acessar painel de revisão;
-- analisar submissões;
-- revisar edições publicadas;
-- simular aprovação ou solicitação de ajustes.
+- acessar o gerenciamento de submissões;
+- pesquisar boas práticas e ferramentas;
+- editar conteúdos;
+- arquivar e recuperar conteúdos sem exclusão física.
 
 Permissões esperadas:
 
 - deve acessar `/painel-revisao/`;
-- deve acessar `/painel-revisao-edicoes/`.
+- `/painel-revisao-edicoes/` deve somente redirecionar para `/painel-revisao/`.
 
 ## Modelo para compartilhar credenciais
 

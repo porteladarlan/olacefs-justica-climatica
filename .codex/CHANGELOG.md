@@ -1,5 +1,11 @@
 # Changelog da base Codex
 
+## NEG-7 pós-deploy — remoção final do fluxo de revisão — 2026-09-14
+
+- Estados editoriais legados continuam preservados e pesquisáveis, mas aparecem somente como `Registro histórico`, sem reativar etapas de revisão ou aprovação.
+- Removidos da interface os comentários de revisor e a seção antiga de solicitações de edição; as rotas legadas permanecem apenas como redirecionamentos compatíveis.
+- Corrigido o estado vazio de Ferramentas para comunicar publicação direta por usuários autenticados, em PT/ES/EN.
+
 ## NEG-7C — Fechamento das pendências da auditoria
 
 - endurecida a comparação de favoritos, as transições de ferramentas e a validação de recuperação;
