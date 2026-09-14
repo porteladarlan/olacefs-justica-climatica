@@ -9,11 +9,12 @@ Antes de convidar pessoas externas, confirmar:
 - [ ] `python manage.py test` passa localmente.
 - [ ] Dados demonstrativos foram carregados no ambiente de teste.
 - [ ] O ambiente Render está atualizado.
-- [ ] Home, catálogo, ficha, formulário e revisão carregam sem erro.
+- [ ] Home, catálogo, ficha, formulário e gerenciamento carregam sem erro.
 - [ ] PT/ES/EN estão funcionando.
 - [ ] Login/cadastro funcionam.
-- [ ] Usuário comum não acessa painel de revisão.
-- [ ] Staff/revisor acessa painel de revisão.
+- [ ] Usuário comum não acessa o gerenciamento global.
+- [ ] Staff acessa o gerenciamento de submissões.
+- [ ] Publicação direta, arquivamento e recuperação funcionam sem etapa de aprovação.
 - [ ] Existe orientação clara para as pessoas testadoras.
 
 ## Comandos recomendados antes do teste

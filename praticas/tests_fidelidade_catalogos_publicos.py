@@ -279,17 +279,17 @@ class FidelidadeCatalogosPublicosTests(TestCase):
             (
                 "/ferramentas/",
                 "O cat&aacute;logo de ferramentas est&aacute; em prepara&ccedil;&atilde;o.",
-                "Os conte&uacute;dos ser&atilde;o publicados ap&oacute;s a conclus&atilde;o da curadoria institucional.",
+                "Usuários autenticados podem publicar uma ferramenta completa diretamente pelo Meu espaço.",
             ),
             (
                 "/es/ferramentas/",
                 "El cat&aacute;logo de herramientas est&aacute; en preparaci&oacute;n.",
-                "Los contenidos se publicar&aacute;n despu&eacute;s de concluir la curadur&iacute;a institucional.",
+                "Los usuarios autenticados pueden publicar una herramienta completa directamente desde Mi espacio.",
             ),
             (
                 "/en/ferramentas/",
                 "The tools catalog is being prepared.",
-                "Content will be published after institutional curation is complete.",
+                "Authenticated users can publish a complete tool directly from My space.",
             ),
             (
                 "/banco-tecnico/",

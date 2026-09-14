@@ -95,7 +95,7 @@ class Command(BaseCommand):
         alertas.extend(self.auditar_usuario_comum(usuario_comum, senha))
 
         self.stdout.write("")
-        self.stdout.write(self.style.MIGRATE_LABEL("5. Acesso de usuário staff/revisor"))
+        self.stdout.write(self.style.MIGRATE_LABEL("5. Acesso de usuário staff ao gerenciamento"))
         alertas.extend(self.auditar_usuario_staff(usuario_staff, senha))
 
         self.stdout.write("")
@@ -198,7 +198,7 @@ class Command(BaseCommand):
                 if response.status_code in [302, 403]:
                     self.stdout.write(self.style.SUCCESS(f"  USER {caminho} -> {response.status_code}"))
                 elif response.status_code == 200:
-                    msg = f"Usuário comum acessou área de revisão com 200: {caminho}"
+                    msg = f"Usuário comum acessou gerenciamento com 200: {caminho}"
                     alertas.append(msg)
                     self.stdout.write(self.style.WARNING(f"  USER {caminho} -> 200"))
                 else:
@@ -215,10 +215,17 @@ class Command(BaseCommand):
             for url in self.URLS_RESTRITAS_REVISAO:
                 caminho = self.caminho(prefixo, url)
                 response = self.get(client, caminho)
-                if response.status_code == 200:
-                    self.stdout.write(self.style.SUCCESS(f"  STAFF {caminho} -> 200"))
+                status_esperado = 302 if url == "/painel-revisao-edicoes/" else 200
+                redirecionamento_legado_valido = (
+                    status_esperado == 302
+                    and response.status_code == 302
+                    and response.url == self.caminho(prefixo, "/painel-revisao/")
+                )
+                if response.status_code == status_esperado and (status_esperado == 200 or redirecionamento_legado_valido):
+                    sufixo = " (compatibilidade)" if status_esperado == 302 else ""
+                    self.stdout.write(self.style.SUCCESS(f"  STAFF {caminho} -> {status_esperado}{sufixo}"))
                 else:
-                    msg = f"Usuário staff não acessou área de revisão com 200: {caminho} -> {response.status_code}"
+                    msg = f"Usuário staff recebeu resposta inesperada no gerenciamento: {caminho} -> {response.status_code}"
                     alertas.append(msg)
                     self.stdout.write(self.style.WARNING(f"  STAFF {caminho} -> {response.status_code}"))
 

@@ -21,9 +21,10 @@ Esta fase adiciona uma validação automatizada do fluxo funcional principal da 
    - usuário anônimo é bloqueado/redirecionado em envio e meus envios;
    - usuário autenticado acessa envio e meus envios.
 
-3. Fluxo de revisão:
-   - usuário comum não acessa painel de revisão;
-   - staff/revisor acessa painel de revisão e painel de edições publicadas.
+3. Gerenciamento de submissões:
+   - usuário comum não acessa o gerenciamento global;
+   - staff acessa o gerenciamento consolidado;
+   - a rota legada de edições publicadas redireciona para o gerenciamento consolidado.
 
 4. Catálogo:
    - valida se a página pública do catálogo carrega em PT/ES/EN;

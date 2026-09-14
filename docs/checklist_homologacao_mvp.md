@@ -46,45 +46,40 @@ Validar se o MVP atende aos requisitos negociais definidos para a Plataforma Reg
 - [ ] Usuário autenticado acessa “Meus envios”.
 - [ ] Formulário de envio vem com nome/e-mail preenchidos quando possível.
 - [ ] Usuário consegue salvar rascunho.
-- [ ] Usuário consegue enviar para revisão.
+- [ ] Usuário consegue publicar diretamente.
 - [ ] Confirmação de envio é exibida.
 
-## 5. Status e edição pelo autor
+## 5. Meus envios e edição pelo autor
 
-- [ ] Usuário consegue consultar status pelo e-mail.
-- [ ] Rascunhos aparecem na consulta.
-- [ ] Envios pendentes aparecem na consulta.
-- [ ] Comentário do revisor aparece quando existir.
-- [ ] Autor consegue editar envio antes da publicação.
-- [ ] Autor consegue reenviar para revisão.
+- [ ] Usuário visualiza somente conteúdos ligados à própria conta autenticada.
+- [ ] Rascunhos, publicados e arquivados aparecem em “Meus envios”.
+- [ ] Estados legados aparecem apenas como “Registro histórico”.
+- [ ] Comentários de revisão e solicitações antigas de edição não aparecem.
+- [ ] Autor consegue editar o próprio rascunho e publicar diretamente.
+- [ ] Autor consegue arquivar e recuperar boa prática própria sem exclusão física.
 
-## 6. Revisão e publicação
+## 6. Gerenciamento de submissões
 
-- [ ] Painel de revisão exige usuário staff.
-- [ ] Revisor consegue ver envios pendentes.
-- [ ] Revisor consegue marcar como em revisão.
-- [ ] Revisor consegue aprovar.
-- [ ] Revisor consegue publicar.
-- [ ] Revisor consegue devolver para ajustes.
-- [ ] Revisor consegue rejeitar.
+- [ ] Gerenciamento global exige usuário staff.
+- [ ] Painel exibe somente os indicadores Publicado e Arquivado.
+- [ ] Busca geral encontra boas práticas e ferramentas por nome, país, EFS, e-mail e responsável.
+- [ ] Boas práticas e ferramentas usam cartões consistentes.
+- [ ] Staff consegue editar, arquivar e recuperar conteúdos sem exclusão física.
+- [ ] Não existem ações operacionais de revisão, aprovação, devolução ou rejeição.
 - [ ] Experiência publicada aparece no catálogo.
 
-## 7. Edição de conteúdo publicado
+## 7. Edição e compatibilidade histórica
 
-- [ ] Autor consegue solicitar edição de experiência publicada.
-- [ ] Versão publicada continua visível enquanto a edição é revisada.
-- [ ] Painel de edições publicadas lista propostas pendentes.
-- [ ] Tela de revisão mostra comparação “valor atual x valor proposto”.
-- [ ] Campos alterados aparecem destacados.
-- [ ] Revisor consegue aprovar e aplicar a edição.
-- [ ] Revisor consegue rejeitar a edição.
-- [ ] Comentário do revisor aparece no acompanhamento.
+- [ ] Autor consegue editar boa prática publicada própria e a alteração é refletida diretamente.
+- [ ] Usuário comum edita ferramenta própria somente enquanto rascunho; staff gerencia os demais estados.
+- [ ] A rota antiga de status redireciona conforme o perfil autenticado.
+- [ ] A rota antiga de edições publicadas redireciona para o gerenciamento consolidado.
+- [ ] Solicitações antigas continuam preservadas no banco sem serem exibidas.
 
 ## 8. Anexos
 
 - [ ] Aceita PDF.
-- [ ] Aceita Word.
-- [ ] Aceita Excel.
+- [ ] Aceita JPG e PNG.
 - [ ] Rejeita extensões não permitidas.
 - [ ] Limita a até três anexos por experiência.
 - [ ] Rejeita arquivo acima do limite definido.

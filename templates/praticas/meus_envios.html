@@ -16,7 +16,7 @@
         <header class="account-heading">
             <div class="eyebrow">{% if LANGUAGE_CODE == 'en' %}My space{% elif LANGUAGE_CODE == 'es' %}Mi espacio{% else %}Meu espa&ccedil;o{% endif %}</div>
             <h1>{% if LANGUAGE_CODE == 'en' %}My submissions{% elif LANGUAGE_CODE == 'es' %}Mis env&iacute;os{% else %}Meus envios{% endif %}</h1>
-            <p>{% if LANGUAGE_CODE == 'en' %}Track drafts, submissions, review comments and edit requests linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Acompa&ntilde;e borradores, env&iacute;os, comentarios de revisi&oacute;n y solicitudes de edici&oacute;n vinculados a su cuenta autenticada.{% else %}Acompanhe rascunhos, envios, coment&aacute;rios de revis&atilde;o e solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o vinculados &agrave; sua conta autenticada.{% endif %}</p>
+            <p>{% if LANGUAGE_CODE == 'en' %}Track drafts and published or archived content linked to your authenticated account.{% elif LANGUAGE_CODE == 'es' %}Acompa&ntilde;e borradores y contenidos publicados o archivados vinculados a su cuenta autenticada.{% else %}Acompanhe rascunhos e conte&uacute;dos publicados ou arquivados vinculados &agrave; sua conta autenticada.{% endif %}</p>
         </header>
         <a href="{% url 'adicionar_boa_pratica' %}" class="btn btn-primary workspace-primary-action">{% if LANGUAGE_CODE == 'en' %}Submit new practice{% elif LANGUAGE_CODE == 'es' %}Enviar nueva pr&aacute;ctica{% else %}Enviar nova pr&aacute;tica{% endif %}</a>
     </div>
@@ -24,11 +24,6 @@
     <section class="workspace-section" aria-labelledby="submission-list-title">
         <h2 id="submission-list-title">{% if LANGUAGE_CODE == 'en' %}Good practices{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas{% else %}Boas pr&aacute;ticas{% endif %}</h2>
         {% include 'praticas/includes/lista_envios_conta.html' %}
-    </section>
-
-    <section class="workspace-section" aria-labelledby="edit-request-list-title">
-        <h2 id="edit-request-list-title">{% if LANGUAGE_CODE == 'en' %}Edit requests for published content{% elif LANGUAGE_CODE == 'es' %}Solicitudes de edici&oacute;n de contenidos publicados{% else %}Solicita&ccedil;&otilde;es de edi&ccedil;&atilde;o de conte&uacute;dos publicados{% endif %}</h2>
-        {% include 'praticas/includes/lista_propostas_edicao_conta.html' %}
     </section>
 
     <section class="workspace-section" aria-labelledby="tool-submission-list-title">

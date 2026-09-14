@@ -36,7 +36,7 @@
 3. Os textos de ajuda são suficientes?
 4. Algum campo pareceu desnecessário?
 5. Algum campo importante está faltando?
-6. A diferença entre salvar rascunho e enviar para revisão está clara?
+6. A diferença entre salvar rascunho e publicar diretamente está clara?
 
 ## Recursos técnicos e normas
 

@@ -18,7 +18,7 @@ A versão consolidada inclui:
 
 - visual público revisado;
 - fluxo de envio ajustado;
-- fluxo de revisão e aprovação validado;
+- fluxo de rascunho, publicação direta e gerenciamento validado;
 - recursos técnicos e normas alinhados;
 - dados demonstrativos para apresentação;
 - usabilidade e acessibilidade refinadas;

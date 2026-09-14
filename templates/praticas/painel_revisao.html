@@ -47,7 +47,7 @@
     <li>
         <article class="submission-item">
             <div class="d-flex flex-wrap gap-2 mb-3">
-                <span class="status-pill status-{{ experiencia.status_publicacao }}">{% if experiencia.status_publicacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}{% elif experiencia.status_publicacao == 'enviado' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviado{% else %}Enviado{% endif %}{% elif experiencia.status_publicacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}{% elif experiencia.status_publicacao == 'aprovado' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobado{% else %}Aprovado{% endif %}{% elif experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}{% elif experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}{% elif experiencia.status_publicacao == 'rejeitado' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazado{% else %}Rejeitado{% endif %}{% endif %}</span>
+                <span class="status-pill {% if experiencia.status_publicacao == 'rascunho' or experiencia.status_publicacao == 'publicado' or experiencia.status_publicacao == 'arquivado' %}status-{{ experiencia.status_publicacao }}{% else %}status-historico{% endif %}">{% if experiencia.status_publicacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}{% elif experiencia.status_publicacao == 'publicado' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicado{% else %}Publicado{% endif %}{% elif experiencia.status_publicacao == 'arquivado' %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivado{% else %}Arquivado{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' %}Historical record{% else %}Registro histórico{% endif %}{% endif %}</span>
                 <span class="badge-soft">{{ experiencia.atualizado_em|date:"d/m/Y H:i" }}</span>
             </div>
             <h2 class="h4 section-title">{{ experiencia.titulo_exibicao }}</h2>
@@ -57,12 +57,6 @@
                 <strong>{% if LANGUAGE_CODE == 'en' %}Country{% elif LANGUAGE_CODE == 'es' %}País{% else %}País{% endif %}:</strong> {{ experiencia.pais.nome_exibicao }}<br>
                 <strong>E-mail:</strong> {{ experiencia.email_contato|default:"-" }}
             </div>
-            {% if experiencia.comentario_revisor %}
-                <div class="compact-summary-card mb-3">
-                    <strong>{% if LANGUAGE_CODE == 'en' %}Last reviewer comment{% elif LANGUAGE_CODE == 'es' %}Último comentario del revisor{% else %}Último comentário do revisor{% endif %}</strong>
-                    <p class="section-subtitle small mb-0">{{ experiencia.comentario_revisor|truncatechars:220 }}</p>
-                </div>
-            {% endif %}
             <a class="btn btn-outline-primary btn-sm" href="{% url 'editar_boa_pratica' experiencia.pk %}">{% if LANGUAGE_CODE == 'en' %}Edit good practice{% elif LANGUAGE_CODE == 'es' %}Editar buena práctica{% else %}Editar boa prática{% endif %}</a>
             {% if experiencia.status_publicacao == 'arquivado' %}<a class="btn btn-outline-success btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Restore{% elif LANGUAGE_CODE == 'es' %}Restaurar{% else %}Recuperar{% endif %}</a>{% elif experiencia.status_publicacao == 'publicado' %}<a class="btn btn-outline-danger btn-sm" href="{% url 'arquivar_boa_pratica' experiencia.pk %}?next={{ request.get_full_path|urlencode }}">{% if LANGUAGE_CODE == 'en' %}Archive good practice{% elif LANGUAGE_CODE == 'es' %}Archivar buena práctica{% else %}Arquivar boa prática{% endif %}</a>{% endif %}
         </article>

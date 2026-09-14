@@ -5,15 +5,12 @@
             <article class="submission-item">
                 <div class="submission-item-main">
                     <div class="submission-item-meta">
-                        <span class="status-badge status-{{ ferramenta.situacao }}">
+                        <span class="status-badge {% if ferramenta.situacao == 'rascunho' or ferramenta.situacao == 'publicada' or ferramenta.situacao == 'arquivada' %}status-{{ ferramenta.situacao }}{% else %}status-historico{% endif %}">
                             <span class="status-dot" aria-hidden="true"></span>
                             {% if ferramenta.situacao == 'rascunho' %}{% if LANGUAGE_CODE == 'en' %}Draft{% elif LANGUAGE_CODE == 'es' %}Borrador{% else %}Rascunho{% endif %}
-                            {% elif ferramenta.situacao == 'enviada' %}{% if LANGUAGE_CODE == 'en' %}Submitted{% elif LANGUAGE_CODE == 'es' %}Enviada{% else %}Enviada{% endif %}
-                            {% elif ferramenta.situacao == 'em_revisao' %}{% if LANGUAGE_CODE == 'en' %}Under review{% elif LANGUAGE_CODE == 'es' %}En revisión{% else %}Em revisão{% endif %}
-                            {% elif ferramenta.situacao == 'aprovada' %}{% if LANGUAGE_CODE == 'en' %}Approved{% elif LANGUAGE_CODE == 'es' %}Aprobada{% else %}Aprovada{% endif %}
                             {% elif ferramenta.situacao == 'publicada' %}{% if LANGUAGE_CODE == 'en' %}Published{% elif LANGUAGE_CODE == 'es' %}Publicada{% else %}Publicada{% endif %}
-                            {% elif ferramenta.situacao == 'rejeitada' %}{% if LANGUAGE_CODE == 'en' %}Rejected{% elif LANGUAGE_CODE == 'es' %}Rechazada{% else %}Rejeitada{% endif %}
-                            {% else %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivada{% else %}Arquivada{% endif %}{% endif %}
+                            {% elif ferramenta.situacao == 'arquivada' %}{% if LANGUAGE_CODE == 'en' %}Archived{% elif LANGUAGE_CODE == 'es' %}Archivada{% else %}Arquivada{% endif %}
+                            {% else %}{% if LANGUAGE_CODE == 'en' %}Historical record{% else %}Registro histórico{% endif %}{% endif %}
                         </span>
                         {% if ferramenta.setor %}<span>{{ ferramenta.setor.nome_exibicao }}</span>{% endif %}
                         {% if ferramenta.ano %}<span>{{ ferramenta.ano }}</span>{% elif ferramenta.periodo %}<span>{{ ferramenta.periodo }}</span>{% endif %}

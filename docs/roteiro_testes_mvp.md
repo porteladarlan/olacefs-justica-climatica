@@ -58,30 +58,27 @@ http://127.0.0.1:8000/
 6. Enviar nova boa prática.
 7. Salvar como rascunho.
 8. Consultar em “Meus envios”.
-9. Editar e reenviar.
+9. Editar o rascunho e publicar diretamente.
+10. Confirmar que a boa prática aparece no catálogo.
 
-## Fluxo 5 — Revisão
+## Fluxo 5 — Gerenciamento de submissões
 
-1. Entrar com superusuário/staff.
+1. Entrar com usuário staff.
 2. Acessar `/painel-revisao/`.
-3. Abrir envio pendente.
-4. Marcar como em revisão.
-5. Aprovar.
-6. Publicar.
-7. Confirmar que aparece no catálogo.
+3. Confirmar os indicadores Publicado e Arquivado.
+4. Pesquisar boas práticas e ferramentas por nome, país, EFS, e-mail e responsável.
+5. Editar um conteúdo publicado.
+6. Arquivar o conteúdo sem excluí-lo fisicamente.
+7. Recuperar o conteúdo arquivado e confirmar seu retorno ao catálogo.
 
 ## Fluxo 6 — Edição de publicado
 
-1. Consultar status pelo e-mail do autor.
-2. Solicitar edição de experiência publicada.
-3. Alterar título ou resultados.
-4. Enviar proposta.
-5. Entrar como revisor.
-6. Abrir `/painel-revisao-edicoes/`.
-7. Abrir proposta.
-8. Conferir comparação “valor atual x valor proposto”.
-9. Aprovar e aplicar.
-10. Confirmar alteração no catálogo/ficha.
+1. Entrar como pessoa autora.
+2. Abrir “Meus envios”.
+3. Editar uma boa prática publicada própria.
+4. Alterar título ou resultados e salvar.
+5. Confirmar que a alteração aparece imediatamente no catálogo/ficha.
+6. Confirmar que `/painel-revisao-edicoes/` apenas redireciona para `/painel-revisao/` quando acessada por staff.
 
 ## Fluxo 7 — Anexos
 
@@ -102,9 +99,10 @@ O MVP pode ser demonstrado quando:
 
 - navegação pública funciona;
 - submissão exige cadastro;
-- revisão funciona;
-- publicação funciona;
-- edição publicada exige aprovação;
+- rascunho e publicação direta funcionam;
+- gerenciamento por staff funciona sem etapas de revisão ou aprovação;
+- edição publicada é refletida diretamente;
+- arquivamento e recuperação preservam o registro;
 - comparação funciona;
 - favoritos funcionam;
 - anexos são validados;

@@ -6,7 +6,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import translation
 
-from .models import EFS, Experiencia, Ferramenta, NormaInternacional, NormaInternacionalPais, Pais, Setor, TipoExperiencia
+from .models import EFS, Experiencia, Ferramenta, NormaInternacional, NormaInternacionalPais, Pais, PropostaEdicaoExperiencia, Setor, TipoExperiencia
 from .views import _ids_comparacao_seguros
 
 
@@ -232,6 +232,7 @@ class Neg7AjustesPosHomologacaoTests(TestCase):
         self.assertContains(response, 'data-testid="panel-open-search"')
 
     def test_status_do_painel_de_boas_praticas_e_localizado_sem_mistura(self):
+        experiencias = []
         for status in (
             Experiencia.StatusPublicacao.RASCUNHO,
             Experiencia.StatusPublicacao.ENVIADO,
@@ -241,23 +242,98 @@ class Neg7AjustesPosHomologacaoTests(TestCase):
             Experiencia.StatusPublicacao.ARQUIVADO,
             Experiencia.StatusPublicacao.REJEITADO,
         ):
-            self.experiencia(status, titulo=f"Status {status}")
+            experiencias.append(self.experiencia(status, titulo=f"Registro {status}"))
         self.client.force_login(self.staff)
-        rotulos = {
-            "pt-br": ("Rascunho", "Enviado", "Em revisão", "Aprovado", "Publicado", "Arquivado", "Rejeitado"),
-            "es": ("Borrador", "Enviado", "En revisión", "Aprobado", "Publicado", "Archivado", "Rechazado"),
-            "en": ("Draft", "Submitted", "Under review", "Approved", "Published", "Archived", "Rejected"),
+        cenarios = {
+            "pt-br": (("Rascunho", "Publicado", "Arquivado", "Registro histórico"), ("Enviado", "Em revisão", "Aprovado", "Rejeitado")),
+            "es": (("Borrador", "Publicado", "Archivado", "Registro histórico"), ("Enviado", "En revisión", "Aprobado", "Rechazado")),
+            "en": (("Draft", "Published", "Archived", "Historical record"), ("Submitted", "Under review", "Approved", "Rejected")),
         }
-        for idioma, esperados in rotulos.items():
+        for idioma, (esperados, legados) in cenarios.items():
             with self.subTest(idioma=idioma), translation.override(idioma):
                 response = self.client.get(reverse("painel_revisao"))
                 conteudo = unescape(response.content.decode("utf-8"))
                 painel = conteudo.split('data-testid="panel-good-practices"', 1)[1].split("</section>", 1)[0]
                 for rotulo in esperados:
                     self.assertIn(rotulo, painel)
-                proibidos = set({"Rascunho", "Em revisão", "Aprovado", "Publicado", "Arquivado", "Rejeitado"}) - set(esperados)
-                for rotulo in proibidos:
+                for rotulo in legados:
                     self.assertNotIn(rotulo, painel)
+                self.assertEqual(painel.count("status-historico"), 4)
+                self.assertEqual(
+                    {item.pk for item in response.context["experiencias"]},
+                    {item.pk for item in experiencias},
+                )
+
+    def test_fluxo_legado_permanece_no_banco_sem_aparecer_na_interface(self):
+        experiencia = self.experiencia(
+            Experiencia.StatusPublicacao.EM_REVISAO,
+            titulo="Registro legado preservado",
+        )
+        experiencia.comentario_revisor = "COMENTARIO_REVISOR_NAO_DEVE_APARECER"
+        experiencia.save(update_fields=["comentario_revisor"])
+        proposta = PropostaEdicaoExperiencia.objects.create(
+            experiencia=experiencia,
+            email_contato="neg7@example.org",
+            comentario_autor="SOLICITACAO_LEGADA_NAO_DEVE_APARECER",
+            comentario_revisor="RESPOSTA_LEGADA_NAO_DEVE_APARECER",
+            dados_json={"titulo": "Título histórico"},
+            status=PropostaEdicaoExperiencia.Status.PENDENTE,
+        )
+
+        for usuario, rota in ((self.autor, "meus_envios"), (self.staff, "painel_revisao")):
+            with self.subTest(usuario=usuario.username, rota=rota):
+                self.client.force_login(usuario)
+                response = self.client.get(reverse(rota))
+                conteudo = unescape(response.content.decode("utf-8"))
+                self.assertContains(response, experiencia.titulo)
+                self.assertIn("Registro histórico", conteudo)
+                self.assertNotIn(experiencia.comentario_revisor, conteudo)
+                self.assertNotIn(proposta.comentario_autor, conteudo)
+                self.assertNotIn(proposta.comentario_revisor, conteudo)
+                self.assertNotIn("Solicitações de edição de conteúdos publicados", conteudo)
+
+        self.client.force_login(self.autor)
+        response = self.client.get(reverse("editar_boa_pratica", args=[experiencia.pk]))
+        self.assertNotContains(response, experiencia.comentario_revisor)
+        self.assertTrue(PropostaEdicaoExperiencia.objects.filter(pk=proposta.pk).exists())
+
+    def test_estados_legados_de_ferramentas_aparecem_como_registro_historico(self):
+        for situacao in (
+            Ferramenta.Situacao.ENVIADA,
+            Ferramenta.Situacao.EM_REVISAO,
+            Ferramenta.Situacao.APROVADA,
+            Ferramenta.Situacao.REJEITADA,
+        ):
+            self.ferramenta(situacao)
+
+        self.client.force_login(self.staff)
+        cenarios = {
+            "pt-br": ("Registro histórico", ("Enviada", "Em revisão", "Aprovada", "Rejeitada")),
+            "es": ("Registro histórico", ("Enviada", "En revisión", "Aprobada", "Rechazada")),
+            "en": ("Historical record", ("Submitted", "Under review", "Approved", "Rejected")),
+        }
+        for idioma, (historico, legados) in cenarios.items():
+            with self.subTest(idioma=idioma), translation.override(idioma):
+                response = self.client.get(reverse("painel_revisao"))
+                conteudo = unescape(response.content.decode("utf-8"))
+                painel = conteudo.split('data-testid="panel-tools"', 1)[1]
+                self.assertEqual(painel.count("status-historico"), 4)
+                self.assertIn(historico, painel)
+                for rotulo in legados:
+                    self.assertNotIn(rotulo, painel)
+
+    def test_estado_vazio_de_ferramentas_comunica_publicacao_direta(self):
+        cenarios = (
+            ("pt-br", "Usuários autenticados podem publicar uma ferramenta completa diretamente pelo Meu espaço.", "curadoria institucional"),
+            ("es", "Los usuarios autenticados pueden publicar una herramienta completa directamente desde Mi espacio.", "curaduría institucional"),
+            ("en", "Authenticated users can publish a complete tool directly from My space.", "institutional curation"),
+        )
+        for idioma, esperado, legado in cenarios:
+            with self.subTest(idioma=idioma), translation.override(idioma):
+                response = self.client.get(reverse("ferramentas"))
+                conteudo = unescape(response.content.decode("utf-8"))
+                self.assertIn(esperado, conteudo)
+                self.assertNotIn(legado, conteudo)
 
     def test_busca_de_ferramenta_cobre_codigo_responsavel_e_autoria(self):
         ferramenta = self.ferramenta()

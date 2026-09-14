@@ -14,9 +14,9 @@ A plataforma contempla:
 - catálogo público de boas práticas;
 - ficha estruturada de experiências;
 - formulário de envio de boas práticas;
-- fluxo de rascunho, envio e revisão;
-- painel de revisão;
-- painel de revisão de edições publicadas;
+- fluxo de rascunho e publicação direta;
+- gerenciamento consolidado de submissões para staff;
+- compatibilidade por redirecionamento das rotas editoriais antigas;
 - recursos técnicos;
 - normas internacionais;
 - suporte trilíngue em português, espanhol e inglês;
@@ -29,7 +29,7 @@ A plataforma contempla:
 
 - Fase 15G — revisão visual das páginas públicas.
 - Fase 15H — ajustes do formulário de envio.
-- Fase 15I — ajustes do fluxo de revisão e aprovação.
+- Fase 15I — base histórica do fluxo editorial, posteriormente consolidada pelo NEG-7 sem revisão ou aprovação.
 - Fase 15J — conteúdo institucional, recursos técnicos e normas.
 - Fase 15K — dados demonstrativos para apresentação.
 - Fase 15L — usabilidade e acessibilidade.
