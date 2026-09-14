@@ -253,7 +253,7 @@ class ShellGlobalLote1Tests(TestCase):
         self.assertNotIn("Meus envios", shell)
         self.assertNotIn("Painel de revisão", shell)
         self.assertNotIn("Administração do Django", shell)
-        self.assertNotIn(f'href="{reverse("logout_usuario")}"', shell)
+        self.assertNotIn(f'action="{reverse("logout_usuario")}"', shell)
 
     def test_menu_autenticado_exibe_usuario_escapado_e_destinos_reais(self):
         self.client.force_login(self.usuario)
@@ -263,7 +263,9 @@ class ShellGlobalLote1Tests(TestCase):
         self.assertIn(f'href="{reverse("meus_envios")}"', shell)
         self.assertNotIn(f'href="{reverse("status_envio")}"', shell)
         self.assertIn(f'href="{reverse("favoritos_experiencias")}"', shell)
-        self.assertIn(f'href="{reverse("logout_usuario")}"', shell)
+        self.assertIn(f'action="{reverse("logout_usuario")}"', shell)
+        self.assertIn('method="post"', shell)
+        self.assertIn('name="csrfmiddlewaretoken"', shell)
         self.assertNotIn(f'href="{reverse("login_usuario")}"', shell)
         self.assertNotIn(f'href="{reverse("registrar_usuario")}"', shell)
 
