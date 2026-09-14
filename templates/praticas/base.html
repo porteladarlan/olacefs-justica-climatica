@@ -2319,9 +2319,12 @@
                                 <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li>
-                                <a class="dropdown-item" href="{% url 'logout_usuario' %}">
-                                    {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
-                                </a>
+                                <form method="post" action="{% url 'logout_usuario' %}" class="m-0">
+                                    {% csrf_token %}
+                                    <button class="dropdown-item border-0 bg-transparent text-start w-100" type="submit">
+                                        {% if LANGUAGE_CODE == 'en' %}Sign out{% elif LANGUAGE_CODE == 'es' %}Salir{% else %}Sair{% endif %}
+                                    </button>
+                                </form>
                             </li>
                         {% else %}
                             <li>

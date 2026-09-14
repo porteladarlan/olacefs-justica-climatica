@@ -22,7 +22,7 @@
 - a fundação técnica da afiliação usuário–EFS existe, mas nomes/poderes dos papéis, aprovadores, retenção e autorização por objeto continuam pendentes; até decisões e fase específica, vínculo, episódio e papel não concedem acesso e objetos sem `autor` permanecem restritos a staff;
 - o limite de três anexos foi alinhado à interface atual; eventual alteração quantitativa depende de confirmação negocial e deve preservar os controles de segurança implementados.
 - o Bootstrap 5.3.3 continua carregado por `cdn.jsdelivr.net` como exceção temporária do Lote 1; localização, integridade e política offline permanecem hardening P1 posterior;
-- o logout autenticado continua aceitando GET por decisão explícita de escopo do Lote 1; a migração para POST com CSRF permanece pendência P1;
+- o logout autenticado exige POST com CSRF; links antigos ou favoritos para `/sair/` recebem HTTP 405 e devem ser removidos de integrações externas;
 - a validação automatizada cobre os contratos do shell, mas zoom de 200%, tecnologia assistiva, storage bloqueado e interações reais de teclado exigem evidência manual complementar em navegador.
 - Boas Práticas e Marcos Normativos foram comparados em navegador com o protótipo em 1440 × 900 e verificados sem rolagem horizontal em 320/768/1024/1440 px; as demais páginas ainda exigem homologação visual própria e a auditoria com tecnologia assistiva permanece pendente;
 - Marcos Normativos ainda não possui no schema natureza jurídica, ano próprio ou publicação de compêndio; esses elementos permanecem indisponíveis na interface para evitar dados ou downloads simulados até a Fase 2B;
@@ -31,5 +31,7 @@
 - perguntas, taxonomias e referências do Guia permanecem somente em espanhol; traduções PT/EN, correções editoriais, UX pública e reconciliação normativa dependem de decisões posteriores e não podem ser inferidas;
 - referências do Guia permanecem no nível de subárea por decisão GUIA-07; criar relação por pergunta, deduplicar conceitualmente ou vincular automaticamente a `NormaInternacional` produziria precisão não sustentada pela fonte.
 - a documentação histórica permanece fragmentada; a organização física completa dos documentos está pendente para a Fase 0B.
-- autenticação reforçada e rate limiting continuam pendentes, assim como autorização institucional usuário–EFS.
-- antivírus/quarentena de uploads, CSP, storage persistente, logs centralizados e hardening operacional do Hetzner continuam pendentes.
+- sessões e tokens de redefinição possuem limites explícitos, mas MFA, rate limiting distribuído e autorização institucional usuário–EFS continuam pendentes.
+- a CSP defensiva está aplicada e uma política restritiva opera em modo de relatório; scripts e estilos inline e o Bootstrap por CDN impedem ainda a adoção imediata de uma política estrita sem exceções.
+- antivírus/quarentena de uploads, storage persistente, logs centralizados e hardening operacional do Hetzner continuam pendentes.
+- o SAST possui dois achados médios B310 conhecidos em URLs operacionais controladas; não há achado de alta severidade/alta confiança, e os fluxos devem continuar limitando esquemas e destinos.

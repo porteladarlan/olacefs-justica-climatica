@@ -1,5 +1,15 @@
 # Changelog da base Codex
 
+## Hardening de segurança e evidências para TI — 2026-09-14
+
+- logout migrado de GET para POST autenticado com CSRF;
+- sessão limitada a oito horas, renovada por atividade e encerrada ao fechar o navegador;
+- tokens de redefinição de senha limitados a 24 horas por padrão;
+- CSP defensiva aplicada e política restritiva adicionada em modo de relatório;
+- CI ampliado com `pip-audit`, Bandit, compilação Python e actions fixadas por SHA;
+- Dependabot configurado para dependências Python e GitHub Actions;
+- criada matriz técnica de controles, evidências e responsabilidades da TI, sem alterar schema, dados ou produção.
+
 ## NEG-7 pós-deploy — remoção final do fluxo de revisão — 2026-09-14
 
 - Estados editoriais legados continuam preservados e pesquisáveis, mas aparecem somente como `Registro histórico`, sem reativar etapas de revisão ou aprovação.

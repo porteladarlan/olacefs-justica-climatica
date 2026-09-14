@@ -827,6 +827,8 @@ def login_usuario(request):
     return render(request, "praticas/login_usuario.html", {"form": form, "next": request.GET.get("next", "")})
 
 
+@login_required(login_url="login_usuario")
+@require_POST
 def logout_usuario(request):
     logout(request)
     messages.success(
