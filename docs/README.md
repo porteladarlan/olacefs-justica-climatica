@@ -14,6 +14,7 @@ Legenda: **VIGENTE** é referência atual; **HISTÓRICO** registra implementaç�
 
 ## Arquitetura, segurança e proteção de dados
 
+- [Relatório técnico de segurança e transição para TI](seguranca/relatorio_controles_ti_2026-09-14.md) — **VIGENTE**
 - [Contexto do projeto](../.codex/docs/PROJECT_CONTEXT.md) — **VIGENTE**
 - [Módulos](../.codex/docs/MODULES.md) — **VIGENTE**
 - [Arquitetura](../.codex/docs/ARCHITECTURE.md) — **VIGENTE**
@@ -28,7 +29,7 @@ Legenda: **VIGENTE** é referência atual; **HISTÓRICO** registra implementaç�
 - [Checklist de ambiente de produção](ambiente/checklist_ambiente_producao.md) — **VIGENTE**
 - [Variáveis de ambiente recomendadas](ambiente/variaveis_ambiente_recomendadas.md) — **VIGENTE**
 - [Guia de deploy e migration futura](ambiente/guia_deploy_migracao_futura.md) — **REFERÊNCIA**
-- [Checklist de hardening](ambiente/checklist_hardening_producao.md) — **PENDENTE DE REVISÃO**
+- [Checklist de hardening](ambiente/checklist_hardening_producao.md) — **VIGENTE**
 - [Limitações do ambiente gratuito](ambiente/limitacoes_ambiente_gratuito.md) — **REFERÊNCIA**
 - [Backup e restore](operacao_backup_restore.md) — **REFERÊNCIA**
 - [Monitoramento e alertas](operacao_monitoramento_alertas.md) — **REFERÊNCIA**
