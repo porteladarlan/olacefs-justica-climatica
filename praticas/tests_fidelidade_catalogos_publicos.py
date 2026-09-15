@@ -4,6 +4,7 @@ from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import finders
+from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import translation
@@ -175,6 +176,11 @@ class FidelidadeCatalogosPublicosTests(TestCase):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, titulo, html=False)
+                self.assertContains(response, 'class="catalog-eyebrow-icon"')
+                self.assertContains(
+                    response,
+                    f'src="{static("praticas/img/search.svg")}"',
+                )
                 self.assertContains(response, 'class="catalog-layout"')
                 self.assertContains(response, "data-filter-search", count=4)
                 self.assertContains(response, 'class="catalog-filter-label"', count=4)

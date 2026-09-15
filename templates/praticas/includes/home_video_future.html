@@ -3,17 +3,15 @@
         <h2 class="home-section-title" id="home-video-title">{% if LANGUAGE_CODE == 'en' %}Discover the story behind the Climate Justice Platform{% elif LANGUAGE_CODE == 'es' %}Conoce la historia detr&aacute;s de la Plataforma de Justicia Clim&aacute;tica{% else %}Conhe&ccedil;a a hist&oacute;ria por tr&aacute;s da Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}</h2>
     </div>
     <div class="home-video-frame">
-        <video
+        <iframe
             id="home-video-player"
-            class="home-video-player"
-            controls
-            preload="metadata"
-            playsinline
-            aria-label="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform official teaser{% elif LANGUAGE_CODE == 'es' %}Teaser oficial de la Plataforma de Justicia Clim&aacute;tica{% else %}Teaser oficial da Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}"
-        >
-            <source src="/media/videos/teaser-plataforma-jc.mp4" type="video/mp4">
-            {% if LANGUAGE_CODE == 'en' %}Your browser cannot play this video.{% elif LANGUAGE_CODE == 'es' %}Tu navegador no puede reproducir este video.{% else %}Seu navegador n&atilde;o consegue reproduzir este v&iacute;deo.{% endif %}
-        </video>
+            class="home-video-embed"
+            src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"
+            title="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform official video{% elif LANGUAGE_CODE == 'es' %}Video oficial de la Plataforma de Justicia Clim&aacute;tica{% else %}V&iacute;deo oficial da Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="encrypted-media; picture-in-picture; web-share"
+            allowfullscreen
+        ></iframe>
     </div>
-    <p class="home-video-fallback" id="home-video-error" role="status" hidden>{% if LANGUAGE_CODE == 'en' %}If the video does not load, the official media file is not yet available in this environment.{% elif LANGUAGE_CODE == 'es' %}Si el video no carga, el archivo multimedia oficial a&uacute;n no est&aacute; disponible en este entorno.{% else %}Se o v&iacute;deo n&atilde;o carregar, o arquivo oficial de m&iacute;dia ainda n&atilde;o est&aacute; dispon&iacute;vel neste ambiente.{% endif %}</p>
 </section>

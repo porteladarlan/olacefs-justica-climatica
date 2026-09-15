@@ -43,12 +43,14 @@ class SecurityHardeningTests(TestCase):
         politica = response.headers["Content-Security-Policy"]
         self.assertIn("base-uri 'self'", politica)
         self.assertIn("form-action 'self'", politica)
+        self.assertIn("frame-src 'self' https://www.youtube-nocookie.com", politica)
         self.assertIn("frame-ancestors 'none'", politica)
         self.assertIn("object-src 'none'", politica)
 
         relatorio = response.headers["Content-Security-Policy-Report-Only"]
         self.assertIn("default-src 'self'", relatorio)
         self.assertIn("https://cdn.jsdelivr.net", relatorio)
+        self.assertIn("frame-src 'self' https://www.youtube-nocookie.com", relatorio)
 
     def test_parametros_defensivos_de_sessao_e_token(self):
         self.assertTrue(settings.SESSION_COOKIE_HTTPONLY)

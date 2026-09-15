@@ -49,11 +49,20 @@
 }
 
 .catalog-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--green);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .16em;
     text-transform: uppercase;
+}
+
+.catalog-eyebrow-icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
 }
 
 .catalog-heading h1 {
