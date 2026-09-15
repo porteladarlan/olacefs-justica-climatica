@@ -1,5 +1,12 @@
 # Changelog da base Codex
 
+## Ajustes visuais solicitados pela Ildenny — 2026-09-15
+
+- substituído o vídeo MP4 servido pela aplicação por incorporação responsiva do YouTube em modo de privacidade, com carregamento tardio e sem reprodução automática;
+- atualizadas as três imagens da página de exemplos, na ordem recebida e com dimensões padronizadas em 941 × 634 px;
+- incluído o ícone de busca antes do rótulo “Experiências regionais” no catálogo de boas práticas;
+- ajustadas descrições alternativas, legendas trilíngues, CSP e testes automatizados relacionados.
+
 ## Hardening de segurança e evidências para TI — 2026-09-14
 
 - logout migrado de GET para POST autenticado com CSRF;

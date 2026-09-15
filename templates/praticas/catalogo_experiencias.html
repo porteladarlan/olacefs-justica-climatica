@@ -17,7 +17,10 @@
     <section class="catalog-section" aria-labelledby="catalog-title">
         <header class="catalog-heading">
             <div>
-                <div class="catalog-eyebrow">{% if LANGUAGE_CODE == 'en' %}Regional experiences{% elif LANGUAGE_CODE == 'es' %}Experiencias regionales{% else %}Experi&ecirc;ncias regionais{% endif %}</div>
+                <div class="catalog-eyebrow">
+                    <img class="catalog-eyebrow-icon" src="{% static 'praticas/img/search.svg' %}" width="24" height="24" alt="" aria-hidden="true">
+                    <span>{% if LANGUAGE_CODE == 'en' %}Regional experiences{% elif LANGUAGE_CODE == 'es' %}Experiencias regionales{% else %}Experi&ecirc;ncias regionais{% endif %}</span>
+                </div>
                 <h1 id="catalog-title">{% if LANGUAGE_CODE == 'en' %}Good practices in climate justice{% elif LANGUAGE_CODE == 'es' %}Buenas pr&aacute;cticas en justicia clim&aacute;tica{% else %}Boas pr&aacute;ticas em justi&ccedil;a clim&aacute;tica{% endif %}</h1>
                 <p>{% if LANGUAGE_CODE == 'en' %}Explore experiences registered by SAIs. Select a country on the map or browse the full catalog.{% elif LANGUAGE_CODE == 'es' %}Explora las experiencias registradas por las EFS. Selecciona un pa&iacute;s en el mapa o navega el cat&aacute;logo completo.{% else %}Explore as experi&ecirc;ncias cadastradas pelas EFS. Selecione um pa&iacute;s no mapa ou navegue pelo cat&aacute;logo completo.{% endif %}</p>
             </div>

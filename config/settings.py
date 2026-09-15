@@ -232,6 +232,7 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_CSP = {
     "base-uri": [CSP.SELF],
     "form-action": [CSP.SELF],
+    "frame-src": [CSP.SELF, "https://www.youtube-nocookie.com"],
     "frame-ancestors": [CSP.NONE],
     "object-src": [CSP.NONE],
 }
@@ -243,7 +244,7 @@ SECURE_CSP_REPORT_ONLY = {
     "font-src": [CSP.SELF, "data:"],
     "connect-src": [CSP.SELF],
     "media-src": [CSP.SELF],
-    "frame-src": [CSP.SELF],
+    "frame-src": [CSP.SELF, "https://www.youtube-nocookie.com"],
     "base-uri": [CSP.SELF],
     "form-action": [CSP.SELF],
     "frame-ancestors": [CSP.NONE],

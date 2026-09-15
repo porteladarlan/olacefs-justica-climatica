@@ -600,21 +600,19 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, titulo)
                 self.assertContains(response, "OLACEFS + GIZ")
-                self.assertContains(response, "Gustavo Mansur / Agência Senado")
-                self.assertContains(response, "FAO (2019)")
-                self.assertContains(response, "Denisa Starbova")
                 self.assertContains(
                     response,
-                    'src="/static/praticas/img/ejemplo-rs2024.jpg"',
+                    'src="/static/praticas/img/indigenous-man-traditional-headdress-face-mask-forest.jpg"',
                 )
                 self.assertContains(
                     response,
-                    'src="/static/praticas/img/ejemplo-corredor-seco.jpg"',
+                    'src="/static/praticas/img/women-standing-dry-soil-fishing-gear-global-warming-water-crisis.jpg"',
                 )
                 self.assertContains(
                     response,
-                    'src="/static/praticas/img/ejemplo-huni-kui.jpg"',
+                    'src="/static/praticas/img/guiding-disaster-relief-strategy-ar-generative-ai.jpg"',
                 )
+                self.assertContains(response, 'width="941" height="634"', count=3)
 
     def test_pagina_de_exemplos_tem_breadcrumb_e_hierarquia_semantica(self):
         response = self.client.get(reverse("exemplos_injustica_climatica"))
@@ -654,43 +652,36 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertNotIn("official introduction", bloco)
                 self.assertNotIn("<p>", bloco)
                 self.assertIn(
-                    '<source src="/media/videos/teaser-plataforma-jc.mp4" type="video/mp4">',
+                    'src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"',
                     bloco,
                 )
-                self.assertIn('preload="metadata"', bloco)
-                self.assertIn("playsinline", bloco)
+                self.assertIn('loading="lazy"', bloco)
+                self.assertIn('referrerpolicy="strict-origin-when-cross-origin"', bloco)
                 self.assertNotIn("autoplay", bloco)
                 self.assertNotContains(response, "Etapa futura")
                 self.assertNotContains(response, "Future stage")
                 self.assertContains(response, f'formaction="{reverse("catalogo_experiencias")}"')
                 self.assertContains(response, f'formaction="{reverse("normas_internacionais")}"')
 
-    def test_video_home_usa_player_html5_via_media_sem_autoplay(self):
+    def test_video_home_usa_youtube_privacidade_sem_autoplay(self):
         response = self.client.get(reverse("pagina_inicial"))
         html = response.content.decode("utf-8")
         bloco = html.split('<section class="home-video', 1)[1].split(
             "</section>", 1
         )[0]
 
-        self.assertIn("<video", bloco)
-        self.assertIn("controls", bloco)
-        self.assertIn('preload="metadata"', bloco)
-        self.assertIn("playsinline", bloco)
+        self.assertIn("<iframe", bloco)
+        self.assertIn('class="home-video-embed"', bloco)
         self.assertIn(
-            '<source src="/media/videos/teaser-plataforma-jc.mp4" type="video/mp4">',
+            'src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"',
             bloco,
         )
+        self.assertIn('loading="lazy"', bloco)
+        self.assertIn('allowfullscreen', bloco)
         self.assertNotIn("autoplay", bloco)
         self.assertNotIn("Conte&uacute;do audiovisual em prepara&ccedil;&atilde;o", bloco)
         self.assertNotIn("static/praticas", bloco)
-        self.assertIn(
-            'class="home-video-fallback" id="home-video-error" role="status" hidden',
-            bloco,
-        )
-
-        pagina = response.content.decode("utf-8")
-        self.assertIn('player.addEventListener("error"', pagina)
-        self.assertIn("errorMessage.hidden = false;", pagina)
+        self.assertNotIn("/media/videos/", bloco)
 
     def test_refinamento_visual_remove_alturas_e_linhas_artificiais(self):
         css = Path(finders.find("praticas/css/home.css")).read_text(

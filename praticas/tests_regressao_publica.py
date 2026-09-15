@@ -386,7 +386,7 @@ class RegressaoPublicaTests(TestCase):
                     html.count('class="home-foundation-actions"'), 2
                 )
                 self.assertIn('id="regionalMap"', html)
-                self.assertIn('id="home-video-error" role="status" hidden', html)
+                self.assertIn('src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"', html)
                 self.assertNotIn("autoplay", html)
 
     def test_mapa_preserva_paths_reais_selecao_unitária_e_zoom(self):
