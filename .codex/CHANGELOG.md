@@ -1,5 +1,14 @@
 # Changelog da base Codex
 
+## README de produção e continuidade técnica — 2026-09-16
+
+- atualizado o estado do projeto para refletir a operação institucional no Hetzner, o vídeo oficial incorporado, os backups e o fluxo de liberação controlada;
+- corrigido o início rápido local, incluindo migrations e esclarecendo que `.env.example` é referência e não é carregado automaticamente;
+- consolidados arquitetura, stack, módulos, variáveis, rotas, testes, CI, segurança, contribuição, deploy e referências para novos desenvolvedores;
+- registrada a exigência operacional de executar comandos Django com o ambiente administrado pelo systemd, sem expor nem carregar o `EnvironmentFile` como script Bash;
+- atualizado o teste documental que ainda exigia a classificação superada de “versão de validação”;
+- nenhuma alteração funcional, de schema, dados ou produção foi realizada.
+
 ## Ajustes visuais solicitados pela Ildenny — 2026-09-15
 
 - substituído o vídeo MP4 servido pela aplicação por incorporação responsiva do YouTube em modo de privacidade, com carregamento tardio e sem reprodução automática;

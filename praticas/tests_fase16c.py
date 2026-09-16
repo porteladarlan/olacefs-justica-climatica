@@ -6,11 +6,20 @@ from django.urls import reverse
 
 
 class RevisaoSeniorSegurancaTests(TestCase):
-    def test_readme_atualizado_sem_mvp_local(self):
+    def test_readme_reflete_producao_institucional(self):
         readme = Path(settings.BASE_DIR) / "README.md"
         self.assertTrue(readme.exists())
         conteudo = readme.read_text(encoding="utf-8")
-        self.assertIn("versão de validação", conteudo.lower())
+        self.assertIn("em operação no ambiente institucional", conteudo.lower())
+        self.assertIn(
+            "https://olacefs-justiciaclimatica.gizapps.org.br/",
+            conteudo,
+        )
+        self.assertIn("pull request", conteudo.lower())
+        self.assertNotIn(
+            "esta é uma versão de validação para desenvolvimento e teste",
+            conteudo.lower(),
+        )
         self.assertNotIn("MVP local", conteudo)
         self.assertIn("Segurança", conteudo)
 
