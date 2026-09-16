@@ -1,265 +1,353 @@
 # Plataforma Regional de Boas Práticas em Auditoria com Perspectiva de Justiça Climática
 
-## Visão geral
+[![CI](https://github.com/porteladarlan/olacefs-justica-climatica/actions/workflows/ci.yml/badge.svg)](https://github.com/porteladarlan/olacefs-justica-climatica/actions/workflows/ci.yml)
 
-A plataforma regional da OLACEFS, impulsionada por COMTEMA e CGID com apoio da GIZ no contexto AdaptaInfra, reúne experiências de auditoria e conteúdos relacionados à justiça climática. O sistema organiza consulta pública, contribuição institucional, referências normativas, ferramentas e uma futura Guia de Perguntas em português, espanhol e inglês.
+Plataforma web da OLACEFS, impulsionada por COMTEMA e CGID com apoio da GIZ no contexto do projeto AdaptaInfra. O sistema reúne experiências de auditoria, marcos normativos, ferramentas e conteúdos relacionados à justiça climática em português, espanhol e inglês.
 
-Esta é uma versão de validação para desenvolvimento e teste. Ainda não é a produção institucional definitiva. A publicação oficial depende de governança editorial, infraestrutura persistente, operação, proteção de dados e homologação institucional.
+## Estado atual
 
-## Escopo e situação atual
+A plataforma está em operação no ambiente institucional:
 
-O repositório mantém um monólito Django com templates server-side, catálogo público, fluxos autenticados e gerenciamento de submissões.
+- **Produção:** <https://olacefs-justiciaclimatica.gizapps.org.br/>
+- **Health check:** <https://olacefs-justiciaclimatica.gizapps.org.br/health/>
+- **Código de referência:** branch `main`, após pull request e CI aprovados
+- **Infraestrutura:** Nginx, Gunicorn/Django e PostgreSQL em servidor Hetzner
+- **Arquivos estáticos:** WhiteNoise com manifesto e compressão
+- **Mídia:** armazenamento persistente no servidor, com rotina própria de backup
+- **Render:** ambiente legado de validação; não é a produção institucional
 
-| Módulo | Estado real |
+O merge em `main` não representa deploy automático. A produção é atualizada por uma liberação controlada, com backup, SHA definido, verificações Django, reinício do serviço, smoke test e possibilidade de rollback.
+
+## Funcionalidades
+
+| Módulo | Estado |
 |---|---|
-| Início | Implementado |
-| Fundamentos | Implementado, com conteúdo trilíngue e abas acessíveis |
-| Mapa regional | Implementado, com dados públicos agregados, seleção por país e alternativa textual |
-| Boas Práticas | Implementado, com catálogo, filtros, ficha, anexos e relações |
-| Contribuição | Implementado, com autenticação, formulário, rascunho e publicação direta |
-| Meu Espaço | Implementado, com login, cadastro, conteúdos próprios, rascunhos e favoritos |
-| Marcos Normativos | Implementado, com catálogo, fontes e filtros disponíveis |
-| Ferramentas | Implementado, com catálogo próprio, rascunho, publicação direta, arquivamento e recuperação |
-| Guia de Perguntas | Fundação estrutural implementada; publicação pública desabilitada por padrão e conteúdo editorial pendente |
-| Recursos Técnicos | Implementado como catálogo curado |
-| Gerenciamento | Interno, protegido por staff e Django Admin, sem etapas de revisão ou aprovação |
-| i18n e acessibilidade | Implementado na interface atual; auditoria completa com tecnologia assistiva permanece pendente |
-| Vídeo e casos audiovisuais | Desabilitado/futuro |
+| Página inicial | Publicada, trilíngue, responsiva e com vídeo oficial incorporado pelo YouTube em modo de privacidade aprimorada |
+| Fundamentos e exemplos | Publicados, com abas acessíveis e casos ilustrativos de injustiça climática |
+| Mapa regional | Publicado, com dados agregados, seleção por país e alternativa textual |
+| Boas Práticas | Catálogo público, filtros, ficha, comparação, favoritos e anexos |
+| Contribuição | Cadastro, confirmação de e-mail, autenticação, rascunho e envio de experiências |
+| Meu Espaço | Conteúdos próprios, rascunhos, acompanhamento e favoritos |
+| Marcos Normativos | Catálogo público com busca e filtros localizados |
+| Ferramentas | Catálogo, criação, edição e arquivamento lógico conforme autorização |
+| Recursos Técnicos | Catálogo público curado |
+| Gerenciamento | Área interna protegida para usuários `staff` e Django Admin |
+| Guia de Perguntas | Estrutura, importação controlada e prévia interna implementadas; publicação pública desabilitada por padrão |
+| Internacionalização | Português, espanhol e inglês; espanhol é a referência inicial de parte do conteúdo institucional |
 
-A aplicação não presume que protótipo, dados demonstrativos ou materiais de teste sejam conteúdo institucional homologado.
+Dados demonstrativos, materiais de teste e conteúdo em rascunho não devem ser tratados como conteúdo institucional homologado.
 
-### Idioma original e traduções das Boas Práticas
+## Arquitetura
 
-O idioma original é determinado pela rota/requisição localizada: português grava nos campos canônicos, espanhol nos campos com sufixo `_es` e inglês nos campos com sufixo `_en`. A tradução automática, quando habilitada por endpoint, preenche somente campos vazios; nunca substitui o original nem traduções manuais não vazias. Falhas do provedor não bloqueiam a publicação, e nenhuma chamada externa ocorre sem endpoint configurado.
+O projeto é um monólito Django com renderização server-side. Não há SPA nem microsserviços.
 
-O painel restrito de gestão de boas práticas exibe visualmente apenas os
-indicadores Publicado e Arquivado. Os estados internos, registros históricos,
-rota e permissões legadas permanecem preservados; o acesso às edições de
-conteúdos publicados não é apresentado na interface. A busca geral localiza
-boas práticas por título, país, EFS, e-mail e pessoa responsável, cobrindo os
-campos textuais em PT, ES e EN. O filtro visual de status não faz mais parte da
-interface, mas o parâmetro legado continua sendo aceito internamente para
-preservar URLs existentes.
+```text
+Navegador
+    |
+    v
+Nginx / TLS
+    |
+    v
+Gunicorn -> Django -> Views / Forms / Services -> ORM -> PostgreSQL
+                 |                                  |
+                 +-> Templates / WhiteNoise         +-> Dados persistentes
+                 |
+                 +-> Mídia persistente e SMTP
+```
 
-Administradores também gerenciam ferramentas no painel interno: podem editar
-ferramentas em qualquer situação editorial sem mudar seu estado e arquivá-las
-logicamente. O arquivamento remove a ferramenta do catálogo público, preserva
-registro, autoria, traduções, lote, código, relações e conteúdo, e não executa
-hard delete. Essas ações ficam restritas a usuários staff; usuários comuns
-mantêm apenas o fluxo de edição de seus próprios rascunhos.
+Princípios de manutenção:
 
-### Contrato dos filtros de Marcos Normativos
+- preservar o monólito e fazer a menor alteração suficiente;
+- manter autorização no backend, inclusive por objeto;
+- versionar migrations e preservar compatibilidade de dados;
+- manter português, espanhol e inglês nas mudanças de interface;
+- validar acessibilidade, responsividade, uploads e redirecionamentos;
+- não confundir protótipo, requisito, dado demonstrativo e comportamento vigente.
 
-Os filtros públicos mantêm os parâmetros `setor` e `natureza`, enquanto seus
-valores usam chaves canônicas estáveis e labels localizados em PT, ES e EN.
-Setores usam as chaves estáveis do catálogo
-operacional (`agua_energia`, `infraestrutura`, `biodiversidade_ecossistemas`,
-`saude`, `alimentacao_agricultura`, `industria_extrativa`,
-`gestao_riscos_desastres`, `genero_direitos_humanos` e `pobreza_desigualdade`);
-`binding` e `non_binding` identificam a natureza jurídica. Rótulos localizados
-continuam aceitos para compatibilidade, mas cada idioma exibe e consulta apenas
-seus próprios campos traduzidos.
+## Stack
 
-## Stack e ambientes
+- Python 3.13 no CI e na linha de desenvolvimento atual;
+- Django 6.0;
+- PostgreSQL em ambiente implantado e SQLite no desenvolvimento/teste local;
+- Gunicorn, Nginx e systemd em produção;
+- WhiteNoise para arquivos estáticos;
+- templates Django, HTML5, CSS3 e JavaScript;
+- GitHub Actions para checks, testes, auditoria de dependências e análise estática;
+- `pip-audit`, Bandit e Dependabot no fluxo de segurança.
 
-- Python 3.12/3.13;
-- Django 6.x;
-- templates server-side do Django;
-- PostgreSQL em staging/production institucional;
-- SQLite para desenvolvimento e testes locais;
-- Gunicorn e WhiteNoise;
-- Bootstrap carregado por CDN na configuração atual;
-- Render mantido como ambiente legado/teste;
-- Hetzner AX42-1 como infraestrutura institucional futura, ainda pendente de configuração, operação e homologação.
+As faixas efetivas de versões estão em [`requirements.txt`](requirements.txt). Evite documentar ou instalar dependências fora desse arquivo sem registrar a mudança.
 
-## Estrutura canônica
+## Estrutura do repositório
 
-~~~text
+```text
 olacefs-justica-climatica/
-├── config/                  # settings e URLs do projeto
-├── praticas/                # app, models, forms, views, admin, serviços e testes
-│   ├── management/commands/
-│   ├── migrations/
-│   └── static/
-├── templates/praticas/      # templates HTML funcionais
-├── static/                  # CSS, JavaScript e assets versionados
-├── docs/                    # documentação humana
-├── ops/                     # operação e backups canônicos
-├── .codex/                  # contexto e memória dos agentes
-├── .github/workflows/       # CI
-├── build.sh
-├── render.yaml
-├── Procfile
-├── requirements.txt
-├── runtime.txt
-└── manage.py
-~~~
+├── config/                     # settings, URLs, WSGI, ASGI e health check
+├── praticas/                   # domínio, models, forms, views, serviços e testes
+│   ├── management/commands/    # importadores, auditorias e gates operacionais
+│   ├── migrations/             # evolução versionada do banco
+│   └── static/praticas/        # CSS, JavaScript, imagens, fontes e ícones
+├── templates/praticas/         # templates funcionais e trilíngues
+├── locale/                     # catálogos de tradução do Django
+├── docs/                       # documentação humana, testes e histórico
+├── ops/                        # backup, restore, monitoramento e units systemd
+├── .codex/                     # contexto técnico, decisões e playbooks do projeto
+├── .github/workflows/          # CI do GitHub Actions
+├── build.sh                    # build do ambiente legado Render
+├── render.yaml                 # configuração do ambiente legado Render
+├── requirements.txt            # dependências Python
+└── manage.py                   # entrada administrativa do Django
+```
 
-## Instalação local
+## Início rápido local
 
-Use uma cópia do arquivo [.env.example](.env.example). Ele documenta somente variáveis reconhecidas por config/settings.py; não coloque valores reais nele.
+### Pré-requisitos
+
+- Git;
+- Python 3.13 recomendado;
+- acesso ao PostgreSQL somente quando a tarefa exigir reprodução de ambiente implantado.
+
+O desenvolvimento comum usa SQLite local. Nunca reutilize banco, mídia, credenciais ou dados reais de produção.
 
 ### Windows PowerShell
 
-~~~powershell
-git clone <url-do-repositorio>
+```powershell
+git clone https://github.com/porteladarlan/olacefs-justica-climatica.git
 Set-Location olacefs-justica-climatica
 
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-Copy-Item .env.example .env
 
+$env:DJANGO_ENV = "development"
+$env:DEBUG = "True"
+
+python manage.py migrate
 python manage.py check
 python manage.py runserver
-~~~
+```
 
-Se o PowerShell bloquear a ativação, use diretamente o executável:
+Se a política do PowerShell impedir a ativação, use o executável diretamente:
 
-~~~powershell
+```powershell
+$env:DJANGO_ENV = "development"
+$env:DEBUG = "True"
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe manage.py check
-~~~
+.\.venv\Scripts\python.exe manage.py migrate
+.\.venv\Scripts\python.exe manage.py runserver
+```
 
-### Linux/Bash
+### Linux ou macOS
 
-~~~bash
-git clone <url-do-repositorio>
+```bash
+git clone https://github.com/porteladarlan/olacefs-justica-climatica.git
 cd olacefs-justica-climatica
 
 python3.13 -m venv .venv
 source .venv/bin/activate
 
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-cp .env.example .env
 
+export DJANGO_ENV=development
+export DEBUG=True
+
+python manage.py migrate
 python manage.py check
 python manage.py runserver
-~~~
+```
 
-Para um ambiente institucional, configure as variáveis no provedor ou no serviço de execução, sem versionar segredos. Staging e production exigem PostgreSQL.
+A aplicação ficará disponível em <http://127.0.0.1:8000/>.
 
-## Validação
+### Sobre o `.env.example`
 
-Execute na ordem:
+O arquivo [`.env.example`](.env.example) documenta as variáveis centrais de configuração, mas **não é carregado automaticamente** pelo Django. Defina as variáveis no terminal, IDE, gerenciador de processos ou serviço de execução. Não adicione segredos ao Git e não copie valores de produção para o ambiente local.
 
-~~~text
+Em `staging` e `production`, a inicialização falha de forma segura quando faltam configurações obrigatórias ou quando são detectados `DEBUG=True`, SQLite, chave fraca, host curinga, origem CSRF sem HTTPS ou cookies inseguros.
+
+## Variáveis de ambiente
+
+| Grupo | Variáveis principais |
+|---|---|
+| Ambiente | `DJANGO_ENV`, `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` |
+| Banco | `DATABASE_URL` |
+| Sessão | `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_AGE`, `SESSION_EXPIRE_AT_BROWSER_CLOSE`, `SESSION_SAVE_EVERY_REQUEST` |
+| HTTPS | `SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, `SECURE_HSTS_PRELOAD`, `TRUST_X_FORWARDED_PROTO` |
+| E-mail | `EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `DEFAULT_FROM_EMAIL` |
+| Arquivos | `STATIC_ROOT`, `MEDIA_ROOT`, `MAX_UPLOAD_SIZE_MB`, `DATA_UPLOAD_MAX_MEMORY_SIZE`, `FILE_UPLOAD_MAX_MEMORY_SIZE` |
+| Tradução opcional | `PJC_TRANSLATION_ENDPOINT`, `PJC_TRANSLATION_TOKEN`, `PJC_TRANSLATION_TIMEOUT` |
+| Recursos | `GUIA_PUBLICO_HABILITADO` |
+
+Consulte [`.env.example`](.env.example) e [variáveis recomendadas](docs/ambiente/variaveis_ambiente_recomendadas.md) antes de criar ou alterar uma configuração.
+
+## Banco, migrations e dados locais
+
+Para criar ou atualizar somente o banco local de desenvolvimento:
+
+```text
+python manage.py makemigrations --check --dry-run
+python manage.py migrate
+```
+
+Regras obrigatórias:
+
+- toda alteração de model deve ter migration versionada e teste correspondente;
+- não execute migrations diretamente em produção sem release aprovado, backup e rollback;
+- não carregue dados fictícios, importadores ou comandos de publicação em ambiente institucional sem autorização explícita;
+- `carregar_dados_ficticios` é destinado a desenvolvimento e demonstração controlada;
+- exclusões funcionais devem respeitar arquivamento lógico e regras de proteção existentes.
+
+## Testes e qualidade
+
+Antes de abrir um pull request, execute:
+
+```text
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py collectstatic --noinput
 python manage.py test
 git diff --check
-~~~
+```
 
-Não execute migrate, cargas ou importadores contra o banco local real sem plano, backup e autorização. Os testes criam banco temporário.
+Para mudanças focadas, execute primeiro o módulo de teste relacionado e finalize com a suíte completa. Os testes usam banco temporário; não aponte `DATABASE_URL` para um banco real durante a execução local.
 
-## Rotas atuais
+O CI possui dois gates:
 
-As rotas abaixo podem receber o prefixo /en/ ou /es/:
+1. **Django checks and tests:** instalação, system check, migrations, arquivos estáticos e suíte completa;
+2. **Dependency and static security analysis:** `pip-audit`, compilação Python e Bandit para achados de alta severidade e alta confiança.
 
-| Rota | Situação |
+## Fluxo de contribuição
+
+1. Atualize sua referência de `main`.
+2. Crie uma branch curta e específica, como `feature/...`, `fix/...`, `security/...` ou `docs/...`.
+3. Implemente a menor mudança coerente e adicione ou ajuste testes.
+4. Atualize documentação, riscos e [`.codex/CHANGELOG.md`](.codex/CHANGELOG.md) quando aplicável.
+5. Execute a validação local.
+6. Abra pull request para `main`.
+7. Aguarde os dois jobs do CI e a revisão antes do merge.
+8. Faça deploy somente do SHA aprovado e com procedimento de rollback.
+
+Não faça commits ou alterações manuais diretamente no código em produção.
+
+## Produção e deploy
+
+A topologia operacional é:
+
+```text
+Internet -> DNS/TLS -> Nginx -> Gunicorn/Django -> PostgreSQL
+                                      |
+                                      +-> staticfiles e mídia persistente
+```
+
+Referências operacionais atuais:
+
+- aplicação: `/srv/justica-climatica/app`;
+- virtualenv: `/srv/justica-climatica/venv`;
+- serviço: `justica-climatica.service`;
+- usuário de execução: `deploy`;
+- health check público: `/health/`;
+- rotinas de backup e monitoramento: [`ops/`](ops/).
+
+O arquivo de ambiente ativo é administrado pelo systemd. Não o imprima, não o copie e não presuma que possa ser carregado com `source`: a sintaxe de `EnvironmentFile` pode não ser válida como script Bash. Para comandos Django no servidor, use o contexto do serviço ou `systemd-run` com o mesmo `EnvironmentFile`, sem expor valores.
+
+Sequência mínima de uma liberação:
+
+1. confirmar PR, CI e SHA aprovado;
+2. verificar worktree limpo, serviço e health check;
+3. gerar e validar backups de PostgreSQL e mídia;
+4. atualizar o checkout para o SHA exato;
+5. verificar dependências e migrations;
+6. executar `check`, migrations autorizadas e `collectstatic` no ambiente correto;
+7. reiniciar o serviço;
+8. validar health check, páginas críticas, logs e SHA final;
+9. executar rollback do código e restaurar dados somente quando o plano indicar.
+
+Não inclua IPs, chaves SSH, senhas, tokens, conteúdo de arquivos de ambiente ou dados pessoais na documentação e nos logs. Consulte o [guia de deploy](.codex/infrastructure/DEPLOYMENT.md), o [checklist de produção](docs/ambiente/checklist_ambiente_producao.md) e a documentação de [backup e restore](docs/operacao_backup_restore.md).
+
+## Rotas principais
+
+As rotas funcionais recebem `/es/` ou `/en/` quando localizadas; o português usa a rota sem prefixo.
+
+| Rota | Acesso e finalidade |
 |---|---|
-| / | Início |
-| /catalogo/ | Catálogo público de Boas Práticas |
-| /experiencias/<id>/ | Ficha pública |
-| /comparar/ | Comparação de experiências |
-| /favoritos/ | Favoritos |
-| /banco-tecnico/ | Recursos Técnicos |
-| /normas-internacionais/ | Marcos Normativos |
-| /ferramentas/ | Ferramentas |
-| /sobre/ | Sobre a plataforma |
-| /guia/ | Guia pública quando GUIA_PUBLICO_HABILITADO=True |
-| /guia/preview/ | Prévia interna da Guia |
-| /cadastro/ | Cadastro |
-| /entrar/ | Login |
-| /adicionar-boa-pratica/ | Contribuição autenticada |
-| /editar-boa-pratica/<id>/ | Edição autorizada |
-| /meus-envios/ | Meu Espaço |
-| /status-envio/ | Compatibilidade: redireciona para Meus envios ou Gerenciamento de submissões |
-| /painel-revisao/ | Gerenciamento de submissões para staff |
-| /painel-revisao-edicoes/ | Redirecionamento compatível para o gerenciamento de submissões |
-| /admin/ | Django Admin |
-| /health/ | Health check |
-| /i18n/ | Seleção de idioma |
+| `/` | Página inicial pública |
+| `/exemplos-injustica-climatica/` | Exemplos públicos de injustiça climática |
+| `/catalogo/` | Catálogo público de Boas Práticas |
+| `/experiencias/<id>/` | Ficha pública de experiência publicada |
+| `/comparar/` | Comparação de experiências |
+| `/normas-internacionais/` | Marcos Normativos |
+| `/ferramentas/` | Ferramentas |
+| `/banco-tecnico/` | Recursos Técnicos |
+| `/sobre/` | Informações institucionais |
+| `/cadastro/` | Cadastro e confirmação de conta |
+| `/entrar/` | Autenticação |
+| `/senha/esqueci/` | Recuperação de senha |
+| `/meus-envios/` | Conteúdo do usuário autenticado |
+| `/adicionar-boa-pratica/` | Nova contribuição autenticada |
+| `/painel-revisao/` | Gerenciamento interno para `staff` |
+| `/guia/` | Guia público quando `GUIA_PUBLICO_HABILITADO=True` |
+| `/guia/preview/` | Prévia interna do Guia |
+| `/admin/` | Django Admin |
+| `/health/` | Estado da aplicação e do banco |
 
-## Segurança implementada
+## Segurança
 
-A base atual inclui:
+As referências BSI e o BSI TR-03185 orientam o SSDLC do projeto, mas não representam certificação. Entre os controles implementados estão:
 
-- autorização no backend para áreas autenticadas e staff;
-- controle de acesso por objeto para experiências;
-- proteção CSRF e cookies HTTP-only;
-- DEBUG=False como padrão;
-- ALLOWED_HOSTS e CSRF_TRUSTED_ORIGINS configuráveis;
-- validação de uploads por extensão, MIME informado, assinatura e tamanho;
-- limite de anexos por experiência;
-- redirecionamento seguro;
-- catálogo público restrito a conteúdo publicado;
-- separação entre dados públicos e campos internos;
-- migrations versionadas e testes de regressão.
-- encerramento de sessão exclusivamente por POST com CSRF;
-- expiração de sessão em oito horas, renovada por atividade e encerrada ao fechar o navegador;
-- validade padrão de 24 horas para tokens de redefinição de senha;
-- CSP defensiva aplicada para objetos, base, formulários e enquadramento;
-- CSP restritiva em modo de relatório para orientar a remoção de scripts e estilos inline;
-- auditoria de dependências e análise estática no CI;
-- GitHub Actions fixadas por SHA e atualização semanal via Dependabot.
+- segredos fora do repositório e configuração fail-closed em ambientes implantados;
+- autorização no backend e controle de acesso por objeto;
+- CSRF, cookies `HttpOnly`, `Secure` e `SameSite=Lax` conforme ambiente;
+- sessão com duração configurável e expiração ao fechar o navegador;
+- headers defensivos e Content Security Policy;
+- validação de upload por extensão, MIME declarado, assinatura e tamanho;
+- redirecionamentos locais seguros;
+- separação entre conteúdo público, rascunhos e dados internos;
+- logout por `POST` com CSRF;
+- análise de dependências, SAST e testes de regressão no CI;
+- backups com checksum e scripts de restore controlado;
+- monitoramento e health check com verificação do banco.
 
-## Pendências de segurança e operação
+Pontos que continuam exigindo evolução institucional ou operacional:
 
-Antes da produção institucional ainda são necessários:
+- rate limiting distribuído;
+- antivírus e quarentena de anexos;
+- centralização de logs e observabilidade ampliada;
+- redução gradual das exceções identificadas pela CSP em modo de relatório;
+- política formal de privacidade, retenção e atendimento aos titulares;
+- governança editorial, licenças e autorização de ativos;
+- homologação ampliada com tecnologias assistivas.
 
-- rate limiting distribuído no proxy ou em armazenamento compartilhado;
-- autorização institucional usuário–EFS;
-- aviso de privacidade, base legal, retenção e canal de direitos;
-- antivírus, quarentena e análise avançada de uploads;
-- remoção gradual das exceções identificadas pela CSP em modo de relatório;
-- storage persistente para mídia;
-- PostgreSQL institucional provisionado;
-- backups e restauração testados;
-- logs centralizados e monitoramento;
-- hardening operacional do Hetzner;
-- domínio oficial, TLS e HSTS validados;
-- homologação com tecnologia assistiva e zoom;
-- governança editorial, licença e autorização de assets.
+Consulte [Segurança e SSDLC](.codex/docs/SECURITY_SSDLC.md), [Proteção de dados](.codex/docs/DATA_PROTECTION.md) e o [relatório de controles para TI](docs/seguranca/relatorio_controles_ti_2026-09-14.md).
 
-## Render e Hetzner
+## Regras funcionais importantes
 
-O Render permanece documentado para validação e teste externo legado. Seus arquivos de build podem executar instalação, coleta de estáticos e migration conforme a configuração do ambiente, mas isso não representa produção institucional.
-
-A futura operação no Hetzner requer configuração deliberada de PostgreSQL, storage, backups, TLS, observabilidade, usuários de serviço, firewall e procedimento de rollback. Nenhuma dessas etapas é executada por este repositório automaticamente.
-
-## Dados demonstrativos
-
-carregar_dados_ficticios produz dados locais para validação e apresentação. Esses registros não são conteúdo oficial da OLACEFS ou das EFS e não devem ser carregados em ambiente institucional sem autorização explícita.
-
-Favoritos de boas práticas continuam sendo alternados por POST com CSRF. A ação administrativa de exclusão foi substituída por arquivamento lógico: o registro, anexos, relacionamentos e histórico são preservados, com autorização para o autor da prática ou para staff. A rota antiga permanece somente por compatibilidade.
-
-## Contrato atual da Home
-
-- O painel do mapa usa “Entidades Fiscalizadoras”.
-- A quantidade e o botão usam “Experiências registradas no país”.
-- O vídeo apresenta a história da Plataforma de Justiça Climática, sem subtítulo redundante.
-- Português, espanhol e inglês permanecem suportados.
-
-## Contrato atual do envio de ferramentas
-
-- A interface utiliza “Responsável” nos três idiomas.
-- O campo técnico permanece `pais_ou_instancia`.
-- O mesmo valor continua alimentando `Ferramenta.pais_ou_instancia` e `Ferramenta.responsavel`.
-- Nenhuma alteração de schema foi necessária.
+- somente conteúdo publicado aparece nos catálogos públicos;
+- autoria ou perfil `staff` controla edição e arquivamento conforme o fluxo;
+- o arquivamento é lógico e preserva registro, anexos, relações e histórico;
+- favoritos e logout usam `POST` com CSRF;
+- traduções automáticas, quando configuradas, preenchem apenas campos vazios;
+- português usa campos canônicos, enquanto espanhol e inglês usam campos localizados do domínio;
+- falha do provedor de tradução não deve impedir a publicação;
+- vínculos institucionais registrados não concedem autorização automaticamente;
+- o Guia público permanece condicionado à configuração e a uma versão publicada válida.
 
 ## Documentação
 
+Comece por:
+
 - [Índice da documentação](docs/README.md);
-- [Índice operacional dos agentes](.codex/00_PROJECT_INDEX.md);
 - [Contexto do projeto](.codex/docs/PROJECT_CONTEXT.md);
+- [Módulos](.codex/docs/MODULES.md);
 - [Arquitetura](.codex/docs/ARCHITECTURE.md);
-- [Segurança SSDLC](.codex/docs/SECURITY_SSDLC.md);
-- [Proteção de dados](.codex/docs/DATA_PROTECTION.md);
-- [Estratégia de testes](.codex/docs/TEST_STRATEGY.md).
+- [Modelo de dados](.codex/docs/DATA_MODEL.md);
+- [Regras de negócio](.codex/docs/BUSINESS_RULES.md);
+- [Estratégia de testes](.codex/docs/TEST_STRATEGY.md);
+- [Segurança e SSDLC](.codex/docs/SECURITY_SSDLC.md);
+- [Checklist de homologação](docs/checklist_homologacao_mvp.md).
+
+Documentos de fases anteriores preservam rastreabilidade, mas não devem ser tratados isoladamente como contrato atual. Em caso de divergência, priorize requisito aprovado, comportamento coberto por teste, código em `main` e documentação marcada como vigente.
 
 ## Governança e licença
 
-Governança editorial, licença, termos de uso e política de privacidade permanecem pendentes de definição e aprovação institucional.
+A governança editorial, a licença pública do código e as políticas institucionais de privacidade e uso ainda dependem de definição formal. Até essa decisão, não presuma autorização para redistribuição, reutilização de conteúdo institucional ou publicação de dados e ativos fora do escopo aprovado.
