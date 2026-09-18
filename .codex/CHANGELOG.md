@@ -1,5 +1,14 @@
 # Changelog da base Codex
 
+## Fidelidade da página de exemplos climáticos — 2026-09-18
+
+- substituído o conteúdo editorial divergente pelos textos trilíngues fornecidos no protótipo atualizado da designer;
+- corrigidas a ordem dos três casos e a associação das imagens oficiais a povos indígenas, seca e inundações;
+- implementados os três cards clicáveis para navegação interna até cada caso, com uso por teclado, foco programático e respeito à preferência de redução de movimento;
+- ajustados largura, tipografia, cores, bordas, ícones e responsividade para reproduzir a referência visual recebida;
+- atualizados os testes de conteúdo, idiomas, hierarquia semântica, assets e navegação interna;
+- nenhuma migration nem alteração de dados é necessária para esta entrega.
+
 ## README de produção e continuidade técnica — 2026-09-16
 
 - atualizado o estado do projeto para refletir a operação institucional no Hetzner, o vídeo oficial incorporado, os backups e o fluxo de liberação controlada;

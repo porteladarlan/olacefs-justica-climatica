@@ -587,19 +587,39 @@ class HomePrimeiraEvolucaoTests(TestCase):
             r"grid-template-columns:\s*1fr",
         )
 
-    def test_pagina_de_exemplos_e_publica_trilingue_e_usa_acervo_oficial(self):
+    def test_pagina_de_exemplos_reproduz_conteudo_trilingue_da_designer(self):
         casos = (
-            ("/exemplos-injustica-climatica/", "Exemplos de injustiça climática"),
-            ("/es/exemplos-injustica-climatica/", "Ejemplos de injusticia climática"),
-            ("/en/exemplos-injustica-climatica/", "Examples of climate injustice"),
+            (
+                "/exemplos-injustica-climatica/",
+                "Justiça climática e infraestrutura sustentável",
+                "Efeitos sobre povos indígenas",
+                "Seca e desigualdade climática",
+                "Enchentes, inundações e desigualdade territorial",
+            ),
+            (
+                "/es/exemplos-injustica-climatica/",
+                "Justicia climática e infraestructura sostenible",
+                "Efectos sobre pueblos indígenas",
+                "Sequía y desigualdad climática",
+                "Crecidas, inundaciones y desigualdad territorial",
+            ),
+            (
+                "/en/exemplos-injustica-climatica/",
+                "Climate justice and sustainable infrastructure",
+                "Effects on indigenous peoples",
+                "Drought and climate inequality",
+                "Floods and territorial inequality",
+            ),
         )
 
-        for caminho, titulo in casos:
+        for caminho, titulo, caso_1, caso_2, caso_3 in casos:
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
-                self.assertContains(response, titulo)
-                self.assertContains(response, "OLACEFS + GIZ")
+                self.assertContains(response, titulo, count=2)
+                self.assertContains(response, caso_1, count=2)
+                self.assertContains(response, caso_2, count=2)
+                self.assertContains(response, caso_3, count=2)
                 self.assertContains(
                     response,
                     'src="/static/praticas/img/indigenous-man-traditional-headdress-face-mask-forest.jpg"',
@@ -613,20 +633,44 @@ class HomePrimeiraEvolucaoTests(TestCase):
                     'src="/static/praticas/img/guiding-disaster-relief-strategy-ar-generative-ai.jpg"',
                 )
                 self.assertContains(response, 'width="941" height="634"', count=3)
+                self.assertNotContains(response, "Official collection · OLACEFS + GIZ")
+                self.assertNotContains(response, "Acervo oficial · OLACEFS + GIZ")
 
-    def test_pagina_de_exemplos_tem_breadcrumb_e_hierarquia_semantica(self):
+    def test_pagina_de_exemplos_tem_cards_clicaveis_e_hierarquia_semantica(self):
         response = self.client.get(reverse("exemplos_injustica_climatica"))
         html = response.content.decode("utf-8")
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'aria-label="Navegação estrutural"')
-        self.assertContains(response, f'href="{reverse("pagina_inicial")}"')
         self.assertContains(
             response,
             f'href="{reverse("pagina_inicial")}#pillarsSection"',
         )
+        for destino in (
+            "climate-example-indigenous",
+            "climate-example-drought",
+            "climate-example-floods",
+        ):
+            self.assertContains(response, f'href="#{destino}"', count=1)
+            self.assertContains(response, f'id="{destino}"', count=1)
+            self.assertIn(
+                f'id="{destino}" aria-labelledby="{destino}-title" tabindex="-1"',
+                html,
+            )
+        self.assertContains(response, 'class="climate-examples-nav-icon"', count=3)
+        self.assertContains(
+            response,
+            f'src="{static("praticas/js/climate-examples.js")}"',
+        )
         self.assertEqual(len(re.findall(r"<h1\b", html)), 1)
-        self.assertGreaterEqual(len(re.findall(r"<h2\b", html)), 4)
+        self.assertEqual(len(re.findall(r"<h2\b", html)), 3)
+
+        script = Path(
+            finders.find("praticas/js/climate-examples.js")
+        ).read_text(encoding="utf-8")
+        self.assertIn('target.scrollIntoView({', script)
+        self.assertIn('prefers-reduced-motion: reduce', script)
+        self.assertIn('target.focus({ preventScroll: true })', script)
 
     def test_mapa_funcional_e_video_oficial_trilingue(self):
         casos = [
