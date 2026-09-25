@@ -13,7 +13,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Max, Prefetch, Q
+from django.db.models import Count, IntegerField, Max, OuterRef, Prefetch, Q, Subquery
+from django.db.models.functions import Coalesce
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -286,6 +287,13 @@ def experiencias_publicas():
     )
 
 
+def _filtro_experiencias_por_paises(paises_ids, *, multiplo=True):
+    sufixo = "__in" if multiplo else ""
+    return Q(**{f"pais_id{sufixo}": paises_ids}) | Q(
+        **{f"paises_participantes__id{sufixo}": paises_ids}
+    )
+
+
 def _url_com_paises(nome_rota, paises_ids):
     base = reverse(nome_rota)
     consulta = urlencode([("pais", pais_id) for pais_id in paises_ids])
@@ -293,6 +301,19 @@ def _url_com_paises(nome_rota, paises_ids):
 
 
 def _payload_mapa_regional():
+    experiencias_publicadas_por_pais = (
+        experiencias_publicas()
+        .filter(
+            _filtro_experiencias_por_paises(
+                OuterRef("pk"),
+                multiplo=False,
+            )
+        )
+        .order_by()
+        .values("status_publicacao")
+        .annotate(total=Count("pk", distinct=True))
+        .values("total")
+    )
     efs_mapa = EFS.objects.only(
         "id",
         "nome",
@@ -307,12 +328,12 @@ def _payload_mapa_regional():
             efs__isnull=False,
         )
         .annotate(
-            experiencias_publicadas=Count(
-                "experiencias",
-                filter=Q(
-                    experiencias__status_publicacao=Experiencia.StatusPublicacao.PUBLICADO
+            experiencias_publicadas=Coalesce(
+                Subquery(
+                    experiencias_publicadas_por_pais,
+                    output_field=IntegerField(),
                 ),
-                distinct=True,
+                0,
             ),
             criterios_normativos=Count(
                 "normas_internacionais_status__norma",
@@ -1081,8 +1102,7 @@ def catalogo_experiencias(request):
     if selecoes["pais"]:
         paises_ids = [objeto.pk for objeto in selecoes["pais"]]
         experiencias = experiencias.filter(
-            Q(pais_id__in=paises_ids)
-            | Q(paises_participantes__id__in=paises_ids)
+            _filtro_experiencias_por_paises(paises_ids)
         )
     for chave, campo in campos_filtro.items():
         if selecoes[chave]:

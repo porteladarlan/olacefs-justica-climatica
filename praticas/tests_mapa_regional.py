@@ -308,6 +308,30 @@ class MapaRegionalTests(TestCase):
         )
         self.assertEqual(response.context["total_resultados"], 0)
 
+    def test_contador_do_mapa_coincide_com_catalogo_para_paises_participantes(self):
+        self.publicada_brasil.paises_participantes.add(
+            self.argentina,
+            self.chile,
+        )
+
+        payload = _payload_mapa_regional()
+        por_id = {pais["id"]: pais for pais in payload["paises"]}
+        for pais, total_esperado in (
+            (self.argentina, 2),
+            (self.chile, 1),
+        ):
+            with self.subTest(pais=pais.sigla):
+                response = self.client.get(
+                    reverse("catalogo_experiencias"), {"pais": pais.pk}
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.context["total_resultados"], total_esperado)
+                self.assertEqual(
+                    por_id[pais.pk]["experiencias_publicadas"],
+                    response.context["total_resultados"],
+                )
+
     def test_pais_inexistente_na_url_nao_causa_erro(self):
         for route in ("catalogo_experiencias", "normas_internacionais"):
             with self.subTest(route=route):
