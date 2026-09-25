@@ -6,7 +6,7 @@
         <iframe
             id="home-video-player"
             class="home-video-embed"
-            src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"
+            src="{% if LANGUAGE_CODE == 'en' %}https://www.youtube-nocookie.com/embed/XW-hVHuejEo{% elif LANGUAGE_CODE == 'es' %}https://www.youtube-nocookie.com/embed/csWyarN8NB0{% else %}https://www.youtube-nocookie.com/embed/6q7n6bZdr10{% endif %}"
             title="{% if LANGUAGE_CODE == 'en' %}Climate Justice Platform official video{% elif LANGUAGE_CODE == 'es' %}Video oficial de la Plataforma de Justicia Clim&aacute;tica{% else %}V&iacute;deo oficial da Plataforma de Justi&ccedil;a Clim&aacute;tica{% endif %}"
             loading="lazy"
             referrerpolicy="strict-origin-when-cross-origin"

@@ -674,12 +674,12 @@ class HomePrimeiraEvolucaoTests(TestCase):
 
     def test_mapa_funcional_e_video_oficial_trilingue(self):
         casos = [
-            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Conhe&ccedil;a a hist&oacute;ria por tr&aacute;s da Plataforma de Justi&ccedil;a Clim&aacute;tica"),
-            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Conoce la historia detr&aacute;s de la Plataforma de Justicia Clim&aacute;tica"),
-            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Discover the story behind the Climate Justice Platform"),
+            ("/", "EFS da Am&eacute;rica Latina e Caribe", "Mapa interativo", "Conhe&ccedil;a a hist&oacute;ria por tr&aacute;s da Plataforma de Justi&ccedil;a Clim&aacute;tica", "6q7n6bZdr10"),
+            ("/es/", "EFS de Am&eacute;rica Latina y el Caribe", "Mapa interactivo", "Conoce la historia detr&aacute;s de la Plataforma de Justicia Clim&aacute;tica", "csWyarN8NB0"),
+            ("/en/", "SAIs of Latin America and the Caribbean", "Interactive map", "Discover the story behind the Climate Justice Platform", "XW-hVHuejEo"),
         ]
 
-        for caminho, mapa, estado_funcional, video in casos:
+        for caminho, mapa, estado_funcional, video, video_id in casos:
             with self.subTest(caminho=caminho):
                 response = self.client.get(caminho)
                 self.assertEqual(response.status_code, 200)
@@ -696,9 +696,18 @@ class HomePrimeiraEvolucaoTests(TestCase):
                 self.assertNotIn("official introduction", bloco)
                 self.assertNotIn("<p>", bloco)
                 self.assertIn(
-                    'src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"',
+                    f'src="https://www.youtube-nocookie.com/embed/{video_id}"',
                     bloco,
                 )
+                for outro_video_id in {
+                    "6q7n6bZdr10",
+                    "csWyarN8NB0",
+                    "XW-hVHuejEo",
+                } - {video_id}:
+                    self.assertNotIn(
+                        f"youtube-nocookie.com/embed/{outro_video_id}",
+                        bloco,
+                    )
                 self.assertIn('loading="lazy"', bloco)
                 self.assertIn('referrerpolicy="strict-origin-when-cross-origin"', bloco)
                 self.assertNotIn("autoplay", bloco)
@@ -717,7 +726,7 @@ class HomePrimeiraEvolucaoTests(TestCase):
         self.assertIn("<iframe", bloco)
         self.assertIn('class="home-video-embed"', bloco)
         self.assertIn(
-            'src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"',
+            'src="https://www.youtube-nocookie.com/embed/6q7n6bZdr10"',
             bloco,
         )
         self.assertIn('loading="lazy"', bloco)

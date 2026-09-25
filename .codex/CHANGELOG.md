@@ -1,5 +1,12 @@
 # Changelog da base Codex
 
+## Vídeos institucionais por idioma — 2026-09-25
+
+- a página inicial passa a exibir o vídeo institucional em português nas rotas PT-BR, o vídeo original em espanhol nas rotas ES e o vídeo em inglês nas rotas EN;
+- preservados o domínio de privacidade `youtube-nocookie.com`, o carregamento tardio e a ausência de reprodução automática;
+- adicionada cobertura trilíngue para garantir o vídeo correto em cada idioma e impedir o uso cruzado dos demais vídeos;
+- nenhuma migration ou alteração de dados é necessária.
+
 ## Correção da contagem regional — 2026-09-24
 
 - alinhado o total de experiências exibido no mapa ao mesmo critério aplicado pelo catálogo de boas práticas;
