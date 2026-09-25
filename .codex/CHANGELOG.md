@@ -1,5 +1,12 @@
 # Changelog da base Codex
 
+## Correção da contagem regional — 2026-09-24
+
+- alinhado o total de experiências exibido no mapa ao mesmo critério aplicado pelo catálogo de boas práticas;
+- países participantes de auditorias coordenadas passam a considerar essas experiências na contagem, com deduplicação de registros;
+- adicionado teste de regressão que compara diretamente o contador do mapa com o total retornado pelo filtro do país;
+- nenhuma migration nem alteração de dados é necessária para esta correção.
+
 ## Fidelidade da página de exemplos climáticos — 2026-09-18
 
 - substituído o conteúdo editorial divergente pelos textos trilíngues fornecidos no protótipo atualizado da designer;
