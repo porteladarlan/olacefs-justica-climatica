@@ -360,6 +360,11 @@ class RegressaoPublicaTests(TestCase):
             "https://olacefs.com/giz/wp-content/uploads/sites/14/2025/11/"
             "Position_Paper_Miolo_ESP.pdf"
         )
+        videos = {
+            "": "6q7n6bZdr10",
+            "/es": "csWyarN8NB0",
+            "/en": "XW-hVHuejEo",
+        }
         for prefixo, titulos in conceitos.items():
             with self.subTest(prefixo=prefixo or "pt-br"):
                 response, inventario = self._inventario(self._caminho(prefixo, "/"))
@@ -386,7 +391,10 @@ class RegressaoPublicaTests(TestCase):
                     html.count('class="home-foundation-actions"'), 2
                 )
                 self.assertIn('id="regionalMap"', html)
-                self.assertIn('src="https://www.youtube-nocookie.com/embed/csWyarN8NB0"', html)
+                self.assertIn(
+                    f'src="https://www.youtube-nocookie.com/embed/{videos[prefixo]}"',
+                    html,
+                )
                 self.assertNotIn("autoplay", html)
 
     def test_mapa_preserva_paths_reais_selecao_unitária_e_zoom(self):
