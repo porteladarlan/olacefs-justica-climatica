@@ -85,5 +85,3 @@ Os documentos históricos permanecem no lugar nesta fase. A consolidação físi
 - documentos de correções pontuais já absorvidas pelo código atual — **CANDIDATO A ARQUIVAMENTO**;
 - documentos do Render que descrevem o ambiente legado/teste — **REFERÊNCIA**;
 - documentos de release e segurança ainda usados na validação — **VIGENTE** ou **REFERÊNCIA**, conforme indicado acima.
-
-As referências internas de segurança e proteção de dados permanecem em [.codex/docs/SECURITY_SSDLC.md](../.codex/docs/SECURITY_SSDLC.md) e [.codex/docs/DATA_PROTECTION.md](../.codex/docs/DATA_PROTECTION.md).
