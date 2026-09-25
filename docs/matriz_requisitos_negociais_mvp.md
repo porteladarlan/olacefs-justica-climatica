@@ -43,7 +43,7 @@ Esta matriz consolida a aderência do MVP ao questionário funcional respondido 
 | Títulos autoexplicativos para anexos | Orientação textual no formulário | Implementado |
 | Portal de conhecimento vivo | Estrutura visual, catálogo, normas, banco técnico, comparação e submissão contínua | Implementado |
 | Navegação enxuta e intuitiva | Header com `Meus envios` para o autor e `Gerenciamento de submissões` para staff; a rota antiga de status é mantida somente como redirecionamento compatível | Implementado |
-| PT/ES/EN | Estrutura trilíngue nas principais telas e dados demonstrativos | Implementado no MVP |
+| PT/ES/EN | Estrutura trilíngue nas principais telas e dados demonstrativos; vídeo institucional próprio por idioma (PT-BR, ES e EN) | Implementado no MVP |
 | Acessibilidade básica | Skip link, foco visual, aria-labels, aria-live e redução de movimento | Implementado |
 | Dados demonstrativos executivos | 6 EFS/países, experiências institucionais, normas, temas e banco técnico | Implementado |
 | Homologação | Checklist, roteiro de testes e documentação de demonstração | Implementado |
